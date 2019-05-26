@@ -16,11 +16,7 @@ pip install requests
 
 ### Installing
 
-Install using pip
-
-```
-pip install unofficalTikTokApi
-```
+Clone and just include tiktok.py in your python file
 
 ## Quick Start Guide
 
