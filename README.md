@@ -2,6 +2,17 @@
 
 This is an unoffical api wrapper for tiktok.com in python. With this api you are able to call most trending and fetch specific user information.
 
+## Important Information
+* If this API stops working you can open an issue on github, or the most common issue is that the signature has expired. I've added a way that you can fix that pretty easily. 
+* Go to [This TikTokPage](https://www.tiktok.com/en/trending) using the debug menu look under network. 
+* Refresh the page. 
+* After most of the javascript loads you should see a name of something like "list?secUid=&id=&type=5&...&_signature=xyz".
+* Click on that and in the url copy the _signature parameter and pass it into the API like the example below. If you open an issue I will update it manually within a day if you'd rather not do that.
+```
+api.trending(10, sig=xyz)
+```
+
+
 ## Getting Started
 
 To get started using this api follow the instructions below.
