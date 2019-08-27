@@ -3,35 +3,42 @@
 This is an unoffical api wrapper for tiktok.com in python. With this api you are able to call most trending and fetch specific user information.
 
 ## Important Information
-* If this API stops working you can open an issue on github, or the most common issue is that the signature has expired. I've added a way that you can fix that pretty easily. 
-* Go to [This TikTokPage](https://www.tiktok.com/en/trending) using the debug menu look under network. 
-* Refresh the page. 
-* After most of the javascript loads you should see a name of something like "list?secUid=&id=&type=5&...&_signature=xyz".
-* Click on that and in the url copy the _signature parameter and pass it into the API like the example below. If you open an issue I will update it manually within a day if you'd rather not do that.
-```
-api.trending(10, sig=xyz)
-```
-
+* If this API stops working for any reason open an issue.
 
 ## Getting Started
 
 To get started using this api follow the instructions below.
 
-### Prerequisites
+It is quite a long installation process just for a TikTok api, the first release can be found [here](https://github.com/davidteather/TikTok-Api/releases/edit/v1.0) and is not as suitable for long term projects, however it may be easier for a day of scraping TikTok, as the installation is much easier.
 
-You need just python's requests module. If you're not using pip to install.
-
-```
-pip install requests
-```
+Despite this, I **still recommend** you follow this process and use the latest version.
 
 ### Installing
 
-Clone and just include tiktok.py in your python file
+If you need help installing or run into some error, please open an issue. I will try to help out as much as I can.
+
+Tested with python 3.7.3
+
+```
+pip install requests
+pip install selenium
+pip install browsermob-proxy
+pip install psutil
+```
+
+* You do need to have **java installed**.
+* You must add **browsermob-proxy/bin** to your environment path.
+* This library uses Browsermob-proxy, they are licensed under the apache2.0 license. Please make sure you adhere to their guidelines in /browsermob-proxy/LICENSE.txt
+* **Firefox** must be installed.
+* You must download the latest **geckodriver** from [mozilla](https://github.com/mozilla/geckodriver/releases), and include the .exe in your path.
+
+Include whatever python script you want to run in the same directory as tiktok.py. Or just change the getTrending.py.
+
+I will be looking for ways to shorten this installation in the future as it's a lot just for a TikTok API, however it does work 100% of the time after generating a new signature automatically.
 
 ## Quick Start Guide
 
-Explain how to run the automated tests for this system
+Here's a quick bit of code to get the most recent trending on TikTok
 
 ```
 from tiktok import TikTokapi
@@ -44,6 +51,17 @@ api.trending(10)
 
 ## Detailed Documentation
 
+### The TikTok class
+
+```
+# Variable set like
+api = TikTokapi()
+```
+
+The program will then verify a signature by opening firefox tab and checking the network packets.
+
+##### The Trending Method
+
 ```
 # Where count is how many result you want
 # Verbose is optional, default=0. Set it to 1 to get more information
@@ -53,8 +71,10 @@ api.trending(count, verbose)
 Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/0be2e495e2de54098e8f2a9594581d27)
 JSON object tree [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1)
 
+##### The userPosts method
+
 ```
-# Where count is how many result you want
+# Where count is how many results you want
 # Verbose is optional, default=0. Set it to 1 to get more information
 # userid is the tiktok userid, can be found through response json tree or in the tiktok url
 api.userPosts(userid, count, verbose)

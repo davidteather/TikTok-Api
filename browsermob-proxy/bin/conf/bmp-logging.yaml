@@ -1,0 +1,37 @@
+# This file controls the logging configuration for browsermob-proxy in "standalone" mode. To adjust the amount of log output, modify the
+# 'level' fields below. For more information on log4j configuration files, see http://logging.apache.org/log4j/2.x/manual/configuration.html.
+
+configuration:
+  name: standalone
+  appenders:
+    console:
+      name: console
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "[%-5level %date{ISO8601} %logger] (%thread) %msg %xThrowable%n"
+    file:
+      -
+        name: file
+        fileName: bmp.log
+        PatternLayout:
+          pattern: "[%-5level %date{ISO8601} %logger] (%thread) %msg %xThrowable%n"
+        append: false
+  loggers:
+    logger:
+      -
+        name: net.lightbody.bmp.proxy.jetty.util.ThreadedServer
+        level: warn
+        additivity: false
+      -
+        name: net.lightbody.bmp
+        # to suppress unwanted BMP logging statements, set the level below for the source logger to WARN or ERROR.
+        # to enable more verbose logging, set the level to DEBUG or TRACE.
+        level: info
+    root:
+      # to suppress unwanted logging statements globally, set the level below to WARN or ERROR.
+      level: info
+      appender-ref:
+        -
+          ref: console
+        -
+          ref: file

@@ -1,0 +1,29 @@
+#!/bin/sh
+
+BASEDIR=`dirname $0`/..
+BASEDIR=`(cd "$BASEDIR"; pwd)`
+
+# if user has not explicitly set a command to use to invoke java, use 'java' and assume it is on the path
+if [ -z "$JAVACMD" ]
+then
+    JAVACMD="java"
+fi
+
+"$JAVACMD" $JAVA_OPTS \
+           -Dapp.name="browsermob-proxy" \
+           -Dbasedir="$BASEDIR" \
+           -jar "$BASEDIR/lib/browsermob-dist-2.1.4.jar" \
+           "$@"
+
+# if we couldn't find java, print a helpful error message
+if [ $? -eq 127 ]
+then
+    echo
+    echo "Unable to run java using command: $JAVACMD"
+    echo "Make sure java is installed and on the path, or set JAVACMD to the java executable before running this script."
+    echo
+    echo "Example:"
+    echo
+    echo "    $ JAVACMD=/var/lib/jdk/bin/java ./browsermob-proxy"
+    echo
+fi
