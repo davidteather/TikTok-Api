@@ -3,7 +3,7 @@ class TikTokapi:
     def __init__(self):
         val = 0
 
-    def trending(self, count=10, verbose=0, sig="uxN3WhAd5mSyXw1PtPyKK7sTd0"):
+    def trending(self, count=10, verbose=0, sig="W5cHbxAVBvNS2316KIvp21uXB3"):
         import requests
         loop = True
         while loop is True:
@@ -22,7 +22,7 @@ class TikTokapi:
                 loop = False
                 return data["body"]["itemListData"]
 
-    def userPosts(self, id, count=10, verbose=0, sig="uxN3WhAd5mSyXw1PtPyKK7sTd0"):
+    def userPosts(self, id, count=10, verbose=0, sig="W5cHbxAVBvNS2316KIvp21uXB3"):
         import requests
         loop = True
         while loop is True:
