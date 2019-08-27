@@ -4,6 +4,7 @@ This is an unoffical api wrapper for tiktok.com in python. With this api you are
 
 ## Important Information
 * If this API stops working for any reason open an issue.
+* Feel free to mention @davidteather in an issue you open, because I might not see it otherwise.
 
 ## Getting Started
 
