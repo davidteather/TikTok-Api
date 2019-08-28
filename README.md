@@ -52,7 +52,7 @@ api.trending(10)
 
 ## Detailed Documentation
 
-### The TikTok class
+##### The TikTok class
 
 ```
 # Variable set like
