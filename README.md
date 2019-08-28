@@ -72,7 +72,7 @@ api.trending(count, verbose)
 Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/0be2e495e2de54098e8f2a9594581d27)
 JSON object tree [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1)
 
-##### The userPosts method
+##### The userPosts Method
 
 ```
 # Where count is how many results you want
@@ -80,6 +80,8 @@ JSON object tree [here](https://gist.github.com/davidteather/bc4baef0edb621dd322
 # userid is the tiktok userid, can be found through response json tree or in the tiktok url
 api.userPosts(userid, count, verbose)
 ```
+
+Since this isn't an offical TikTok API the TikTok servers don't know what to do. This method specifically will throw a lot of errors if you have verbose on. It takes a lot longer than trending, however it will still end up working. Just give it a few minutes.
 
 Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/a5c1e54de353353f77a78139d2e5a9f9)
 It has the same JSON object tree as trending. It's [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1) anyways.
