@@ -29,7 +29,7 @@ class TikTokapi:
         driver.get("https://www.tiktok.com/en/trending")
         data = proxy.har
         for element in data['log']['entries']:
-            if "https: //www.tiktok.com/share/item/list?" in element['request']['url'] or "https://www.tiktok.com/share/item/list?" in element['request']['url']:
+            if "https://m.tiktok.com/share/item/list?" in element['request']['url'] or "https://www.tiktok.com/share/item/list?" in element['request']['url']:
                 print("Found signature, continuing.")
                 self.signature = element['request']['queryString'][6]['value']
 
