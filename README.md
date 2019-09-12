@@ -21,21 +21,16 @@ If you need help installing or run into some error, please open an issue. I will
 Tested with python 3.7.3
 
 ```
-pip install requests
-pip install selenium
-pip install browsermob-proxy
-pip install psutil
+pip install TikTokApi
 ```
 
-* You do need to have **java installed**.
+Or install directly from this GitHub repo.
+
+* You do need to have **java installed**
+* Download browsermob-proxy [here](https://bmp.lightbody.net/)
 * You must add **browsermob-proxy/bin** to your environment path.
-* This library uses Browsermob-proxy, they are licensed under the apache2.0 license. Please make sure you adhere to their guidelines in /browsermob-proxy/LICENSE.txt
 * **Firefox** must be installed.
 * You must download the latest **geckodriver** from [mozilla](https://github.com/mozilla/geckodriver/releases), and include the .exe in your path.
-
-Include whatever python script you want to run in the same directory as tiktok.py. Or just change the getTrending.py.
-
-I will be looking for ways to shorten this installation in the future as it's a lot just for a TikTok API, however it does work 100% of the time after generating a new signature automatically.
 
 ## Quick Start Guide
 
@@ -56,7 +51,7 @@ api.trending(10)
 
 ```
 # Variable set like
-api = TikTokapi()
+api = TikTokapi("path/to/browsermob-proxy/bin/browsermob-proxy")
 ```
 
 The program will then verify a signature by opening firefox tab and checking the network packets.
