@@ -30,7 +30,7 @@ before_script:
   # - python setup.py build
   - "pip install -r requirements.txt"
   - "sudo apt-get install unzip"
-  - "wget https://github.com/lightbody/browsermob-proxy/releases/download/browsermob-proxy-2.1.4/browsermob-proxy-2.1.4-bin.zip -O /tmp/browsermob-proxy.zip && mkdir tests/browsermob-proxy && unzip /tmp/browsermob-proxy.zip -d tests/ && mv -f tests/browsermob-proxy-2.1.4 tests/browsermob-proxy-test"
+  - "wget https://github.com/lightbody/browsermob-proxy/releases/download/browsermob-proxy-2.1.4/browsermob-proxy-2.1.4-bin.zip -O /tmp/browsermob-proxy.zip && mkdir tests/browsermob-proxy && unzip /tmp/browsermob-proxy.zip -d tests/"
   - ""
   - "python setup.py install_lib"
 
