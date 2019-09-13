@@ -12,5 +12,5 @@ def getTrending(results):
 
 def test_trending():
     assert getTrending(5) == 5
-    assert getTrending(10) == 5
-    assert getTrending(20) == 5
+    assert getTrending(10) == 10
+    assert getTrending(20) == 20

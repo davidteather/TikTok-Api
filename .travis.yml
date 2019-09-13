@@ -28,8 +28,11 @@ before_script:
   # - "seleniumbase install geckodriver"
   # - "wget https://github.com/mozilla/geckodriver/releases/download/v0.25.0/geckodriver-v0.25.0-linux64.tar.gz -o /tmp/geckodriver.tar.gz && tar -C /opt -xzf /tmp/geckodriver.tar.gz && sudo chmod 755 /opt/geckodriver && sudo ln -fs /opt/geckodriver /usr/bin/geckodriver && sudo ln -fs /opt/geckodriver /usr/local/bin/geckodriver"
   # - python setup.py build
-  - "wget https://github.com/lightbody/browsermob-proxy/releases/download/browsermob-proxy-2.1.4/browsermob-proxy-2.1.4-bin.zip -O /tmp/browsermob-proxy.tar.gz && tar -C /opt -xzf /tmp/browsermob-proxy.tar.gz && sudo cp -r /opt/browsermob-proxy browsermob-proxy"
-  - python setup.py install_lib
+  - "pip install -r requirements.txt"
+  - "sudo apt-get install unzip"
+  - "wget https://github.com/lightbody/browsermob-proxy/releases/download/browsermob-proxy-2.1.4/browsermob-proxy-2.1.4-bin.zip -O /tmp/browsermob-proxy.zip && mkdir tests/browsermob-proxy && unzip /tmp/browsermob-proxy.zip -d tests/ && mv -f tests/browsermob-proxy-2.1.4 tests/browsermob-proxy-test"
+  - ""
+  - "python setup.py install_lib"
 
 script:
   - pytest tests/test_trending.py
