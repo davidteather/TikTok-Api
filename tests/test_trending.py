@@ -3,7 +3,7 @@ from TikTokApi import TikTokapi
 
 
 def getTrending(results):
-    api = TikTokapi("browsermob-proxy-2.1.4/bin/browsermob-proxy")
+    api = TikTokapi("browsermob-proxy/bin/browsermob-proxy")
     trending = api.trending(results)
 
     return len(trending)
