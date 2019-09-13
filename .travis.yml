@@ -14,7 +14,7 @@ addons:
 
 install:
   - pip install pytest seleniumbase
-  - pip install -r requirements.txt
+  - "python setup.py"
 
 language: python
 python:
