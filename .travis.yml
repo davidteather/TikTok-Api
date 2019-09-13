@@ -27,7 +27,7 @@ before_script:
   # - "wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 && tar -xvf ./phantomjs-2.1.1-linux-x86_64.tar.bz2 && export PATH=$PWD/phantomjs-2.1.1-linux-x86_64/bin:$PATH"
   # - "seleniumbase install geckodriver"
   # - "wget https://github.com/mozilla/geckodriver/releases/download/v0.25.0/geckodriver-v0.25.0-linux64.tar.gz -o /tmp/geckodriver.tar.gz && tar -C /opt -xzf /tmp/geckodriver.tar.gz && sudo chmod 755 /opt/geckodriver && sudo ln -fs /opt/geckodriver /usr/bin/geckodriver && sudo ln -fs /opt/geckodriver /usr/local/bin/geckodriver"
-  - python setup.py --help-commands
+  - python setup.py build
   - python setup.py install
 
 script:
