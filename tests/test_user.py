@@ -2,7 +2,7 @@ from TikTokApi import TikTokapi
 
 def getUser(results):
     api = TikTokapi("browsermob-proxy/bin/browsermob-proxy", headless=True)
-    result = api.userPosts("6718751032510759942")
+    result = api.userPosts("6718751032510759942", count=results)
 
     return len(result)
 
