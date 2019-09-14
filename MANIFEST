@@ -2,5 +2,4 @@
 setup.cfg
 setup.py
 TikTokApi\__init__.py
-TikTokApi\getTrending.py
 TikTokApi\tiktok.py

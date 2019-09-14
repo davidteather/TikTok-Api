@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
   name = 'TikTokApi',         
   packages = ['TikTokApi'],   
-  version = '2.1.2.1',      
+  version = '2.1.3',      
   license='MIT',        
   description = 'The Unoffical TikTok API Wrapper in Python 3.',   
   author = 'David Teather',                   
