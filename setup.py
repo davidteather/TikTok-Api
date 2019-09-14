@@ -1,14 +1,22 @@
 from distutils.core import setup
-setup(
+import os.path
+import setuptools
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
+setuptools.setup(
   name = 'TikTokApi',         
   packages = ['TikTokApi'],   
-  version = '2.1.3',      
+  version = '2.1.4.2',      
   license='MIT',        
   description = 'The Unoffical TikTok API Wrapper in Python 3.',   
   author = 'David Teather',                   
   author_email = 'contact.davidteather@gmail.com',     
-  url = 'https://github.com/davidteather/tiktok-api',  
-  download_url = 'https://github.com/davidteather/TikTok-Api/archive/V2.1.3.tar.gz', 
+  url = 'https://github.com/davidteather/tiktok-api',
+  long_description=long_description,
+  long_description_content_type="text/markdown",  
+  download_url = 'https://github.com/davidteather/TikTok-Api/tarball/master', 
   keywords = ['tiktok', 'python3', 'api', 'unofficial', 'tiktok-api'], 
   install_requires=[
           'requests',
