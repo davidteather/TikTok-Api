@@ -51,10 +51,11 @@ api.trending(10)
 
 ```
 # Variable set like
-api = TikTokapi("path/to/browsermob-proxy/bin/browsermob-proxy")
+api = TikTokapi(path_to_browsermob_directory, headless=False)
 ```
+path_to_browsermob_directory - String - should be the path from the directory you are running from the code to the extracted zip file of [browsermob-proxy](https://bmp.lightbody.net/)
+headless - True/False - True means it will run a headless firefox browser, could be detected by TikTok, however it is more convienent. Default = False.
 
-The program will then verify a signature by opening firefox tab and checking the network packets.
 
 ##### The Trending Method
 
