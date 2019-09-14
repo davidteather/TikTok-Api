@@ -31,7 +31,7 @@ before_script:
   - "sudo apt-get install java-common"
   - "pip install -r requirements.txt"
   - "sudo apt-get install unzip"
-  - "wget https://github.com/lightbody/browsermob-proxy/releases/download/browsermob-proxy-2.1.4/browsermob-proxy-2.1.4-bin.zip -O /tmp/browsermob-proxy.zip && mkdir browsermob-proxy && unzip /tmp/browsermob-proxy.zip && mv -f browsermob-proxy-2.1.4 browsermob-proxy"
+  - "wget https://github.com/lightbody/browsermob-proxy/releases/download/browsermob-proxy-2.1.4/browsermob-proxy-2.1.4-bin.zip -O /tmp/browsermob-proxy.zip && mkdir davidteather/TikTok-Api/browsermob-proxy && unzip /tmp/browsermob-proxy.zip -d davidteather/TikTok-Api/browsermob-proxy"
   - "python setup.py install_lib"
 
 script:
