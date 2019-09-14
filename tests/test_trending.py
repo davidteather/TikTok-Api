@@ -1,13 +1,10 @@
 from TikTokApi import TikTokapi
 
-
-
 def getTrending(results):
     api = TikTokapi("browsermob-proxy/bin/browsermob-proxy", headless=True)
     trending = api.trending(results)
 
     return len(trending)
-
 
 
 def test_trending():
