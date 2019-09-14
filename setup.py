@@ -1,25 +1,20 @@
 from distutils.core import setup
 import os.path
+import setuptools
 
-try:
-    here = os.path.abspath(os.path.dirname(__file__))
-    README = open(os.path.join(here, "README.md"), encoding="utf-8").read()
-    with open(os.path.join(here, "requirements/base.txt"), encoding="utf-8") as f:
-        required = [l.strip("\n") for l in f if l.strip("\n") and not l.startswith("#")]
-except IOError:
-    required = []
-    README = ""
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
-setup(
+setuptools.setup(
   name = 'TikTokApi',         
   packages = ['TikTokApi'],   
-  version = '2.1.4',      
+  version = '2.1.4.2',      
   license='MIT',        
   description = 'The Unoffical TikTok API Wrapper in Python 3.',   
   author = 'David Teather',                   
   author_email = 'contact.davidteather@gmail.com',     
   url = 'https://github.com/davidteather/tiktok-api',
-  long_description=README,
+  long_description=long_description,
   long_description_content_type="text/markdown",  
   download_url = 'https://github.com/davidteather/TikTok-Api/tarball/master', 
   keywords = ['tiktok', 'python3', 'api', 'unofficial', 'tiktok-api'], 
