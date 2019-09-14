@@ -17,10 +17,6 @@ addons:
 install:
   - pip install pytest
 
-language: python
-python:
-  - "3.7"
-
 before_script:
   - "wget https://github.com/mozilla/geckodriver/releases/download/v0.25.0/geckodriver-v0.25.0-linux64.tar.gz -O /tmp/geckodriver.tar.gz && tar -C /opt -xzf /tmp/geckodriver.tar.gz && sudo chmod 755 /opt/geckodriver && sudo ln -fs /opt/geckodriver /usr/bin/geckodriver && sudo ln -fs /opt/geckodriver /usr/local/bin/geckodriver"
   - "sudo apt-get install java-common"
