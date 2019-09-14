@@ -1,11 +1,12 @@
 class TikTokapi:
 
-    def __init__(self, browsermobDirectory):
+    def __init__(self, browsermobDirectory, headless=False):
         print("New class reference, finding valid signature. This might take a minute.")
         from browsermobproxy import Server
         import psutil
         import json
         import time
+        from selenium.webdriver.firefox.options import Options
 
         for proc in psutil.process_iter():
             # check whether the process name matches
@@ -24,7 +25,10 @@ class TikTokapi:
         profile = webdriver.FirefoxProfile()
         selenium_proxy = proxy.selenium_proxy()
         profile.set_proxy(selenium_proxy)
-        driver = webdriver.Firefox(firefox_profile=profile)
+        options = Options()
+        if headless == True:
+            options.headless = True
+        driver = webdriver.Firefox(firefox_profile=profile, options=options)
 
         proxy.new_har("list")
         driver.get("https://www.tiktok.com/en/trending")
