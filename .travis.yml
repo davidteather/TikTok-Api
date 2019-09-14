@@ -28,3 +28,4 @@ before_script:
 
 script:
   - pytest tests/test_trending.py
+  - pytest tests/test_user.py
