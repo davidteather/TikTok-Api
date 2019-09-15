@@ -14,7 +14,7 @@ def checkDupes(res):
 
 
 def test_hashtag():
-    api = TikTokapi("browsermob-proxy", headless=True)
+    api = TikTokapi("browsermob-proxy/bin/browsermob-proxy", headless=True)
 
     res = api.search_by_hashtag("funny", count=10)
     assert len(res) == 10
@@ -26,7 +26,7 @@ def test_hashtag():
 
 
 def test_get_trending_hashtag():
-    api = TikTokapi("browsermob-proxy", headless=True)
+    api = TikTokapi("browsermob-proxy/bin/browsermob-proxy", headless=True)
 
     assert len(api.get_trending_hashtags()) == 4
     
