@@ -69,6 +69,7 @@ api.trending(count, verbose)
 ```
 
 Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/0be2e495e2de54098e8f2a9594581d27)
+
 JSON object tree [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1)
 
 ##### The userPosts Method
@@ -83,7 +84,32 @@ api.userPosts(userid, count, verbose)
 Since this isn't an offical TikTok API the TikTok servers don't know what to do. This method specifically will throw a lot of errors if you have verbose on. It takes a lot longer than trending, however it will still end up working. Just give it a few minutes.
 
 Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/a5c1e54de353353f77a78139d2e5a9f9)
+
 It has the same JSON object tree as trending. It's [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1) anyways.
+
+##### The search_by_hashtag Method
+
+```
+api.search_by_hashtag(hashtag, count=10)
+```
+
+hashtag - A string of the hashtag without the # mark. Ex: hashtag = "funny"
+
+count - The number of results you want
+
+Since this isn't an offical TikTok API the TikTok servers don't know what to do with my bad solutions, this takes a bit longer as it needs to find the hashtagID and stuff.
+
+Search by hashtag returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/a5c1e54de353353f77a78139d2e5a9f9)
+
+It has the same JSON object tree as trending. It's [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1) anyways.
+
+##### The get_trending_hashtags Method
+
+```
+api.get_trending_hashtags()
+```
+
+This returns the 4 displayed trending hashtags in an array, this does change on every new instance of the api as it changes on page refreshes. 
 
 ## Built With
 
