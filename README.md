@@ -103,6 +103,16 @@ Search by hashtag returns an array of json objects. Example structure [here](htt
 
 It has the same JSON object tree as trending. It's [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1) anyways.
 
+##### The get_Video_By_Url Method
+
+```
+api.getVideoByUrl(video_url, return_bytes=0)
+```
+
+video_url - The video you want to get url.
+
+return_bytes - The default value is 0, when it is set to 1 the function instead returns the bytes from the video rather than just the direct url.
+
 ##### The get_trending_hashtags Method
 
 ```

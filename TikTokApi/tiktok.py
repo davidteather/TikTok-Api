@@ -1,5 +1,7 @@
 class TikTokapi:
-
+    #
+    # The TikTokapi class initial function
+    #
     def __init__(self, browsermobDirectory, headless=False):
         # Imports
         print("New class reference, finding valid signature. This might take a minute.")
@@ -58,13 +60,20 @@ class TikTokapi:
         server.stop()
         driver.quit()
 
+    #
     # Show the user the trending hashtags
-
+    #
     def get_trending_hashtags(self):
         # Returns the trending hashtags from /en/trending
         return self.hashtag
 
+
+    # 
     # Allows the user to search by a specific hashtag
+    #
+    # hastag - the hashtag you want to search by
+    # count - the amount of results you want
+    #
     def search_by_hashtag(self, hashtag, count=10):
         import requests
         from browsermobproxy import Server
@@ -189,7 +198,13 @@ class TikTokapi:
         else:
             raise Exception('Unable to locate the hashtag ID')
 
-    # Gets trending
+
+    #
+    # Gets trending results
+    #
+    # count - the number of results to display
+    # verbose - 0 or 1, 1 is intense logging
+    #
     def trending(self, count=10, verbose=0):
         import requests
 
@@ -227,7 +242,13 @@ class TikTokapi:
                     else:
                         return response
 
+
+    #
     # Gets a user's post
+    #
+    # count - the count of results
+    # verbose - 1 is high logging
+    #
     def userPosts(self, id, count=10, verbose=0):
         import requests
         while True:
@@ -272,3 +293,64 @@ class TikTokapi:
 
                     else:
                         return response
+
+
+    #
+    # Gets the source url of a given url for a tiktok
+    #
+    # video_url - the url of the video
+    # return_bytes - 0 is just the url, 1 is the actual video bytes
+    #
+    def get_Video_By_Url(self, video_url, return_bytes=0):
+        # Imports
+        import requests
+        import time
+        import json
+        from selenium import webdriver
+        from selenium.webdriver.firefox.options import Options
+
+        # Gets the VideoID
+        videoID = video_url.split("/video/")[1].split("?")[0]
+
+        # Checks if they should determine the return_bytes
+        if return_bytes == 0:
+            # Creates FF profile
+            profile = webdriver.FirefoxProfile()
+            options = Options()
+            profile.set_preference("media.volume_scale", "0.0")
+            if self.headless == True:
+                options.headless = True
+
+            driver = webdriver.Firefox(firefox_profile=profile, options=options)
+            
+
+            driver.get("https://www.tiktok.com/node/video/playwm?id=" + videoID)
+            time.sleep(3)
+            
+
+            url = driver.current_url
+            driver.quit()
+
+            return url
+        else:
+            # Creates FF profile
+            profile = webdriver.FirefoxProfile()
+            options = Options()
+            profile.set_preference("media.volume_scale", "0.0")
+            if self.headless == True:
+                options.headless = True
+
+            driver = webdriver.Firefox(firefox_profile=profile, options=options)
+            
+
+            driver.get("https://www.tiktok.com/node/video/playwm?id=" + videoID)
+            time.sleep(3)
+            
+
+            url = driver.current_url
+            driver.quit()
+
+
+            r = requests.get(url)
+            
+            return r.content
