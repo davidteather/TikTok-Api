@@ -106,7 +106,7 @@ It has the same JSON object tree as trending. It's [here](https://gist.github.co
 ##### The get_Video_By_Url Method
 
 ```
-api.getVideoByUrl(video_url, return_bytes=0)
+api.get_Video_By_Url(video_url, return_bytes=0)
 ```
 
 video_url - The video you want to get url.
