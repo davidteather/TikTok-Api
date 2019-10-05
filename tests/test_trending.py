@@ -1,12 +1,5 @@
 from TikTokApi import TikTokapi
 
-def getTrending(results):
-    
-    trending = 
-
-    return len(trending)
-
-
 def test_trending():
     api = TikTokapi("browsermob-proxy/bin/browsermob-proxy", headless=True)
     assert len(api.trending(5)) == 5
