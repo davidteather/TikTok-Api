@@ -1,11 +1,6 @@
 dist: xenial
 language: python
 python:
-  - "3.0"
-  - "3.1"
-  - "3.2"
-  - "3.3"
-  - "3.4"
   - "3.5"
   - "3.6"
   - "3.7"
@@ -35,3 +30,4 @@ script:
   - pytest tests/test_trending.py
   - pytest tests/test_user.py
   - pytest tests/test_hashtag.py
+  - pytest tests/test_VideoByUrl.py
