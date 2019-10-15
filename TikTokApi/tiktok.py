@@ -226,7 +226,7 @@ class TikTokapi:
                 for tiktok in data["body"]["itemListData"]:
                     response.append(tiktok)
                 while True:
-                    if count > len(response) and str(data['body']['hasMore']) == "True":
+                    if count > len(response) and data['body']['hasMore'] == "True":
                         url = "https://m.tiktok.com/share/item/list?id=&type=5&count=" + \
                             str(count - len(response)) + "&minCursor=0&maxCursor=" + \
                             data['body']['maxCursor'] + \
