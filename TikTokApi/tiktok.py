@@ -249,7 +249,6 @@ class TikTokapi:
                                            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"})
 
             data = r.json()
-            print(data)
             response = []
             if data["statusCode"] == 0:
                 maxCursor = data['body']['maxCursor']
@@ -257,8 +256,6 @@ class TikTokapi:
                     response.append(tiktok)
                 while True:
                     try:
-                        print(data)
-                        print("")
                         if count > len(response):
                             var = data['body']['hasMore']
                             maxCursor = data['body']['maxCursor']
