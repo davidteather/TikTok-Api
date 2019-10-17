@@ -240,6 +240,7 @@ class TikTokapi:
         import requests
 
         while True:
+            
             url = "https://m.tiktok.com/share/item/list?id=&type=5&count=" + \
                 str(count) + "&minCursor=0&maxCursor=0&_signature=" + \
                 self.signature
@@ -248,17 +249,18 @@ class TikTokapi:
                                            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"})
 
             data = r.json()
+            print(data)
             response = []
-            if data["statusCode"] != 0:
-                if verbose == 1:
-                    print("Invalid Signature Retrying")
-            else:
+            if data["statusCode"] == 0:
                 maxCursor = data['body']['maxCursor']
                 for tiktok in data["body"]["itemListData"]:
                     response.append(tiktok)
                 while True:
                     try:
-                        if count > len(response) and data['body']['hasMore'] == True:
+                        print(data)
+                        print("")
+                        if count > len(response):
+                            var = data['body']['hasMore']
                             maxCursor = data['body']['maxCursor']
                             url = "https://m.tiktok.com/share/item/list?id=&type=5&count=" + \
                                 str(count - len(response)) + "&minCursor=0&maxCursor=" + \
@@ -350,7 +352,7 @@ class TikTokapi:
                                                        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"})
 
                         data = r.json()
-                        
+
                         continue
 
     #
