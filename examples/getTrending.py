@@ -1,6 +1,3 @@
-# NOTE: This python file cannot be run from the examples folder.
-# It MUST BE in the same directory as tiktok.py is located!
-# Yeah sorry, it's kind of annoying, but it's more organized this way.
 from TikTokApi import TikTokapi
 
 # Starts T

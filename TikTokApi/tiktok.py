@@ -67,14 +67,14 @@ class TikTokapi:
         # Returns the trending hashtags from /en/trending
         return self.hashtag
 
-
-    # 
+    #
     # Allows the user to search by a specific hashtag
     #
     # hastag - the hashtag you want to search by
     # count - the amount of results you want
     #
-    def search_by_hashtag(self, hashtag, count=10):
+
+    def search_by_hashtag(self, hashtag, count=10, verbose=0):
         import requests
         from browsermobproxy import Server
         import psutil
@@ -110,7 +110,7 @@ class TikTokapi:
             options.headless = True
         driver = webdriver.Firefox(firefox_profile=profile, options=options)
 
-        # Browsermob-capture 
+        # Browsermob-capture
         proxy.new_har("list")
         driver.get("https://www.tiktok.com/tag/" + hashtag + "?langCountry=en")
         data = proxy.har
@@ -129,75 +129,105 @@ class TikTokapi:
 
         if hashtagId != None:
             while True:
-                try:
-                    var = data['body']['hasMore']
-                    hasMore = True
-                except:
-                    hasMore = False
-                    cookie = ''.join(random.choice(
-                        string.ascii_uppercase + string.digits) for _ in range(40))
+                cookie = ''.join(random.choice(
+                    string.ascii_uppercase + string.digits) for _ in range(40))
 
-                    url = "https://www.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=" + \
-                            str(count - len(response)) + "&minCursor=-1&maxCursor=0&_signature=" + \
-                            self.signature + "&shareUid="
+                url = "https://m.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=" + \
+                    str(count - len(response)) + "&minCursor=-1&maxCursor=0&_signature=" + \
+                    self.signature + "&shareUid="
 
-                    headers = {"authority": "www.tiktok.com",
-                               "method": "GET",
-                               "path": url.split("https://www.tiktok.com")[1],
-                               "scheme": "https",
-                               "accept": "application/json, text/plain, */*",
-                               "accept-encoding": "gzip, deflate, br",
-                               "accept-language": "en-US,en;q=0.9",
-                               "cache-control": "no-cache",
-                               "cookie": cookie,
-                               "referer": "https://www.tiktok.com/tag/" + hashtag + "?langCountry=en",
-                               "sec-fetch-mode": "cors",
-                               "sec-fetch-site": "same-origin",
-                               "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"}
+                headers = {"authority": "m.tiktok.com",
+                           "method": "GET",
+                           "path": url.split("https://m.tiktok.com")[1],
+                           "scheme": "https",
+                           "accept": "application/json, text/plain, */*",
+                           "accept-encoding": "gzip, deflate, br",
+                           "accept-language": "en-US,en;q=0.9",
+                           "cache-control": "no-cache",
+                           "cookie": cookie,
+                           "pragma": "no-cache",
+                           "sec-fetch-mode": "navigate",
+                           "sec-fetch-site": "none",
+                           "sec-fetch-user": "?1",
+                           "upgrade-insecure-requests": "1",
+                           "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36"}
+                r = requests.get(url, headers=headers)
+                # https://m.tiktok.com/share/item/list?secUid=&id=5424&type=3&count=48&minCursor=-1&maxCursor=0&_signature=InBkoxARf-DFB5ylwWFzPiJwZb&shareUid=
+                #r = requests.get(url)
 
-                    r = requests.get(url, headers=headers)
+                data = r.json()
 
-                    data = r.json()
-                    if data["statusCode"] == 0:
-                        for tiktok in data["body"]["itemListData"]:
-                            response.append(tiktok)
+                if data["statusCode"] == 0:
+                    maxCursor = data['body']['maxCursor']
+                    for tiktok in data["body"]["itemListData"]:
+                        response.append(tiktok)
 
-                if hasMore == True:
-                    if count > len(response) and str(data['body']['hasMore']) == "True":
-                        cookie = ''.join(random.choice(
-                            string.ascii_uppercase + string.digits) for _ in range(40))
+                    while True:
+                        try:
+                            if count > len(response):
+                                data['body']['hasMore'] == True
+                                cookie = ''.join(random.choice(
+                                    string.ascii_uppercase + string.digits) for _ in range(40))
 
-                        url = "https://www.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=" + \
-                            str(count - len(response)) + "&minCursor=-1&maxCursor=" + data['body']['maxCursor'] + "&_signature=" + \
-                            self.signature + "&shareUid="
+                                url = "https://m.tiktok.com/share/item/list?secUid=&id=" + str(hashtagId) + "&type=3&count=" + \
+                                    str(count - len(response)) + "&minCursor=-1&maxCursor=" + str(maxCursor) + "&_signature=" + \
+                                    self.signature + "&shareUid="
 
-                        headers = {"authority": "www.tiktok.com",
-                                   "method": "GET",
-                                   "path": url.split("https://www.tiktok.com")[1],
-                                   "scheme": "https",
-                                   "accept": "application/json, text/plain, */*",
-                                   "accept-encoding": "gzip, deflate, br",
-                                   "accept-language": "en-US,en;q=0.9",
-                                   "cache-control": "no-cache",
-                                   "cookie": cookie,
-                                   "referer": "https://www.tiktok.com/tag/" + hashtag + "?langCountry=en",
-                                   "sec-fetch-mode": "cors",
-                                   "sec-fetch-site": "same-origin",
-                                   "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"}
-                        r = requests.get(url, headers=headers)
+                                headers = {"authority": "m.tiktok.com",
+                                           "method": "GET",
+                                           "path": url.split("https://m.tiktok.com")[1],
+                                           "scheme": "https",
+                                           "accept": "application/json, text/plain, */*",
+                                           "accept-encoding": "gzip, deflate, br",
+                                           "accept-language": "en-US,en;q=0.9",
+                                           "cache-control": "no-cache",
+                                           "cookie": cookie,
+                                           "pragma": "no-cache",
+                                           "sec-fetch-mode": "navigate",
+                                           "sec-fetch-site": "none",
+                                           "sec-fetch-user": "?1",
+                                           "upgrade-insecure-requests": "1",
+                                           "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36"}
+                                r = requests.get(url, headers=headers)
 
-                        data = r.json()
+                                data = r.json()
 
-                        if data["statusCode"] == 0:
-                            for tiktok in data["body"]["itemListData"]:
-                                response.append(tiktok)
+                                if data["statusCode"] == 0:
+                                    maxCursor = data['body']['maxCursor']
+                                    for tiktok in data["body"]["itemListData"]:
+                                        response.append(tiktok)
 
-                    else:
-                        return response
+                            else:
+                                return response
+
+                        except:
+                            cookie = ''.join(random.choice(
+                                string.ascii_uppercase + string.digits) for _ in range(40))
+
+                            url = "https://m.tiktok.com/share/item/list?secUid=&id=" + str(hashtagId) + "&type=3&count=" + \
+                                str(count - len(response)) + "&minCursor=-1&maxCursor=" + str(maxCursor) + "&_signature=" + \
+                                self.signature + "&shareUid="
+
+                            headers = {"authority": "m.tiktok.com",
+                                       "method": "GET",
+                                       "path": url.split("https://m.tiktok.com")[1],
+                                       "scheme": "https",
+                                       "accept": "application/json, text/plain, */*",
+                                       "accept-encoding": "gzip, deflate, br",
+                                       "accept-language": "en-US,en;q=0.9",
+                                       "cache-control": "no-cache",
+                                       "cookie": cookie,
+                                       "referer": "https://m.tiktok.com/tag/" + hashtag + "?langCountry=en",
+                                       "sec-fetch-mode": "cors",
+                                       "sec-fetch-site": "same-origin",
+                                       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"}
+                            r = requests.get(url, headers=headers)
+
+                            data = r.json()
+                            continue
 
         else:
             raise Exception('Unable to locate the hashtag ID')
-
 
     #
     # Gets trending results
@@ -205,6 +235,7 @@ class TikTokapi:
     # count - the number of results to display
     # verbose - 0 or 1, 1 is intense logging
     #
+
     def trending(self, count=10, verbose=0):
         import requests
 
@@ -218,19 +249,20 @@ class TikTokapi:
 
             data = r.json()
             response = []
-
             if data["statusCode"] != 0:
                 if verbose == 1:
                     print("Invalid Signature Retrying")
             else:
+                maxCursor = data['body']['maxCursor']
                 for tiktok in data["body"]["itemListData"]:
                     response.append(tiktok)
                 while True:
                     try:
-                        if count > len(response) and str(data['body']['hasMore']) == "True":
+                        if count > len(response) and data['body']['hasMore'] == True:
+                            maxCursor = data['body']['maxCursor']
                             url = "https://m.tiktok.com/share/item/list?id=&type=5&count=" + \
                                 str(count - len(response)) + "&minCursor=0&maxCursor=" + \
-                                data['body']['maxCursor'] + \
+                                maxCursor + \
                                 "&_signature=" + self.signature
 
                             r = requests.get(url, headers={"authority": "m.tiktok.com", "method": "GET", "path": url.split("https://m.tiktok.com")[0], "scheme": "https", "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
@@ -243,8 +275,17 @@ class TikTokapi:
                         else:
                             return response
                     except:
-                        continue
+                        url = "https://m.tiktok.com/share/item/list?id=&type=5&count=" + \
+                            str(count - len(response)) + "&minCursor=0&maxCursor=" + \
+                            maxCursor + \
+                            "&_signature=" + self.signature
 
+                        r = requests.get(url, headers={"authority": "m.tiktok.com", "method": "GET", "path": url.split("https://m.tiktok.com")[0], "scheme": "https", "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+                                                       "accept-encoding": "gzip, deflate, br", "accept-language": "en-US,en;q=0.9", "cache-control": "max-age=0", "upgrade-insecure-requests": "1",
+                                                       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"})
+
+                        data = r.json()
+                        continue
 
     #
     # Gets a user's post
@@ -252,6 +293,7 @@ class TikTokapi:
     # count - the count of results
     # verbose - 1 is high logging
     #
+
     def userPosts(self, id, count=10, verbose=0):
         import requests
         while True:
@@ -269,15 +311,16 @@ class TikTokapi:
                 if verbose == 1:
                     print("Invalid Signature Retrying")
             else:
+                maxCursor = data['body']['maxCursor']
                 for tiktok in data["body"]["itemListData"]:
                     response.append(tiktok)
                 while True:
-                    if count > len(response) and str(data['body']['hasMore']) == "True":
-                        url = "https://m.tiktok.com/share/item/list?id=" + str(id) + "&type=1&count=" + \
-                            str(count - len(response)) + "&minCursor=0&maxCursor=" + data['body']['maxCursor'] + "&_signature=" + \
-                            self.signature
-                        var = True
-                        while var:
+                    try:
+                        if count > len(response) and str(data['body']['hasMore']) == "True":
+                            url = "https://m.tiktok.com/share/item/list?id=" + str(id) + "&type=1&count=" + \
+                                str(count - len(response)) + "&minCursor=0&maxCursor=" + maxCursor + "&_signature=" + \
+                                self.signature
+                            maxCursor = data['body']['maxCursor']
 
                             r = requests.get(url, headers={"authority": "m.tiktok.com", "method": "GET", "path": url.split("https://m.tiktok.com")[0], "scheme": "https", "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
                                                            "accept-encoding": "gzip, deflate, br", "accept-language": "en-US,en;q=0.9", "cache-control": "max-age=0", "upgrade-insecure-requests": "1",
@@ -288,15 +331,27 @@ class TikTokapi:
                             if data["statusCode"] == 0:
                                 for tiktok in data["body"]["itemListData"]:
                                     response.append(tiktok)
-                                var = False
 
                             else:
                                 if verbose == 1:
-                                    print("Invalid Signature Retrying")
+                                    print(
+                                        "Invalid Signature Retrying")
 
-                    else:
-                        return response
+                        else:
+                            return response
 
+                    except:
+                        url = "https://m.tiktok.com/share/item/list?id=" + str(id) + "&type=1&count=" + \
+                            str(count - len(response)) + "&minCursor=0&maxCursor=" + maxCursor + "&_signature=" + \
+                            self.signature
+
+                        r = requests.get(url, headers={"authority": "m.tiktok.com", "method": "GET", "path": url.split("https://m.tiktok.com")[0], "scheme": "https", "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+                                                       "accept-encoding": "gzip, deflate, br", "accept-language": "en-US,en;q=0.9", "cache-control": "max-age=0", "upgrade-insecure-requests": "1",
+                                                       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"})
+
+                        data = r.json()
+                        
+                        continue
 
     #
     # Gets the source url of a given url for a tiktok
@@ -304,6 +359,7 @@ class TikTokapi:
     # video_url - the url of the video
     # return_bytes - 0 is just the url, 1 is the actual video bytes
     #
+
     def get_Video_By_Url(self, video_url, return_bytes=0):
         # Imports
         import requests
@@ -324,12 +380,11 @@ class TikTokapi:
             if self.headless == True:
                 options.headless = True
 
-            driver = webdriver.Firefox(firefox_profile=profile, options=options)
-            
+            driver = webdriver.Firefox(
+                firefox_profile=profile, options=options)
 
             driver.get("https://www.tiktok.com/node/video/playwm?id=" + videoID)
             time.sleep(3)
-            
 
             url = driver.current_url
             driver.quit()
@@ -343,17 +398,15 @@ class TikTokapi:
             if self.headless == True:
                 options.headless = True
 
-            driver = webdriver.Firefox(firefox_profile=profile, options=options)
-            
+            driver = webdriver.Firefox(
+                firefox_profile=profile, options=options)
 
             driver.get("https://www.tiktok.com/node/video/playwm?id=" + videoID)
             time.sleep(3)
-            
 
             url = driver.current_url
             driver.quit()
 
-
             r = requests.get(url)
-            
+
             return r.content
