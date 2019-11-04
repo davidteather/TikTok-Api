@@ -32,8 +32,8 @@ Or install directly from this GitHub repo.
 * You do need to have **java installed**
 * Download browsermob-proxy [here](https://bmp.lightbody.net/)
 * You must add **browsermob-proxy/bin** to your environment path.
-* **Firefox** must be installed.
-* You must download the latest **geckodriver** from [mozilla](https://github.com/mozilla/geckodriver/releases), and include the .exe in your path.
+* **Chrome** must be installed.
+* You must download the latest **chromedriver** from [Google](https://sites.google.com/a/chromium.org/chromedriver/downloads), and include the .exe in your path.
 
 ## Quick Start Guide
 
@@ -57,7 +57,7 @@ api.trending(10)
 api = TikTokapi(path_to_browsermob_directory, headless=False)
 ```
 path_to_browsermob_directory - String - should be the path from the directory you are running from the code to the extracted zip file of [browsermob-proxy](https://bmp.lightbody.net/)
-headless - True/False - True means it will run a headless firefox browser, could be detected by TikTok, however it is more convienent. Default = False.
+headless - True/False - True means it will run a headless chrome browser, could be detected by TikTok, however it is more convienent. Default = False.
 
 
 ##### The Trending Method
