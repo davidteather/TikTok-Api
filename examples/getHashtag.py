@@ -17,3 +17,5 @@ for tiktok in result:
     print(tiktok['itemInfos']['text'])
 
 print(len(result))
+
+api.quit_browser()

@@ -121,6 +121,14 @@ api.get_trending_hashtags()
 
 This returns the 4 displayed trending hashtags in an array, this does change on every new instance of the api as it changes on page refreshes. 
 
+##### The quit_browser Method
+
+```
+api.quit_browser()
+```
+
+This quits the browser.
+
 ## Built With
 
 * [Python 3.7](https://www.python.org/) - The web framework used
