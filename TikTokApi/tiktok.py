@@ -12,7 +12,7 @@ class TikTokapi:
         import json
         from selenium import webdriver
         from selenium.webdriver.firefox.options import Options
-
+        self.browsermobDirectory = browsermobDirectory
         # Kills any browsermob-proxy
         for proc in psutil.process_iter():
             # check whether the process name matches
@@ -20,12 +20,12 @@ class TikTokapi:
                 proc.kill()
 
         dictf = {'port': 8090}
-        server = Server(
+        self.server = Server(
             path=browsermobDirectory, options=dictf)
         # "browsermob-proxy/bin/browsermob-proxy"
-        server.start()
+        self.server.start()
         time.sleep(1)
-        proxy = server.create_proxy()
+        self.proxy = self.server.create_proxy()
         time.sleep(1)
 
         # Creates FF profile
@@ -33,7 +33,7 @@ class TikTokapi:
         chromeProfile.add_argument("--disable-automation")
         chromeProfile.add_experimental_option(
             "excludeSwitches", ["enable-automation"])
-        chromeProfile.add_argument("--proxy-server={0}".format(proxy.proxy))
+        chromeProfile.add_argument("--proxy-server={0}".format(self.proxy.proxy))
         chromeProfile.add_experimental_option("mobileEmulation", {"deviceName": "Galaxy S5"})
 
         if headless == True:
@@ -41,9 +41,9 @@ class TikTokapi:
         self.driver = webdriver.Chrome(chrome_options=chromeProfile)
 
         # Records FF Har
-        proxy.new_har("list")
+        self.proxy.new_har("list")
         self.driver.get("https://www.tiktok.com/en/trending")
-        data = proxy.har
+        data = self.proxy.har
         for element in data['log']['entries']:
             if "https://m.tiktok.com/share/item/list?" in element['request']['url'] or "https://www.tiktok.com/share/item/list?" in element['request']['url']:
                 print("Found signature, continuing.")
@@ -57,7 +57,6 @@ class TikTokapi:
         self.cookieString = ""
         for cookie in self.driver.get_cookies():
             self.cookieString = self.cookieString + cookie['name'] + "=" + cookie['value'] + "; "
-            print(cookie)
 
         self.cookieString = self.cookieString[:-2]
 
@@ -71,8 +70,6 @@ class TikTokapi:
         self.hashtag = hashtagArray
         self.headless = headless
         self.browsermobDirectory = browsermobDirectory
-
-        server.stop()
 
 
     def quit_browser(self):
@@ -206,12 +203,16 @@ class TikTokapi:
     def trending(self, count=10, verbose=0):
         import requests
         import string
+        import time
         import json
         import random
         def cookie_generator(size=100, chars=string.ascii_uppercase + string.digits):
             return ''.join(random.choice(chars) for _ in range(size))
 
         while True:
+            # TODO: Max Cursor Issue
+            # https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=2&minCursor=0&maxCursor=1000005823613&shareUid=&_signature=0NDOfgAgEB-lIUUg-oc9StDQz2AAI10
+            # https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=5&minCursor=0&maxCursor=0&shareUid=&_signature=Oo2r.AAgEBtPfCCiX9JspzqNquAAGc9
             url = "https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=" + str(count) + "&minCursor=0&maxCursor=0&shareUid=&_signature=" + self.signature
 
             # https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=5&minCursor=0&maxCursor=0&shareUid=&_signature=DGZaZAAgEB95l9E6AB.J8gxmW3AAFHi
@@ -229,6 +230,7 @@ class TikTokapi:
                 print(response)
                 while True:
                     try:
+                        time.sleep(5)
                         print(count)
                         print(len(response))
                         if count > len(response):
@@ -238,7 +240,13 @@ class TikTokapi:
                                 str(count - len(response)) + "&minCursor=0&maxCursor=" + \
                                 str(maxCursor) + \
                                 "&_signature=" + self.signature
-                            url = "https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=" + str(count - len(response)) + "&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature=" + self.signature
+
+                            if count - len(response) > 5:
+                                var = count - len(response)
+                            else:
+                                var = 5
+
+                            url = "https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=" + str(var) + "&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature=" + self.signature
 
                             self.driver.get(url)
                             data = json.loads(self.driver.find_element_by_xpath("//pre").text)
@@ -248,12 +256,18 @@ class TikTokapi:
                         else:
                             return response
                     except:
+
+                        if count - len(response) > 5:
+                                var = count - len(response)
+                        else:
+                            var = 5
+
                         url = "https://m.tiktok.com/share/item/list?id=&type=5&count=" + \
                             str(count - len(response)) + "&minCursor=0&maxCursor=" + \
                             str(maxCursor) + \
                             "&_signature=" + self.signature
                         
-                        url = "https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=" + str(count - len(response)) + "&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature=" + self.signature
+                        url = "https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=" + str(var) + "&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature=" + self.signature
 
                         self.driver.get(url)
                         data = json.loads(self.driver.find_element_by_xpath("//pre").text)
@@ -337,48 +351,40 @@ class TikTokapi:
         # Imports
         import requests
         import time
+        import browsermobproxy
+        from browsermobproxy import Server
+        import psutil
         import json
         from selenium import webdriver
         from selenium.webdriver.firefox.options import Options
 
-        # Gets the VideoID
-        videoID = video_url.split("/video/")[1].split("?")[0]
-
         # Checks if they should determine the return_bytes
         if return_bytes == 0:
-            # Creates FF profile
-            profile = webdriver.FirefoxProfile()
-            options = Options()
-            profile.set_preference("media.volume_scale", "0.0")
-            if self.headless == True:
-                options.headless = True
-
-            driver = webdriver.Firefox(
-                firefox_profile=profile, options=options)
-
-            driver.get("https://www.tiktok.com/node/video/playwm?id=" + videoID)
-            time.sleep(3)
-
-            url = driver.current_url
-            driver.quit()
+            self.proxy.new_har("vid")
+            self.driver.get(video_url)
+            data = self.proxy.har
+            
+            for entry in data['log']['entries']:
+                try:
+                    if "muscdn.com" in entry['response']['redirectURL']:
+                        url = entry['response']['redirectURL']
+                        break
+                except:
+                    continue
 
             return url
         else:
-            # Creates FF profile
-            profile = webdriver.FirefoxProfile()
-            options = Options()
-            profile.set_preference("media.volume_scale", "0.0")
-            if self.headless == True:
-                options.headless = True
-
-            driver = webdriver.Firefox(
-                firefox_profile=profile, options=options)
-
-            driver.get("https://www.tiktok.com/node/video/playwm?id=" + videoID)
-            time.sleep(3)
-
-            url = driver.current_url
-            driver.quit()
+            self.proxy.new_har("vid")
+            self.driver.get(video_url)
+            data = self.proxy.har
+            
+            for entry in data['log']['entries']:
+                try:
+                    if "muscdn.com" in entry['response']['redirectURL']:
+                        url = entry['response']['redirectURL']
+                        break
+                except:
+                    continue
 
             r = requests.get(url)
 
