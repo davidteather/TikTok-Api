@@ -13,6 +13,8 @@ class TikTokapi:
         from selenium import webdriver
         from selenium.webdriver.firefox.options import Options
         self.browsermobDirectory = browsermobDirectory
+        import random_user_agent
+        from random_user_agent import user_agent
         # Kills any browsermob-proxy
         for proc in psutil.process_iter():
             # check whether the process name matches
@@ -29,16 +31,20 @@ class TikTokapi:
         time.sleep(1)
 
         # Creates FF profile
+
         chromeProfile = webdriver.ChromeOptions()
         chromeProfile.add_argument("--disable-automation")
+        chromeProfile.add_argument("--no-sandbox")
         chromeProfile.add_experimental_option(
             "excludeSwitches", ["enable-automation"])
-        chromeProfile.add_argument("--proxy-server={0}".format(self.proxy.proxy))
-        chromeProfile.add_experimental_option("mobileEmulation", {"deviceName": "Galaxy S5"})
+        chromeProfile.add_argument(
+            "--proxy-server={0}".format(self.proxy.proxy))
+        # chromeProfile.add_experimental_option("mobileEmulation", {"deviceName": "Galaxy S5"})
 
         if headless == True:
             chromeProfile.add_argument('headless')
         self.driver = webdriver.Chrome(chrome_options=chromeProfile)
+        self.driver.set_window_size(1920, 1080)
 
         # Records FF Har
         self.proxy.new_har("list")
@@ -53,35 +59,25 @@ class TikTokapi:
                         self.signature = queryS['value']
                         break
 
-
         self.cookieString = ""
         for cookie in self.driver.get_cookies():
-            self.cookieString = self.cookieString + cookie['name'] + "=" + cookie['value'] + "; "
+            self.cookieString = self.cookieString + \
+                cookie['name'] + "=" + cookie['value'] + "; "
 
         self.cookieString = self.cookieString[:-2]
-
-        # Get Trending hashtags
-        hashtags = self.driver.find_elements_by_xpath(
-            '//h3[@class="_list_item_title"]/a')
-        hashtagArray = []
-        for hashtag in hashtags:
-            hashtagArray.append(hashtag.get_attribute('title'))
-
-        self.hashtag = hashtagArray
         self.headless = headless
         self.browsermobDirectory = browsermobDirectory
-
 
     def quit_browser(self):
         self.driver.quit()
 
-
     #
     # Show the user the trending hashtags
     #
+
     def get_trending_hashtags(self):
         # Returns the trending hashtags from /en/trending
-        return self.hashtag
+        return "Deprecated"
 
     #
     # Allows the user to search by a specific hashtag
@@ -92,106 +88,47 @@ class TikTokapi:
 
     def search_by_hashtag(self, hashtag, count=10, verbose=0):
         import requests
-        from browsermobproxy import Server
-        import psutil
-        import json
+        import string
         import time
         import json
-        import json
-        from selenium import webdriver
-        from selenium.webdriver.firefox.options import Options
-
-        import string
         import random
 
-        for proc in psutil.process_iter():
-            # check whether the process name matches
-            if proc.name() == "browsermob-proxy":
-                proc.kill()
+        self.driver.get("https://www.tiktok.com/tag/" +
+                        hashtag.replace("#", "") + "?lang=en")
+        time.sleep(2)
 
-        dict = {'port': 8090}
-        server = Server(
-            path=self.browsermobDirectory, options=dict)
-        # "browsermob-proxy/bin/browsermob-proxy"
-        server.start()
-        time.sleep(1)
-        proxy = server.create_proxy()
-        time.sleep(1)
-        # Browsermob-capture
-        proxy.new_har("list")
-        self.driver.get("https://www.tiktok.com/tag/" + hashtag + "?langCountry=en")
-        data = proxy.har
+        self.driver.execute_script(
+            "window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)
+        TikToks = self.driver.find_elements_by_xpath(
+            "//div[@class='jsx-1410658769 video-feed-item']")
+        TikToksUrls = self.driver.find_elements_by_xpath(
+            "//div[@class='jsx-1410658769 video-feed-item']/div/div/div/a")
+        TikToksViews = self.driver.find_elements_by_xpath(
+            "//div[@class='jsx-1410658769 video-feed-item']/div/div/div/a/div/div/div/div/div/span")
 
-        hashtagId = None
-
-        # Assigns signature and hashtagID
-        for element in data['log']['entries']:
-            if "https://m.tiktok.com/share/item/list?" in element['request']['url'] or "https://www.tiktok.com/share/item/list?" in element['request']['url']:
-
-                for queryS in element['request']['queryString']:
-                    if queryS['name'] == "_signature":
-                        self.signature = queryS['value']
-                        break
-
-        response = []
-
-        if hashtagId != None:
-            while True:
-                cookie = ''.join(random.choice(
-                    string.ascii_uppercase + string.digits) for _ in range(40))
-
-                url = "https://m.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=" + \
-                    str(count - len(response)) + "&minCursor=-1&maxCursor=0&_signature=" + \
-                    self.signature + "&shareUid="
-
-                self.driver.get(url)
-
-
-                data = json.loads(self.driver.find_element_by_xpath("//pre").text)
-
-                if data["statusCode"] == 0:
-                    maxCursor = data['body']['maxCursor']
-                    for tiktok in data["body"]["itemListData"]:
-                        response.append(tiktok)
-
-                    while True:
-                        try:
-                            if count > len(response):
-                                data['body']['hasMore'] == True
-                                cookie = ''.join(random.choice(
-                                    string.ascii_uppercase + string.digits) for _ in range(40))
-
-                                url = "https://m.tiktok.com/share/item/list?secUid=&id=" + str(hashtagId) + "&type=3&count=" + \
-                                    str(count - len(response)) + "&minCursor=-1&maxCursor=" + str(maxCursor) + "&_signature=" + \
-                                    self.signature + "&shareUid="
-
-                                
-                                self.driver.get(url)
-                                data = json.loads(self.driver.find_element_by_xpath("//pre").text)
-
-                                if data["statusCode"] == 0:
-                                    maxCursor = data['body']['maxCursor']
-                                    for tiktok in data["body"]["itemListData"]:
-                                        response.append(tiktok)
-
-                            else:
-                                return response
-
-                        except:
-                            cookie = ''.join(random.choice(
-                                string.ascii_uppercase + string.digits) for _ in range(40))
-
-                            url = "https://m.tiktok.com/share/item/list?secUid=&id=" + str(hashtagId) + "&type=3&count=" + \
-                                str(count - len(response)) + "&minCursor=-1&maxCursor=" + str(maxCursor) + "&_signature=" + \
-                                self.signature + "&shareUid="
-
-                            self.driver.get(url)
-                            data = json.loads(self.driver.find_element_by_xpath("//pre").text)
-                            continue
-
+        returnArr = []
+        if count > len(TikToks):
+            lower = len(TikToks)
         else:
-            raise Exception('Unable to locate the hashtag ID')
+            lower = count
+        for i in range(0, lower):
+            if "k" in TikToksViews[i].text.strip():
+                likes = float(
+                    TikToksViews[i].text.strip().replace("k", "")) * 1000
+            elif "m" in TikToksViews[i].text.strip():
+                likes = float(
+                    TikToksViews[i].text.strip().replace("m", "")) * 1000000
+            else:
+                likes = TikToksViews[i].text.strip()
 
+            returnArr.append({
+                "link": TikToksUrls[i].get_attribute("href"),
+                "author": TikToksUrls[i].get_attribute("href").split("/")[3],
+                "likes": likes
+            })
+
+        return returnArr
 
     #
     # Gets trending results
@@ -206,73 +143,63 @@ class TikTokapi:
         import time
         import json
         import random
-        def cookie_generator(size=100, chars=string.ascii_uppercase + string.digits):
-            return ''.join(random.choice(chars) for _ in range(size))
 
-        while True:
-            # TODO: Max Cursor Issue
-            # https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=2&minCursor=0&maxCursor=1000005823613&shareUid=&_signature=0NDOfgAgEB-lIUUg-oc9StDQz2AAI10
-            # https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=5&minCursor=0&maxCursor=0&shareUid=&_signature=Oo2r.AAgEBtPfCCiX9JspzqNquAAGc9
-            url = "https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=" + str(count) + "&minCursor=0&maxCursor=0&shareUid=&_signature=" + self.signature
+        self.driver.get("https://www.tiktok.com/en/trending")
+        time.sleep(2)
 
-            # https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=5&minCursor=0&maxCursor=0&shareUid=&_signature=DGZaZAAgEB95l9E6AB.J8gxmW3AAFHi
-                
+        self.driver.execute_script(
+            "window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)
+        TikToks = self.driver.find_elements_by_xpath(
+            "//div[@class='jsx-1410658769 video-feed-item']")
+        TikToksUrls = self.driver.find_elements_by_xpath(
+            "//div[@class='jsx-1410658769 video-feed-item']/div/div/div/a")
+        TikToksViews = self.driver.find_elements_by_xpath(
+            "//div[@class='jsx-1410658769 video-feed-item']/div/div/div/a/div/div/div/div/div/span")
 
-            self.driver.get(url)
-            data = json.loads(self.driver.find_element_by_xpath("//pre").text)
-            print(data)
+        returnArr = []
+        if count > len(TikToks):
+            lower = len(TikToks)
+        else:
+            lower = count
+        for i in range(0, lower):
+            if "k" in TikToksViews[i].text.strip():
+                likes = float(
+                    TikToksViews[i].text.strip().replace("k", "")) * 1000
+            elif "m" in TikToksViews[i].text.strip():
+                likes = float(
+                    TikToksViews[i].text.strip().replace("m", "")) * 1000000
+            else:
+                likes = TikToksViews[i].text.strip()
 
-            response = []
-            if data["statusCode"] == 0:
-                maxCursor = data['body']['maxCursor']
-                for tiktok in data["body"]["itemListData"]:
-                    response.append(tiktok)
-                print(response)
-                while True:
-                    try:
-                        time.sleep(5)
-                        print(count)
-                        print(len(response))
-                        if count > len(response):
-                            var = data['body']['hasMore']
-                            maxCursor = data['body']['maxCursor']
-                            url = "https://m.tiktok.com/share/item/list?id=&type=5&count=" + \
-                                str(count - len(response)) + "&minCursor=0&maxCursor=" + \
-                                str(maxCursor) + \
-                                "&_signature=" + self.signature
+            returnArr.append({
+                "link": TikToksUrls[i].get_attribute("href"),
+                "author": TikToksUrls[i].get_attribute("href").split("/")[3],
+                "likes": likes
+            })
 
-                            if count - len(response) > 5:
-                                var = count - len(response)
-                            else:
-                                var = 5
+        return returnArr
 
-                            url = "https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=" + str(var) + "&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature=" + self.signature
+    #
+    # Gets the song of a tiktok url
+    #
+    # url - url of the tiktok
+    #
 
-                            self.driver.get(url)
-                            data = json.loads(self.driver.find_element_by_xpath("//pre").text)
-                            if data["statusCode"] == 0:
-                                for tiktok in data["body"]["itemListData"]:
-                                    response.append(tiktok)
-                        else:
-                            return response
-                    except:
+    def get_song(self, url):
+        import requests
+        import string
+        import time
+        import json
+        import random
 
-                        if count - len(response) > 5:
-                                var = count - len(response)
-                        else:
-                            var = 5
+        self.driver.get(url)
+        time.sleep(2)
 
-                        url = "https://m.tiktok.com/share/item/list?id=&type=5&count=" + \
-                            str(count - len(response)) + "&minCursor=0&maxCursor=" + \
-                            str(maxCursor) + \
-                            "&_signature=" + self.signature
-                        
-                        url = "https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=" + str(var) + "&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature=" + self.signature
-
-                        self.driver.get(url)
-                        data = json.loads(self.driver.find_element_by_xpath("//pre").text)
-
-                        continue
+        return {
+            "song_name": self.driver.find_element_by_xpath("//a[@tag='a']").text.strip(),
+            "song_link": self.driver.find_element_by_xpath("//a[@class='jsx-1861775669 jsx-537314381']").get_attribute("href"),
+        }
 
     #
     # Gets a user's post
@@ -281,64 +208,49 @@ class TikTokapi:
     # verbose - 1 is high logging
     #
 
-    def userPosts(self, id, count=10, verbose=0):
+    def userPosts(self, username, count=10, verbose=0):
         import requests
-        while True:
-            url = "https://m.tiktok.com/share/item/list?id=" + str(id) + "&type=1&count=" + \
-                str(count) + "&minCursor=0&maxCursor=0&_signature=" + \
-                self.signature
-            r = requests.get(url, headers={"authority": "m.tiktok.com", "method": "GET", "path": url.split("https://m.tiktok.com")[0], "scheme": "https", "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
-                                           "accept-encoding": "gzip, deflate, br", "accept-language": "en-US,en;q=0.9", "cache-control": "max-age=0", "upgrade-insecure-requests": "1",
-                                           "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"})
+        import string
+        import time
+        import json
+        import random
 
-            data = r.json()
-            response = []
+        self.driver.get("https://www.tiktok.com/@" +
+                        username.replace("@", "") + "?")
+        time.sleep(2)
 
-            if data["statusCode"] != 0:
-                if verbose == 1:
-                    print("Invalid Signature Retrying")
+        self.driver.execute_script(
+            "window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)
+        TikToks = self.driver.find_elements_by_xpath(
+            "//div[@class='jsx-1410658769 video-feed-item']")
+        TikToksUrls = self.driver.find_elements_by_xpath(
+            "//div[@class='jsx-1410658769 video-feed-item']/div/div/div/a")
+        TikToksViews = self.driver.find_elements_by_xpath(
+            "//div[@class='jsx-1410658769 video-feed-item']/div/div/div/a/div/div/div/div/div/span")
+
+        returnArr = []
+        if count > len(TikToks):
+            lower = len(TikToks)
+        else:
+            lower = count
+        for i in range(0, lower):
+            if "k" in TikToksViews[i].text.strip():
+                likes = float(
+                    TikToksViews[i].text.strip().replace("k", "")) * 1000
+            elif "m" in TikToksViews[i].text.strip():
+                likes = float(
+                    TikToksViews[i].text.strip().replace("m", "")) * 1000000
             else:
-                maxCursor = data['body']['maxCursor']
-                for tiktok in data["body"]["itemListData"]:
-                    response.append(tiktok)
-                while True:
-                    try:
-                        if count > len(response) and str(data['body']['hasMore']) == "True":
-                            url = "https://m.tiktok.com/share/item/list?id=" + str(id) + "&type=1&count=" + \
-                                str(count - len(response)) + "&minCursor=0&maxCursor=" + maxCursor + "&_signature=" + \
-                                self.signature
-                            maxCursor = data['body']['maxCursor']
+                likes = TikToksViews[i].text.strip()
 
-                            r = requests.get(url, headers={"authority": "m.tiktok.com", "method": "GET", "path": url.split("https://m.tiktok.com")[0], "scheme": "https", "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
-                                                           "accept-encoding": "gzip, deflate, br", "accept-language": "en-US,en;q=0.9", "cache-control": "max-age=0", "upgrade-insecure-requests": "1",
-                                                           "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"})
+            returnArr.append({
+                "link": TikToksUrls[i].get_attribute("href"),
+                "author": TikToksUrls[i].get_attribute("href").split("/")[3],
+                "likes": likes
+            })
 
-                            data = r.json()
-
-                            if data["statusCode"] == 0:
-                                for tiktok in data["body"]["itemListData"]:
-                                    response.append(tiktok)
-
-                            else:
-                                if verbose == 1:
-                                    print(
-                                        "Invalid Signature Retrying")
-
-                        else:
-                            return response
-
-                    except:
-                        url = "https://m.tiktok.com/share/item/list?id=" + str(id) + "&type=1&count=" + \
-                            str(count - len(response)) + "&minCursor=0&maxCursor=" + maxCursor + "&_signature=" + \
-                            self.signature
-
-                        r = requests.get(url, headers={"authority": "m.tiktok.com", "method": "GET", "path": url.split("https://m.tiktok.com")[0], "scheme": "https", "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
-                                                       "accept-encoding": "gzip, deflate, br", "accept-language": "en-US,en;q=0.9", "cache-control": "max-age=0", "upgrade-insecure-requests": "1",
-                                                       "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"})
-
-                        data = r.json()
-
-                        continue
+        return returnArr
 
     #
     # Gets the source url of a given url for a tiktok
@@ -362,30 +274,10 @@ class TikTokapi:
         if return_bytes == 0:
             self.proxy.new_har("vid")
             self.driver.get(video_url)
-            data = self.proxy.har
-            
-            for entry in data['log']['entries']:
-                try:
-                    if "muscdn.com" in entry['response']['redirectURL']:
-                        url = entry['response']['redirectURL']
-                        break
-                except:
-                    continue
-
-            return url
+            return self.driver.find_element_by_xpath("//video[@class='jsx-3382097194 video-player']").get_attribute("src")
+        
         else:
             self.proxy.new_har("vid")
             self.driver.get(video_url)
-            data = self.proxy.har
-            
-            for entry in data['log']['entries']:
-                try:
-                    if "muscdn.com" in entry['response']['redirectURL']:
-                        url = entry['response']['redirectURL']
-                        break
-                except:
-                    continue
-
-            r = requests.get(url)
-
+            r = requests.get( self.driver.find_element_by_xpath("//video[@class='jsx-3382097194 video-player']").get_attribute("src") )
             return r.content

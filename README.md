@@ -69,24 +69,21 @@ headless - True/False - True means it will run a headless chrome browser, could 
 api.trending(count, verbose)
 ```
 
-Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/0be2e495e2de54098e8f2a9594581d27)
-
-JSON object tree [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1)
+Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/1844d21d07f290be91fd9e56e41f925e)
 
 ##### The userPosts Method
 
 ```
-# Where count is how many results you want
-# Verbose is optional, default=0. Set it to 1 to get more information
-# userid is the tiktok userid, can be found through response json tree or in the tiktok url
-api.userPosts(userid, count, verbose)
+api.userPosts(username, count, verbose)
 ```
 
-Since this isn't an offical TikTok API the TikTok servers don't know what to do. This method specifically will throw a lot of errors if you have verbose on. It takes a lot longer than trending, however it will still end up working. Just give it a few minutes.
+username - the username of the user
 
-Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/a5c1e54de353353f77a78139d2e5a9f9)
+count - the amount you want
 
-It has the same JSON object tree as trending. It's [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1) anyways.
+verbose - 0/1 if you want it to display things
+
+Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/1844d21d07f290be91fd9e56e41f925e)
 
 ##### The search_by_hashtag Method
 
@@ -100,9 +97,19 @@ count - The number of results you want
 
 Since this isn't an offical TikTok API the TikTok servers don't know what to do with my bad solutions, this takes a bit longer as it needs to find the hashtagID and stuff.
 
-Search by hashtag returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/a5c1e54de353353f77a78139d2e5a9f9)
+Search by hashtag returns an array of json objects.  Example structure [here](https://gist.github.com/davidteather/1844d21d07f290be91fd9e56e41f925e)
 
-It has the same JSON object tree as trending. It's [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1) anyways.
+
+##### The get_song Method
+
+```
+api.get_song(url)
+```
+
+url - The url of the TikTok, can be found via trending.
+
+This returns a dictionary. Example structure [here](https://gist.github.com/davidteather/777befde18641f44d90fbf008082ec02)
+
 
 ##### The get_Video_By_Url Method
 
@@ -114,7 +121,7 @@ video_url - The video you want to get url.
 
 return_bytes - The default value is 0, when it is set to 1 the function instead returns the bytes from the video rather than just the direct url.
 
-##### The get_trending_hashtags Method
+##### The get_trending_hashtags Method ( not working as of now )
 
 ```
 api.get_trending_hashtags()
