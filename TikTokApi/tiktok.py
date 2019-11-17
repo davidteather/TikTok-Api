@@ -13,8 +13,6 @@ class TikTokapi:
         from selenium import webdriver
         from selenium.webdriver.firefox.options import Options
         self.browsermobDirectory = browsermobDirectory
-        import random_user_agent
-        from random_user_agent import user_agent
         # Kills any browsermob-proxy
         for proc in psutil.process_iter():
             # check whether the process name matches
