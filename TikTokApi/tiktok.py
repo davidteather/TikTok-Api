@@ -12,40 +12,56 @@ class TikTokapi:
         import time
         import json
         from selenium import webdriver
-        from selenium.webdriver.firefox.options import Options
 
+        self.browsermobDirectory = browsermobDirectory
         # Kills any browsermob-proxy
         for proc in psutil.process_iter():
             # check whether the process name matches
             if proc.name() == "browsermob-proxy":
                 proc.kill()
 
-        dict = {'port': 8090}
-        server = Server(
-            path=browsermobDirectory, options=dict)
+        dictf = {'port': 8090}
+        self.server = Server(
+            path=browsermobDirectory, options=dictf)
         # "browsermob-proxy/bin/browsermob-proxy"
-        server.start()
+        self.server.start()
         time.sleep(1)
-        proxy = server.create_proxy()
+        self.proxy = self.server.create_proxy()
         time.sleep(1)
 
         # Creates FF profile
-        profile = webdriver.FirefoxProfile()
-        selenium_proxy = proxy.selenium_proxy()
-        profile.set_proxy(selenium_proxy)
-        options = Options()
+
+        chromeProfile = webdriver.ChromeOptions()
+        chromeProfile.add_argument("--disable-automation")
+        chromeProfile.add_argument("--no-sandbox")
+        chromeProfile.add_argument('--disable-extensions')
+        chromeProfile.add_argument('--profile-directory=Default')
+        chromeProfile.add_argument("--incognito")
+        chromeProfile.add_argument("--disable-plugins-discovery")
+        chromeProfile.add_argument("--start-maximized")
+        chromeProfile.add_argument("--user-agent=Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1")
+        chromeProfile.add_experimental_option('useAutomationExtension', False)
+        chromeProfile.add_experimental_option(
+            "excludeSwitches", ["enable-automation"])
+        chromeProfile.add_argument(
+            "--proxy-server={0}".format(self.proxy.proxy))
+        # chromeProfile.add_experimental_option("mobileEmulation", {"deviceName": "Galaxy S5"})
+
         if headless == True:
-            options.headless = True
-        driver = webdriver.Firefox(firefox_profile=profile, options=options)
+            chromeProfile.add_argument('headless')
+        self.driver = webdriver.Chrome(chrome_options=chromeProfile)
+        self.driver.set_window_size(1920, 1080)
 
         # Records FF Har
-        proxy.new_har("list")
-        driver.get("https://www.tiktok.com/en/trending")
-        data = proxy.har
+        self.proxy.new_har("list")
+        self.driver.delete_all_cookies()
+        self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => false});")
+        self.driver.get("https://www.tiktok.com/en/trending")
+        data = self.proxy.har
         self.signature = "VIm6dAAgEBardkWLNbDzilSJDWAAAlc"
 
         # Get Trending hashtags
-        hashtags = driver.find_elements_by_xpath(
+        hashtags = self.driver.find_elements_by_xpath(
             '//h3[@class="_list_item_title"]/a')
         hashtagArray = []
         for hashtag in hashtags:
@@ -55,8 +71,11 @@ class TikTokapi:
         self.headless = headless
         self.browsermobDirectory = browsermobDirectory
 
-        server.stop()
-        driver.quit()
+
+    # Quits the browser
+    def quit_browser(self):
+        self.driver.quit()
+
 
     #
     # Show the user the trending hashtags
@@ -85,33 +104,10 @@ class TikTokapi:
         import string
         import random
 
-        for proc in psutil.process_iter():
-            # check whether the process name matches
-            if proc.name() == "browsermob-proxy":
-                proc.kill()
-
-        dict = {'port': 8090}
-        server = Server(
-            path=self.browsermobDirectory, options=dict)
-        # "browsermob-proxy/bin/browsermob-proxy"
-        server.start()
-        time.sleep(1)
-        proxy = server.create_proxy()
-        time.sleep(1)
-
-        # Firefox selenium stuff
-        profile = webdriver.FirefoxProfile()
-        selenium_proxy = proxy.selenium_proxy()
-        profile.set_proxy(selenium_proxy)
-        options = Options()
-        if self.headless == True:
-            options.headless = True
-        driver = webdriver.Firefox(firefox_profile=profile, options=options)
-
         # Browsermob-capture
-        proxy.new_har("list")
-        driver.get("https://www.tiktok.com/tag/" + hashtag + "?langCountry=en")
-        data = proxy.har
+        self.proxy.new_har("list")
+        self.driver.get("https://www.tiktok.com/tag/" + hashtag + "?langCountry=en")
+        data = self.proxy.har
 
         hashtagId = None
 
@@ -123,19 +119,18 @@ class TikTokapi:
 
                         print(hashtagId)
                     if name['name'] == "_signature":
-                        self.signature = name['value'] 
-                        print(self.signature)
-
-        driver.quit()
+                        hashtagSignature = name['value'] 
+                        print(hashtagSignature)
 
         response = []
 
         if hashtagId != None:
             while True:
-                url = "https://www.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=30&minCursor=0&maxCursor=0&shareUid=&_signature" + self.signature
+                url = "https://www.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=30&minCursor=0&maxCursor=0&shareUid=&_signature=" + hashtagSignature
+                print(url)
                 headers = {"method": "GET",
                            "accept-encoding": "gzip, deflate, br",
-                           "Referer": self.referer,
+                           "Referer": "https://www.tiktok.com/tag/funny",
                            "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"}
                 r = requests.get(url, headers=headers)
 
@@ -157,7 +152,7 @@ class TikTokapi:
                                 cookie = ''.join(random.choice(
                                     string.ascii_uppercase + string.digits) for _ in range(40))
 
-                                url = "https://www.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=30&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature" + self.signature
+                                url = "https://www.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=30&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature" + hashtagSignature
 
                                 headers = {"method": "GET",
                                            "accept-encoding": "gzip, deflate, br",
@@ -183,7 +178,7 @@ class TikTokapi:
                             cookie = ''.join(random.choice(
                                 string.ascii_uppercase + string.digits) for _ in range(40))
 
-                            url = "https://www.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=30&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature" + self.signature
+                            url = "https://www.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=30&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature" + hashtagSignature
 
                             headers = {"method": "GET",
                                        "accept-encoding": "gzip, deflate, br",
