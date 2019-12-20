@@ -102,29 +102,29 @@ class TikTokapi:
         from selenium.webdriver.firefox.options import Options
 
         import string
+        import warnings
+
         import random
 
         hashtagId = None
         tries = 0
 
         while hashtagId == None:
-            if tries >= 5:
+            if tries >= 10:
                 raise Exception("Could not locate hashtag ID: Tried " + str(tries) + " times")
             # Browsermob-capture
+            time.sleep(2)
             self.proxy.new_har("list")
             self.driver.get("https://www.tiktok.com/tag/" + hashtag + "?langCountry=en")
             data = self.proxy.har
 
 
             for element in data['log']['entries']:
+                warnings.warn(str(element))
                 if hashtagId != None:
                     break
                 elif "https://m.tiktok.com/share/item/list?" in element['request']['url'] or "https://www.tiktok.com/share/item/list?" in element['request']['url']:
                     for name in element['request']['queryString']:
-                        print(name)
-                        print(name['name'])
-                        print(name['value'])
-                        print(name['name'] == "id" and name['value'] != "")
                         if name['name'] == "id" and name['value'] != "":
                             hashtagId = name['value']
                             break
