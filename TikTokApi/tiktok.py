@@ -102,7 +102,6 @@ class TikTokapi:
         from selenium.webdriver.firefox.options import Options
 
         import string
-        import warnings
 
         import random
 
@@ -120,7 +119,6 @@ class TikTokapi:
 
 
             for element in data['log']['entries']:
-                warnings.warn(str(element))
                 if hashtagId != None:
                     break
                 elif "https://m.tiktok.com/share/item/list?" in element['request']['url'] or "https://www.tiktok.com/share/item/list?" in element['request']['url']:
