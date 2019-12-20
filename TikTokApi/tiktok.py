@@ -139,7 +139,7 @@ class TikTokapi:
                         else:
                             return response
 
-                    if len(resposne) == count:
+                    if len(response) == count:
                         return response
 
                     raise Exception('Rate Limit: This function only currently supports 30 TikToks.')
@@ -281,7 +281,7 @@ class TikTokapi:
                     else:
                         return response
                 
-                if len(resposne) == count:
+                if len(response) == count:
                     return response
 
                 raise Exception('Rate Limit: This function only currently supports 30 TikToks.')
