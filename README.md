@@ -75,13 +75,16 @@ JSON object tree [here](https://gist.github.com/davidteather/bc4baef0edb621dd322
 ##### The userPosts Method
 
 ```
-# Where count is how many results you want
-# Verbose is optional, default=0. Set it to 1 to get more information
-# userid is the tiktok userid, can be found through response json tree or in the tiktok url
-api.userPosts(userid, count, verbose)
+api.userPosts(userid, secUid, count, verbose)
 ```
 
-Since this isn't an offical TikTok API the TikTok servers don't know what to do. This method specifically will throw a lot of errors if you have verbose on. It takes a lot longer than trending, however it will still end up working. Just give it a few minutes.
+userid - The id of the user, can be found in the TikTok json response titled "userId"
+
+secUid - Also found in the TikTok json response the key anme is "secUid"
+
+
+**Note:** Currently limited to 30 because of some issues with getting past 30. It will raise an exception if you try for higher.
+
 
 Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/a5c1e54de353353f77a78139d2e5a9f9)
 
@@ -95,11 +98,18 @@ api.search_by_hashtag(hashtag, count=10)
 
 hashtag - A string of the hashtag without the # mark. Ex: hashtag = "funny"
 
+
 count - The number of results you want
+
+
+**Note:** Currently limited to 30 because of some issues with getting past 30. It will raise an exception if you try for higher.
+
 
 Since this isn't an offical TikTok API the TikTok servers don't know what to do with my bad solutions, this takes a bit longer as it needs to find the hashtagID and stuff.
 
+
 Search by hashtag returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/a5c1e54de353353f77a78139d2e5a9f9)
+
 
 It has the same JSON object tree as trending. It's [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1) anyways.
 

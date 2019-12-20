@@ -114,28 +114,22 @@ class TikTokapi:
         for element in data['log']['entries']:
             if "https://m.tiktok.com/share/item/list?" in element['request']['url'] or "https://www.tiktok.com/share/item/list?" in element['request']['url']:
                 for name in element['request']['queryString']:
-                    if name['name'] == "id":
+                    if name['name'] == "id" and name['name'] != "":
                         hashtagId = name['value']
-
-                        print(hashtagId)
-                    if name['name'] == "_signature":
-                        hashtagSignature = name['value'] 
-                        print(hashtagSignature)
 
         response = []
 
         if hashtagId != None:
             while True:
-                url = "https://www.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=30&minCursor=0&maxCursor=0&shareUid=&_signature=" + hashtagSignature
-                print(url)
+                hashtagSignature = "yZ-7VgAgEBu8bjAI0DLgHMmfukAAJRs"
+                url = "https://m.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=30&minCursor=0&maxCursor=0&shareUid=&_signature=" + hashtagSignature
                 headers = {"method": "GET",
                            "accept-encoding": "gzip, deflate, br",
-                           "Referer": "https://www.tiktok.com/tag/funny",
+                           "Referer": self.referer,
                            "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"}
                 r = requests.get(url, headers=headers)
 
                 data = r.json()
-                print(data)
 
                 if data["statusCode"] == 0:
                     maxCursor = data['body']['maxCursor']
@@ -145,14 +139,13 @@ class TikTokapi:
                         else:
                             return response
 
+                    raise Exception('Rate Limit: This function only currently supports 30 TikToks.')
+
                     while True:
                         try:
                             if count > len(response):
                                 data['body']['hasMore'] == True
-                                cookie = ''.join(random.choice(
-                                    string.ascii_uppercase + string.digits) for _ in range(40))
-
-                                url = "https://www.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=30&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature" + hashtagSignature
+                                url = "https://m.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=30&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature=" + hashtagSignature
 
                                 headers = {"method": "GET",
                                            "accept-encoding": "gzip, deflate, br",
@@ -175,10 +168,8 @@ class TikTokapi:
                                 return response
 
                         except:
-                            cookie = ''.join(random.choice(
-                                string.ascii_uppercase + string.digits) for _ in range(40))
 
-                            url = "https://www.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=30&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature" + hashtagSignature
+                            url = "https://m.tiktok.com/share/item/list?secUid=&id=" + hashtagId + "&type=3&count=30&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature=" + hashtagSignature
 
                             headers = {"method": "GET",
                                        "accept-encoding": "gzip, deflate, br",
@@ -259,12 +250,15 @@ class TikTokapi:
     # verbose - 1 is high logging
     #
 
-    def userPosts(self, id, count=10, verbose=0):
+    def userPosts(self, id, secUid, count=10, verbose=0):
         import requests
         while True:
-            url = "https://m.tiktok.com/share/item/list?id=" + str(id) + "&type=1&count=" + \
-                str(count) + "&minCursor=0&maxCursor=0&_signature=" + \
-                self.signature
+
+            # I feel like this signature won't work in a few hours
+            userpostSig = "T.EPYAAgEBM6AIQ-UrnWvU.xDnAABIP"
+
+
+            url = "https://m.tiktok.com/share/item/list?secUid=" + str(secUid) + "&id=" + str(id) + "&type=1&count=30&minCursor=0&maxCursor=0&shareUid=&_signature=" + userpostSig
             r = requests.get(url, headers={"method": "GET",
                                            "accept-encoding": "gzip, deflate, br",
                                            "Referer": self.referer,
@@ -279,13 +273,18 @@ class TikTokapi:
             else:
                 maxCursor = data['body']['maxCursor']
                 for tiktok in data["body"]["itemListData"]:
-                    response.append(tiktok)
+                    if count > len(response):
+                        response.append(tiktok)
+                    else:
+                        return response
+                
+                raise Exception('Rate Limit: This function only currently supports 30 TikToks.')
                 while True:
                     try:
                         if count > len(response) and str(data['body']['hasMore']) == "True":
                             url = "https://m.tiktok.com/share/item/list?id=" + str(id) + "&type=1&count=" + \
                                 str(count - len(response)) + "&minCursor=0&maxCursor=" + maxCursor + "&_signature=" + \
-                                self.signature
+                                userpostSig
                             maxCursor = data['body']['maxCursor']
 
                             r = requests.get(url, headers={"method": "GET",

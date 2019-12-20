@@ -20,12 +20,12 @@ def test_hashtag():
     assert len(res) == 10
     assert checkDupes(res) == 0
 
-    res = api.search_by_hashtag("funny", count=50)
-    assert len(res) == 50
+    res = api.search_by_hashtag("funny", count=20)
+    assert len(res) == 20
     assert checkDupes(res) == 0
 
+    res = api.search_by_hashtag("funny", count=30)
+    assert len(res) == 30
+    assert checkDupes(res) == 0
 
-def test_get_trending_hashtag():
-    api = TikTokapi("browsermob-proxy/bin/browsermob-proxy", headless=True)
-
-    assert len(api.get_trending_hashtags()) == 4
+    api.quit_browser()
