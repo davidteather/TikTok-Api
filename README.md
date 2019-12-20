@@ -3,8 +3,7 @@
 
 This is an unoffical api wrapper for tiktok.com in python. With this api you are able to call most trending and fetch specific user information.
 
- [![GitHub release (latest by date)](https://img.shields.io/github/v/release/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/releases) [![Build Status](https://travis-ci.com/davidteather/TikTok-Api.svg?branch=master)](https://travis-ci.com/davidteather/TikTok-Api) [![GitHub](https://img.shields.io/github/license/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/blob/master/LICENSE) 
-[![Downloads](https://pepy.tech/badge/tiktokapi)](https://pypi.org/project/TikTokApi/)
+ [![GitHub release (latest by date)](https://img.shields.io/github/v/release/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/releases) [![Build Status](https://travis-ci.com/davidteather/TikTok-Api.svg?branch=master)](https://travis-ci.com/davidteather/TikTok-Api) [![GitHub](https://img.shields.io/github/license/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/blob/master/LICENSE) [![PyPI - Downloads](https://img.shields.io/pypi/dm/TikTokApi)](https://pypi.org/project/TikTokApi/)
 
 ## Important Information
 * If this API stops working for any reason open an issue.
@@ -33,8 +32,8 @@ Or install directly from this GitHub repo.
 * You do need to have **java installed**
 * Download browsermob-proxy [here](https://bmp.lightbody.net/)
 * You must add **browsermob-proxy/bin** to your environment path.
-* **Chrome** must be installed.
-* You must download the latest **chromedriver** from [Google](https://sites.google.com/a/chromium.org/chromedriver/downloads), and include the .exe in your path.
+* **Firefox** must be installed.
+* You must download the latest **geckodriver** from [mozilla](https://github.com/mozilla/geckodriver/releases), and include the .exe in your path.
 
 ## Quick Start Guide
 
@@ -58,7 +57,7 @@ api.trending(10)
 api = TikTokapi(path_to_browsermob_directory, headless=False)
 ```
 path_to_browsermob_directory - String - should be the path from the directory you are running from the code to the extracted zip file of [browsermob-proxy](https://bmp.lightbody.net/)
-headless - True/False - True means it will run a headless chrome browser, could be detected by TikTok, however it is more convienent. Default = False.
+headless - True/False - True means it will run a headless firefox browser, could be detected by TikTok, however it is more convienent. Default = False.
 
 
 ##### The Trending Method
@@ -69,21 +68,27 @@ headless - True/False - True means it will run a headless chrome browser, could 
 api.trending(count, verbose)
 ```
 
-Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/1844d21d07f290be91fd9e56e41f925e)
+Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/0be2e495e2de54098e8f2a9594581d27)
+
+JSON object tree [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1)
 
 ##### The userPosts Method
 
 ```
-api.userPosts(username, count, verbose)
+api.userPosts(userid, secUid, count, verbose)
 ```
 
-username - the username of the user
+userid - The id of the user, can be found in the TikTok json response titled "userId"
 
-count - the amount you want
+secUid - Also found in the TikTok json response the key anme is "secUid"
 
-verbose - 0/1 if you want it to display things
 
-Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/1844d21d07f290be91fd9e56e41f925e)
+**Note:** Currently limited to 30 because of some issues with getting past 30. It will raise an exception if you try for higher.
+
+
+Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/a5c1e54de353353f77a78139d2e5a9f9)
+
+It has the same JSON object tree as trending. It's [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1) anyways.
 
 ##### The search_by_hashtag Method
 
@@ -93,23 +98,20 @@ api.search_by_hashtag(hashtag, count=10)
 
 hashtag - A string of the hashtag without the # mark. Ex: hashtag = "funny"
 
+
 count - The number of results you want
+
+
+**Note:** Currently limited to 30 because of some issues with getting past 30. It will raise an exception if you try for higher.
+
 
 Since this isn't an offical TikTok API the TikTok servers don't know what to do with my bad solutions, this takes a bit longer as it needs to find the hashtagID and stuff.
 
-Search by hashtag returns an array of json objects.  Example structure [here](https://gist.github.com/davidteather/1844d21d07f290be91fd9e56e41f925e)
+
+Search by hashtag returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/a5c1e54de353353f77a78139d2e5a9f9)
 
 
-##### The get_song Method
-
-```
-api.get_song(url)
-```
-
-url - The url of the TikTok, can be found via trending.
-
-This returns a dictionary. Example structure [here](https://gist.github.com/davidteather/777befde18641f44d90fbf008082ec02)
-
+It has the same JSON object tree as trending. It's [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1) anyways.
 
 ##### The get_Video_By_Url Method
 
@@ -121,21 +123,13 @@ video_url - The video you want to get url.
 
 return_bytes - The default value is 0, when it is set to 1 the function instead returns the bytes from the video rather than just the direct url.
 
-##### The get_trending_hashtags Method ( not working as of now )
+##### The get_trending_hashtags Method
 
 ```
 api.get_trending_hashtags()
 ```
 
 This returns the 4 displayed trending hashtags in an array, this does change on every new instance of the api as it changes on page refreshes. 
-
-##### The quit_browser Method
-
-```
-api.quit_browser()
-```
-
-This quits the browser.
 
 ## Built With
 

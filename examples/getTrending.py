@@ -9,8 +9,6 @@ trending = api.trending(results)
 
 for tiktok in trending:
     # Prints the text of the tiktok
-    print(tiktok)
+    print(tiktok['itemInfos']['text'])
 
 print(len(trending))
-
-api.quit_browser()
