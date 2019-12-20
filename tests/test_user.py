@@ -8,7 +8,7 @@ def getUser(results):
     return len(result)
 
 
-def test_trending():
+def test_user():
     assert getUser(5) == 5
     assert getUser(10) == 10
     assert getUser(30) == 30
