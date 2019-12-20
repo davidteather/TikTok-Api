@@ -104,21 +104,35 @@ class TikTokapi:
         import string
         import random
 
-        # Browsermob-capture
-        self.proxy.new_har("list")
-        self.driver.get("https://www.tiktok.com/tag/" + hashtag + "?langCountry=en")
-        data = self.proxy.har
-
         hashtagId = None
+        tries = 0
 
-        for element in data['log']['entries']:
-            if "https://m.tiktok.com/share/item/list?" in element['request']['url'] or "https://www.tiktok.com/share/item/list?" in element['request']['url']:
-                for name in element['request']['queryString']:
-                    if name['name'] == "id" and name['name'] != "":
-                        hashtagId = name['value']
+        while hashtagId == None:
+            if tries >= 5:
+                raise Exception("Could not locate hashtag ID: Tried " + str(tries) + " times")
+            # Browsermob-capture
+            self.proxy.new_har("list")
+            self.driver.get("https://www.tiktok.com/tag/" + hashtag + "?langCountry=en")
+            data = self.proxy.har
+
+
+            for element in data['log']['entries']:
+                if hashtagId != None:
+                    break
+                elif "https://m.tiktok.com/share/item/list?" in element['request']['url'] or "https://www.tiktok.com/share/item/list?" in element['request']['url']:
+                    for name in element['request']['queryString']:
+                        print(name)
+                        print(name['name'])
+                        print(name['value'])
+                        print(name['name'] == "id" and name['value'] != "")
+                        if name['name'] == "id" and name['value'] != "":
+                            hashtagId = name['value']
+                            break
+
+            tries += 1
 
         response = []
-
+        print(hashtagId + " here")
         if hashtagId != None:
             while True:
                 hashtagSignature = "yZ-7VgAgEBu8bjAI0DLgHMmfukAAJRs"
