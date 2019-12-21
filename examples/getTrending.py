@@ -12,3 +12,4 @@ for tiktok in trending:
     print(tiktok['itemInfos']['text'])
 
 print(len(trending))
+api.quit_browser()
