@@ -4,7 +4,6 @@ class TikTokapi:
     #
     def __init__(self, browsermobDirectory, headless=False):
         # Imports
-        print("New class reference, finding valid signature. This might take a minute.")
         self.referer = "https://www.tiktok.com/@ondymikula/video/6757762109670477061"
         from browsermobproxy import Server
         import psutil
@@ -130,7 +129,6 @@ class TikTokapi:
             tries += 1
 
         response = []
-        print(hashtagId + " here")
         if hashtagId != None:
             while True:
                 hashtagSignature = "yZ-7VgAgEBu8bjAI0DLgHMmfukAAJRs"
