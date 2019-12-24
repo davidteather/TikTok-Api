@@ -347,49 +347,57 @@ class TikTokapi:
         # Imports
         import requests
         import time
+        import browsermobproxy
+        from browsermobproxy import Server
+        import psutil
+        import json
+        from bs4 import BeautifulSoup
+
+        self.driver.get(video_url)
+        time.sleep(5)
+        
+        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+        data = json.loads(soup.find_all('script', attrs={"id": "videoObject"})[0].text)
+
+        if return_bytes == 0:
+            return data['contentUrl']
+        else:
+            r = requests.get(data['contentUrl'])
+            return r.content
+
+    #
+    # returns videos related to given video
+    #
+
+    def get_Related_Videos(self, video_url):
+        # Imports
+        import requests
+        import time
+        import browsermobproxy
+        from browsermobproxy import Server
+        import psutil
         import json
         from selenium import webdriver
         from selenium.webdriver.firefox.options import Options
 
-        # Gets the VideoID
-        videoID = video_url.split("/video/")[1].split("?")[0]
+        videoID = video_url.split("/")[5]
+        found = False
+        tries = 0
+        while not found:
+            if tries >= 50:
+                raise Exception("Tried 50 times could not find video JSON.")
+            else:
+                url = "https://m.tiktok.com/share/item/list?secUid=&id=" + videoID + "&type=0&count=10&minCursor=0&maxCursor=0&shareUid=&_signature=" + self.signature
 
-        # Checks if they should determine the return_bytes
-        if return_bytes == 0:
-            # Creates FF profile
-            profile = webdriver.FirefoxProfile()
-            options = Options()
-            profile.set_preference("media.volume_scale", "0.0")
-            if self.headless == True:
-                options.headless = True
+                r = requests.get(url, headers={"method": "GET",
+                                                "accept-encoding": "gzip, deflate, br",
+                                                "Referer": self.referer,
+                                                "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"})
 
-            driver = webdriver.Firefox(
-                firefox_profile=profile, options=options)
+                data = r.json()
+                if data['statusCode'] == 0:
+                    found = True
+                    break
+                tries += 1
 
-            driver.get("https://www.tiktok.com/node/video/playwm?id=" + videoID)
-            time.sleep(3)
-
-            url = driver.current_url
-            driver.quit()
-
-            return url
-        else:
-            # Creates FF profile
-            profile = webdriver.FirefoxProfile()
-            options = Options()
-            profile.set_preference("media.volume_scale", "0.0")
-            if self.headless == True:
-                options.headless = True
-
-            driver = webdriver.Firefox(
-                firefox_profile=profile, options=options)
-
-            driver.get("https://www.tiktok.com/node/video/playwm?id=" + videoID)
-            time.sleep(3)
-
-            url = driver.current_url
-            driver.quit()
-
-            r = requests.get(url)
-
-            return r.content
+        return data['body']['itemListData']
