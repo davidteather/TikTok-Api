@@ -123,13 +123,15 @@ video_url - The video you want to get url.
 
 return_bytes - The default value is 0, when it is set to 1 the function instead returns the bytes from the video rather than just the direct url.
 
-##### The get_trending_hashtags Method
+##### The get_Related_Videos Method
 
 ```
-api.get_trending_hashtags()
+api.get_Related_Videos(video_url)
 ```
 
-This returns the 4 displayed trending hashtags in an array, this does change on every new instance of the api as it changes on page refreshes. 
+This method returns the suggested trending videos titled "trends for you" on desktop. 
+
+video_url - the video URL that you want to see related videos for 
 
 ## Built With
 
