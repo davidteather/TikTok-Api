@@ -2,7 +2,8 @@ class TikTokapi:
     #
     # The TikTokapi class initial function
     #
-    def __init__(self, browsermobDirectory, headless=False):
+    def __init__(self, browsermobDirectory, headless=False, manualSignature="EeMCigAgEBFkEonUIlHZBRHjA5AAE.m"):
+        self.signature = manualSignature
         # Imports
         self.referer = "https://www.tiktok.com/@ondymikula/video/6757762109670477061"
         from browsermobproxy import Server
