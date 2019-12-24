@@ -56,8 +56,19 @@ class TikTokapi:
         self.driver.delete_all_cookies()
         self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => false});")
         self.driver.get("https://www.tiktok.com/en/trending")
+
+        time.sleep(5)
         data = self.proxy.har
-        self.signature = "VIm6dAAgEBardkWLNbDzilSJDWAAAlc"
+
+
+        for element in data['log']['entries']:
+            if "https://m.tiktok.com/share/item/list?" in element['request']['url'] or "https://www.tiktok.com/share/item/list?" in element['request']['url']:
+                for name in element['request']['queryString']:
+                    if name['name'] == "_signature" and name['value'] != "":
+                        self.signature = name['value']
+                        break
+
+        # self.signature = "pN0c4gAgEBDRLJe8E9p926TdHfAAPru"
 
         # Get Trending hashtags
         hashtags = self.driver.find_elements_by_xpath(
@@ -208,7 +219,7 @@ class TikTokapi:
         import requests
 
         while True:
-            url = "https://www.tiktok.com/share/item/list?secUid=&id=&type=5&count=30&minCursor=0&maxCursor=0&shareUid=&_signature=" + self.signature
+            url = "https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=30&minCursor=0&maxCursor=0&shareUid=&_signature=" + self.signature
             r = requests.get(url, headers={"method": "GET",
                                            "accept-encoding": "gzip, deflate, br",
                                            "Referer": self.referer,
@@ -230,7 +241,7 @@ class TikTokapi:
                             var = data['body']['hasMore']
                             maxCursor = data['body']['maxCursor']
 
-                            url = "https://www.tiktok.com/share/item/list?secUid=&id=&type=5&count=30&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature=" + self.signature
+                            url = "https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=30&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature=" + self.signature
 
                             r = requests.get(url, headers={"method": "GET",
                                                            "accept-encoding": "gzip, deflate, br",
@@ -246,7 +257,7 @@ class TikTokapi:
                         else:
                             return response
                     except:
-                        url = "https://www.tiktok.com/share/item/list?secUid=&id=&type=5&count=30&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature=" + self.signature
+                        url = "https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=30&minCursor=0&maxCursor=" + str(maxCursor) + "&shareUid=&_signature=" + self.signature
 
                         r = requests.get(url, headers={"method": "GET",
                                                        "accept-encoding": "gzip, deflate, br",
@@ -268,7 +279,8 @@ class TikTokapi:
         while True:
 
             # I feel like this signature won't work in a few hours
-            userpostSig = "T.EPYAAgEBM6AIQ-UrnWvU.xDnAABIP"
+            # userpostSig = "T.EPYAAgEBM6AIQ-UrnWvU.xDnAABIP"
+            userpostSig = self.signature
 
 
             url = "https://m.tiktok.com/share/item/list?secUid=" + str(secUid) + "&id=" + str(id) + "&type=1&count=30&minCursor=0&maxCursor=0&shareUid=&_signature=" + userpostSig
