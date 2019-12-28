@@ -126,6 +126,7 @@ class TikTokapi:
             time.sleep(2)
             self.proxy.new_har("list")
             self.driver.get("https://www.tiktok.com/tag/" + hashtag + "?langCountry=en")
+            time.sleep(5)
             data = self.proxy.har
 
 
