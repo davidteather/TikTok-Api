@@ -33,3 +33,6 @@ before_script:
 script:
   - pytest tests/test_trending.py
   - pytest tests/test_user.py
+  - pytest tests/test_sounds.py
+  - pytest tests/testVideoByUrl.py
+  - pytest tests/test_hashtag.py
