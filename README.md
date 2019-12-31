@@ -75,8 +75,12 @@ JSON object tree [here](https://gist.github.com/davidteather/bc4baef0edb621dd322
 ##### The userPosts Method
 
 ```
-api.userPosts(userid, secUid, count, verbose)
+api.userPosts(username="", id="", secUid="", count, verbose)
 ```
+
+You can either define username OR BOTH id and secUid. Defining secUid and id is much faster than defining it by username, but it's still an option.
+
+username - the username of the tiktok user without the @
 
 userid - The id of the user, can be found in the TikTok json response titled "userId"
 
@@ -132,6 +136,20 @@ api.get_Related_Videos(video_url)
 This method returns the suggested trending videos titled "trends for you" on desktop. 
 
 video_url - the video URL that you want to see related videos for 
+
+##### The search_by_sound Method
+
+```
+api.search_by_sound(soundLink, count=10, verbose=0)
+```
+
+This method returns the trending videos under a specific sound or music link.
+
+soundLink - Either the original sound link or the music link for a specific song.
+
+count - Limited to 30 due to weird restrictions on the api.
+
+verbose - 0/1 for debugging.
 
 ## Built With
 
