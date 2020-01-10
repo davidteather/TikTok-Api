@@ -2,7 +2,7 @@ class TikTokapi:
     #
     # The TikTokapi class initial function
     #
-    def __init__(self, browsermobDirectory, headless=False, manualSignature="bg-.HAAgEBAb.jRCa8cEFG4PvgAADAH"):
+    def __init__(self, browsermobDirectory, chromedriverPath=None, headless=False, manualSignature="bg-.HAAgEBAb.jRCa8cEFG4PvgAADAH"):
         self.signature = manualSignature
         # Imports
         self.referer = "https://www.tiktok.com/@ondymikula/video/6757762109670477061"
@@ -50,7 +50,10 @@ class TikTokapi:
 
         if headless == True:
             chromeProfile.add_argument('headless')
-        self.driver = webdriver.Chrome(chrome_options=chromeProfile)
+        if chromedriverPath:
+            self.driver = webdriver.Chrome(chrome_options=chromeProfile, executable_path=chromedriverPath)
+        else:
+            self.driver = webdriver.Chrome(chrome_options=chromeProfile)
         self.driver.set_window_size(1920, 1080)
 
         # Records FF Har
