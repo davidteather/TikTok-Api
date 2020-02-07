@@ -1,5 +1,5 @@
 
-# Official TikTok API in Python
+# Unofficial TikTok API in Python
 
 This is an unoffical api wrapper for tiktok.com in python. With this api you are able to call most trending and fetch specific user information.
 
