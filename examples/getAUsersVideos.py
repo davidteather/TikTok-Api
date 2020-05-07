@@ -1,22 +1,15 @@
-from TikTokApi import TikTokapi
-
-# Starts The Api Class
-api = TikTokapi("browsermob-proxy/bin/browsermob-proxy")
+from TikTokApi import TikTokApi
+# Starts TikTokApi
+api = TikTokApi()
 
 # The Number of trending TikToks you want to be displayed
 results = 10
 
-# The TikTok user's ID, can be found in the JSON from trending
-id = "6667259165620912134"
-
-# The TikTok user's secUid, can be found in the Json from trending
-secUid = "MS4wLjABAAAAmROcF0HiS0_I562i4obaZJDpFVZ5IegSTj_Z3zE-Mf_BDx0OoiibJ3TMeYeCLrhx"
-
-trending = api.userPosts(id, secUid, count=results)
-
-for tiktok in trending:
+# Returns a list of dictionaries of the trending object
+userPosts = api.userPosts("6745191554350760966", "MS4wLjABAAAAM3R2BtjzVT-uAtstkl2iugMzC6AtnpkojJbjiOdDDrdsTiTR75-8lyWJCY5VvDrZ", 30)
+# Loops over every tiktok
+for tiktok in userPosts:
     # Prints the text of the tiktok
-    print(tiktok['itemInfos']['text'])
+    print(tiktok['desc'])
 
-print(len(trending))
-api.quit_browser()
+print(len(userPosts))

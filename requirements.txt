@@ -1,2 +1,5 @@
 requests
 bs4
+pyppeteer
+asyncio
+selenium

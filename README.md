@@ -7,45 +7,38 @@ This is an unoffical api wrapper for tiktok.com in python. With this api you are
 
 ## Important Information
 * If this API stops working for any reason open an issue.
-* Feel free to mention @davidteather in an issue you open, because I might not see it otherwise.
 
 ## Getting Started
 
 To get started using this api follow the instructions below.
 
-It is quite a long installation process just for a TikTok api, the first release can be found [here](https://github.com/davidteather/TikTok-Api/releases/edit/v1.0) and is not as suitable for long term projects, however it may be easier for a day of scraping TikTok, as the installation is much easier.
-
-Despite this, I **still recommend** you follow this process and use the latest version.
-
 ### Installing
 
 If you need help installing or run into some error, please open an issue. I will try to help out as much as I can.
-
-Tested with python 3.7.3
 
 ```
 pip install TikTokApi
 ```
 
-Or install directly from this GitHub repo.
-
-* You do need to have **java installed**
-* Download browsermob-proxy [here](https://bmp.lightbody.net/)
-* You must add **browsermob-proxy/bin** to your environment path.
-* **Firefox** must be installed.
-* You must download the latest **geckodriver** from [mozilla](https://github.com/mozilla/geckodriver/releases), and include the .exe in your path.
-
 ## Quick Start Guide
 
-Here's a quick bit of code to get the most recent trending on TikTok
+Here's a quick bit of code to get the most recent trending on TikTok. There's more example in the examples directory.
+
+[Here's](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d) an example of what a tiktok dictionary looks like.
 
 ```
-from tiktok import TikTokapi
+from TikTokApi import TikTokApi
+api = TikTokApi()
 
-api = TikTokapi(path_to_browsermob_directory)
-# path_to_browsermob_directory - String - should be the path from the directory you are running from the code to the extracted zip file of [browsermob-proxy](https://bmp.lightbody.net/)
-# Will Get the 10 most recent trending on the tiktok trending page
-api.trending(10)
+results = 10
+
+trending = api.trending(results)
+
+for tiktok in trending:
+    # Prints the text of the tiktok
+    print(tiktok['desc'])
+
+print(len(trending))
 ```
 
 ## Detailed Documentation
@@ -53,11 +46,10 @@ api.trending(10)
 ##### The TikTok class
 
 ```
-# Variable set like
-api = TikTokapi(path_to_browsermob_directory, headless=False)
+TikTokApi(self, debug=False)
 ```
-path_to_browsermob_directory - String - should be the path from the directory you are running from the code to the extracted zip file of [browsermob-proxy](https://bmp.lightbody.net/)
-headless - True/False - True means it will run a headless firefox browser, could be detected by TikTok, however it is more convienent. Default = False.
+
+debug - Enable this if you need some more output.
 
 
 ##### The Trending Method
@@ -65,12 +57,13 @@ headless - True/False - True means it will run a headless firefox browser, could
 ```
 # Where count is how many result you want
 # Verbose is optional, default=0. Set it to 1 to get more information
-api.trending(count, verbose)
+api.trending(self, count=30, referrer="https://www.tiktok.com/@ondymikula/video/6756762109670477061")
 ```
 
-Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/0be2e495e2de54098e8f2a9594581d27)
+count - this is how many trending Tiktoks you want to be returned.
 
-JSON object tree [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1)
+Trending returns an array of dictionaries. Example structure [here](https://www.tiktok.com/@ondymikula/video/6756762109670477061)
+
 
 ##### The userPosts Method
 

@@ -1,15 +1,13 @@
-from TikTokApi import TikTokapi
+from TikTokApi import TikTokApi
 
 def test_trending():
-    api = TikTokapi("browsermob-proxy/bin/browsermob-proxy", headless=True)
+    api = TikTokApi()
     assert len(api.trending(5)) == 5
     assert len(api.trending(10)) == 10
     assert len(api.trending(20)) == 20
-    api.quit_browser()
 
 
 def test_extended_trending():
-    api = TikTokapi("browsermob-proxy/bin/browsermob-proxy", headless=True)
+    api = TikTokApi()
     assert len(api.trending(50)) == 50
-    assert len(api.trending(100)) == 100
-    api.quit_browser()
+    assert len(api.trending(75)) == 75
