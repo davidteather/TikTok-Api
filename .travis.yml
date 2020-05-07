@@ -22,12 +22,9 @@ install:
 
 before_script:
   - "sudo apt-get install unzip"
-  - "wget https://github.com/mozilla/geckodriver/releases/download/v0.25.0/geckodriver-v0.25.0-linux64.tar.gz -O /tmp/geckodriver.tar.gz && tar -C /opt -xzf /tmp/geckodriver.tar.gz && sudo chmod 755 /opt/geckodriver && sudo ln -fs /opt/geckodriver /usr/bin/geckodriver && sudo ln -fs /opt/geckodriver /usr/local/bin/geckodriver"
   - "wget https://chromedriver.storage.googleapis.com/79.0.3945.36/chromedriver_linux64.zip -O /tmp/chromedriver.zip && unzip /tmp/chromedriver.zip -d /opt && sudo chmod 755 /opt/chromedriver && sudo ln -fs /opt/chromedriver /usr/bin/chromedriver && sudo ln -fs /opt/chromedriver /usr/local/bin/chromedriver"
   - "sudo apt-get install java-common"
   - "pip install -r requirements.txt"
-  - "sudo apt-get install unzip"
-  - "wget https://github.com/lightbody/browsermob-proxy/releases/download/browsermob-proxy-2.1.4/browsermob-proxy-2.1.4-bin.zip -O /tmp/browsermob-proxy.zip && unzip /tmp/browsermob-proxy.zip && mv -f browsermob-proxy-2.1.4 browsermob-proxy"
   - "python setup.py install_lib"
 
 script:
