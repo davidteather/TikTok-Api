@@ -24,7 +24,6 @@ pip install TikTokApi
 
 Here's a quick bit of code to get the most recent trending on TikTok. There's more example in the examples directory.
 
-[Here's](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d) an example of what a tiktok dictionary looks like.
 
 ```
 from TikTokApi import TikTokApi
@@ -40,6 +39,7 @@ for tiktok in trending:
 
 print(len(trending))
 ```
+[Here's](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d) an example of what a tiktok dictionary looks like.
 
 ## Detailed Documentation
 
