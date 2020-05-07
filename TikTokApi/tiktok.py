@@ -54,7 +54,7 @@ class TikTokApi:
     #
     # Gets tiktoks by music ID
     #
-    # Note: not working for whatever reason. 
+    # Note: not working because the browser.py seems to only generate valid sigs for /api/item_list directory 
     #
     def bySound(self, id, count=30):
         api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=4&count={}&minCursor=0&maxCursor=0&shareUid=&lang=&verifyFp=".format(str(id), str(count))
@@ -64,7 +64,7 @@ class TikTokApi:
     # 
     # Gets a user object for id and secUid
     #
-    # Note: not working for whatever reason. 
+    # Note: not working because the browser.py seems to only generate valid sigs for /api/item_list directory
     #
     def getUserObject(self, username):
         api_url = "https://m.tiktok.com/api/user/detail/?uniqueId={}&language=en&verifyFp=".format(username)
