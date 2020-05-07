@@ -40,7 +40,7 @@ Or install directly from this GitHub repo.
 Here's a quick bit of code to get the most recent trending on TikTok
 
 ```
-from tiktok import TikTokapi
+from TikTokApi import TikTokapi
 
 api = TikTokapi(path_to_browsermob_directory)
 # path_to_browsermob_directory - String - should be the path from the directory you are running from the code to the extracted zip file of [browsermob-proxy](https://bmp.lightbody.net/)
