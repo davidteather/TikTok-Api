@@ -64,6 +64,23 @@ count - this is how many trending Tiktoks you want to be returned.
 
 Trending returns an array of dictionaries. Example structure [here](https://www.tiktok.com/@ondymikula/video/6756762109670477061)
 
+##### The get_Video_By_TikTok Method
+
+```
+api.get_Video_By_TikTok(data)
+```
+
+data - The tiktok dictionary returned from the API. Will return bytes.
+
+##### The get_Video_By_DownloadURL Method
+
+```
+api.get_Video_By_DownloadURL(url)
+```
+
+url - The download url that's found in the TikTok dictionary. TikTok['video']['downloadAddr']
+
+
 ##### The get_Video_By_Url Method
 
 ```

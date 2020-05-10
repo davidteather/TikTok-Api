@@ -34,6 +34,20 @@ class TikTokApi:
 
 
     #
+    # Method that retrives data from the api
+    #
+    def getBytes(self, api_url, signature, userAgent):
+        url = api_url + \
+            "&_signature=" + signature
+        r = requests.get(url, headers={"method": "GET",
+                                    "accept-encoding": "gzip, deflate, br",
+                                    "Referer": self.referrer,
+                                    "user-agent": userAgent,
+                                    })           
+        return r.content
+
+
+    #
     # Gets trending Tiktoks
     #
     def trending(self, count=30):
@@ -67,11 +81,27 @@ class TikTokApi:
     # Note: not working because the browser.py seems to only generate valid sigs for /api/item_list directory
     #
     def getUserObject(self, username):
-        api_url = "https://m.tiktok.com/api/user/detail/?uniqueId={}&language=en&verifyFp=".format(username)
+        api_url = "https://t.tiktok.com/api/user/detail/?uniqueId={}&secUid=&verifyFp=".format(username)
         b = browser(api_url)
         return self.getData(api_url, b.signature, b.userAgent)['userInfo']['user']
 
-    
+    # 
+    # Downloads video from TikTok using a TikTok object
+    #
+    def get_Video_By_TikTok(self, data):
+        api_url = data['video']['downloadAddr']
+        b = browser(api_url)
+        return self.getBytes(api_url, b.signature, b.userAgent)
+
+
+    # 
+    # Downloads video from TikTok using download url in a tiktok object
+    #
+    def get_Video_By_DownloadURL(self, api_url):
+        b = browser(api_url)
+        return self.getBytes(api_url, b.signature, b.userAgent)
+
+
     #
     # Gets the source url of a given url for a tiktok
     #
