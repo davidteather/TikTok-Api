@@ -1,7 +1,6 @@
 from TikTokApi import TikTokApi
-
 def test_trending():
     api = TikTokApi()
-    assert len(api.trending(5)) == 5
-    assert len(api.trending(10)) == 10
-    assert len(api.trending(20)) == 20
+    assert abs(len(api.trending(5))-5) <= 1
+    assert abs(len(api.trending(10))-10) <= 1
+    assert abs(len(api.trending(20))-20) <= 1
