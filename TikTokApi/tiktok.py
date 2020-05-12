@@ -126,3 +126,8 @@ class TikTokApi:
         else:
             r = requests.get(data['contentUrl'])
             return r.content
+
+    def get_videos_by_tag_id(self, tag_id, count=30):
+        api_url = f'https://m.tiktok.com/share/item/list?secUid=&id={tag_id}&type=3&count={count}&minCursor=0&maxCursor=0&shareUid=&lang=en&verifyFp='
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)
