@@ -121,6 +121,7 @@ class TikTokApi:
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         data = json.loads(soup.find_all('script', attrs={"id": "videoObject"})[0].text)
 
+
         if return_bytes == 0:
             return data['contentUrl']
         else:
