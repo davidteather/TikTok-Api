@@ -17,7 +17,7 @@ class TikTokApi:
         if debug:
             print("Class initialized")
 
-        self.referrer = "https://www.tiktok.com/@ondymikula/video/6756762109670477061"
+        self.referrer = "https://www.tiktok.com/tag/jakefromstate?lang=en"
 
     #
     # Method that retrives data from the api
@@ -26,81 +26,143 @@ class TikTokApi:
         url = api_url + \
             "&_signature=" + signature
         r = requests.get(url, headers={"method": "GET",
-                                    "accept-encoding": "gzip, deflate, br",
-                                    "Referer": self.referrer,
-                                    "user-agent": userAgent,
-                                    })           
-        return r.json()
+                                       "accept-encoding": "gzip, deflate, br",
+                                       "referrer": self.referrer,
+                                       "user-agent": userAgent,
+                                       })
 
+        try:
+            return r.json()
+        except:
+            print("Converting response to JSON failed response is below (probably empty)")
+            print(r.text)
+            raise Exception('Invalid Response')
 
     #
     # Method that retrives data from the api
     #
+
     def getBytes(self, api_url, signature, userAgent):
         url = api_url + \
             "&_signature=" + signature
         r = requests.get(url, headers={"method": "GET",
-                                    "accept-encoding": "gzip, deflate, br",
-                                    "Referer": self.referrer,
-                                    "user-agent": userAgent,
-                                    })           
+                                       "accept-encoding": "gzip, deflate, br",
+                                       "referrer": self.referrer,
+                                       "user-agent": userAgent,
+                                       })
         return r.content
-
 
     #
     # Gets trending Tiktoks
     #
+
     def trending(self, count=30):
-        api_url = "https://m.tiktok.com/api/item_list/?count={}&id=1&type=5&secUid=&maxCursor=1&minCursor=0&sourceType=12&appId=1233&verifyFp=".format(str(count))
+        api_url = "https://m.tiktok.com/api/item_list/?count={}&id=1&type=5&secUid=&maxCursor=1&minCursor=0&sourceType=12&appId=1233&verifyFp=".format(
+            str(count))
         b = browser(api_url)
 
         return self.getData(api_url, b.signature, b.userAgent)['items']
-        
+
     #
     # Gets a specific user's tiktoks
     #
     def userPosts(self, userID, secUID, count=30):
-        api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor=0&minCursor=0&sourceType=8&appId=1233&region=US&language=en&verifyFp=".format(str(count), str(userID), str(secUID))
+        api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor=0&minCursor=0&sourceType=8&appId=1233&region=US&language=en&verifyFp=".format(
+            str(count), str(userID), str(secUID))
         b = browser(api_url)
         return self.getData(api_url, b.signature, b.userAgent)['items']
 
+    #
+    # Gets a specific user's tiktoks by username
+    #
+
+    def byUsername(self, username, count=30):
+        data = self.getUserObject(username)
+        return self.userPosts(data['id'], data['secUid'], count=count)
 
     #
     # Gets tiktoks by music ID
     #
-    # Note: not working because the browser.py seems to only generate valid sigs for /api/item_list directory 
+    # id - the sound ID
     #
-    def bySound(self, id, count=30):
-        api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=4&count={}&minCursor=0&maxCursor=0&shareUid=&lang=&verifyFp=".format(str(id), str(count))
-        b = browser(api_url)
-        return self.getData(api_url, b.signature, b.userAgent)['items']
 
-    # 
+    def bySound(self, id, count=30):
+        api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=4&count={}&minCursor=0&maxCursor=0&shareUid=&lang=en&verifyFp=".format(
+            str(id), str(count))
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)['body']['itemListData']
+
+    #
+    # Gets the music object
+    #
+    def getMusicObject(self, id):
+        api_url = "https://m.tiktok.com/api/music/detail/?musicId={}&language=en&verifyFp=".format(
+            str(id))
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)
+
+    #
+    # Gets tiktoks by hashtag
+    #
+
+    def byHashtag(self, hashtag, count=30):
+        id = self.getHashtagObject(hashtag)['challengeInfo']['challenge']['id']
+        api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=3&count={}&minCursor=0&maxCursor=0&shareUid=&lang=en&verifyFp=".format(
+            str(id), str(count))
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)['body']['itemListData']
+
+    #
+    # Gets tiktoks by hashtag (for use in byHashtag)
+    #
+
+    def getHashtagObject(self, hashtag):
+        api_url = "https://m.tiktok.com/api/challenge/detail/?verifyFP=&challengeName={}&language=en".format(
+            str(hashtag))
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)
+
+    #
+    # Discover page, consists challenges (hashtags)
+    #
+
+    def discoverHashtags(self):
+        api_url = "https://m.tiktok.com/node/share/discover?noUser=1&userCount=30&scene=0&verifyFp="
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)['body'][1]['exploreList']
+
+    #
+    # Discover page, consists of music
+    #
+
+    def discoverMusic(self):
+        api_url = "https://m.tiktok.com/node/share/discover?noUser=1&userCount=30&scene=0&verifyFp="
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)['body'][2]['exploreList']
+    #
     # Gets a user object for id and secUid
     #
-    # Note: not working because the browser.py seems to only generate valid sigs for /api/item_list directory
-    #
+
     def getUserObject(self, username):
-        api_url = "https://t.tiktok.com/api/user/detail/?uniqueId={}&secUid=&verifyFp=".format(username)
+        api_url = "https://m.tiktok.com/api/user/detail/?uniqueId={}&language=en&verifyFp=".format(
+            username)
         b = browser(api_url)
         return self.getData(api_url, b.signature, b.userAgent)['userInfo']['user']
 
-    # 
+    #
     # Downloads video from TikTok using a TikTok object
     #
+
     def get_Video_By_TikTok(self, data):
         api_url = data['video']['downloadAddr']
-        b = browser(api_url)
-        return self.getBytes(api_url, b.signature, b.userAgent)
+        return self.get_Video_By_DownloadURL(api_url)
 
-
-    # 
+    #
     # Downloads video from TikTok using download url in a tiktok object
     #
-    def get_Video_By_DownloadURL(self, api_url):
-        b = browser(api_url)
-        return self.getBytes(api_url, b.signature, b.userAgent)
-
+    def get_Video_By_DownloadURL(self, download_url):
+        b = browser(download_url)
+        return self.getBytes(download_url, b.signature, b.userAgent)
 
     #
     # Gets the source url of a given url for a tiktok
@@ -119,7 +181,8 @@ class TikTokApi:
         time.sleep(5)
 
         soup = BeautifulSoup(driver.page_source, 'html.parser')
-        data = json.loads(soup.find_all('script', attrs={"id": "videoObject"})[0].text)
+        data = json.loads(soup.find_all(
+            'script', attrs={"id": "videoObject"})[0].text)
 
         if return_bytes == 0:
             return data['contentUrl']

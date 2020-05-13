@@ -1,492 +1,186 @@
-class TikTokapi:
+import asyncio
+import pyppeteer
+import random
+import requests
+from .browser import browser
+from bs4 import BeautifulSoup
+import time
+import json
+from selenium import webdriver
+
+
+class TikTokApi:
     #
-    # The TikTokapi class initial function
+    # The TikTokapi class constructor
     #
-    def __init__(self, browsermobDirectory, headless=False, manualSignature="bg-.HAAgEBAb.jRCa8cEFG4PvgAADAH"):
-        self.signature = manualSignature
-        # Imports
-        self.referer = "https://www.tiktok.com/@ondymikula/video/6757762109670477061"
-        from browsermobproxy import Server
-        import psutil
-        import json
-        import time
-        import json
-        from selenium import webdriver
+    def __init__(self, debug=False):
+        if debug:
+            print("Class initialized")
 
-        self.browsermobDirectory = browsermobDirectory
-        # Kills any browsermob-proxy
-        for proc in psutil.process_iter():
-            # check whether the process name matches
-            if proc.name() == "browsermob-proxy":
-                proc.kill()
-
-        dictf = {'port': 8090}
-        self.server = Server(
-            path=browsermobDirectory, options=dictf)
-        # "browsermob-proxy/bin/browsermob-proxy"
-        self.server.start()
-        time.sleep(1)
-        self.proxy = self.server.create_proxy()
-        time.sleep(1)
-
-        # Creates FF profile
-
-        chromeProfile = webdriver.ChromeOptions()
-        chromeProfile.add_argument("--disable-automation")
-        chromeProfile.add_argument("--no-sandbox")
-        chromeProfile.add_argument('--disable-extensions')
-        chromeProfile.add_argument('--profile-directory=Default')
-        chromeProfile.add_argument("--incognito")
-        chromeProfile.add_argument('--ignore-certificate-errors')
-        chromeProfile.add_argument('--ignore-ssl-errors')
-        chromeProfile.add_argument("--disable-plugins-discovery")
-        chromeProfile.add_argument("--start-maximized")
-        chromeProfile.add_argument(
-            "--user-agent=Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1")
-        chromeProfile.add_experimental_option('useAutomationExtension', False)
-        chromeProfile.add_experimental_option(
-            "excludeSwitches", ["enable-automation"])
-        chromeProfile.add_argument(
-            "--proxy-server={0}".format(self.proxy.proxy))
-        # chromeProfile.add_experimental_option("mobileEmulation", {"deviceName": "Galaxy S5"})
-
-        if headless == True:
-            chromeProfile.add_argument('headless')
-        self.driver = webdriver.Chrome(chrome_options=chromeProfile)
-        self.driver.set_window_size(1920, 1080)
-
-        # Records FF Har
-        self.proxy.new_har("list")
-        self.driver.delete_all_cookies()
-        self.driver.execute_script(
-            "Object.defineProperty(navigator, 'webdriver', {get: () => false});")
-        self.driver.get("https://www.tiktok.com/en/trending")
-
-        time.sleep(5)
-        data = self.proxy.har
-
-        for element in data['log']['entries']:
-            if "https://m.tiktok.com/share/item/list?" in element['request']['url'] or "https://www.tiktok.com/share/item/list?" in element['request']['url']:
-                for name in element['request']['queryString']:
-                    if name['name'] == "_signature" and name['value'] != "":
-                        self.signature = name['value']
-                        break
-
-        # self.signature = "pN0c4gAgEBDRLJe8E9p926TdHfAAPru"
-
-        # Get Trending hashtags
-        hashtags = self.driver.find_elements_by_xpath(
-            '//h3[@class="_list_item_title"]/a')
-        hashtagArray = []
-        for hashtag in hashtags:
-            hashtagArray.append(hashtag.get_attribute('title'))
-
-        self.hashtag = hashtagArray
-        self.headless = headless
-        self.browsermobDirectory = browsermobDirectory
-
-    # Quits the browser
-
-    def quit_browser(self):
-        self.driver.quit()
+        self.referrer = "https://www.tiktok.com/tag/jakefromstate?lang=en"
 
     #
-    # Show the user the trending hashtags
+    # Method that retrives data from the api
     #
-
-    def get_trending_hashtags(self):
-        # Returns the trending hashtags from /en/trending
-        return self.hashtag
-
-    #
-    # Allows the user to search by a specific hashtag
-    #
-    # hastag - the hashtag you want to search by
-    # count - the amount of results you want
-    #
-
-    def search_by_hashtag(self, hashtag, count=10, verbose=0):
-        import requests
-        from browsermobproxy import Server
-        import psutil
-        import json
-        import time
-        import json
-        from selenium import webdriver
-        from selenium.webdriver.firefox.options import Options
-
-        import string
-
-        import random
-
-        hashtagId = None
-        tries = 0
-
-        while hashtagId == None:
-            if tries >= 10:
-                raise Exception(
-                    "Could not locate hashtag ID: Tried " + str(tries) + " times")
-            # Browsermob-capture
-            time.sleep(2)
-            self.proxy.new_har("list")
-            self.driver.get("https://www.tiktok.com/tag/" +
-                            hashtag + "?langCountry=en")
-            time.sleep(5)
-            data = self.proxy.har
-
-            for element in data['log']['entries']:
-                if hashtagId != None:
-                    break
-                elif "https://m.tiktok.com/share/item/list?" in element['request']['url'] or "https://www.tiktok.com/share/item/list?" in element['request']['url']:
-                    for name in element['request']['queryString']:
-                        if name['name'] == "id" and name['value'] != "":
-                            hashtagId = name['value']
-                            break
-
-            tries += 1
-
-        response = []
-        if hashtagId != None:
-            while True:
-                hashtagSignature = "yZ-7VgAgEBu8bjAI0DLgHMmfukAAJRs"
-                url = "https://m.tiktok.com/share/item/list?secUid=&id=" + hashtagId + \
-                    "&type=3&count=30&minCursor=0&maxCursor=0&shareUid=&_signature=" + hashtagSignature
-                headers = {"method": "GET",
-                           "accept-encoding": "gzip, deflate, br",
-                           "Referer": self.referer,
-                           "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"}
-                r = requests.get(url, headers=headers)
-
-                data = r.json()
-
-                if data["statusCode"] == 0:
-                    maxCursor = data['body']['maxCursor']
-                    for tiktok in data["body"]["itemListData"]:
-                        if count > len(response):
-                            response.append(tiktok)
-                        else:
-                            return response
-
-                    if len(response) == count:
-                        return response
-
-                    raise Exception(
-                        'Rate Limit: This function only currently supports 30 TikToks.')
-
-                    while True:
-                        try:
-                            if count > len(response):
-                                data['body']['hasMore'] == True
-                                url = "https://m.tiktok.com/share/item/list?secUid=&id=" + hashtagId + \
-                                    "&type=3&count=30&minCursor=0&maxCursor=" + \
-                                    str(maxCursor) + \
-                                    "&shareUid=&_signature=" + hashtagSignature
-
-                                headers = {"method": "GET",
-                                           "accept-encoding": "gzip, deflate, br",
-                                           "Referer": self.referer,
-                                           "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"}
-
-                                r = requests.get(url, headers=headers)
-
-                                data = r.json()
-
-                                if data["statusCode"] == 0:
-                                    maxCursor = data['body']['maxCursor']
-                                    for tiktok in data["body"]["itemListData"]:
-                                        if count > len(response):
-                                            response.append(tiktok)
-                                        else:
-                                            return response
-
-                            else:
-                                return response
-
-                        except:
-
-                            url = "https://m.tiktok.com/share/item/list?secUid=&id=" + hashtagId + \
-                                "&type=3&count=30&minCursor=0&maxCursor=" + \
-                                str(maxCursor) + \
-                                "&shareUid=&_signature=" + hashtagSignature
-
-                            headers = {"method": "GET",
+    def getData(self, api_url, signature, userAgent):
+        url = api_url + \
+            "&_signature=" + signature
+        r = requests.get(url, headers={"method": "GET",
                                        "accept-encoding": "gzip, deflate, br",
-                                       "Referer": self.referer,
-                                       "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"}
+                                       "referrer": self.referrer,
+                                       "user-agent": userAgent,
+                                       })
 
-                            r = requests.get(url, headers=headers)
-
-                            data = r.json()
-                            continue
-
-        else:
-            raise Exception('Unable to locate the hashtag ID')
-
-    #
-    # Gets trending results
-    #
-    # count - the number of results to display
-    # verbose - 0 or 1, 1 is intense logging
-    #
-
-    def trending(self, count=10, verbose=0):
-        import requests
-
-        while True:
-            url = "https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=30&minCursor=0&maxCursor=0&shareUid=&_signature=" + self.signature
-            r = requests.get(url, headers={"method": "GET",
-                                           "accept-encoding": "gzip, deflate, br",
-                                           "Referer": self.referer,
-                                           "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"}
-                             )
-
-            data = r.json()
-            response = []
-            if data["statusCode"] == 0:
-                maxCursor = data['body']['maxCursor']
-                for tiktok in data["body"]["itemListData"]:
-                    if count > len(response):
-                        response.append(tiktok)
-                    else:
-                        return response
-                while True:
-                    try:
-                        if count > len(response):
-                            var = data['body']['hasMore']
-                            maxCursor = data['body']['maxCursor']
-
-                            url = "https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=30&minCursor=0&maxCursor=" + \
-                                str(maxCursor) + \
-                                "&shareUid=&_signature=" + self.signature
-
-                            r = requests.get(url, headers={"method": "GET",
-                                                           "accept-encoding": "gzip, deflate, br",
-                                                           "Referer": self.referer,
-                                                           "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"})
-                            data = r.json()
-                            if data["statusCode"] == 0:
-                                for tiktok in data["body"]["itemListData"]:
-                                    if count > len(response):
-                                        response.append(tiktok)
-                                    else:
-                                        return response
-                        else:
-                            return response
-                    except:
-                        url = "https://m.tiktok.com/share/item/list?secUid=&id=&type=5&count=30&minCursor=0&maxCursor=" + \
-                            str(maxCursor) + "&shareUid=&_signature=" + \
-                            self.signature
-
-                        r = requests.get(url, headers={"method": "GET",
-                                                       "accept-encoding": "gzip, deflate, br",
-                                                       "Referer": self.referer,
-                                                       "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"})
-
-                        data = r.json()
-                        continue
+        try:
+            return r.json()
+        except:
+            print("Converting response to JSON failed response is below (probably empty)")
+            print(r.text)
+            raise Exception('Invalid Response')
 
     #
-    # Gets a user's post
-    #
-    # count - the count of results
-    # verbose - 1 is high logging
+    # Method that retrives data from the api
     #
 
-    def userPosts(self, username="", id="", secUid="", count=10, verbose=0):
-        import requests
-        import time
-        from browsermobproxy import Server
-        import psutil
-        import json
-        if id != "" and secUid != "":
-            while True:
-                url = "https://m.tiktok.com/share/item/list?secUid=" + str(secUid) + "&id=" + str(
-                    id) + "&type=1&count=30&minCursor=0&maxCursor=0&shareUid=&_signature=" + self.signature
-                r = requests.get(url, headers={"method": "GET",
-                                               "accept-encoding": "gzip, deflate, br",
-                                               "Referer": self.referer,
-                                               "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"})
+    def getBytes(self, api_url, signature, userAgent):
+        url = api_url + \
+            "&_signature=" + signature
+        r = requests.get(url, headers={"method": "GET",
+                                       "accept-encoding": "gzip, deflate, br",
+                                       "referrer": self.referrer,
+                                       "user-agent": userAgent,
+                                       })
+        return r.content
 
-                data = r.json()
-                response = []
+    #
+    # Gets trending Tiktoks
+    #
 
-                if data["statusCode"] != 0:
-                    if verbose == 1:
-                        print("Invalid Signature Retrying")
-                else:
-                    maxCursor = data['body']['maxCursor']
-                    for tiktok in data["body"]["itemListData"]:
-                        if count > len(response):
-                            response.append(tiktok)
-                        else:
-                            return response
+    def trending(self, count=30):
+        api_url = "https://m.tiktok.com/api/item_list/?count={}&id=1&type=5&secUid=&maxCursor=1&minCursor=0&sourceType=12&appId=1233&verifyFp=".format(
+            str(count))
+        b = browser(api_url)
 
-                    if len(response) == count:
-                        return response
+        return self.getData(api_url, b.signature, b.userAgent)['items']
 
-                    raise Exception(
-                        'Rate Limit: This function only currently supports 30 TikToks.')
-                    while True:
-                        try:
-                            if count > len(response) and str(data['body']['hasMore']) == "True":
-                                url = "https://m.tiktok.com/share/item/list?id=" + str(id) + "&type=1&count=" + \
-                                    str(count - len(response)) + "&minCursor=0&maxCursor=" + maxCursor + "&_signature=" + \
-                                    self.signature
-                                maxCursor = data['body']['maxCursor']
+    #
+    # Gets a specific user's tiktoks
+    #
+    def userPosts(self, userID, secUID, count=30):
+        api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor=0&minCursor=0&sourceType=8&appId=1233&region=US&language=en&verifyFp=".format(
+            str(count), str(userID), str(secUID))
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)['items']
 
-                                r = requests.get(url, headers={"method": "GET",
-                                                               "accept-encoding": "gzip, deflate, br",
-                                                               "Referer": self.referer,
-                                                               "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"})
+    #
+    # Gets a specific user's tiktoks by username
+    #
 
-                                data = r.json()
+    def byUsername(self, username, count=30):
+        data = self.getUserObject(username)
+        return self.userPosts(data['id'], data['secUid'], count=count)
 
-                                if data["statusCode"] == 0:
-                                    for tiktok in data["body"]["itemListData"]:
-                                        response.append(tiktok)
+    #
+    # Gets tiktoks by music ID
+    #
+    # id - the sound ID
+    #
 
-                                else:
-                                    if verbose == 1:
-                                        print(
-                                            "Invalid Signature Retrying")
+    def bySound(self, id, count=30):
+        api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=4&count={}&minCursor=0&maxCursor=0&shareUid=&lang=en&verifyFp=".format(
+            str(id), str(count))
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)['items']
 
-                            else:
-                                return response
+    #
+    # Gets the music object
+    #
+    def getMusicObject(self, id):
+        api_url = "https://m.tiktok.com/api/music/detail/?musicId={}&language=en&verifyFp=".format(
+            str(id))
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)
 
-                        except:
-                            url = "https://m.tiktok.com/share/item/list?id=" + str(id) + "&type=1&count=" + \
-                                str(count - len(response)) + "&minCursor=0&maxCursor=" + maxCursor + "&_signature=" + \
-                                self.signature
+    #
+    # Gets tiktoks by hashtag
+    #
 
-                            r = requests.get(url, headers={"method": "GET",
-                                                           "accept-encoding": "gzip, deflate, br",
-                                                           "Referer": self.referer,
-                                                           "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"})
+    def byHashtag(self, hashtag, count=30):
+        id = self.getHashtagObject(hashtag)['challengeInfo']['challenge']['id']
+        api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=3&count={}&minCursor=0&maxCursor=0&shareUid=&lang=en&verifyFp=".format(
+            str(id), str(count))
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)['body']['itemListData']
 
-                            data = r.json()
+    #
+    # Gets tiktoks by hashtag (for use in byHashtag)
+    #
 
-                            continue
+    def getHashtagObject(self, hashtag):
+        api_url = "https://m.tiktok.com/api/challenge/detail/?verifyFP=&challengeName={}&language=en".format(
+            str(hashtag))
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)
 
-        else:
-            id = None
-            tries = 0
+    #
+    # Discover page, consists challenges (hashtags)
+    #
 
-            while id == None:
-                if tries >= 10:
-                    raise Exception(
-                        "Could not locate user ID: Tried " + str(tries) + " times")
-                # Browsermob-capture
-                time.sleep(2)
-                self.proxy.new_har("list")
-                self.driver.get("https://www.tiktok.com/@" +
-                                username + "?lang=en")
-                time.sleep(5)
-                data = self.proxy.har
+    def discoverHashtags(self):
+        api_url = "https://m.tiktok.com/node/share/discover?noUser=1&userCount=30&scene=0&verifyFp="
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)['body'][1]['exploreList']
 
-                for element in data['log']['entries']:
-                    if id != None:
-                        break
-                    elif "https://m.tiktok.com/share/item/list?" in element['request']['url'] or "https://www.tiktok.com/share/item/list?" in element['request']['url']:
-                        for name in element['request']['queryString']:
-                            if name['name'] == "id" and name['value'] != "":
-                                id = name['value']
-                                break
+    #
+    # Discover page, consists of music
+    #
 
-                tries += 1
+    def discoverMusic(self):
+        api_url = "https://m.tiktok.com/node/share/discover?noUser=1&userCount=30&scene=0&verifyFp="
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)['body'][2]['exploreList']
+    #
+    # Gets a user object for id and secUid
+    #
 
-            if id != "":
-                while True:
+    def getUserObject(self, username):
+        api_url = "https://m.tiktok.com/api/user/detail/?uniqueId={}&language=en&verifyFp=".format(
+            username)
+        b = browser(api_url)
+        return self.getData(api_url, b.signature, b.userAgent)['userInfo']['user']
 
-                    url = "https://m.tiktok.com/share/item/list?secUid=&id=" + str(
-                        id) + "&type=1&count=30&minCursor=0&maxCursor=0&shareUid=&_signature=" + self.signature
-                    r = requests.get(url, headers={"method": "GET",
-                                                   "accept-encoding": "gzip, deflate, br",
-                                                   "Referer": self.referer,
-                                                   "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"})
+    #
+    # Downloads video from TikTok using a TikTok object
+    #
 
-                    data = r.json()
-                    response = []
+    def get_Video_By_TikTok(self, data):
+        api_url = data['video']['downloadAddr']
+        return self.get_Video_By_DownloadURL(api_url)
 
-                    if data["statusCode"] != 0:
-                        if verbose == 1:
-                            print("Invalid Signature Retrying")
-                    else:
-                        maxCursor = data['body']['maxCursor']
-                        for tiktok in data["body"]["itemListData"]:
-                            if count > len(response):
-                                response.append(tiktok)
-                            else:
-                                return response
-
-                        if len(response) == count:
-                            return response
-
-                        raise Exception(
-                            'Rate Limit: This function only currently supports 30 TikToks.')
-                        while True:
-                            try:
-                                if count > len(response) and str(data['body']['hasMore']) == "True":
-                                    url = "https://m.tiktok.com/share/item/list?id=" + str(id) + "&type=1&count=" + \
-                                        str(count - len(response)) + "&minCursor=0&maxCursor=" + maxCursor + "&_signature=" + \
-                                        self.signature
-                                    maxCursor = data['body']['maxCursor']
-
-                                    r = requests.get(url, headers={"method": "GET",
-                                                                   "accept-encoding": "gzip, deflate, br",
-                                                                   "Referer": self.referer,
-                                                                   "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"})
-
-                                    data = r.json()
-
-                                    if data["statusCode"] == 0:
-                                        for tiktok in data["body"]["itemListData"]:
-                                            response.append(tiktok)
-
-                                    else:
-                                        if verbose == 1:
-                                            print(
-                                                "Invalid Signature Retrying")
-
-                                else:
-                                    return response
-
-                            except:
-                                url = "https://m.tiktok.com/share/item/list?id=" + str(id) + "&type=1&count=" + \
-                                    str(count - len(response)) + "&minCursor=0&maxCursor=" + maxCursor + "&_signature=" + \
-                                    self.signature
-
-                                r = requests.get(url, headers={"method": "GET",
-                                                               "accept-encoding": "gzip, deflate, br",
-                                                               "Referer": self.referer,
-                                                               "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"})
-
-                                data = r.json()
-
-                                continue
-            else:
-                raise Exception("Unable to locate user ID and secUid")
+    #
+    # Downloads video from TikTok using download url in a tiktok object
+    #
+    def get_Video_By_DownloadURL(self, download_url):
+        b = browser(download_url)
+        return self.getBytes(download_url, b.signature, b.userAgent)
 
     #
     # Gets the source url of a given url for a tiktok
     #
     # video_url - the url of the video
     # return_bytes - 0 is just the url, 1 is the actual video bytes
+    # chromedriver_path - path to your chrome driver executible
     #
 
-    def get_Video_By_Url(self, video_url, return_bytes=0):
-        # Imports
-        import requests
-        import time
-        import browsermobproxy
-        from browsermobproxy import Server
-        import psutil
-        import json
-        from bs4 import BeautifulSoup
-
-        self.driver.get(video_url)
+    def get_Video_By_Url(self, video_url, return_bytes=0, chromedriver_path=None):
+        if chromedriver_path != None:
+            driver = webdriver.Chrome(executable_path=chromedriver_path)
+        else:
+            driver = webdriver.Chrome()
+        driver.get(video_url)
         time.sleep(5)
 
-        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
         data = json.loads(soup.find_all(
             'script', attrs={"id": "videoObject"})[0].text)
 
@@ -495,126 +189,3 @@ class TikTokapi:
         else:
             r = requests.get(data['contentUrl'])
             return r.content
-
-    #
-    # returns videos related to given video
-    #
-
-    def get_Related_Videos(self, video_url):
-        # Imports
-        import requests
-        import time
-        import browsermobproxy
-        from browsermobproxy import Server
-        import psutil
-        import json
-        from selenium import webdriver
-        from selenium.webdriver.firefox.options import Options
-
-        videoID = video_url.split("/")[5]
-        found = False
-        tries = 0
-        while not found:
-            if tries >= 50:
-                raise Exception("Tried 50 times could not find video JSON.")
-            else:
-                url = "https://m.tiktok.com/share/item/list?secUid=&id=" + videoID + \
-                    "&type=0&count=10&minCursor=0&maxCursor=0&shareUid=&_signature=" + self.signature
-
-                r = requests.get(url, headers={"method": "GET",
-                                               "accept-encoding": "gzip, deflate, br",
-                                               "Referer": self.referer,
-                                               "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"})
-
-                data = r.json()
-                if data['statusCode'] == 0:
-                    found = True
-                    break
-                tries += 1
-
-        return data['body']['itemListData']
-
-    #
-    # This function searchs by a specific sound using a url of the sound
-    #
-    def search_by_sound(self, soundLink, count=10, verbose=0):
-        import requests
-        import time
-
-        self.driver.get(soundLink)
-        time.sleep(5)
-        soundID = self.driver.current_url.split("?")[0].split(
-            "-")[len(self.driver.current_url.split("?")[0].split("-")) - 1]
-        try:
-            test = int(soundID)
-        except:
-            soundID = self.driver.current_url.split(".html?")[0].split(
-                "/")[len(self.driver.current_url.split(".html?")[0].split("/")) - 1]
-
-        while True:
-            url = "https://m.tiktok.com/share/item/list?secUid=&id=" + soundID + \
-                "&type=4&count=30&minCursor=0&maxCursor=0&shareUid=&_signature=" + self.signature
-            r = requests.get(url, headers={"method": "GET",
-                                           "accept-encoding": "gzip, deflate, br",
-                                           "Referer": self.referer,
-                                           "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"})
-
-            data = r.json()
-            response = []
-
-            if data["statusCode"] != 0:
-                if verbose == 1:
-                    print("Invalid Signature Retrying")
-            else:
-                maxCursor = data['body']['maxCursor']
-                for tiktok in data["body"]["itemListData"]:
-                    if count > len(response):
-                        response.append(tiktok)
-                    else:
-                        return response
-
-                if len(response) == count:
-                    return response
-
-                raise Exception(
-                    'Rate Limit: This function only currently supports 27 TikToks.')
-                while True:
-                    try:
-                        if count > len(response) and str(data['body']['hasMore']) == "True":
-                            url = "https://m.tiktok.com/share/item/list?id=" + str(id) + "&type=1&count=" + \
-                                str(count - len(response)) + "&minCursor=0&maxCursor=" + maxCursor + "&_signature=" + \
-                                self.signature
-                            maxCursor = data['body']['maxCursor']
-
-                            r = requests.get(url, headers={"method": "GET",
-                                                           "accept-encoding": "gzip, deflate, br",
-                                                           "Referer": self.referer,
-                                                           "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"})
-
-                            data = r.json()
-
-                            if data["statusCode"] == 0:
-                                for tiktok in data["body"]["itemListData"]:
-                                    response.append(tiktok)
-
-                            else:
-                                if verbose == 1:
-                                    print(
-                                        "Invalid Signature Retrying")
-
-                        else:
-                            return response
-
-                    except:
-                        url = "https://m.tiktok.com/share/item/list?id=" + str(id) + "&type=1&count=" + \
-                            str(count - len(response)) + "&minCursor=0&maxCursor=" + maxCursor + "&_signature=" + \
-                            self.signature
-
-                        r = requests.get(url, headers={"method": "GET",
-                                                       "accept-encoding": "gzip, deflate, br",
-                                                       "Referer": self.referer,
-                                                       "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"})
-
-                        data = r.json()
-
-                        continue
