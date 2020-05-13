@@ -52,7 +52,7 @@ TikTokApi(self, debug=False)
 debug - Enable this if you need some more output.
 
 
-##### The Trending Method
+##### The trending Method
 
 ```
 # Where count is how many result you want
@@ -71,6 +71,80 @@ api.get_Video_By_TikTok(data)
 ```
 
 data - The tiktok dictionary returned from the API. Will return bytes.
+
+
+##### The bySound Method
+
+This method returns an array of tiktoks based on a sound id.
+```
+def bySound(self, id, count=30)
+```
+
+id - the sound's id (you can get this from other methods)
+
+
+##### The getUserObject Method
+
+This method returns a user object, primarily used for other methods within the package.
+```
+def getUserObject(self, username)
+```
+
+username - the unique username of the person you want to get an object for.
+
+##### The getMusicObject Method
+
+This method returns a music object, primarily used for other methods within the package.
+
+```
+def getMusicObject(self, id)
+```
+
+id - the ID of the music.
+
+##### The getHashtagObject Method
+
+This method returns a hashtag (challenge) object, primarily used for other methods within the package.
+
+```
+def getHashtagObject(self, hashtag)
+```
+
+hashtag - the hashtag or challenge name
+
+##### The byUsername Method
+
+This method returns an array of tiktoks by a username
+
+```
+def byUsername(self, username, count=30)
+```
+
+##### The byHashtag Method
+
+This method returns an array of TikToks by a given hashtag or challenge (without the #)
+
+```
+def byHashtag(self, hashtag, count=30)
+```
+
+hashtag - a given hashtag or challenge without the #
+
+##### The discoverMusic Method
+
+Returns trending music shown on the side at tiktok's trending page on desktop
+
+```
+def discoverMusic(self)
+```
+
+##### The discoverHashtags Method
+
+Returns trending hashtags (challenges) shown on the side at tiktok's trending page on desktop
+
+```
+def discoverHashtags(self)
+```
 
 ##### The get_Video_By_DownloadURL Method
 

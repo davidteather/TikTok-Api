@@ -30,3 +30,7 @@ before_script:
 script:
   - pytest tests/test_trending.py
   - pytest tests/test_user.py
+  - pytest tests/test_VideoByUrl.py
+  - pytest tests/test_bySound.py
+  - pytest tests/test_byUsername.py
+  - pytest tests/test_byHashtag.py

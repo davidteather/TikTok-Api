@@ -1,7 +1,6 @@
-from TikTokApi import TikTokapi
+from TikTokApi import TikTokApi
 
 def test_get_video_by_url():
-    api = TikTokapi("browsermob-proxy/bin/browsermob-proxy", headless=True)
-    bytesV = api.get_Video_By_Url("https://www.tiktok.com/@bts_official_bighit/video/6741282343362759938?langCountry=en", return_bytes=1)
-    assert type(bytesV) == type(bytes())
-    api.quit_browser()
+    api = TikTokApi()
+    bytesV = api.get_Video_By_TikTok(api.trending(count=30)[0])
+    assert type(bytesV) == type(bytes()) 
