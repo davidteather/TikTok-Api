@@ -18,6 +18,7 @@ If you need help installing or run into some error, please open an issue. I will
 
 ```
 pip install TikTokApi
+pyppeteer-install
 ```
 
 ## Quick Start Guide
