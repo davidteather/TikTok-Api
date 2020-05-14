@@ -30,14 +30,14 @@ class TikTokApi:
                                        "referrer": self.referrer,
                                        "user-agent": userAgent,
                                        })
-
         try:
             return r.json()
         except:
             print("Converting response to JSON failed response is below (probably empty)")
             print(r.text)
             raise Exception('Invalid Response')
-
+    
+    
     #
     # Method that retrives data from the api
     #
@@ -57,20 +57,65 @@ class TikTokApi:
     #
 
     def trending(self, count=30):
-        api_url = "https://m.tiktok.com/api/item_list/?count={}&id=1&type=5&secUid=&maxCursor=1&minCursor=0&sourceType=12&appId=1233&verifyFp=".format(
-            str(count))
-        b = browser(api_url)
+        response = []
+        maxCount = 99
+        maxCursor = 0
 
-        return self.getData(api_url, b.signature, b.userAgent)['items']
+        while len(response) < count:
+            if count < maxCount:
+                realCount = count
+            else:
+                realCount = maxCount
+
+            api_url = "https://m.tiktok.com/api/item_list/?count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&verifyFp=".format(
+            str(realCount), str(maxCursor))
+            b = browser(api_url)
+            res = self.getData(api_url, b.signature, b.userAgent)
+
+            for t in res['items']:
+                response.append(t)
+
+            if not res['hasMore']:
+                print("TikTok isn't sending more TikToks beyond this point.")
+                return response
+            
+            realCount = count-len(response)
+            maxCursor = res['maxCursor']
+
+
+        return response[:count]
 
     #
     # Gets a specific user's tiktoks
     #
     def userPosts(self, userID, secUID, count=30):
-        api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor=0&minCursor=0&sourceType=8&appId=1233&region=US&language=en&verifyFp=".format(
-            str(count), str(userID), str(secUID))
-        b = browser(api_url)
-        return self.getData(api_url, b.signature, b.userAgent)['items']
+        response = []
+        maxCount = 99
+        maxCursor = 0
+
+        while len(response) < count:
+            if count < maxCount:
+                realCount = count
+            else:
+                realCount = maxCount
+
+            api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region=US&language=en&verifyFp=".format(
+            str(realCount), str(userID), str(secUID), str(maxCursor))
+            b = browser(api_url)
+            res = self.getData(api_url, b.signature, b.userAgent)
+
+            for t in res['items']:
+                response.append(t)
+
+            if not res['hasMore']:
+                print("TikTok isn't sending more TikToks beyond this point.")
+                return response
+            
+            realCount = count-len(response)
+            maxCursor = res['maxCursor']
+
+
+        return response[:count]
 
     #
     # Gets a specific user's tiktoks by username
@@ -87,10 +132,32 @@ class TikTokApi:
     #
 
     def bySound(self, id, count=30):
-        api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=4&count={}&minCursor=0&maxCursor=0&shareUid=&lang=en&verifyFp=".format(
-            str(id), str(count))
-        b = browser(api_url)
-        return self.getData(api_url, b.signature, b.userAgent)['body']['itemListData']
+        response = []
+        maxCount = 99
+        maxCursor = 0
+
+        while len(response) < count:
+            if count < maxCount:
+                realCount = count
+            else:
+                realCount = maxCount
+
+            api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=4&count={}&minCursor=0&maxCursor={}&shareUid=&lang=en&verifyFp=".format(
+            str(id), str(realCount), str(maxCursor))
+            b = browser(api_url)
+            res = self.getData(api_url, b.signature, b.userAgent)
+
+            for t in res['body']['itemListData']:
+                response.append(t)
+
+            if not res['body']['hasMore']:
+                print("TikTok isn't sending more TikToks beyond this point.")
+                return response
+            
+            realCount = count-len(response)
+            maxCursor = res['body']['maxCursor']
+
+        return response[:count]
 
     #
     # Gets the music object
@@ -107,10 +174,32 @@ class TikTokApi:
 
     def byHashtag(self, hashtag, count=30):
         id = self.getHashtagObject(hashtag)['challengeInfo']['challenge']['id']
-        api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=3&count={}&minCursor=0&maxCursor=0&shareUid=&lang=en&verifyFp=".format(
-            str(id), str(count))
-        b = browser(api_url)
-        return self.getData(api_url, b.signature, b.userAgent)['body']['itemListData']
+        response = []
+        maxCount = 99
+        maxCursor = 0
+
+        while len(response) < count:
+            if count < maxCount:
+                realCount = count
+            else:
+                realCount = maxCount
+
+            api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=3&count={}&minCursor=0&maxCursor={}&shareUid=&lang=en&verifyFp=".format(
+                str(id), str(realCount), str(maxCursor))
+            b = browser(api_url)
+            res = self.getData(api_url, b.signature, b.userAgent)
+
+            for t in res['body']['itemListData']:
+                response.append(t)
+
+            if not res['body']['hasMore']:
+                print("TikTok isn't sending more TikToks beyond this point.")
+                return response
+            
+            realCount = count-len(response)
+            maxCursor = res['body']['maxCursor']
+
+        return response[:count]
 
     #
     # Gets tiktoks by hashtag (for use in byHashtag)
