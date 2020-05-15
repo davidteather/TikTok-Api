@@ -22,13 +22,14 @@ class TikTokApi:
     #
     # Method that retrives data from the api
     #
-    def getData(self, api_url, signature, userAgent):
+    def getData(self, api_url, signature, userAgent, language='en'):
         url = api_url + \
             "&_signature=" + signature
         r = requests.get(url, headers={"method": "GET",
                                        "accept-encoding": "gzip, deflate, br",
                                        "referrer": self.referrer,
                                        "user-agent": userAgent,
+                                       "accept-language": language
                                        })
         try:
             return r.json()
@@ -56,7 +57,7 @@ class TikTokApi:
     # Gets trending Tiktoks
     #
 
-    def trending(self, count=30):
+    def trending(self, count=30, language='en'):
         response = []
         maxCount = 99
         maxCursor = 0
@@ -66,11 +67,10 @@ class TikTokApi:
                 realCount = count
             else:
                 realCount = maxCount
-
-            api_url = "https://m.tiktok.com/api/item_list/?count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&verifyFp=".format(
-            str(realCount), str(maxCursor))
-            b = browser(api_url)
-            res = self.getData(api_url, b.signature, b.userAgent)
+            api_url = "https://m.tiktok.com/api/item_list/?count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region=US&language={}&verifyFp=".format(
+            str(realCount), str(maxCursor), str(language))
+            b = browser(api_url, language=language)
+            res = self.getData(api_url, b.signature, b.userAgent, language=language)
 
             for t in res['items']:
                 response.append(t)
@@ -88,7 +88,7 @@ class TikTokApi:
     #
     # Gets a specific user's tiktoks
     #
-    def userPosts(self, userID, secUID, count=30):
+    def userPosts(self, userID, secUID, count=30, language='en'):
         response = []
         maxCount = 99
         maxCursor = 0
@@ -99,8 +99,8 @@ class TikTokApi:
             else:
                 realCount = maxCount
 
-            api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region=US&language=en&verifyFp=".format(
-            str(realCount), str(userID), str(secUID), str(maxCursor))
+            api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region=US&language={}&verifyFp=".format(
+            str(realCount), str(userID), str(secUID), str(maxCursor), str(language))
             b = browser(api_url)
             res = self.getData(api_url, b.signature, b.userAgent)
 
@@ -131,7 +131,7 @@ class TikTokApi:
     # id - the sound ID
     #
 
-    def bySound(self, id, count=30):
+    def bySound(self, id, count=30, language='en'):
         response = []
         maxCount = 99
         maxCursor = 0
@@ -142,8 +142,8 @@ class TikTokApi:
             else:
                 realCount = maxCount
 
-            api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=4&count={}&minCursor=0&maxCursor={}&shareUid=&lang=en&verifyFp=".format(
-            str(id), str(realCount), str(maxCursor))
+            api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=4&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}&verifyFp=".format(
+            str(id), str(realCount), str(maxCursor), str(language))
             b = browser(api_url)
             res = self.getData(api_url, b.signature, b.userAgent)
 
@@ -162,9 +162,9 @@ class TikTokApi:
     #
     # Gets the music object
     #
-    def getMusicObject(self, id):
-        api_url = "https://m.tiktok.com/api/music/detail/?musicId={}&language=en&verifyFp=".format(
-            str(id))
+    def getMusicObject(self, id, language='en'):
+        api_url = "https://m.tiktok.com/api/music/detail/?musicId={}&language={}&verifyFp=".format(
+            str(id), language)
         b = browser(api_url)
         return self.getData(api_url, b.signature, b.userAgent)
 
@@ -172,7 +172,7 @@ class TikTokApi:
     # Gets tiktoks by hashtag
     #
 
-    def byHashtag(self, hashtag, count=30):
+    def byHashtag(self, hashtag, count=30, language='en'):
         id = self.getHashtagObject(hashtag)['challengeInfo']['challenge']['id']
         response = []
         maxCount = 99
@@ -184,8 +184,8 @@ class TikTokApi:
             else:
                 realCount = maxCount
 
-            api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=3&count={}&minCursor=0&maxCursor={}&shareUid=&lang=en&verifyFp=".format(
-                str(id), str(realCount), str(maxCursor))
+            api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=3&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}&verifyFp=".format(
+                str(id), str(realCount), str(maxCursor), language)
             b = browser(api_url)
             res = self.getData(api_url, b.signature, b.userAgent)
 
@@ -205,9 +205,9 @@ class TikTokApi:
     # Gets tiktoks by hashtag (for use in byHashtag)
     #
 
-    def getHashtagObject(self, hashtag):
-        api_url = "https://m.tiktok.com/api/challenge/detail/?verifyFP=&challengeName={}&language=en".format(
-            str(hashtag))
+    def getHashtagObject(self, hashtag, language='en'):
+        api_url = "https://m.tiktok.com/api/challenge/detail/?verifyFP=&challengeName={}&language={}".format(
+            str(hashtag), language)
         b = browser(api_url)
         return self.getData(api_url, b.signature, b.userAgent)
 
@@ -232,9 +232,9 @@ class TikTokApi:
     # Gets a user object for id and secUid
     #
 
-    def getUserObject(self, username):
-        api_url = "https://m.tiktok.com/api/user/detail/?uniqueId={}&language=en&verifyFp=".format(
-            username)
+    def getUserObject(self, username, language='en'):
+        api_url = "https://m.tiktok.com/api/user/detail/?uniqueId={}&language={}&verifyFp=".format(
+            username, language)
         b = browser(api_url)
         return self.getData(api_url, b.signature, b.userAgent)['userInfo']['user']
 
