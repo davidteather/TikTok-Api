@@ -28,8 +28,7 @@ class TikTokApi:
         r = requests.get(url, headers={"method": "GET",
                                        "accept-encoding": "gzip, deflate, br",
                                        "referrer": self.referrer,
-                                       "user-agent": userAgent,
-                                       "accept-language": language
+                                       "user-agent": userAgent
                                        })
         try:
             return r.json()
