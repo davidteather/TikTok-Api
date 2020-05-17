@@ -17,7 +17,8 @@ class TikTokApi:
         if debug:
             print("Class initialized")
 
-        self.referrer = "https://www.tiktok.com/tag/jakefromstate?lang=en"
+        self.referrer = "https://www.tiktok.com/trending?lang="
+        #self.referrer = "https://www.tiktok.com/@ondymikula/video/6757762109670477061"
 
     #
     # Method that retrives data from the api
@@ -27,10 +28,23 @@ class TikTokApi:
             "&_signature=" + signature
         r = requests.get(url, headers={"method": "GET",
                                        "accept-encoding": "gzip, deflate, br",
-                                       "referrer": self.referrer,
-                                       "user-agent": userAgent
+                                       "referrer": self.referrer + language,
+                                       "user-agent": userAgent,
+                                       'accept': 'application/json, text/plain, */*',
+                                       'dnt': '1',
+                                       'cache-control': 'no-cache',
+                                       'scheme': 'https',
+                                       'authority': 'm.tiktok.com',
+                                       'origin': 'https://www.tiktok.com',
+                                       'pragma': 'no-cache',
+                                       'sec-fetch-dest': 'empty',
+                                       'sec-fetch-mode': 'cors',
+                                       'sec-fetch-site': 'same-site',
+                                       'path': url.split("tiktok.com")[1],
+                                       'accept-language': 'en-US,en;q=0.9'
                                        })
         try:
+            print(r.request.headers)
             return r.json()
         except:
             print("Converting response to JSON failed response is below (probably empty)")
