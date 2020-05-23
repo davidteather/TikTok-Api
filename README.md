@@ -23,12 +23,6 @@ pyppeteer-install
 
 If you're running a virtual machine you need to install chromedriver for your machine globally. Download it [here](https://sites.google.com/a/chromium.org/chromedriver/) and add it to your path.
 
-Some Linux Variants
-```
-sudo apt-get install chromium-chromedriver
-```
-
-
 
 ## Quick Start Guide
 
