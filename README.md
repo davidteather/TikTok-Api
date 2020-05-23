@@ -21,6 +21,15 @@ pip install TikTokApi
 pyppeteer-install
 ```
 
+If you're running a virtual machine you need to install chromedriver for your machine globally. Download it [here](https://sites.google.com/a/chromium.org/chromedriver/) and add it to your path.
+
+Some Linux Variants
+```
+sudo apt-get install chromium-chromedriver
+```
+
+
+
 ## Quick Start Guide
 
 Here's a quick bit of code to get the most recent trending on TikTok. There's more example in the examples directory.
