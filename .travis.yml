@@ -22,7 +22,7 @@ install:
 
 before_script:
   - "sudo apt-get install unzip"
-  - "wget https://chromedriver.storage.googleapis.com/79.0.3945.36/chromedriver_linux64.zip -O /tmp/chromedriver.zip && unzip /tmp/chromedriver.zip -d /opt && sudo chmod 755 /opt/chromedriver && sudo ln -fs /opt/chromedriver /usr/bin/chromedriver && sudo ln -fs /opt/chromedriver /usr/local/bin/chromedriver"
+  - "wget https://chromedriver.storage.googleapis.com/83.0.4103.39/chromedriver_linux64.zip -O /tmp/chromedriver.zip && unzip /tmp/chromedriver.zip -d /opt && sudo chmod 755 /opt/chromedriver && sudo ln -fs /opt/chromedriver /usr/bin/chromedriver && sudo ln -fs /opt/chromedriver /usr/local/bin/chromedriver"
   - "sudo apt-get install java-common"
   - "pip install -r requirements.txt"
   - "python setup.py install_lib"

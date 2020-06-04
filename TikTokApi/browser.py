@@ -1,11 +1,14 @@
 import asyncio
 import pyppeteer
 import random
+import time
 from pyppeteer_stealth import stealth
 
+
 class browser:
-    def __init__(self, url):
+    def __init__(self, url, language='en'):
         self.url = url
+        self.language = language
         self.userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"
         self.args = [
             "--no-sandbox",
@@ -42,15 +45,17 @@ class browser:
 
         await self.page.setUserAgent(self.userAgent)
 
-        await self.page.goto("https://www.tiktok.com/trending?lang=en", {
+        await self.page.setExtraHTTPHeaders({
+            'Accept-Language': self.language
+        })
+
+        await self.page.goto("https://www.tiktok.com/trending?lang=" + self.language, {
             'waitUntil': "load"
         })
 
         self.signature = await self.page.evaluate('''() => {
-          var t = {}
-          webpackJsonp.filter(x => typeof x[1]['duD4'] === "function")[0][1].duD4(null, t)
           var url = "''' + self.url + '''"
-          var token = t.sign({url: url})
+          var token = window.byted_acrawler.sign({url: url});
           return token;
           }''')
         await self.browser.close()
