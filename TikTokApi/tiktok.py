@@ -44,7 +44,6 @@ class TikTokApi:
                                        'accept-language': 'en-US,en;q=0.9'
                                        })
         try:
-            print(r.request.headers)
             return r.json()
         except:
             print("Converting response to JSON failed response is below (probably empty)")

@@ -1,7 +1,9 @@
 import asyncio
 import pyppeteer
 import random
+import time
 from pyppeteer_stealth import stealth
+
 
 class browser:
     def __init__(self, url, language='en'):
@@ -20,7 +22,7 @@ class browser:
 
         self.options = {
             'args': self.args,
-            'headless': True,
+            'headless': False,
             'ignoreHTTPSErrors': True,
             'userDataDir': "./tmp"
         }
@@ -52,10 +54,8 @@ class browser:
         })
 
         self.signature = await self.page.evaluate('''() => {
-          var t = {}
-          webpackJsonp.filter(x => typeof x[1]['duD4'] === "function")[0][1].duD4(null, t)
           var url = "''' + self.url + '''"
-          var token = t.sign({url: url})
+          var token = window.byted_acrawler.sign({url: url});
           return token;
           }''')
         await self.browser.close()
