@@ -22,7 +22,7 @@ class browser:
 
         self.options = {
             'args': self.args,
-            'headless': False,
+            'headless': True,
             'ignoreHTTPSErrors': True,
             'userDataDir': "./tmp"
         }
