@@ -24,10 +24,14 @@ class browser:
             'args': self.args,
             'headless': True,
             'ignoreHTTPSErrors': True,
-            'userDataDir': "./tmp"
+            'userDataDir': "./tmp",
+            'handleSIGINT': False,
+            'handleSIGTERM': False,
+            'handleSIGHUP': False
         }
 
-        asyncio.get_event_loop().run_until_complete(self.start())
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(self.start())
 
     async def start(self):
         self.browser = await pyppeteer.launch(self.options)
