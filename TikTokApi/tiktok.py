@@ -219,7 +219,7 @@ class TikTokApi:
 
     def getHashtagObject(self, hashtag, language='en'):
         api_url = "https://m.tiktok.com/api/challenge/detail/?verifyFP=&challengeName={}&language={}".format(
-            str(hashtag), language)
+            str(hashtag.encode('utf-8'))[2:-1].replace("\\x", "%").upper(), language)
         b = browser(api_url)
         return self.getData(api_url, b.signature, b.userAgent)
 
