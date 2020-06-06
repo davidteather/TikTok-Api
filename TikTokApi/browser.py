@@ -6,7 +6,7 @@ from pyppeteer_stealth import stealth
 
 
 class browser:
-    def __init__(self, url, language='en'):
+    def __init__(self, url, language='en', proxy=None):
         self.url = url
         self.language = language
         self.userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"
@@ -17,7 +17,7 @@ class browser:
             "--window-position=0,0",
             "--ignore-certifcate-errors",
             "--ignore-certifcate-errors-spki-list",
-            "--user-agent=" + self.userAgent
+            "--user-agent=" + self.userAgent,
         ]
 
         self.options = {
