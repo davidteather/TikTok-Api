@@ -181,6 +181,16 @@ video_url - The video you want to get url.
 
 return_bytes - The default value is 0, when it is set to 1 the function instead returns the bytes from the video rather than just the direct url.
 
+##### The get_Video_No_Watermark Method
+
+```
+api.get_Video_No_Watermark(video_url, return_bytes=0)
+```
+
+video_url - The video you want to get url.
+
+return_bytes - The default value is 0, when it is set to 1 the function instead returns the bytes from the video rather than just the direct url.
+
 ## Built With
 
 * [Python 3.7](https://www.python.org/) - The web framework used
