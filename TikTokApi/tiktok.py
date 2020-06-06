@@ -245,10 +245,13 @@ class TikTokApi:
     #
 
     def getUserObject(self, username, language='en'):
+        return self.getUser(username, language)['userInfo']['user']
+
+    def getUser(self, username, language='en'):
         api_url = "https://m.tiktok.com/api/user/detail/?uniqueId={}&language={}&verifyFp=".format(
             username, language)
         b = browser(api_url)
-        return self.getData(api_url, b.signature, b.userAgent)['userInfo']['user']
+        return self.getData(api_url, b.signature, b.userAgent)
 
     #
     # Downloads video from TikTok using a TikTok object
@@ -290,3 +293,4 @@ class TikTokApi:
         else:
             r = requests.get(data['contentUrl'])
             return r.content
+    
