@@ -17,6 +17,7 @@ class TikTokApi:
         if debug:
             print("Class initialized")
 
+        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36"
         self.referrer = "https://www.tiktok.com/trending?lang="
         #self.referrer = "https://www.tiktok.com/@ondymikula/video/6757762109670477061"
 
@@ -49,8 +50,7 @@ class TikTokApi:
             print("Converting response to JSON failed response is below (probably empty)")
             print(r.text)
             raise Exception('Invalid Response')
-    
-    
+
     #
     # Method that retrives data from the api
     #
@@ -80,9 +80,10 @@ class TikTokApi:
             else:
                 realCount = maxCount
             api_url = "https://m.tiktok.com/api/item_list/?count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region=US&language={}&verifyFp=".format(
-            str(realCount), str(maxCursor), str(language))
+                str(realCount), str(maxCursor), str(language))
             b = browser(api_url, language=language)
-            res = self.getData(api_url, b.signature, b.userAgent, language=language)
+            res = self.getData(api_url, b.signature,
+                               b.userAgent, language=language)
 
             for t in res['items']:
                 response.append(t)
@@ -90,10 +91,9 @@ class TikTokApi:
             if not res['hasMore']:
                 print("TikTok isn't sending more TikToks beyond this point.")
                 return response
-            
+
             realCount = count-len(response)
             maxCursor = res['maxCursor']
-
 
         return response[:count]
 
@@ -112,7 +112,7 @@ class TikTokApi:
                 realCount = maxCount
 
             api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region=US&language={}&verifyFp=".format(
-            str(realCount), str(userID), str(secUID), str(maxCursor), str(language))
+                str(realCount), str(userID), str(secUID), str(maxCursor), str(language))
             b = browser(api_url)
             res = self.getData(api_url, b.signature, b.userAgent)
 
@@ -122,10 +122,9 @@ class TikTokApi:
             if not res['hasMore']:
                 print("TikTok isn't sending more TikToks beyond this point.")
                 return response
-            
+
             realCount = count-len(response)
             maxCursor = res['maxCursor']
-
 
         return response[:count]
 
@@ -155,7 +154,7 @@ class TikTokApi:
                 realCount = maxCount
 
             api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=4&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}&verifyFp=".format(
-            str(id), str(realCount), str(maxCursor), str(language))
+                str(id), str(realCount), str(maxCursor), str(language))
             b = browser(api_url)
             res = self.getData(api_url, b.signature, b.userAgent)
 
@@ -165,7 +164,7 @@ class TikTokApi:
             if not res['body']['hasMore']:
                 print("TikTok isn't sending more TikToks beyond this point.")
                 return response
-            
+
             realCount = count-len(response)
             maxCursor = res['body']['maxCursor']
 
@@ -207,7 +206,7 @@ class TikTokApi:
             if not res['body']['hasMore']:
                 print("TikTok isn't sending more TikToks beyond this point.")
                 return response
-            
+
             realCount = count-len(response)
             maxCursor = res['body']['maxCursor']
 
@@ -290,3 +289,48 @@ class TikTokApi:
         else:
             r = requests.get(data['contentUrl'])
             return r.content
+
+    #
+    # No Water Mark
+    #
+    def get_Video_No_Watermark(self, video_url, return_bytes=1):
+        r = requests.get(video_url, headers={"method": "GET",
+                                             "accept-encoding": "utf-8",
+                                             "user-agent": self.userAgent
+                                             })
+
+        data = r.text.split("\"contentUrl\":\"")
+        if len(data) > 1:
+            contentURL = data[1].split("\"")[0]
+
+            r = requests.get(contentURL, headers={"method": "GET",
+                                                  "accept-encoding": "gzip, deflate, br",
+                                                  'accept-Language': 'en-US,en;q=0.9',
+                                                  'Range': 'bytes=0-200000',
+                                                  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                                                  "user-agent": self.userAgent
+                                                  })
+
+            tmp = r.text.split("vid:")
+            if len(tmp) > 1:
+                key = tmp[1].split("%")[0]
+
+                if key[-1:] == ' ':
+                    key = key[1:]
+
+                if key[:1] == ' ':
+                    key = key[:-1]
+
+            else:
+                key = ""
+
+            cleanVideo = "https://api2.musical.ly/aweme/v1/playwm/?video_id=" + key
+
+            b = browser(cleanVideo, find_redirect=True)
+            
+            if return_bytes == 0:
+                return b.redirect_url
+            else:
+                r = requests.get(b.redirect_url)
+                return r.content
+                
