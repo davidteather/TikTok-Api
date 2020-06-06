@@ -99,6 +99,13 @@ This method returns a user object, primarily used for other methods within the p
 def getUserObject(self, username)
 ```
 
+##### The getUser Method
+
+This method returns a user object, including all profile data about the user.
+```
+def getUserObject(self, username)
+```
+
 username - the unique username of the person you want to get an object for.
 
 ##### The getMusicObject Method

@@ -1,23 +1,20 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: "[BUG] - Your Error Here"
-labels: bug
+name: Installation Help
+about: If you're having trouble getting this to run for the first time please use
+  this template
+title: "[INSTALLATION] - Your error here"
+labels: installation_help
 assignees: ''
 
 ---
 
-**Describe the bug**
+**Describe the error**
 
-A clear and concise description of what the bug is.
+Put the error trace here.
 
 **The buggy code**
 
 Please insert the code that is throwing errors or is giving you weird unexpected results.
-
-**Expected behavior**
-
-A clear and concise description of what you expected to happen.
 
 **Screenshots**
 
@@ -30,4 +27,4 @@ If applicable, add screenshots to help explain your problem.
 
 **Additional context**
 
-Add any other context about the problem here.
+Put what you have already tried. Your problem is probably in the closed issues tab already.
