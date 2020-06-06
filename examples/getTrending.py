@@ -1,15 +1,16 @@
-from TikTokApi import TikTokapi
-
-# Starts T
-api = TikTokapi("path/to/browsermob-proxy")
+from TikTokApi import TikTokApi
+# Starts TikTokApi
+api = TikTokApi()
 
 # The Number of trending TikToks you want to be displayed
 results = 10
+
+# Returns a list of dictionaries of the trending object
 trending = api.trending(results)
 
+# Loops over every tiktok
 for tiktok in trending:
     # Prints the text of the tiktok
-    print(tiktok['itemInfos']['text'])
+    print(tiktok['desc'])
 
 print(len(trending))
-api.quit_browser()

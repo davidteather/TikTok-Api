@@ -8,9 +8,9 @@ with open("README.md", "r") as fh:
 setuptools.setup(
   name = 'TikTokApi',         
   packages = ['TikTokApi'],   
-  version = '2.3.5',      
+  version = '3.1.4',      
   license='MIT',        
-  description = 'The Unoffical TikTok API Wrapper in Python 3.',   
+  description = 'The Unofficial TikTok API Wrapper in Python 3.',   
   author = 'David Teather',                   
   author_email = 'contact.davidteather@gmail.com',     
   url = 'https://github.com/davidteather/tiktok-api',
@@ -21,9 +21,11 @@ setuptools.setup(
   install_requires=[
           'requests',
           'selenium',
-          'browsermob-proxy',
-          'psutil',
+          'asyncio',
+          'asyncio',
           'bs4',
+          'pyppeteer',
+          'pyppeteer_stealth'
       ],
   classifiers=[
     'Development Status :: 3 - Alpha',

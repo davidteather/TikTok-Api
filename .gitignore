@@ -9,3 +9,5 @@ browsermob-proxy/*
 myScripts/*
 test.py
 debug.log
+res.html
+tmp/*

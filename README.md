@@ -1,121 +1,168 @@
 
-# Unoffical TikTok API in Python
+# Unofficial TikTok API in Python
 
-This is an unoffical api wrapper for tiktok.com in python. With this api you are able to call most trending and fetch specific user information.
+This is an unofficial api wrapper for TikTok.com in python. With this api you are able to call most trending and fetch specific user information.
 
  [![GitHub release (latest by date)](https://img.shields.io/github/v/release/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/releases) [![Build Status](https://travis-ci.com/davidteather/TikTok-Api.svg?branch=master)](https://travis-ci.com/davidteather/TikTok-Api) [![GitHub](https://img.shields.io/github/license/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/blob/master/LICENSE) [![PyPI - Downloads](https://img.shields.io/pypi/dm/TikTokApi)](https://pypi.org/project/TikTokApi/) [![Downloads](https://pepy.tech/badge/tiktokapi)](https://pypi.org/project/TikTokApi/)
 
+If you want to use this API as a service visit the [RapidAPI](https://rapidapi.com/rapidapideveloper/api/tiktok2)
+
+
+ Consider sponsoring me [here](https://github.com/sponsors/davidteather)
+
 ## Important Information
 * If this API stops working for any reason open an issue.
-* Feel free to mention @davidteather in an issue you open, because I might not see it otherwise.
 
 ## Getting Started
 
 To get started using this api follow the instructions below.
 
-It is quite a long installation process just for a TikTok api, the first release can be found [here](https://github.com/davidteather/TikTok-Api/releases/edit/v1.0) and is not as suitable for long term projects, however it may be easier for a day of scraping TikTok, as the installation is much easier.
-
-Despite this, I **still recommend** you follow this process and use the latest version.
-
 ### Installing
 
 If you need help installing or run into some error, please open an issue. I will try to help out as much as I can.
 
-Tested with python 3.7.3
-
 ```
 pip install TikTokApi
+pyppeteer-install
 ```
 
-Or install directly from this GitHub repo.
+If you're running a virtual machine you need to install chromedriver for your machine globally. Download it [here](https://sites.google.com/a/chromium.org/chromedriver/) and add it to your path.
 
-* You do need to have **java installed**
-* Download browsermob-proxy [here](https://bmp.lightbody.net/)
-* You must add **browsermob-proxy/bin** to your environment path.
-* **Firefox** must be installed.
-* You must download the latest **geckodriver** from [mozilla](https://github.com/mozilla/geckodriver/releases), and include the .exe in your path.
 
 ## Quick Start Guide
 
-Here's a quick bit of code to get the most recent trending on TikTok
+Here's a quick bit of code to get the most recent trending on TikTok. There's more example in the examples directory.
+
 
 ```
-from tiktok import TikTokapi
+from TikTokApi import TikTokApi
+api = TikTokApi()
 
-api = TikTokapi(path_to_browsermob_directory)
-# path_to_browsermob_directory - String - should be the path from the directory you are running from the code to the extracted zip file of [browsermob-proxy](https://bmp.lightbody.net/)
-# Will Get the 10 most recent trending on the tiktok trending page
-api.trending(10)
+results = 10
+
+trending = api.trending(results)
+
+for tiktok in trending:
+    # Prints the text of the tiktok
+    print(tiktok['desc'])
+
+print(len(trending))
 ```
+[Here's](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d) an example of what a tiktok dictionary looks like.
 
 ## Detailed Documentation
 
 ##### The TikTok class
 
 ```
-# Variable set like
-api = TikTokapi(path_to_browsermob_directory, headless=False)
+TikTokApi(self, debug=False)
 ```
-path_to_browsermob_directory - String - should be the path from the directory you are running from the code to the extracted zip file of [browsermob-proxy](https://bmp.lightbody.net/)
-headless - True/False - True means it will run a headless firefox browser, could be detected by TikTok, however it is more convienent. Default = False.
+
+debug - Enable this if you need some more output.
 
 
-##### The Trending Method
+##### The trending Method
 
 ```
 # Where count is how many result you want
 # Verbose is optional, default=0. Set it to 1 to get more information
-api.trending(count, verbose)
+api.trending(self, count=30, referrer="https://www.tiktok.com/@ondymikula/video/6756762109670477061")
 ```
 
-Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/0be2e495e2de54098e8f2a9594581d27)
+count - this is how many trending Tiktoks you want to be returned.
 
-JSON object tree [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1)
+Trending returns an array of dictionaries. Example structure [here](https://www.tiktok.com/@ondymikula/video/6756762109670477061)
 
-##### The userPosts Method
-
-```
-api.userPosts(username="", id="", secUid="", count, verbose)
-```
-
-You can either define username OR BOTH id and secUid. Defining secUid and id is much faster than defining it by username, but it's still an option.
-
-username - the username of the tiktok user without the @
-
-userid - The id of the user, can be found in the TikTok json response titled "userId"
-
-secUid - Also found in the TikTok json response the key anme is "secUid"
-
-
-**Note:** Currently limited to 30 because of some issues with getting past 30. It will raise an exception if you try for higher.
-
-
-Trending returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/a5c1e54de353353f77a78139d2e5a9f9)
-
-It has the same JSON object tree as trending. It's [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1) anyways.
-
-##### The search_by_hashtag Method
+##### The get_Video_By_TikTok Method
 
 ```
-api.search_by_hashtag(hashtag, count=10)
+api.get_Video_By_TikTok(data)
 ```
 
-hashtag - A string of the hashtag without the # mark. Ex: hashtag = "funny"
+data - The tiktok dictionary returned from the API. Will return bytes.
 
 
-count - The number of results you want
+##### The bySound Method
+
+This method returns an array of tiktoks based on a sound id.
+```
+def bySound(self, id, count=30)
+```
+
+id - the sound's id (you can get this from other methods)
 
 
-**Note:** Currently limited to 30 because of some issues with getting past 30. It will raise an exception if you try for higher.
+##### The getUserObject Method
 
+This method returns a user object, primarily used for other methods within the package.
+```
+def getUserObject(self, username)
+```
 
-Since this isn't an offical TikTok API the TikTok servers don't know what to do with my bad solutions, this takes a bit longer as it needs to find the hashtagID and stuff.
+username - the unique username of the person you want to get an object for.
 
+##### The getMusicObject Method
 
-Search by hashtag returns an array of json objects. Example structure [here](https://gist.github.com/davidteather/a5c1e54de353353f77a78139d2e5a9f9)
+This method returns a music object, primarily used for other methods within the package.
 
+```
+def getMusicObject(self, id)
+```
 
-It has the same JSON object tree as trending. It's [here](https://gist.github.com/davidteather/bc4baef0edb621dd322c8ad128a31ac1) anyways.
+id - the ID of the music.
+
+##### The getHashtagObject Method
+
+This method returns a hashtag (challenge) object, primarily used for other methods within the package.
+
+```
+def getHashtagObject(self, hashtag)
+```
+
+hashtag - the hashtag or challenge name
+
+##### The byUsername Method
+
+This method returns an array of tiktoks by a username
+
+```
+def byUsername(self, username, count=30)
+```
+
+##### The byHashtag Method
+
+This method returns an array of TikToks by a given hashtag or challenge (without the #)
+
+```
+def byHashtag(self, hashtag, count=30)
+```
+
+hashtag - a given hashtag or challenge without the #
+
+##### The discoverMusic Method
+
+Returns trending music shown on the side at tiktok's trending page on desktop
+
+```
+def discoverMusic(self)
+```
+
+##### The discoverHashtags Method
+
+Returns trending hashtags (challenges) shown on the side at tiktok's trending page on desktop
+
+```
+def discoverHashtags(self)
+```
+
+##### The get_Video_By_DownloadURL Method
+
+```
+api.get_Video_By_DownloadURL(url)
+```
+
+url - The download url that's found in the TikTok dictionary. TikTok['video']['downloadAddr']
+
 
 ##### The get_Video_By_Url Method
 
@@ -126,30 +173,6 @@ api.get_Video_By_Url(video_url, return_bytes=0)
 video_url - The video you want to get url.
 
 return_bytes - The default value is 0, when it is set to 1 the function instead returns the bytes from the video rather than just the direct url.
-
-##### The get_Related_Videos Method
-
-```
-api.get_Related_Videos(video_url)
-```
-
-This method returns the suggested trending videos titled "trends for you" on desktop. 
-
-video_url - the video URL that you want to see related videos for 
-
-##### The search_by_sound Method
-
-```
-api.search_by_sound(soundLink, count=10, verbose=0)
-```
-
-This method returns the trending videos under a specific sound or music link.
-
-soundLink - Either the original sound link or the music link for a specific song.
-
-count - Limited to 30 due to weird restrictions on the api.
-
-verbose - 0/1 for debugging.
 
 ## Built With
 
