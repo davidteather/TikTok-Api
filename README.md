@@ -99,6 +99,13 @@ This method returns a user object, primarily used for other methods within the p
 def getUserObject(self, username)
 ```
 
+##### The getUser Method
+
+This method returns a user object, including all profile data about the user.
+```
+def getUserObject(self, username)
+```
+
 username - the unique username of the person you want to get an object for.
 
 ##### The getMusicObject Method
@@ -168,6 +175,16 @@ url - The download url that's found in the TikTok dictionary. TikTok['video']['d
 
 ```
 api.get_Video_By_Url(video_url, return_bytes=0)
+```
+
+video_url - The video you want to get url.
+
+return_bytes - The default value is 0, when it is set to 1 the function instead returns the bytes from the video rather than just the direct url.
+
+##### The get_Video_No_Watermark Method
+
+```
+api.get_Video_No_Watermark(video_url, return_bytes=0)
 ```
 
 video_url - The video you want to get url.
