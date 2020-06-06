@@ -103,7 +103,7 @@ def getUserObject(self, username)
 
 This method returns a user object, including all profile data about the user.
 ```
-def getUserObject(self, username)
+def getUser(self, username)
 ```
 
 username - the unique username of the person you want to get an object for.
