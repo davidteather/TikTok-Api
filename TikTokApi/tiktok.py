@@ -299,7 +299,7 @@ class TikTokApi:
         if return_bytes == 0:
             return data['contentUrl']
         else:
-            r = requests.get(data['contentUrl')
+            r = requests.get(data['contentUrl'))
             return r.content
 
     #
