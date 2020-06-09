@@ -299,13 +299,13 @@ class TikTokApi:
         if return_bytes == 0:
             return data['contentUrl']
         else:
-            r = requests.get(data['contentUrl'))
+            r = requests.get(data['contentUrl'])
             return r.content
 
     #
     # No Water Mark
     #
-    def get_Video_No_Watermark(self, video_url, return_bytes=1, proxy=proxy):
+    def get_Video_No_Watermark(self, video_url, return_bytes=1, proxy=None):
         r= requests.get(video_url, headers={"method": "GET",
                                              "accept-encoding": "utf-8",
                                              "user-agent": self.userAgent
