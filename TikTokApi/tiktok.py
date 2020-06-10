@@ -333,6 +333,7 @@ class TikTokApi:
     # Crawler for Suggested Hashtags
     #
     def getSuggestedHashtagsbyIDCrawler(self, count=30, startingId='6745191554350760966'):
+        # gets 14 ish per user
         users = []
         unusedIDS = [startingId] 
         while len(users) < count:
@@ -362,11 +363,12 @@ class TikTokApi:
     # Crawler for Suggested Music
     #
     def getSuggestedMusicIDCrawler(self, count=30, startingId='6745191554350760966'):
+        # gets about 14 per user
         users = []
         unusedIDS = [startingId] 
         while len(users) < count:
             userId = random.choice(unusedIDS)
-            newUsers = self.getSuggestedMusicbyID(userId=userId)
+            newUsers = self.getSuggestedMusicbyID()
 
             for user in newUsers:
                 if user not in users:

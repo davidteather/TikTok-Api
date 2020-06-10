@@ -28,6 +28,12 @@ pyppeteer-install
 
 If you're running a virtual machine you need to install chromedriver for your machine globally. Download it [here](https://sites.google.com/a/chromium.org/chromedriver/) and add it to your path.
 
+### Common Installation Issues
+
+Please don't open an issue if you're experiencing one of these just comment if the provided solution do not work for you.
+
+* [Browser closed unexpectedly](https://github.com/davidteather/TikTok-Api/issues/95)
+* [BadStatusLine](https://github.com/davidteather/TikTok-Api/issues/88)
 
 ## Quick Start Guide
 
@@ -51,6 +57,16 @@ print(len(trending))
 [Here's](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d) an example of what a tiktok dictionary looks like.
 
 ## Detailed Documentation
+
+**Note**: This documentation is called detailed, which it is, but it may be out of date. And if you see something wrong or want to improve the documentation feel free to open a PR with the fixes.
+
+#### Common Parameters
+
+* username - the userame of a user you want to find
+* secUid - the secUid of the user (you can find in the responses)
+* userId / id - The id of the user
+* proxy - the proxy address of your proxy
+* language - the 2 letter code for your language (this is included in the requests by default to TikTok, but it doesn't seem to do much for me at least)
 
 ##### The TikTok class
 
@@ -99,11 +115,25 @@ This method returns a user object, primarily used for other methods within the p
 def getUserObject(self, username)
 ```
 
+##### The getTikTokById Method
+
+This object returns a TikTok object when given the TikTok ID.
+```
+def getTikTokById(self, id, language='en', proxy=None)
+```
+
+##### The getTikTokByUrl Method
+
+This does the same as the getTikTokById method, but it extracts the id out of the url.
+```
+def getTikTokByUrl(self, url, language='en', proxy=None)
+```
+
 ##### The getUser Method
 
 This method returns a user object, including all profile data about the user.
 ```
-def getUser(self, username)
+def getUser(self, username, language='en', proxy=None)
 ```
 
 username - the unique username of the person you want to get an object for.
@@ -160,6 +190,48 @@ Returns trending hashtags (challenges) shown on the side at tiktok's trending pa
 
 ```
 def discoverHashtags(self)
+```
+
+##### The getSuggestedUsersbyID Method
+
+This method gets suggested users for a given userid.
+```
+getSuggestedUsersbyID(self, count=30, userId='6745191554350760966', language='en', proxy=None)
+```
+
+##### The getSuggestedUsersbyIDCrawler Method
+
+This method gets users across a variety of userids.
+```
+getSuggestedUsersbyIDCrawler(self, count=30, startingId='6745191554350760966')
+```
+
+##### The getSuggestedHashtagsbyID Method
+
+This method gets related hashtags given a userid.
+```
+getSuggestedHashtagsbyID(self, count=30, userId='6745191554350760966', language='en', proxy=None)
+```
+
+##### The getSuggestedHashtagsbyIDCrawler Method
+
+This method crawls across multiple user's profile using the user crawler method to generate hashtags.
+```
+getSuggestedHashtagsbyIDCrawler(self, count=30, startingId='6745191554350760966')
+```
+
+##### The getSuggestedMusicbyID Method
+
+This method gets suggested music given a userId
+```
+getSuggestedMusicbyID(self, count=30, userId='6745191554350760966', language='en', proxy=None)
+```
+
+##### The getSuggestedMusicIDCrawler Method
+
+This method crawls across multiple user's profile using the user crawler method to generate music objects.
+```
+getSuggestedMusicIDCrawler(self, count=30, startingId='6745191554350760966')
 ```
 
 ##### The get_Video_By_DownloadURL Method
