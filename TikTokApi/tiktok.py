@@ -288,7 +288,7 @@ class TikTokApi:
                     users.append(user)
                     unusedIDS.append(user['id'])
 
-        return user[:count]
+        return users[:count]
 
     #
     # Get suggested hashtags given userID
@@ -317,7 +317,7 @@ class TikTokApi:
                     users.append(user)
                     unusedIDS.append(user['id'])
 
-        return user[:count]
+        return users[:count]
 
     #
     # Get suggested music by given userID
@@ -346,7 +346,7 @@ class TikTokApi:
                     users.append(user)
                     unusedIDS.append(user['id'])
 
-        return user[:count]
+        return users[:count]
 
     #
     # Downloads video from TikTok using a TikTok object
