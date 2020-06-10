@@ -20,6 +20,9 @@ class browser:
             "--user-agent=" + self.userAgent,
         ]
 
+        if proxy != None:
+            self.args.append("--proxy-server=" + proxy)
+
         self.options = {
             'args': self.args,
             'headless': True,
