@@ -27,6 +27,7 @@ class TikTokApi:
     def getData(self, api_url, signature, userAgent, language='en', proxy=None):
         url = api_url + \
             "&_signature=" + signature
+
         r = requests.get(url, headers={"method": "GET",
                                        "accept-encoding": "gzip, deflate, br",
                                        "referrer": self.referrer + language,
@@ -43,10 +44,7 @@ class TikTokApi:
                                        'sec-fetch-site': 'same-site',
                                        'path': url.split("tiktok.com")[1],
                                        'accept-language': 'en-US,en;q=0.9'
-                                       }, proxies={
-                    'http': proxy,
-                    'https': proxy
-                })
+                                       }, proxies=self.__format_proxy(proxy))
         try:
             return r.json()
         except:
@@ -65,10 +63,7 @@ class TikTokApi:
                                        "accept-encoding": "gzip, deflate, br",
                                        "referrer": self.referrer,
                                        "user-agent": userAgent,
-                                       }, proxies={
-                    'http': proxy,
-                    'https': proxy
-                })
+                                       }, proxies=self.__format_proxy(proxy))
         return r.content
 
     #
@@ -232,15 +227,17 @@ class TikTokApi:
     # Get a tiktok object with another tiktok's id
     #
     def getRecommendedTikToksByVideoID(self, id, language='en', proxy=None):
-        api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=0&count=24&minCursor=0&maxCursor=0&shareUid=&recType=3&lang={}&verifyFp=".format(id, language)
+        api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=0&count=24&minCursor=0&maxCursor=0&shareUid=&recType=3&lang={}&verifyFp=".format(
+            id, language)
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b.signature, b.userAgent, proxy=proxy)['body']
-    
+
     #
     # Gets a tiktok object by ID
     #
     def getTikTokById(self, id, language='en', proxy=None):
-        api_url = "https://m.tiktok.com/api/item/detail/?itemId={}&language={}&verifyFp=".format(id, language)
+        api_url = "https://m.tiktok.com/api/item/detail/?itemId={}&language={}&verifyFp=".format(
+            id, language)
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b.signature, b.userAgent, proxy=proxy)
 
@@ -251,7 +248,8 @@ class TikTokApi:
         if "@" in url and "/video/" in url:
             post_id = url.split("/video/")[1]
         else:
-            raise Exception("URL format not supported. Below is an example of a supported url.\nhttps://www.tiktok.com/@therock/video/6829267836783971589")
+            raise Exception(
+                "URL format not supported. Below is an example of a supported url.\nhttps://www.tiktok.com/@therock/video/6829267836783971589")
 
         return self.getTikTokById(post_id, language=language, proxy=proxy)
 
@@ -292,7 +290,8 @@ class TikTokApi:
     # Get Suggested Users for given userID
     #
     def getSuggestedUsersbyID(self, count=30, userId='6745191554350760966', language='en', proxy=None):
-        api_url = "https://m.tiktok.com/node/share/discover?noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(userId, userId, str(count))
+        api_url = "https://m.tiktok.com/node/share/discover?noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
+            userId, userId, str(count))
         b = browser(api_url, proxy=proxy)
 
         res = []
@@ -303,12 +302,13 @@ class TikTokApi:
     #
     # Crawler for Suggested Users
     #
-    def getSuggestedUsersbyIDCrawler(self, count=30, startingId='6745191554350760966'):
+    def getSuggestedUsersbyIDCrawler(self, count=30, startingId='6745191554350760966', language='en', proxy=None):
         users = []
-        unusedIDS = [startingId] 
+        unusedIDS = [startingId]
         while len(users) < count:
             userId = random.choice(unusedIDS)
-            newUsers = self.getSuggestedUsersbyID(userId=userId)
+            newUsers = self.getSuggestedUsersbyID(
+                userId=userId, language=language, proxy=proxy)
             unusedIDS.remove(userId)
 
             for user in newUsers:
@@ -322,9 +322,10 @@ class TikTokApi:
     # Get suggested hashtags given userID
     #
     def getSuggestedHashtagsbyID(self, count=30, userId='6745191554350760966', language='en', proxy=None):
-        api_url = "https://m.tiktok.com/node/share/discover?noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(userId, userId, str(count))
+        api_url = "https://m.tiktok.com/node/share/discover?noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
+            userId, userId, str(count))
         b = browser(api_url, proxy=proxy)
-        
+
         res = []
         for x in self.getData(api_url, b.signature, b.userAgent, proxy=proxy)['body'][0]['exploreList']:
             res.append(x['cardItem'])
@@ -333,12 +334,14 @@ class TikTokApi:
     #
     # Crawler for Suggested Hashtags
     #
-    def getSuggestedHashtagsbyIDCrawler(self, count=30, startingId='6745191554350760966'):
+    def getSuggestedHashtagsbyIDCrawler(self, count=30, startingId='6745191554350760966', language='en', proxy=None):
         hashtags = []
-        ids = self.getSuggestedUsersbyIDCrawler(count=count, startingId=startingId)
+        ids = self.getSuggestedUsersbyIDCrawler(
+            count=count, startingId=startingId, language=language, proxy=proxy)
         while len(hashtags) < count:
             userId = random.choice(ids)
-            newTags = self.getSuggestedHashtagsbyID(userId=userId)
+            newTags = self.getSuggestedHashtagsbyID(
+                userId=userId, language=language, proxy=proxy)
             ids.remove(userId)
 
             for hashtag in newTags:
@@ -351,9 +354,10 @@ class TikTokApi:
     # Get suggested music by given userID
     #
     def getSuggestedMusicbyID(self, count=30, userId='6745191554350760966', language='en', proxy=None):
-        api_url = "https://m.tiktok.com/node/share/discover?noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(userId, userId, str(count))
+        api_url = "https://m.tiktok.com/node/share/discover?noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
+            userId, userId, str(count))
         b = browser(api_url, proxy=proxy)
-        
+
         res = []
         for x in self.getData(api_url, b.signature, b.userAgent, proxy=proxy)['body'][0]['exploreList']:
             res.append(x['cardItem'])
@@ -362,12 +366,14 @@ class TikTokApi:
     #
     # Crawler for Suggested Music
     #
-    def getSuggestedMusicIDCrawler(self, count=30, startingId='6745191554350760966'):
+    def getSuggestedMusicIDCrawler(self, count=30, startingId='6745191554350760966', language='en', proxy=None):
         musics = []
-        ids = self.getSuggestedUsersbyIDCrawler(count=count, startingId=startingId)
+        ids = self.getSuggestedUsersbyIDCrawler(
+            count=count, startingId=startingId, language=language, proxy=proxy)
         while len(musics) < count:
             userId = random.choice(ids)
-            newTags = self.getSuggestedMusicbyID(userId=userId)
+            newTags = self.getSuggestedMusicbyID(
+                userId=userId, language=language, proxy=proxy)
             ids.remove(userId)
 
             for music in newTags:
@@ -421,51 +427,59 @@ class TikTokApi:
     # No Water Mark
     #
     def get_Video_No_Watermark(self, video_url, return_bytes=1, proxy=None):
-        r= requests.get(video_url, headers={"method": "GET",
+        r = requests.get(video_url, headers={"method": "GET",
                                              "accept-encoding": "utf-8",
                                              "user-agent": self.userAgent
-                                             }, proxies={
-                    'http': proxy,
-                    'https': proxy
-                })
+                                             }, proxies=self.__format_proxy(proxy))
 
-        data= r.text.split("\"contentUrl\":\"")
+        data = r.text.split("\"contentUrl\":\"")
         if len(data) > 1:
-            contentURL= data[1].split("\"")[0]
+            contentURL = data[1].split("\"")[0]
 
-            r= requests.get(contentURL, headers={"method": "GET",
+            r = requests.get(contentURL, headers={"method": "GET",
                                                   "accept-encoding": "gzip, deflate, br",
                                                   'accept-Language': 'en-US,en;q=0.9',
                                                   'Range': 'bytes=0-200000',
                                                   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                                                   "user-agent": self.userAgent
-                                                  }, proxies={
-                                                     'http': proxy,
-                    'https': proxy
-                })
+                                                  }, proxies=self.__format_proxy(proxy))
 
-            tmp= r.text.split("vid:")
+            tmp = r.text.split("vid:")
             if len(tmp) > 1:
-                key= tmp[1].split("%")[0]
+                key = tmp[1].split("%")[0]
 
                 if key[-1:] == ' ':
-                    key= key[1:]
+                    key = key[1:]
 
                 if key[:1] == ' ':
-                    key= key[:-1]
+                    key = key[:-1]
 
             else:
-                key= ""
+                key = ""
 
-            cleanVideo= "https://api2.musical.ly/aweme/v1/playwm/?video_id=" + key
+            cleanVideo = "https://api2.musical.ly/aweme/v1/playwm/?video_id=" + key
 
-            b= browser(cleanVideo, find_redirect=True, proxy=proxy)
+            b = browser(cleanVideo, find_redirect=True, proxy=proxy)
 
             if return_bytes == 0:
                 return b.redirect_url
             else:
-                r= requests.get(b.redirect_url, proxies={
-                    'http': proxy,
-                    'https': proxy
-                })
+                r = requests.get(
+                    b.redirect_url, proxies=self.__format_proxy(proxy))
                 return r.content
+
+    #
+    # PRIVATE METHODS
+    #
+
+    #
+    # Formats the proxy object
+    #
+    def __format_proxy(self, proxy):
+        if proxy != None:
+            return {
+                'http': proxy,
+                'https': proxy
+            }
+        else:
+            return None
