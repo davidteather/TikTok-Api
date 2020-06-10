@@ -262,6 +262,93 @@ class TikTokApi:
         return self.getData(api_url, b.signature, b.userAgent, proxy=proxy)
 
     #
+    # Get Suggested Users for given userID
+    #
+    def getSuggestedUsersbyID(self, count=30, userId='6745191554350760966', language='en', proxy=None):
+        api_url = "https://m.tiktok.com/node/share/discover?noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(userId, userId, str(count))
+        b = browser(api_url, proxy=proxy)
+
+        res = []
+        for x in self.getData(api_url, b.signature, b.userAgent, proxy=proxy)['body'][0]['exploreList']:
+            res.append(x['cardItem'])
+        return res[:count]
+
+    #
+    # Crawler for Suggested Users
+    #
+    def getSuggestedUsersbyIDCrawler(self, count=30, startingId='6745191554350760966'):
+        users = []
+        unusedIDS = [startingId] 
+        while len(users) < count:
+            userId = random.choice(unusedIDS)
+            newUsers = self.getSuggestedUsersbyID(userId=userId)
+
+            for user in newUsers:
+                if user not in users:
+                    users.append(user)
+                    unusedIDS.append(user['id'])
+
+        return user[:count]
+
+    #
+    # Get suggested hashtags given userID
+    #
+    def getSuggestedHashtagsbyID(self, count=30, userId='6745191554350760966', language='en', proxy=None):
+        api_url = "https://m.tiktok.com/node/share/discover?noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(userId, userId, str(count))
+        b = browser(api_url, proxy=proxy)
+        
+        res = []
+        for x in self.getData(api_url, b.signature, b.userAgent, proxy=proxy)['body'][0]['exploreList']:
+            res.append(x['cardItem'])
+        return res[:count]
+
+    #
+    # Crawler for Suggested Hashtags
+    #
+    def getSuggestedHashtagsbyIDCrawler(self, count=30, startingId='6745191554350760966'):
+        users = []
+        unusedIDS = [startingId] 
+        while len(users) < count:
+            userId = random.choice(unusedIDS)
+            newUsers = self.getSuggestedHashtagsbyID(userId=userId)
+
+            for user in newUsers:
+                if user not in users:
+                    users.append(user)
+                    unusedIDS.append(user['id'])
+
+        return user[:count]
+
+    #
+    # Get suggested music by given userID
+    #
+    def getSuggestedMusicbyID(self, count=30, userId='6745191554350760966', language='en', proxy=None):
+        api_url = "https://m.tiktok.com/node/share/discover?noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(userId, userId, str(count))
+        b = browser(api_url, proxy=proxy)
+        
+        res = []
+        for x in self.getData(api_url, b.signature, b.userAgent, proxy=proxy)['body'][0]['exploreList']:
+            res.append(x['cardItem'])
+        return res[:count]
+
+    #
+    # Crawler for Suggested Music
+    #
+    def getSuggestedMusicIDCrawler(self, count=30, startingId='6745191554350760966'):
+        users = []
+        unusedIDS = [startingId] 
+        while len(users) < count:
+            userId = random.choice(unusedIDS)
+            newUsers = self.getSuggestedMusicbyID(userId=userId)
+
+            for user in newUsers:
+                if user not in users:
+                    users.append(user)
+                    unusedIDS.append(user['id'])
+
+        return user[:count]
+
+    #
     # Downloads video from TikTok using a TikTok object
     #
 

@@ -34,3 +34,4 @@ script:
   - pytest tests/test_bySound.py
   - pytest tests/test_byUsername.py
   - pytest tests/test_byHashtag.py
+  - pytest tests/test_suggested.py
