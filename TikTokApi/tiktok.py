@@ -309,6 +309,7 @@ class TikTokApi:
         while len(users) < count:
             userId = random.choice(unusedIDS)
             newUsers = self.getSuggestedUsersbyID(userId=userId)
+            unusedIDS.remove(userId)
 
             for user in newUsers:
                 if user not in users:
@@ -333,19 +334,18 @@ class TikTokApi:
     # Crawler for Suggested Hashtags
     #
     def getSuggestedHashtagsbyIDCrawler(self, count=30, startingId='6745191554350760966'):
-        # gets 14 ish per user
-        users = []
-        unusedIDS = [startingId] 
-        while len(users) < count:
-            userId = random.choice(unusedIDS)
-            newUsers = self.getSuggestedHashtagsbyID(userId=userId)
+        hashtags = []
+        ids = self.getSuggestedUsersbyIDCrawler(count=count, startingId=startingId)
+        while len(hashtags) < count:
+            userId = random.choice(ids)
+            newTags = self.getSuggestedHashtagsbyID(userId=userId)
+            ids.remove(userId)
 
-            for user in newUsers:
-                if user not in users:
-                    users.append(user)
-                    unusedIDS.append(user['id'])
+            for hashtag in newTags:
+                if hashtag not in hashtags:
+                    hashtags.append(hashtag)
 
-        return users[:count]
+        return hashtags[:count]
 
     #
     # Get suggested music by given userID
@@ -363,19 +363,18 @@ class TikTokApi:
     # Crawler for Suggested Music
     #
     def getSuggestedMusicIDCrawler(self, count=30, startingId='6745191554350760966'):
-        # gets about 14 per user
-        users = []
-        unusedIDS = [startingId] 
-        while len(users) < count:
-            userId = random.choice(unusedIDS)
-            newUsers = self.getSuggestedMusicbyID()
+        musics = []
+        ids = self.getSuggestedUsersbyIDCrawler(count=count, startingId=startingId)
+        while len(musics) < count:
+            userId = random.choice(ids)
+            newTags = self.getSuggestedMusicbyID(userId=userId)
+            ids.remove(userId)
 
-            for user in newUsers:
-                if user not in users:
-                    users.append(user)
-                    unusedIDS.append(user['id'])
+            for music in newTags:
+                if music not in musics:
+                    musics.append(music)
 
-        return users[:count]
+        return musics[:count]
 
     #
     # Downloads video from TikTok using a TikTok object
