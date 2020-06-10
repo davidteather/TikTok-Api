@@ -8,6 +8,6 @@ def test_suggested():
 
 def test_suggested_crawlers():
     api = TikTokApi()
+    assert len(api.getSuggestedUsersbyIDCrawler(count=50)) == 50
     assert len(api.getSuggestedHashtagsbyIDCrawler(count=50)) == 50
     assert len(api.getSuggestedMusicIDCrawler(count=50)) == 50
-    assert len(api.getSuggestedUsersbyIDCrawler(count=50)) == 50

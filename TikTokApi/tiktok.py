@@ -44,9 +44,8 @@ class TikTokApi:
                                        'sec-fetch-site': 'same-site',
                                        'path': url.split("tiktok.com")[1],
                                        'accept-language': 'en-US,en;q=0.9'
-                                       }, proxies=self.__format_proxy(proxy), )
+                                       }, proxies=self.__format_proxy(proxy), verify=False)
         try:
-            r.encoding = 'utf-8'
             return r.json()
         except:
             print("Converting response to JSON failed response is below (probably empty)")
