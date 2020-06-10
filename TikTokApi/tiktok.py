@@ -229,6 +229,33 @@ class TikTokApi:
         return self.getData(api_url, b.signature, b.userAgent, proxy=proxy)
 
     #
+    # Get a tiktok object with another tiktok's id
+    #
+    def getRecommendedTikToksByVideoID(self, id, language='en', proxy=None):
+        api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=0&count=24&minCursor=0&maxCursor=0&shareUid=&recType=3&lang={}&verifyFp=".format(id, language)
+        b = browser(api_url, proxy=proxy)
+        return self.getData(api_url, b.signature, b.userAgent, proxy=proxy)['body']
+    
+    #
+    # Gets a tiktok object by ID
+    #
+    def getTikTokById(self, id, language='en', proxy=None):
+        api_url = "https://m.tiktok.com/api/item/detail/?itemId={}&language={}&verifyFp=".format(id, language)
+        b = browser(api_url, proxy=proxy)
+        return self.getData(api_url, b.signature, b.userAgent, proxy=proxy)
+
+    #
+    # Get a tiktok object by url
+    #
+    def getTikTokByUrl(self, url, language='en', proxy=None):
+        if "@" in url and "/video/" in url:
+            post_id = url.split("/video/")[1]
+        else:
+            raise Exception("URL format not supported. Below is an example of a supported url.\nhttps://www.tiktok.com/@therock/video/6829267836783971589")
+
+        return self.getTikTokById(post_id, language=language, proxy=proxy)
+
+    #
     # Discover page, consists challenges (hashtags)
     #
 

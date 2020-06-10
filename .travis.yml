@@ -35,3 +35,4 @@ script:
   - pytest tests/test_byUsername.py
   - pytest tests/test_byHashtag.py
   - pytest tests/test_suggested.py
+  - pytest test/test_getObjectRoutes.py
