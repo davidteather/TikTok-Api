@@ -10,6 +10,41 @@ If you want to use this API as a service visit the [RapidAPI](https://rapidapi.c
 
 Consider sponsoring me [here](https://github.com/sponsors/davidteather)
 
+## Table of Contents
+- [Getting Started](#getting-started)
+    - [Installing](#installing)
+    - [Common Issues](#common-issues)
+- [Quick Start Guide](#quick-start-guide)
+    - [Examples](https://github.com/davidteather/TikTok-Api/examples)
+- [Detailed Documentation](#detailed-documentation)
+    - [Common Parameters](#common-parameters)
+    - [Methods](#methods)
+        - [TikTok Class](#the-tiktok-class)
+        - [get_Video_By_TikTok](#the-get_video_by_tiktok-method)
+        - [bySound](#the-bysound-method)
+        - [getUserObject](#the-getuserobject-method)
+        - [getTikTokById](#the-gettiktokbyid-method)
+        - [getTikTokByUrl](#the-gettiktokbyurl-method)
+        - [getUser](#the-getuser-method)
+        - [getMusicObject](#the-getmusicobject-method)
+        - [getHashtagObject](#the-gethashtagobject-method)
+        - [byUsername](#the-by-username-method)
+        - [byHashtag](#the-byhashtag-method)
+        - [discoverMusic](#the-dicovermusic-method)
+        - [discoverHashtags][#the-discoverHashtags-method]
+        - [getSuggestedUsersbyID](#the-getsuggestedusersbyid-method)
+        - [getSuggestedUsersbyIDCrawler](#the-getssuggestedusersbyidcrawler-method)
+        - [getSuggestedHashtagsbyID](#the-getsuggestedhashtagsbyid-method)
+        - [getSuggestedHashtagsbyIDCrawler](#the-getsuggestedhashtagsbyidcrawler-method)
+        - [getSuggestedMusicbyID](#the-getsuggestedmusicbyid-method)
+        - [getSuggestedMusicIDCrawler](#the-getsuggestedmusicidcrawler-method)
+        - [get_Video_By_DownloadURL](#the-get_video_by_downloadurl-method)
+        - [get_Video_By_Url](#the-get_video_by_url-method)
+        - [get_Video_No_Watermark](#the-get_video_no_watermark-method)
+- [Built With](#built-with)
+- [Authors](#authors)
+- [License](#license)
+
 ## Getting Started
 
 To get started using this api follow the instructions below.
