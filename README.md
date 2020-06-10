@@ -31,7 +31,7 @@ Consider sponsoring me [here](https://github.com/sponsors/davidteather)
         - [byUsername](#the-by-username-method)
         - [byHashtag](#the-byhashtag-method)
         - [discoverMusic](#the-dicovermusic-method)
-        - [discoverHashtags][#the-discoverHashtags-method]
+        - [discoverHashtags](#the-discoverhashtags-method)
         - [getSuggestedUsersbyID](#the-getsuggestedusersbyid-method)
         - [getSuggestedUsersbyIDCrawler](#the-getssuggestedusersbyidcrawler-method)
         - [getSuggestedHashtagsbyID](#the-getsuggestedhashtagsbyid-method)
