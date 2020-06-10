@@ -46,7 +46,7 @@ class TikTokApi:
                                        'accept-language': 'en-US,en;q=0.9'
                                        }, proxies=self.__format_proxy(proxy))
         try:
-            j = r.contnet.decode('utf-8')
+            j = r.content.decode('utf-8')
             return json.loads(j)
         except:
             print("Converting response to JSON failed response is below (probably empty)")
