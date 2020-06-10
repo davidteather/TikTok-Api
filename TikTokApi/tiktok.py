@@ -46,8 +46,7 @@ class TikTokApi:
                                        'accept-language': 'en-US,en;q=0.9'
                                        }, proxies=self.__format_proxy(proxy))
         try:
-            j = r.content.decode('utf-8')
-            return json.loads(j)
+            return r.json()
         except:
             print("Converting response to JSON failed response is below (probably empty)")
             print(r.text)
@@ -342,7 +341,7 @@ class TikTokApi:
         while len(hashtags) < count:
             userId = random.choice(ids)
             newTags = self.getSuggestedHashtagsbyID(
-                userId=userId, language=language, proxy=proxy)
+                userId=userId['id'], language=language, proxy=proxy)
             ids.remove(userId)
 
             for hashtag in newTags:
@@ -374,7 +373,7 @@ class TikTokApi:
         while len(musics) < count:
             userId = random.choice(ids)
             newTags = self.getSuggestedMusicbyID(
-                userId=userId, language=language, proxy=proxy)
+                userId=userId['id'], language=language, proxy=proxy)
             ids.remove(userId)
 
             for music in newTags:
