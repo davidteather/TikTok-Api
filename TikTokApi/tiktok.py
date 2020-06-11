@@ -98,10 +98,11 @@ class TikTokApi:
 
         return response[:count]
 
+    
     #
     # Gets a specific user's tiktoks
     #
-    def userPosts(self, userID, secUID, count=30, language='en', proxy=None):
+    def userPosts(self, userID, secUID, count=30, language='en', region='US' proxy=None):
         response = []
         maxCount = 99
         maxCursor = 0
@@ -112,8 +113,8 @@ class TikTokApi:
             else:
                 realCount = maxCount
 
-            api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region=US&language={}&verifyFp=".format(
-                str(realCount), str(userID), str(secUID), str(maxCursor), str(language))
+            api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region={}&language={}&verifyFp=".format(
+                str(realCount), str(userID), str(secUID), str(maxCursor), str(region), str(language))
             b = browser(api_url, proxy=proxy)
             res = self.getData(api_url, b.signature, b.userAgent, proxy=proxy)
 
@@ -128,14 +129,50 @@ class TikTokApi:
             maxCursor = res['maxCursor']
 
         return response[:count]
-
+    
     #
     # Gets a specific user's tiktoks by username
     #
 
-    def byUsername(self, username, count=30, proxy=None):
+    def byUsername(self, username, count=30, proxy=None, language='en', region='US'):
         data = self.getUserObject(username, proxy=proxy)
-        return self.userPosts(data['id'], data['secUid'], count=count, proxy=proxy)
+        return self.userPosts(data['id'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
+    
+    def userLiked(self, userID, secUID, count=30, language='en', region='US', proxy=None):
+        response = []
+        maxCount = 99
+        maxCursor = 0
+
+        while len(response) < count:
+            if count < maxCount:
+                realCount = count
+            else:
+                realCount = maxCount
+
+            api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=2&secUid={}&maxCursor={}&minCursor=0&sourceType=9&appId=1233&region={}&language={}&verifyFp=".format(
+                str(realCount), str(userID), str(secUID), str(maxCursor), str(region), str(language))
+            b = browser(api_url, proxy=proxy)
+            res = self.getData(api_url, b.signature, b.userAgent, proxy=proxy)
+
+            for t in res['items']:
+                response.append(t)
+
+            if not res['hasMore']:
+                print("TikTok isn't sending more TikToks beyond this point.")
+                return response
+
+            realCount = count-len(response)
+            maxCursor = res['maxCursor']
+
+        return response[:count]
+    
+    #
+    # Gets a specific user's tiktoks by username
+    #
+
+    def userLikedbyUsername(self, username, count=30, proxy=None, language='en', region='US'):
+        data = self.getUserObject(username, proxy=proxy)
+        return self.userLiked(data['id'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
 
     #
     # Gets tiktoks by music ID
