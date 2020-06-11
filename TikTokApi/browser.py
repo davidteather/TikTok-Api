@@ -6,7 +6,7 @@ from pyppeteer_stealth import stealth
 
 
 class browser:
-    def __init__(self, url, language='en', proxy=None, find_redirect=False):
+    def __init__(self, url, language='en', proxy=None, proxy_user=None, proxy_pass=None, find_redirect=False):
         self.url = url
         self.language = language
         self.userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"
@@ -22,6 +22,9 @@ class browser:
 
         if proxy != None:
             self.args.append("--proxy-server=" + proxy)
+        if proxy_user != None:
+            self.proxy_user = proxy_user
+            self.proxy_pass = proxy_pass
 
         self.options = {
             'args': self.args,
@@ -38,11 +41,17 @@ class browser:
         if find_redirect:
             loop.run_until_complete(self.find_redirect())
         else:
-            loop.run_until_complete(self.start())
+            loop.run_until_complete(self.start(proxy_user=proxy_user, proxy_pass=proxy_pass))
 
-    async def start(self):
+    async def start(self, proxy_user=None, proxy_pass=None):
         self.browser = await pyppeteer.launch(self.options)
         self.page = await self.browser.newPage()
+        
+        if proxy_user != None:
+            await  self.page.authenticate({ 
+                'username': proxy_user, 
+                'password': proxy_pass 
+      });
 
         await stealth(self.page)
 
