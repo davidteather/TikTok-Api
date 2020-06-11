@@ -102,7 +102,7 @@ class TikTokApi:
     #
     # Gets a specific user's tiktoks
     #
-    def userPosts(self, userID, secUID, count=30, language='en', region='US' proxy=None):
+    def userPosts(self, userID, secUID, count=30, language='en', region='US', proxy=None):
         response = []
         maxCount = 99
         maxCursor = 0
