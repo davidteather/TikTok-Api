@@ -8,6 +8,7 @@ from pyppeteer_stealth import stealth
 class browser:
     def __init__(self, url, language='en', proxy=None, find_redirect=False):
         self.url = url
+        self.proxy = proxy
         self.language = language
         self.userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"
         self.args = [
@@ -43,6 +44,14 @@ class browser:
     async def start(self):
         self.browser = await pyppeteer.launch(self.options)
         self.page = await self.browser.newPage()
+
+        # Check for user:pass proxy
+        if self.proxy != None:
+            if "@" in self.proxy:
+                await  self.page.authenticate({ 
+                'username': self.proxy.split("://")[1].split(":")[0], 
+                'password': self.proxy.split("://")[1].split(":")[1].split("@")[0] 
+                })
 
         await stealth(self.page)
 
