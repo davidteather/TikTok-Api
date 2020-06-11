@@ -28,7 +28,8 @@ class TikTokApi:
         url = api_url + \
             "&_signature=" + signature
 
-        r = requests.get(url, headers={"method": "GET",
+        r = requests.
+        url, headers={"method": "GET",
                                        "accept-encoding": "gzip, deflate, br",
                                        "referrer": self.referrer + language,
                                        "user-agent": userAgent,
@@ -63,7 +64,7 @@ class TikTokApi:
                                        "accept-encoding": "gzip, deflate, br",
                                        "referrer": self.referrer,
                                        "user-agent": userAgent,
-                                       }, proxies=self.__format_proxy(proxy))
+                                       }, proxies=self.__format_proxy(proxy, proxy_user, proxy_pass))
         return r.content
 
     #
@@ -442,7 +443,7 @@ class TikTokApi:
                                                   'Range': 'bytes=0-200000',
                                                   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                                                   "user-agent": self.userAgent
-                                                  }, proxies=self.__format_proxy(proxy))
+                                                  }, proxies=self.__format_proxy(proxy, proxy_user, proxy_pass))
 
             tmp = r.text.split("vid:")
             if len(tmp) > 1:
@@ -465,7 +466,7 @@ class TikTokApi:
                 return b.redirect_url
             else:
                 r = requests.get(
-                    b.redirect_url, proxies=self.__format_proxy(proxy))
+                    b.redirect_url, proxies=self.__format_proxy(proxy, proxy_user, proxy_pass))
                 return r.content
 
     #
