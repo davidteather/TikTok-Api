@@ -22,8 +22,10 @@ class browser:
         ]
 
         if proxy != None:
-            self.args.append("--proxy-server=" + proxy)
-
+            if "@" in proxy:
+                self.args.append("--proxy-server=" + proxy.split(":")[0] + "://" + proxy.split("://")[1].split(":")[1].split("@")[1] + ":" + proxy.split("://")[1].split(":")[2])
+            else:
+                self.args.append("--proxy-server=" + proxy)
         self.options = {
             'args': self.args,
             'headless': True,
