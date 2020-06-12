@@ -156,19 +156,6 @@ This object returns a TikTok object when given the TikTok ID.
 def getTikTokById(self, id, language='en', proxy=None)
 ```
 
-note: if response returns the following that tiktok is most likely shadow banned from the site.
-```
-{'statusCode': 10204}
-```
-
-##### The isShadowBanned Method
-
-This method returns a boolean if the TikTok in question is shadow banned or not (that the API can tell of)
-
-```
-def isShadowBanned(self, id, language='en', proxy=None)
-```
-
 ##### The getTikTokByUrl Method
 
 This does the same as the getTikTokById method, but it extracts the id out of the url.
