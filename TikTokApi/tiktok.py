@@ -290,6 +290,16 @@ class TikTokApi:
         return self.getData(api_url, b.signature, b.userAgent, proxy=proxy)
 
     #
+    # Checks shadow ban
+    #
+    def isShadowBanned(self, id, language='en', proxy=None):
+        d = self.getTikTokById(id, language=language, proxy=proxy)
+        if d['statusCode'] == 10204:
+            return True
+
+        return False
+
+    #
     # Get a tiktok object by url
     #
     def getTikTokByUrl(self, url, language='en', proxy=None):
