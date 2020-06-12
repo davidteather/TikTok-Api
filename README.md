@@ -41,6 +41,8 @@ Consider sponsoring me [here](https://github.com/sponsors/davidteather)
         - [get_Video_By_DownloadURL](#the-get_video_by_downloadurl-method)
         - [get_Video_By_Url](#the-get_video_by_url-method)
         - [get_Video_No_Watermark](#the-get_video_no_watermark-method)
+        - [userLiked](#the-userliked-method)
+        - [userLikedbyUsername](#the-userlikedbyusername-method)
 - [Built With](#built-with)
 - [Authors](#authors)
 - [License](#license)
@@ -222,6 +224,20 @@ Returns trending hashtags (challenges) shown on the side at tiktok's trending pa
 
 ```
 def discoverHashtags(self, language='en', proxy=None)
+```
+
+##### The userLiked Method
+
+Returns a list of a given user's liked TikToks. Returns a length of 0 if private list.
+```
+userLiked(self, userID, secUID, count=30, language='en', region='US', proxy=None)
+```
+
+### The userLikedbyUsername Method
+
+Returns a list of a given user's liked TikToks. Returns a length of 0 if private list.
+```
+userLikedbyUsername(self, username, count=30, proxy=None, language='en', region='US')
 ```
 
 ##### The getSuggestedUsersbyID Method

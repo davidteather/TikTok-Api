@@ -14,6 +14,7 @@ class TikTokApi:
     # The TikTokapi class constructor
     #
     def __init__(self, debug=False):
+        self.debug = debug
         if debug:
             print("Class initialized")
 
@@ -138,6 +139,9 @@ class TikTokApi:
         data = self.getUserObject(username, proxy=proxy)
         return self.userPosts(data['id'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
     
+    #
+    # Gets a user's liked posts
+    #
     def userLiked(self, userID, secUID, count=30, language='en', region='US', proxy=None):
         response = []
         maxCount = 99
@@ -154,6 +158,13 @@ class TikTokApi:
             b = browser(api_url, proxy=proxy)
             res = self.getData(api_url, b.signature, b.userAgent, proxy=proxy)
 
+            try:
+                res['items']
+            except:
+                if self.debug:
+                    print("Most Likely User's List is Empty")
+                return []
+
             for t in res['items']:
                 response.append(t)
 
@@ -167,7 +178,7 @@ class TikTokApi:
         return response[:count]
     
     #
-    # Gets a specific user's tiktoks by username
+    # Gets a specific user's likes by username
     #
 
     def userLikedbyUsername(self, username, count=30, proxy=None, language='en', region='US'):
