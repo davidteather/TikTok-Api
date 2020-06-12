@@ -108,3 +108,5 @@ class browser:
         })
 
         self.redirect_url = self.page.url
+
+        await self.browser.close()
