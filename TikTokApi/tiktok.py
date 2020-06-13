@@ -386,7 +386,7 @@ class TikTokApi:
         hashtags = []
         ids = self.getSuggestedUsersbyIDCrawler(
             count=count, startingId=startingId, language=language, proxy=proxy)
-        while len(hashtags) < count:
+        while len(hashtags) < count and len(ids) != 0:
             userId = random.choice(ids)
             newTags = self.getSuggestedHashtagsbyID(
                 userId=userId['id'], language=language, proxy=proxy)
@@ -418,7 +418,7 @@ class TikTokApi:
         musics = []
         ids = self.getSuggestedUsersbyIDCrawler(
             count=count, startingId=startingId, language=language, proxy=proxy)
-        while len(musics) < count:
+        while len(musics) < count and len(ids) != 0:
             userId = random.choice(ids)
             newTags = self.getSuggestedMusicbyID(
                 userId=userId['id'], language=language, proxy=proxy)

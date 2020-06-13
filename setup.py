@@ -8,8 +8,8 @@ with open("README.md", "r") as fh:
 setuptools.setup(
   name = 'TikTokApi',         
   packages = ['TikTokApi'],   
-  version = '3.2.1',      
-  license='MIT',        
+  version = '3.2.2',      
+  license='MIT',       
   description = 'The Unofficial TikTok API Wrapper in Python 3.',   
   author = 'David Teather',                   
   author_email = 'contact.davidteather@gmail.com',     
