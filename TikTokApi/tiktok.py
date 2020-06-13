@@ -294,7 +294,7 @@ class TikTokApi:
     #
     def getTikTokByUrl(self, url, language='en', proxy=None):
         if "@" in url and "/video/" in url:
-            post_id = url.split("/video/")[1]
+            post_id = url.split("/video/")[1].split("?")[0]
         else:
             raise Exception(
                 "URL format not supported. Below is an example of a supported url.\nhttps://www.tiktok.com/@therock/video/6829267836783971589")
@@ -375,7 +375,7 @@ class TikTokApi:
         b = browser(api_url, proxy=proxy)
 
         res = []
-        for x in self.getData(api_url, b.signature, b.userAgent, proxy=proxy)['body'][0]['exploreList']:
+        for x in self.getData(api_url, b.signature, b.userAgent, proxy=proxy)['body'][1]['exploreList']:
             res.append(x['cardItem'])
         return res[:count]
 
@@ -407,7 +407,7 @@ class TikTokApi:
         b = browser(api_url, proxy=proxy)
 
         res = []
-        for x in self.getData(api_url, b.signature, b.userAgent, proxy=proxy)['body'][0]['exploreList']:
+        for x in self.getData(api_url, b.signature, b.userAgent, proxy=proxy)['body'][2]['exploreList']:
             res.append(x['cardItem'])
         return res[:count]
 

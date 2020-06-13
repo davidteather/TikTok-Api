@@ -11,3 +11,5 @@ test.py
 debug.log
 res.html
 tmp/*
+dist/*
+*.egg-info
