@@ -10,7 +10,7 @@ class browser:
         self.url = url
         self.proxy = proxy
         self.language = language
-        self.userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"
+        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36"
         self.args = [
             "--no-sandbox",
             "--disable-setuid-sandbox",
@@ -75,11 +75,20 @@ class browser:
             'waitUntil': "load"
         })
 
+        for c in await self.page.cookies():
+            if c['name'] == "s_v_web_id":
+                self.verifyFp = c['value']
+                self.full_url = self.url + "&verifyFp=" + c['value']
+
+        if self.full_url == None:
+            self.full_url = self.url + "&verifyFp="
+
         self.signature = await self.page.evaluate('''() => {
-          var url = "''' + self.url + '''"
+          var url = "''' + self.full_url + '''"
           var token = window.byted_acrawler.sign({url: url});
           return token;
           }''')
+          
         await self.browser.close()
 
     
