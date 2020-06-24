@@ -18,41 +18,27 @@ class TikTokApi:
         if debug:
             print("Class initialized")
 
-        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36"
-        self.referrer = "https://www.tiktok.com/trending?lang="
+        self.userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 Mobile/15E148 Safari/604.1"
         # self.referrer = "https://www.tiktok.com/@ondymikula/video/6757762109670477061"
 
     #
     # Method that retrives data from the api
     #
     def getData(self, api_url, b, language='en', proxy=None):
-        url = b.full_url + \
+        url = b.url + \
+            "&verifyFp=" + b.verifyFp + \
             "&_signature=" + b.signature
         print(url)
         r = requests.get(url, headers={"method": "GET",
-                                       "accept-encoding": "gzip, deflate, br",
-                                       "referrer": self.referrer + language,
-                                       "user-agent": b.userAgent,
-                                       'accept': 'application/json, text/plain, */*',
-                                       'dnt': '1',
-                                       'cache-control': 'no-cache',
-                                       'scheme': 'https',
-                                       'authority': 'm.tiktok.com',
-                                       'origin': 'https://www.tiktok.com',
-                                       'pragma': 'no-cache',
-                                       'sec-fetch-dest': 'empty',
-                                       'sec-fetch-mode': 'cors',
-                                       'sec-fetch-site': 'same-site',
-                                       'path': url.split("tiktok.com")[1],
-                                       'accept-language': 'en-US,en;q=0.9'
-                                       }, proxies=self.__format_proxy(proxy), cookies={
-                                           's_v_web_id': b.verifyFp
-                                       })
+                                       "referrer": b.referrer,
+                                       "user-agent": b.userAgent
+                                       }, proxies=self.__format_proxy(proxy))
         try:
             return r.json()
         except:
             print("Converting response to JSON failed response is below (probably empty)")
             print(r.text)
+
             raise Exception('Invalid Response')
 
     #
@@ -100,10 +86,10 @@ class TikTokApi:
 
         return response[:count]
 
-    
     #
     # Gets a specific user's tiktoks
     #
+
     def userPosts(self, userID, secUID, count=30, language='en', region='US', proxy=None):
         response = []
         maxCount = 99
@@ -114,8 +100,7 @@ class TikTokApi:
                 realCount = count
             else:
                 realCount = maxCount
-
-            api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region={}&language={}&verifyFp=".format(
+            api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region={}&language={}".format(
                 str(realCount), str(userID), str(secUID), str(maxCursor), str(region), str(language))
             b = browser(api_url, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
@@ -131,15 +116,15 @@ class TikTokApi:
             maxCursor = res['maxCursor']
 
         return response[:count]
-    
+
     #
     # Gets a specific user's tiktoks by username
     #
 
     def byUsername(self, username, count=30, proxy=None, language='en', region='US'):
         data = self.getUserObject(username, proxy=proxy)
-        return self.userPosts(data['id'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
-    
+        return self.userPosts(data['userId'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
+
     #
     # Gets a user's liked posts
     #
@@ -177,7 +162,7 @@ class TikTokApi:
             maxCursor = res['maxCursor']
 
         return response[:count]
-    
+
     #
     # Gets a specific user's likes by username
     #
@@ -324,16 +309,16 @@ class TikTokApi:
     #
 
     def getUserObject(self, username, language='en', proxy=None):
-        return self.getUser(username, language, proxy=proxy)['userInfo']['user']
+        return self.getUser(username, language, proxy=proxy)['userData']
 
     #
     # Gets the full exposed user object
     #
     def getUser(self, username, language='en', proxy=None):
-        api_url = "https://m.tiktok.com/api/user/detail/?uniqueId={}&language={}".format(
-            username, language)
-        b = browser(api_url, proxy=proxy)
-        return self.getData(api_url, b, proxy=proxy)
+        api_url = "https://www.tiktok.com/node/share/user/@{}?isUniqueId=true&adj=609".format(
+            username)
+        b = browser(api_url, proxy=proxy, language=language)
+        return self.getData(api_url, b, proxy=proxy, language=language)['body']
 
     #
     # Get Suggested Users for given userID
