@@ -1,6 +1,5 @@
 requests
 bs4
 pyppeteer
-asyncio
 selenium
 pyppeteer_stealth
