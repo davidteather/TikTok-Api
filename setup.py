@@ -24,8 +24,7 @@ setuptools.setup(
           'asyncio',
           'asyncio',
           'bs4',
-          'pyppeteer',
-          'pyppeteer_stealth'
+          'pyppeteer'
       ],
   classifiers=[
     'Development Status :: 3 - Alpha',
