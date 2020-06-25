@@ -18,7 +18,7 @@ class TikTokApi:
         if debug:
             print("Class initialized")
 
-        self.userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 Mobile/15E148 Safari/604.1"
+        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.0 Safari/537.36)"
         # self.referrer = "https://www.tiktok.com/@ondymikula/video/6757762109670477061"
 
     #
@@ -58,13 +58,14 @@ class TikTokApi:
     # Method that retrives data from the api
     #
 
-    def getBytes(self, api_url, signature, userAgent, proxy=None):
+    def getBytes(self, api_url, b, proxy=None):
         url = api_url + \
-            "&_signature=" + signature
+            "&_verifyFp=" + b.verifyFp + \
+            "&_signature=" + b.signature
         r = requests.get(url, headers={"method": "GET",
                                        "accept-encoding": "gzip, deflate, br",
-                                       "referrer": self.referrer,
-                                       "user-agent": userAgent,
+                                       "referrer": b.referrer,
+                                       "user-agent": b.userAgent,
                                        }, proxies=self.__format_proxy(proxy))
         return r.content
 
@@ -322,7 +323,7 @@ class TikTokApi:
     #
 
     def getUserObject(self, username, language='en', proxy=None):
-        return self.getUser(username, language, proxy=proxy)['userData']
+        return self.getUser(username, language, proxy=proxy)['userInfo']['user']
 
     #
     # Gets the full exposed user object
@@ -442,7 +443,7 @@ class TikTokApi:
     #
     def get_Video_By_DownloadURL(self, download_url, proxy=None):
         b = browser(download_url, proxy=proxy)
-        return self.getBytes(download_url, b.signature, b.userAgent, proxy=proxy)
+        return self.getBytes(download_url, b, proxy=proxy)
 
     #
     # Gets the source url of a given url for a tiktok
@@ -453,6 +454,7 @@ class TikTokApi:
     #
 
     def get_Video_By_Url(self, video_url, return_bytes=0, chromedriver_path=None):
+        raise Exception("Deprecated. Other Methods Work Better.")
         if chromedriver_path != None:
             driver = webdriver.Chrome(executable_path=chromedriver_path)
         else:
@@ -472,6 +474,8 @@ class TikTokApi:
 
     #
     # No Water Mark
+    #
+    # TikTok Deprecated it see https://github.com/TufayelLUS/TikTok-Video-Downloader-PHP/issues/4
     #
     def get_Video_No_Watermark(self, video_url, return_bytes=1, proxy=None):
         r = requests.get(video_url, headers={"method": "GET",

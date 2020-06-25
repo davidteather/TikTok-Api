@@ -80,7 +80,6 @@ class browser:
         await self.page.goto("https://www.tiktok.com/@floofybastard?lang=" + self.language, {
             'waitUntil': "load"
         })
-        await asyncio.sleep(2)
         self.userAgent = await self.page.evaluate("""() => {return navigator.userAgent; }""")
 
         for c in await self.page.cookies():
@@ -113,6 +112,18 @@ class browser:
         self.browser = await pyppeteer.launch(self.options)
         self.page = await self.browser.newPage()
 
+        await self.page.evaluateOnNewDocument("""() => {
+    delete navigator.__proto__.webdriver;
+  }""")
+
+        # Check for user:pass proxy
+        if self.proxy != None:
+            if "@" in self.proxy:
+                await self.page.authenticate({
+                    'username': self.proxy.split("://")[1].split(":")[0],
+                    'password': self.proxy.split("://")[1].split(":")[1].split("@")[0]
+                })
+
         await stealth(self.page)
 
         # await self.page.emulate({'viewport': {
@@ -124,10 +135,6 @@ class browser:
         # }})
 
         # await self.page.setUserAgent(self.userAgent)
-
-        await self.page.setExtraHTTPHeaders({
-            'Accept-Language': self.language
-        })
 
         await self.page.goto(self.url, {
             'waitUntil': "load"
