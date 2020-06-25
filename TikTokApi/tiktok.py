@@ -28,14 +28,27 @@ class TikTokApi:
         url = b.url + \
             "&verifyFp=" + b.verifyFp + \
             "&_signature=" + b.signature
-        print(url)
-        r = requests.get(url, headers={"method": "GET",
+        r = requests.get(url, headers={
+            'authority': 'm.tiktok.com',
+            "method": "GET",
+            'path': url.split("tiktok.com")[1],
+            'scheme': 'https',
+            'accept': 'application/json, text/plain, */*',
+                                       "accept-encoding": "gzip, deflate, br",
+                                       'accept-language': 'en-US,en;q=0.9',
                                        "referrer": b.referrer,
+                                       'sec-fetch-dest': 'empty',
+                                       'sec-fetch-mode': 'cors',
+                                       'sec-fetch-site': 'same-site',
                                        "user-agent": b.userAgent
+                                       
+                                       
+                                       
                                        }, proxies=self.__format_proxy(proxy))
         try:
             return r.json()
         except:
+            print(r.request.headers)
             print("Converting response to JSON failed response is below (probably empty)")
             print(r.text)
 
