@@ -315,10 +315,10 @@ class TikTokApi:
     # Gets the full exposed user object
     #
     def getUser(self, username, language='en', proxy=None):
-        api_url = "https://www.tiktok.com/node/share/user/@{}?isUniqueId=true&adj=609".format(
-            username)
-        b = browser(api_url, proxy=proxy, language=language)
-        return self.getData(api_url, b, proxy=proxy, language=language)['body']
+        api_url = "https://m.tiktok.com/api/user/detail/?uniqueId={}&language={}".format(
+            username, language)
+        b = browser(api_url, proxy=proxy)
+        return self.getData(api_url, b, proxy=proxy)
 
     #
     # Get Suggested Users for given userID
