@@ -18,54 +18,54 @@ class TikTokApi:
         if debug:
             print("Class initialized")
 
-        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36"
-        self.referrer = "https://www.tiktok.com/trending?lang="
+        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.0 Safari/537.36)"
         # self.referrer = "https://www.tiktok.com/@ondymikula/video/6757762109670477061"
 
     #
     # Method that retrives data from the api
     #
     def getData(self, api_url, b, language='en', proxy=None):
-        url = b.full_url + \
+        url = b.url + \
+            "&verifyFp=" + b.verifyFp + \
             "&_signature=" + b.signature
-        print(url)
-        r = requests.get(url, headers={"method": "GET",
+        r = requests.get(url, headers={
+            'authority': 'm.tiktok.com',
+            "method": "GET",
+            'path': url.split("tiktok.com")[1],
+            'scheme': 'https',
+            'accept': 'application/json, text/plain, */*',
                                        "accept-encoding": "gzip, deflate, br",
-                                       "referrer": self.referrer + language,
-                                       "user-agent": b.userAgent,
-                                       'accept': 'application/json, text/plain, */*',
-                                       'dnt': '1',
-                                       'cache-control': 'no-cache',
-                                       'scheme': 'https',
-                                       'authority': 'm.tiktok.com',
-                                       'origin': 'https://www.tiktok.com',
-                                       'pragma': 'no-cache',
+                                       'accept-language': 'en-US,en;q=0.9',
+                                       "referrer": b.referrer,
                                        'sec-fetch-dest': 'empty',
                                        'sec-fetch-mode': 'cors',
                                        'sec-fetch-site': 'same-site',
-                                       'path': url.split("tiktok.com")[1],
-                                       'accept-language': 'en-US,en;q=0.9'
-                                       }, proxies=self.__format_proxy(proxy), cookies={
-                                           's_v_web_id': b.verifyFp
-                                       })
+                                       "user-agent": b.userAgent
+                                       
+                                       
+                                       
+                                       }, proxies=self.__format_proxy(proxy))
         try:
             return r.json()
         except:
+            print(r.request.headers)
             print("Converting response to JSON failed response is below (probably empty)")
             print(r.text)
+
             raise Exception('Invalid Response')
 
     #
     # Method that retrives data from the api
     #
 
-    def getBytes(self, api_url, signature, userAgent, proxy=None):
+    def getBytes(self, api_url, b, proxy=None):
         url = api_url + \
-            "&_signature=" + signature
+            "&_verifyFp=" + b.verifyFp + \
+            "&_signature=" + b.signature
         r = requests.get(url, headers={"method": "GET",
                                        "accept-encoding": "gzip, deflate, br",
-                                       "referrer": self.referrer,
-                                       "user-agent": userAgent,
+                                       "referrer": b.referrer,
+                                       "user-agent": b.userAgent,
                                        }, proxies=self.__format_proxy(proxy))
         return r.content
 
@@ -100,10 +100,10 @@ class TikTokApi:
 
         return response[:count]
 
-    
     #
     # Gets a specific user's tiktoks
     #
+
     def userPosts(self, userID, secUID, count=30, language='en', region='US', proxy=None):
         response = []
         maxCount = 99
@@ -114,8 +114,7 @@ class TikTokApi:
                 realCount = count
             else:
                 realCount = maxCount
-
-            api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region={}&language={}&verifyFp=".format(
+            api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region={}&language={}".format(
                 str(realCount), str(userID), str(secUID), str(maxCursor), str(region), str(language))
             b = browser(api_url, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
@@ -131,15 +130,15 @@ class TikTokApi:
             maxCursor = res['maxCursor']
 
         return response[:count]
-    
+
     #
     # Gets a specific user's tiktoks by username
     #
 
     def byUsername(self, username, count=30, proxy=None, language='en', region='US'):
         data = self.getUserObject(username, proxy=proxy)
-        return self.userPosts(data['id'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
-    
+        return self.userPosts(data['userId'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
+
     #
     # Gets a user's liked posts
     #
@@ -177,7 +176,7 @@ class TikTokApi:
             maxCursor = res['maxCursor']
 
         return response[:count]
-    
+
     #
     # Gets a specific user's likes by username
     #
@@ -444,7 +443,7 @@ class TikTokApi:
     #
     def get_Video_By_DownloadURL(self, download_url, proxy=None):
         b = browser(download_url, proxy=proxy)
-        return self.getBytes(download_url, b.signature, b.userAgent, proxy=proxy)
+        return self.getBytes(download_url, b, proxy=proxy)
 
     #
     # Gets the source url of a given url for a tiktok
@@ -455,6 +454,7 @@ class TikTokApi:
     #
 
     def get_Video_By_Url(self, video_url, return_bytes=0, chromedriver_path=None):
+        raise Exception("Deprecated. Other Methods Work Better.")
         if chromedriver_path != None:
             driver = webdriver.Chrome(executable_path=chromedriver_path)
         else:
@@ -474,6 +474,8 @@ class TikTokApi:
 
     #
     # No Water Mark
+    #
+    # TikTok Deprecated it see https://github.com/TufayelLUS/TikTok-Video-Downloader-PHP/issues/4
     #
     def get_Video_No_Watermark(self, video_url, return_bytes=1, proxy=None):
         r = requests.get(video_url, headers={"method": "GET",

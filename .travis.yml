@@ -28,11 +28,4 @@ before_script:
   - "python setup.py install_lib"
 
 script:
-  - pytest tests/test_trending.py
-  - pytest tests/test_user.py
-  - pytest tests/test_VideoByUrl.py
-  - pytest tests/test_bySound.py
-  - pytest tests/test_byUsername.py
-  - pytest tests/test_byHashtag.py
-  - pytest tests/test_suggested.py
-  - pytest tests/test_getObjectRoutes.py
+  - pytest tests
