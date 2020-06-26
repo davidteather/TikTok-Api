@@ -137,7 +137,7 @@ class TikTokApi:
 
     def byUsername(self, username, count=30, proxy=None, language='en', region='US'):
         data = self.getUserObject(username, proxy=proxy)
-        return self.userPosts(data['userId'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
+        return self.userPosts(data['id'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
 
     #
     # Gets a user's liked posts
