@@ -21,8 +21,6 @@ setuptools.setup(
   install_requires=[
           'requests',
           'selenium',
-          'asyncio',
-          'asyncio',
           'bs4',
           'pyppeteer'
       ],
