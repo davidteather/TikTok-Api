@@ -77,6 +77,7 @@ class TikTokApi:
         response = []
         maxCount = 99
         maxCursor = 0
+        first = True
 
         while len(response) < count:
             if count < maxCount:
@@ -88,15 +89,18 @@ class TikTokApi:
             b = browser(api_url, language=language, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
 
-            for t in res['items']:
-                response.append(t)
+            if 'items' in res.keys():
+                for t in res['items']:
+                    response.append(t)
 
-            if not res['hasMore']:
+            if not res['hasMore'] and not first:
                 print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count-len(response)
             maxCursor = res['maxCursor']
+
+            first = False
 
         return response[:count]
 
@@ -108,6 +112,7 @@ class TikTokApi:
         response = []
         maxCount = 99
         maxCursor = 0
+        first = True
 
         while len(response) < count:
             if count < maxCount:
@@ -119,15 +124,18 @@ class TikTokApi:
             b = browser(api_url, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
 
-            for t in res['items']:
-                response.append(t)
+            if 'items' in res.keys():
+                for t in res['items']:
+                    response.append(t)
 
-            if not res['hasMore']:
+            if not res['hasMore'] and not first:
                 print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count-len(response)
             maxCursor = res['maxCursor']
+
+            first = False
 
         return response[:count]
 
@@ -146,6 +154,7 @@ class TikTokApi:
         response = []
         maxCount = 99
         maxCursor = 0
+        first = True
 
         while len(response) < count:
             if count < maxCount:
@@ -165,15 +174,18 @@ class TikTokApi:
                     print("Most Likely User's List is Empty")
                 return []
 
-            for t in res['items']:
-                response.append(t)
+            if 'items' in res.keys():
+                for t in res['items']:
+                    response.append(t)
 
-            if not res['hasMore']:
+            if not res['hasMore'] and not first:
                 print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count-len(response)
             maxCursor = res['maxCursor']
+
+            first = False
 
         return response[:count]
 
