@@ -16,14 +16,16 @@ Put the error trace here.
 
 Please insert the code that is throwing errors or is giving you weird unexpected results.
 
-**Screenshots**
+**Error Trace (if any)**
 
-If applicable, add screenshots to help explain your problem.
+Put the error trace below if there's any error thrown.
+```
+# Error Trace Here
+```
 
 **Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+ - OS: [e.g. Windows 10]
+ - TikTokApi Version [e.g. 3.3.1] - if out of date upgrade before posting an issue
 
 **Additional context**
 
