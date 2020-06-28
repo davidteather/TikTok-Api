@@ -84,6 +84,8 @@ class browser:
             })
             self.userAgent = await self.page.evaluate("""() => {return navigator.userAgent; }""")
 
+            await asyncio.wait(5)
+
             for c in await self.page.cookies():
                 if c['name'] == "s_v_web_id":
                     self.verifyFp = c['value']
