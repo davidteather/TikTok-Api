@@ -73,7 +73,7 @@ class TikTokApi:
     # Gets trending Tiktoks
     #
 
-    def trending(self, count=30, language='en', proxy=None):
+    def trending(self, count=30, language='en', region='US', proxy=None):
         response = []
         maxCount = 99
         maxCursor = 0
@@ -83,8 +83,8 @@ class TikTokApi:
                 realCount = count
             else:
                 realCount = maxCount
-            api_url = "https://m.tiktok.com/api/item_list/?count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region=US&language={}&verifyFp=".format(
-                str(realCount), str(maxCursor), str(language))
+            api_url = "https://m.tiktok.com/api/item_list/?count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region={}&language={}&verifyFp=".format(
+                str(realCount), str(maxCursor), str(region), str(language))
             b = browser(api_url, language=language, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
 
