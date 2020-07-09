@@ -307,9 +307,17 @@ return_bytes - The default value is 0, when it is set to 1 the function instead 
 api.get_Video_No_Watermark(video_url, return_bytes=0, language='en', proxy=None)
 ```
 
-**Note** seems to be deprecated by TikTok see [here](https://github.com/TufayelLUS/TikTok-Video-Downloader-PHP/issues/4)
-
 video_url - The video you want to get url.
+
+return_bytes - The default value is 0, when it is set to 1 the function instead returns the bytes from the video rather than just the direct url.
+
+##### The get_Video_No_Watermark_ID Method
+
+```
+api.get_Video_No_Watermark_ID(self, video_id, return_bytes=1, proxy=None)
+```
+
+video_id - The video id you want to get.
 
 return_bytes - The default value is 0, when it is set to 1 the function instead returns the bytes from the video rather than just the direct url.
 

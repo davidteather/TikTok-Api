@@ -13,3 +13,4 @@ res.html
 tmp/*
 dist/*
 *.egg-info
+.pytest_cache/*
