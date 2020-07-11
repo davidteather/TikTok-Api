@@ -521,3 +521,6 @@ class TikTokApi:
             }
         else:
             return None
+
+    def __get_js(self, proxy=None):
+        return requests.get("https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js", proxies=self.__format_proxy(proxy)).text
