@@ -3,8 +3,6 @@ import pyppeteer
 import random
 import requests
 from .browser import browser
-from .signer import signer
-
 from bs4 import BeautifulSoup
 import time
 import json
@@ -15,7 +13,7 @@ class TikTokApi:
     #
     # The TikTokapi class constructor
     #
-    def __init__(self, debug=False, persistant_signer=False, proxy=None):
+    def __init__(self, debug=False):
         self.debug = debug
         if debug:
             print("Class initialized")
@@ -23,16 +21,11 @@ class TikTokApi:
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.0 Safari/537.36)"
         # self.referrer = "https://www.tiktok.com/@ondymikula/video/6757762109670477061"
 
-        if persistant_signer:
-            self.signer = signer(proxy=proxy, keep_open=True)
-        else:
-            self.signer = None
-
     #
     # Method that retrives data from the api
     #
     def getData(self, api_url, b, language='en', proxy=None):
-        url = api_url + \
+        url = b.url + \
             "&verifyFp=" + b.verifyFp + \
             "&_signature=" + b.signature
         r = requests.get(url, headers={
@@ -93,7 +86,7 @@ class TikTokApi:
                 realCount = maxCount
             api_url = "https://m.tiktok.com/api/item_list/?count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region={}&language={}&verifyFp=".format(
                 str(realCount), str(maxCursor), str(region), str(language))
-            b = browser(api_url, language=language, proxy=proxy, signerObject=self.signer)
+            b = browser(api_url, language=language, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
 
             if 'items' in res.keys():
