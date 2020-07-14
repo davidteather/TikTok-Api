@@ -244,7 +244,7 @@ class TikTokApi:
     # Gets tiktoks by hashtag
     #
 
-    def byHashtag(self, hashtag, count=30, language='en', proxy=None):
+    def byHashtag(self, hashtag, count=30, language='en', proxy=None, offset=0):
         id = self.getHashtagObject(hashtag)['challengeInfo']['challenge']['id']
         response = []
         maxCount = 99
@@ -256,8 +256,8 @@ class TikTokApi:
             else:
                 realCount = maxCount
 
-            api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=3&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}".format(
-                str(id), str(realCount), str(maxCursor), language)
+            api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=3&count={}&minCursor={}&maxCursor={}&shareUid=&lang={}".format(
+                str(id), str(realCount), str(offset) ,str(maxCursor), language)
             b = browser(api_url, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy, language=language)
 
