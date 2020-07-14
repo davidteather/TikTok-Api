@@ -321,6 +321,15 @@ video_id - The video id you want to get.
 
 return_bytes - The default value is 0, when it is set to 1 the function instead returns the bytes from the video rather than just the direct url.
 
+
+If you request without bytes you will need to make a call to the URL it responds yourself to get bytes.
+```
+url = api.get_Video_No_Watermark_ID('6829267836783971589', return_bytes=0)
+
+import requests
+video_bytes = requests.get(url, headers={"User-Agent": "okhttp"}).content
+```
+
 ## Built With
 
 * [Python 3.7](https://www.python.org/) - The web framework used
