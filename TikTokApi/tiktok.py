@@ -487,7 +487,7 @@ class TikTokApi:
     #
     # No Water Mark
     #
-    def get_Video_No_Watermark_ID(self, video_id, proxy=None):
+    def get_Video_No_Watermark_ID(self, video_id, return_bytes=0, proxy=None):
         video_info = self.getTikTokById(video_id)
         video_url = video_info["itemInfo"]["itemStruct"]["video"]["downloadAddr"]
         headers = {"User-Agent": "okhttp"}
@@ -496,15 +496,18 @@ class TikTokApi:
         video_url_no_wm = "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id={" \
                           "}&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4" \
             .format(video_data[pos+4:pos+36])
+        if return_bytes == 0:
+            return video_url_no_wm
+        else:
+            headers = {"User-Agent": "okhttp"}
+            video_data_no_wm = requests.get(video_url_no_wm, params=None, headers=headers)
+            return video_data_no_wm.content
+            
 
-        headers = {"User-Agent": "okhttp"}
-        video_data_no_wm = requests.get(video_url_no_wm, params=None, headers=headers)
-        return video_data_no_wm.content
 
-
-    def get_Video_No_Watermark(self, video_url, proxy=None):
+    def get_Video_No_Watermark(self, video_url, return_bytes=0, proxy=None):
         video_id = video_url.split("/video/")[1].split("?")[0]
-        return self.get_Video_No_Watermark_ID(video_id, proxy=proxy)
+        return self.get_Video_No_Watermark_ID(video_id, return_bytes, proxy=proxy)
 
     #
     # PRIVATE METHODS
