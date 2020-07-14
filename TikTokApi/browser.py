@@ -82,9 +82,9 @@ class browser:
         # })
 
         # might have to switch to a tiktok url if they improve security
-        #await self.page.goto("https://www.bing.com", {
-        #    'waitUntil': "load"
-        #})
+        await self.page.goto("about:blank", {
+            'waitUntil': "load"
+        })
 
         self.userAgent = await self.page.evaluate("""() => {return navigator.userAgent; }""")
 
