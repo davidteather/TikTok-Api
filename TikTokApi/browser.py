@@ -27,7 +27,7 @@ class browser:
             "--window-position=0,0",
             "--ignore-certifcate-errors",
             "--ignore-certifcate-errors-spki-list",
-             "--user-agent=" + self.userAgent,
+             "--user-agent=" + self.userAgent
         ]
 
         #self.args = []
@@ -57,76 +57,60 @@ class browser:
             loop.run_until_complete(self.start())
 
     async def start(self):
-        try:
-            self.browser = await pyppeteer.launch(self.options)
-            self.page = await self.browser.newPage()
+        self.browser = await pyppeteer.launch(self.options)
+        self.page = await self.browser.newPage()
 
-            await self.page.evaluateOnNewDocument("""() => {
-        delete navigator.__proto__.webdriver;
-            }""")
+        await self.page.evaluateOnNewDocument("""() => {
+    delete navigator.__proto__.webdriver;
+        }""")
 
-            # Check for user:pass proxy
-            if self.proxy != None:
-                if "@" in self.proxy:
-                    await self.page.authenticate({
-                        'username': self.proxy.split("://")[1].split(":")[0],
-                        'password': self.proxy.split("://")[1].split(":")[1].split("@")[0]
-                    })
+        # Check for user:pass proxy
+        if self.proxy != None:
+            if "@" in self.proxy:
+                await self.page.authenticate({
+                    'username': self.proxy.split("://")[1].split(":")[0],
+                    'password': self.proxy.split("://")[1].split(":")[1].split("@")[0]
+                })
 
-            await stealth(self.page)
+        await stealth(self.page)
 
-            # await self.page.emulate({
-            #    'viewport': {'width': random.randint(320, 1920), 'height': random.randint(320, 1920), },
-            #    'deviceScaleFactor': random.randint(1, 3),
-            #    'isMobile': random.random() > 0.5,
-            #    'hasTouch': random.random() > 0.5
-            # })
+        # await self.page.emulate({
+        #    'viewport': {'width': random.randint(320, 1920), 'height': random.randint(320, 1920), },
+        #    'deviceScaleFactor': random.randint(1, 3),
+        #    'isMobile': random.random() > 0.5,
+        #    'hasTouch': random.random() > 0.5
+        # })
 
-            # might have to switch to a tiktok url if they improve security
-            await self.page.goto("https://www.bing.com/")
+        # might have to switch to a tiktok url if they improve security
+        #await self.page.goto("https://www.bing.com", {
+        #    'waitUntil': "load"
+        #})
 
-            self.userAgent = await self.page.evaluate("""() => {return navigator.userAgent; }""")
+        self.userAgent = await self.page.evaluate("""() => {return navigator.userAgent; }""")
 
-            self.verifyFp = None
+        self.verifyFp = ''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for i in range(16))
 
-            #
-            # Probably need to unmark this at a later point
-            #
-            #for c in await self.page.cookies():
-            #    if c['name'] == "s_v_web_id":
-            #        self.verifyFp = c['value']
-
-            if self.verifyFp == None:
-                if self.debug:
-                    print("No verifyFp cookie.")
+        await self.page.evaluate("() => { " + self.__get_js(proxy=self.proxy) + " }")
         
-                key = ''
-                for i in range(16):
-                    key += random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits)
-                self.verifyFp = key
+        self.signature = await self.page.evaluate('''() => {
+        var url = "''' + self.url + "&verifyFp=" + self.verifyFp + '''"
+        var token = window.byted_acrawler.sign({url: url});
+        return token;
+        }''')
 
-            await self.page.evaluate("() => { " + self.__get_js(proxy=self.proxy) + " }")
-            
-            self.signature = await self.page.evaluate('''() => {
-            var url = "''' + self.url + "&verifyFp=" + self.verifyFp + '''"
-            var token = window.byted_acrawler.sign({url: url});
-            return token;
-            }''')
+        if self.api_url != None:
+            await self.page.goto(self.url +
+                                "&verifyFp=" + self.verifyFp +
+                                "&_signature=" + self.signature, {
+                                    'waitUntil': "load"
+                                })
 
-            if self.api_url != None:
-                await self.page.goto(self.url +
-                                    "&verifyFp=" + self.verifyFp +
-                                    "&_signature=" + self.signature, {
-                                        'waitUntil': "load"
-                                    })
+            self.data = await self.page.content()
+            print(self.data)
+            #self.data = await json.loads(self.data)
 
-                self.data = await self.page.content()
-                print(self.data)
-                #self.data = await json.loads(self.data)
-
-            await self.browser.close()
-        except:
-            await self.browser.close()
+        await self.browser.close()
+        await self.browser.close()
 
     async def find_redirect(self):
         try:

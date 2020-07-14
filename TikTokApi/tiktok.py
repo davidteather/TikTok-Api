@@ -94,7 +94,8 @@ class TikTokApi:
                     response.append(t)
 
             if not res['hasMore'] and not first:
-                print("TikTok isn't sending more TikToks beyond this point.")
+                if self.debug:
+                    print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count-len(response)
