@@ -41,9 +41,6 @@ class TikTokApi:
                                        'sec-fetch-mode': 'cors',
                                        'sec-fetch-site': 'same-site',
                                        "user-agent": b.userAgent
-                                       
-                                       
-                                       
                                        }, proxies=self.__format_proxy(proxy))
         try:
             return r.json()
@@ -109,10 +106,9 @@ class TikTokApi:
     # Gets a specific user's tiktoks
     #
 
-    def userPosts(self, userID, secUID, count=30, language='en', region='US', proxy=None):
+    def userPosts(self, userID, secUID, count=30, maxCursor=0, language='en', region='US', proxy=None):
         response = []
         maxCount = 99
-        maxCursor = 0
         first = True
 
         while len(response) < count:
@@ -144,9 +140,15 @@ class TikTokApi:
     # Gets a specific user's tiktoks by username
     #
 
-    def byUsername(self, username, count=30, proxy=None, language='en', region='US'):
+    def byUsername(self, username, count=30, maxCursor=0, proxy=None, language='en', region='US'):
         data = self.getUserObject(username, proxy=proxy)
-        return self.userPosts(data['id'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
+        return self.userPosts(data['id'],
+                              data['secUid'],
+                              count=count,
+                              maxCursor=maxCursor,
+                              proxy=proxy,
+                              language=language,
+                              region=region)
 
     #
     # Gets a user's liked posts
@@ -503,7 +505,6 @@ class TikTokApi:
             headers = {"User-Agent": "okhttp"}
             video_data_no_wm = requests.get(video_url_no_wm, params=None, headers=headers)
             return video_data_no_wm.content
-            
 
 
     def get_Video_No_Watermark(self, video_url, return_bytes=0, proxy=None):
