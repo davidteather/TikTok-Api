@@ -491,9 +491,11 @@ class TikTokApi:
     def get_Video_No_Watermark_ID(self, video_id, return_bytes=0, proxy=None):
         video_info = self.getTikTokById(video_id)
         video_url = video_info["itemInfo"]["itemStruct"]["video"]["downloadAddr"]
-        headers = {"User-Agent": "okhttp", "Ranges": "bytes=1000-30000"}
+        headers = {"User-Agent": "okhttp", "Range": "bytes=1000-80000"}
         video_data = requests.get(video_url, params=None, headers=headers).text
         pos = video_data.find("vid:")
+        if pos == -1:
+            return None
         video_url_no_wm = "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id={" \
                           "}&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4" \
             .format(video_data[pos+4:pos+36])
