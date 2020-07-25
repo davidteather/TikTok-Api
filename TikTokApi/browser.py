@@ -111,6 +111,7 @@ class browser:
 
         await self.browser.close()
         await self.browser.close()
+        self.browser.process.communicate()
 
     async def find_redirect(self):
         try:
@@ -148,9 +149,11 @@ class browser:
             self.redirect_url = self.page.url
 
             await self.browser.close()
+            self.browser.process.communicate()
 
         except:
             await self.browser.close()
+            self.browser.process.communicate()
 
     def __format_proxy(self, proxy):
         if proxy != None:
