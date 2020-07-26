@@ -301,7 +301,7 @@ video_url - The video you want to get url.
 
 return_bytes - The default value is 0, when it is set to 1 the function instead returns the bytes from the video rather than just the direct url.
 
-##### The get_Video_No_Watermark Method
+##### The get_Video_No_Watermark_Faster Method
 
 ```
 api.get_Video_No_Watermark(video_url, return_bytes=0, language='en', proxy=None)
@@ -310,6 +310,14 @@ api.get_Video_No_Watermark(video_url, return_bytes=0, language='en', proxy=None)
 video_url - The video you want to get url.
 
 return_bytes - The default value is 0, when it is set to 1 the function instead returns the bytes from the video rather than just the direct url.
+
+If you request without bytes you will need to make a call to the URL it responds yourself to get bytes.
+```
+url = api.get_Video_No_Watermark_ID('6829267836783971589', return_bytes=0)
+
+import requests
+video_bytes = requests.get(url, headers={"User-Agent": "okhttp"}).content
+```
 
 ##### The get_Video_No_Watermark_ID Method
 
@@ -329,6 +337,17 @@ url = api.get_Video_No_Watermark_ID('6829267836783971589', return_bytes=0)
 import requests
 video_bytes = requests.get(url, headers={"User-Agent": "okhttp"}).content
 ```
+
+##### The get_Video_No_Watermark Method
+```
+api.get_Video_No_Watermark(self, video_url, return_bytes=0, proxy=None)
+```
+
+This endpoint returns a url that is able to be opened in any browser, but sacrifices speed for this convenience. Any old request library can return the bytes if you decide to return a url.
+
+video_url - the url of the video you wish to download
+
+return_bytes - if you want to return bytes or a url
 
 ## Built With
 
