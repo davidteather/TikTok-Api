@@ -6,6 +6,7 @@ import json
 import string
 import atexit
 import requests
+import logging
 
 # Import Detection From Stealth
 from .stealth import stealth
