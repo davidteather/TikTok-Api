@@ -6,6 +6,7 @@ import json
 import string
 import atexit
 import requests
+from threading import Thread
 
 # Import Detection From Stealth
 from .stealth import stealth
@@ -49,12 +50,20 @@ class browser:
             'handleSIGHUP': False
         }
 
+
         loop = asyncio.new_event_loop()
 
+        t = Thread(target=self._start_background_loop, args=(loop, ))
+        t.start()
         if find_redirect:
-            loop.run_until_complete(self.find_redirect())
+            fut = asyncio.run_coroutine_threadsafe(self.find_redirect(), loop)
         else:
-            loop.run_until_complete(self.start())
+            fut = asyncio.run_coroutine_threadsafe(self.start(), loop)
+        fut.result()
+
+    def _start_background_loop(self, loop):
+        asyncio.set_event_loop(loop)
+        loop.run_forever()
 
     async def start(self):
         self.browser = await pyppeteer.launch(self.options)
@@ -91,7 +100,7 @@ class browser:
         self.verifyFp = ''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for i in range(16))
 
         await self.page.evaluate("() => { " + self.__get_js(proxy=self.proxy) + " }")
-        
+
         self.signature = await self.page.evaluate('''() => {
         var url = "''' + self.url + "&verifyFp=" + self.verifyFp + '''"
         var token = window.byted_acrawler.sign({url: url});
