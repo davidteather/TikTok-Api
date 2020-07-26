@@ -455,22 +455,6 @@ class TikTokApi:
             chromedriver_path - path to your chrome driver executable 
         """
         raise Exception("Deprecated. Other Methods Work Better.")
-        if chromedriver_path != None:
-            driver = webdriver.Chrome(executable_path=chromedriver_path)
-        else:
-            driver = webdriver.Chrome()
-        driver.get(video_url)
-        time.sleep(5)
-
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
-        data = json.loads(soup.find_all(
-            'script', attrs={"id": "videoObject"})[0].text)
-
-        if return_bytes == 0:
-            return data['contentUrl']
-        else:
-            r = requests.get(data['contentUrl'])
-            return r.content
 
     def get_Video_No_Watermark_ID(self, video_id, return_bytes=0, proxy=None):
         """
