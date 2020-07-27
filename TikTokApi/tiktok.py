@@ -72,7 +72,7 @@ class TikTokApi:
           Gets trending TikToks
         """
         response = []
-        maxCount = 99
+        maxCount = 50
         maxCursor = 0
         first = True
 
@@ -81,11 +81,13 @@ class TikTokApi:
                 realCount = count
             else:
                 realCount = maxCount
-            api_url = "https://m.tiktok.com/api/item_list/?count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region={}&language={}&verifyFp=".format(
+            api_url = "https://m.tiktok.com/api/item_list/?count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region={}&language={}".format(
                 str(realCount), str(maxCursor), str(region), str(language))
             b = browser(api_url, language=language, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
 
+
+            print(res)
             if 'items' in res.keys():
                 for t in res['items']:
                     response.append(t)
@@ -107,7 +109,7 @@ class TikTokApi:
           Gets a specific user's tiktoks
         """
         response = []
-        maxCount = 99
+        maxCount = 50
         maxCursor = 0
         first = True
 
@@ -148,7 +150,7 @@ class TikTokApi:
           Gets a user's liked posts
         """
         response = []
-        maxCount = 99
+        maxCount = 50
         maxCursor = 0
         first = True
 
@@ -199,7 +201,7 @@ class TikTokApi:
           id - the sound ID
         """
         response = []
-        maxCount = 99
+        maxCount = 50
         maxCursor = 0
 
         while len(response) < count:
@@ -240,7 +242,7 @@ class TikTokApi:
         """
         id = self.getHashtagObject(hashtag)['challengeInfo']['challenge']['id']
         response = []
-        maxCount = 99
+        maxCount = 50
         maxCursor = 0
 
         while len(response) < count:
