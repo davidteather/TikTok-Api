@@ -86,8 +86,6 @@ class TikTokApi:
             b = browser(api_url, language=language, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
 
-
-            print(res)
             if 'items' in res.keys():
                 for t in res['items']:
                     response.append(t)
