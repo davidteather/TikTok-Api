@@ -61,6 +61,10 @@ class browser:
             fut = asyncio.run_coroutine_threadsafe(self.start(), loop)
         fut.result()
 
+        loop.close()
+
+
+
     def _start_background_loop(self, loop):
         asyncio.set_event_loop(loop)
         loop.run_forever()
