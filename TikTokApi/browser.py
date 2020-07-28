@@ -6,6 +6,7 @@ import json
 import string
 import atexit
 import requests
+import logging
 from threading import Thread
 
 # Import Detection From Stealth
