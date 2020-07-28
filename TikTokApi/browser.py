@@ -55,14 +55,13 @@ class browser:
         loop = asyncio.new_event_loop()
 
         t = Thread(target=self._start_background_loop, args=(loop, ))
+        t.setDaemon(True)
         t.start()
         if find_redirect:
             fut = asyncio.run_coroutine_threadsafe(self.find_redirect(), loop)
         else:
             fut = asyncio.run_coroutine_threadsafe(self.start(), loop)
         fut.result()
-
-        loop.close()
 
 
 
