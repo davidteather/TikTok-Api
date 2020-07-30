@@ -249,7 +249,7 @@ class TikTokApi:
             else:
                 realCount = maxCount
 
-            api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=3&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}".format(
+            api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=3&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}&verifyFp=".format(
                 str(id), str(realCount), str(maxCursor), language)
             b = browser(api_url, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy, language=language)
@@ -452,7 +452,7 @@ class TikTokApi:
 
             video_url - the url of the video
             return_bytes - 0 is just the url, 1 is the actual video bytes
-            chromedriver_path - path to your chrome driver executable 
+            chromedriver_path - path to your chrome driver executable
         """
         raise Exception("Deprecated. Other Methods Work Better.")
 
