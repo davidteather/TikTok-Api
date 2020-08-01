@@ -3,14 +3,12 @@ import pyppeteer
 import random
 import requests
 from .browser import browser
-from bs4 import BeautifulSoup
 import time
-import json
 from selenium import webdriver
 
 
 class TikTokApi:
-    def __init__(self, debug=False):
+    def __init__(self, debug=False, request_delay=None):
         """
           The TikTokApi class constructor
         """
@@ -19,11 +17,13 @@ class TikTokApi:
             print("Class initialized")
 
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.0 Safari/537.36)"
-
+        self.request_delay = request_delay
     def getData(self, api_url, b, language='en', proxy=None):
         """
           Method that retrives data from the api
         """
+        if self.request_delay != None:
+            time.sleep(self.request_delay)
         url = b.url + \
             "&verifyFp=" + b.verifyFp + \
             "&_signature=" + b.signature

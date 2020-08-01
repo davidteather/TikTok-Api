@@ -2,7 +2,6 @@ import asyncio
 import pyppeteer
 import random
 import time
-import json
 import string
 import atexit
 import requests

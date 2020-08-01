@@ -1,5 +1,4 @@
 requests
-bs4
 pyppeteer
 selenium
 pyppeteer_stealth
