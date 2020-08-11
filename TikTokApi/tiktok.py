@@ -3,14 +3,12 @@ import pyppeteer
 import random
 import requests
 from .browser import browser
-from bs4 import BeautifulSoup
 import time
-import json
 from selenium import webdriver
 
 
 class TikTokApi:
-    def __init__(self, debug=False):
+    def __init__(self, debug=False, request_delay=None):
         """
           The TikTokApi class constructor
         """
@@ -18,12 +16,27 @@ class TikTokApi:
         if debug:
             print("Class initialized")
 
-        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.0 Safari/537.36)"
+        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
+
+        # Get Browser Params
+        b = browser('newParam', newParams=True)
+
+        self.timezone_name = self.__format_new_params__(b.timezone_name)
+        self.browser_language = self.__format_new_params__(b.browser_language)
+        self.browser_platform = self.__format_new_params__(b.browser_platform)
+        self.browser_name = self.__format_new_params__(b.browser_name)
+        self.browser_version = self.__format_new_params__(b.browser_version)
+        self.width = b.width
+        self.height = b.height
+
+        self.request_delay = request_delay
 
     def getData(self, api_url, b, language='en', proxy=None):
         """
           Method that retrives data from the api
         """
+        if self.request_delay != None:
+            time.sleep(self.request_delay)
         url = b.url + \
             "&verifyFp=" + b.verifyFp + \
             "&_signature=" + b.signature
@@ -81,8 +94,8 @@ class TikTokApi:
                 realCount = count
             else:
                 realCount = maxCount
-            api_url = "https://m.tiktok.com/api/item_list/?count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region={}&language={}".format(
-                str(realCount), str(maxCursor), str(region), str(language))
+            api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region={}&language={}".format(
+                self.__add_new_params__() ,str(realCount), str(maxCursor), str(region), str(language))
             b = browser(api_url, language=language, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
 
@@ -116,8 +129,8 @@ class TikTokApi:
                 realCount = count
             else:
                 realCount = maxCount
-            api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region={}&language={}".format(
-                str(realCount), str(userID), str(secUID), str(maxCursor), str(region), str(language))
+            api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region={}&language={}".format(
+                self.__add_new_params__(), str(realCount), str(userID), str(secUID), str(maxCursor), str(region), str(language))
             b = browser(api_url, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
 
@@ -158,8 +171,8 @@ class TikTokApi:
             else:
                 realCount = maxCount
 
-            api_url = "https://m.tiktok.com/api/item_list/?count={}&id={}&type=2&secUid={}&maxCursor={}&minCursor=0&sourceType=9&appId=1233&region={}&language={}&verifyFp=".format(
-                str(realCount), str(userID), str(secUID), str(maxCursor), str(region), str(language))
+            api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=2&secUid={}&maxCursor={}&minCursor=0&sourceType=9&appId=1233&region={}&language={}&verifyFp=".format(
+                self.__add_new_params__(), str(realCount), str(userID), str(secUID), str(maxCursor), str(region), str(language))
             b = browser(api_url, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
 
@@ -208,8 +221,8 @@ class TikTokApi:
             else:
                 realCount = maxCount
 
-            api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=4&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}&verifyFp=".format(
-                str(id), str(realCount), str(maxCursor), str(language))
+            api_url = "https://m.tiktok.com/share/item/list?{}&secUid=&id={}&type=4&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}&verifyFp=".format(
+                self.__add_new_params__(),str(id), str(realCount), str(maxCursor), str(language))
             b = browser(api_url, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
 
@@ -229,12 +242,12 @@ class TikTokApi:
         """
           Gets the music object
         """
-        api_url = "https://m.tiktok.com/api/music/detail/?musicId={}&language={}&verifyFp=".format(
-            str(id), language)
+        api_url = "https://m.tiktok.com/api/music/detail/?{}&musicId={}&language={}&verifyFp=".format(
+            self.__add_new_params__(), str(id), language)
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b, proxy=proxy)
 
-    def byHashtag(self, hashtag, count=30, language='en', proxy=None):
+    def byHashtag(self, hashtag, count=30, language='en', proxy=None, region='US'):
         """
           Gets tiktoks by hashtag
         """
@@ -249,8 +262,10 @@ class TikTokApi:
             else:
                 realCount = maxCount
 
-            api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=3&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}".format(
-                str(id), str(realCount), str(maxCursor), language)
+            api_url = "https://m.tiktok.com/share/item/list?{}&region={}&secUid=&id={}&type=3&count={}&minCursor=0&maxCursor={}&shareUid=&recType=&lang={}".format(
+                self.__add_new_params__(), region, str(
+                    id), str(count), str(maxCursor), language
+            )
             b = browser(api_url, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy, language=language)
 
@@ -270,8 +285,8 @@ class TikTokApi:
         """
           Gets tiktoks by hashtag (for use in byHashtag)
         """
-        api_url = "https://m.tiktok.com/api/challenge/detail/?challengeName={}&language={}".format(
-            str(hashtag.encode('utf-8'))[2:-1].replace("\\x", "%").upper(), language)
+        api_url = "https://m.tiktok.com/api/challenge/detail/?{}&challengeName={}&language={}".format(
+            self.__add_new_params__(), str(hashtag.encode('utf-8'))[2:-1].replace("\\x", "%").upper(), language)
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b, proxy=proxy)
 
@@ -279,8 +294,8 @@ class TikTokApi:
         """
            Get a tiktok object with another tiktok's id
         """
-        api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=0&count=24&minCursor=0&maxCursor=0&shareUid=&recType=3&lang={}&verifyFp=".format(
-            id, language)
+        api_url = "https://m.tiktok.com/share/item/list?{}&secUid=&id={}&type=0&count=24&minCursor=0&maxCursor=0&shareUid=&recType=3&lang={}&verifyFp=".format(
+            self.__add_new_params__(), id, language)
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b, proxy=proxy)['body']
 
@@ -288,8 +303,8 @@ class TikTokApi:
         """
           Gets a tiktok object by ID
         """
-        api_url = "https://m.tiktok.com/api/item/detail/?itemId={}&language={}&verifyFp=".format(
-            id, language)
+        api_url = "https://m.tiktok.com/api/item/detail/?{}&itemId={}&language={}&verifyFp=".format(
+            self.__add_new_params__(), id, language)
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b, proxy=proxy)
 
@@ -309,7 +324,7 @@ class TikTokApi:
         """
           Discover page, consists challenges (hashtags)
         """
-        api_url = "https://m.tiktok.com/node/share/discover?noUser=1&userCount=30&scene=0&verifyFp="
+        api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=1&userCount=30&scene=0&verifyFp=".format(self.__add_new_params__())
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b, proxy=proxy)['body'][1]['exploreList']
 
@@ -317,7 +332,7 @@ class TikTokApi:
         """
           Discover page, consists of music
         """
-        api_url = "https://m.tiktok.com/node/share/discover?noUser=1&userCount=30&scene=0&verifyFp="
+        api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=1&userCount=30&scene=0&verifyFp=".format(self.__add_new_params__())
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b, proxy=proxy)['body'][2]['exploreList']
 
@@ -331,8 +346,8 @@ class TikTokApi:
         """
           Gets the full exposed user object
         """
-        api_url = "https://m.tiktok.com/api/user/detail/?uniqueId={}&language={}".format(
-            username, language)
+        api_url = "https://m.tiktok.com/api/user/detail/?{}&uniqueId={}&language={}".format(
+            self.__add_new_params__(), username, language)
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b, proxy=proxy)
 
@@ -340,8 +355,8 @@ class TikTokApi:
         """
           Get Suggested Users for given userID
         """
-        api_url = "https://m.tiktok.com/node/share/discover?noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
-            userId, userId, str(count))
+        api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
+            self.__add_new_params__(), userId, userId, str(count))
         b = browser(api_url, proxy=proxy)
 
         res = []
@@ -372,8 +387,8 @@ class TikTokApi:
         """
           Get suggested hashtags given userID
         """
-        api_url = "https://m.tiktok.com/node/share/discover?noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
-            userId, userId, str(count))
+        api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
+            self.__add_new_params__(), userId, userId, str(count))
         b = browser(api_url, proxy=proxy)
 
         res = []
@@ -404,8 +419,8 @@ class TikTokApi:
         """
           Get suggested music by given userID
         """
-        api_url = "https://m.tiktok.com/node/share/discover?noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
-            userId, userId, str(count))
+        api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
+            self.__add_new_params__(), userId, userId, str(count))
         b = browser(api_url, proxy=proxy)
 
         res = []
@@ -510,6 +525,7 @@ class TikTokApi:
             tmp = r.text.split("vid:")
             if len(tmp) > 1:
                 key = tmp[1].split("%")[0]
+                print(key)
 
                 if key[-1:] == ' ':
                     key = key[1:]
@@ -520,10 +536,11 @@ class TikTokApi:
             else:
                 key = ""
 
-            cleanVideo = "https://api.tiktokv.com/aweme/v1/playwm/?video_id=" + key
+            cleanVideo = "https://api.tiktokv.com/aweme/v1/playwm/?video_id=" + \
+                key + "&line=0&ratio=default&media_type=4&vr_type=0"
 
             b = browser(cleanVideo, find_redirect=True, proxy=proxy)
-
+            print(b.redirect_url)
             if return_bytes == 0:
                 return b.redirect_url
             else:
@@ -548,3 +565,14 @@ class TikTokApi:
 
     def __get_js(self, proxy=None):
         return requests.get("https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js", proxies=self.__format_proxy(proxy)).text
+
+    def __format_new_params__(self, parm):
+        return parm.replace("/", "%2F").replace(" ", "+").replace(";", "%3B")
+
+    def __add_new_params__(self):
+        return "aid=1988&app_name=tiktok_web&device_platform=web&referer=&user_agent={}&cookie_enabled=true".format(self.__format_new_params__(self.userAgent)) + \
+            "&screen_width={}&screen_height={}&browser_language={}&browser_platform={}&browser_name={}&browser_version={}".format(self.width, self.height, self.browser_language, self.browser_platform, self.browser_name, self.browser_version) + \
+            "&browser_online=true&timezone_name={}&priority_region=&appId=1233&appType=m&isAndroid=false&isMobile=false".format(self.timezone_name) + \
+            "&isIOS=false&OS=windows&did=" + \
+            str(random.randint(10000, 999999999))
+
