@@ -19,7 +19,6 @@ class browser:
         self.referrer = "https://www.tiktok.com/"
         self.language = language
 
-        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.0 Safari/537.36)"
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
         self.args = [
             "--no-sandbox",
@@ -50,16 +49,15 @@ class browser:
             'handleSIGHUP': False
         }
 
-        try :
+        try:
             self.loop = asyncio.new_event_loop()
             if find_redirect:
                 self.loop.run_until_complete(self.find_redirect())
             elif newParams:
-                loop.run_until_complete(self.newParams())
+                self.loop.run_until_complete(self.newParams())
             else:
                 self.loop.run_until_complete(self.start())
-        finally :
-            self.loop.stop()
+        except:
             self.loop.close()
 
     async def newParams(self):
