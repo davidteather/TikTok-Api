@@ -12,7 +12,7 @@ import logging
 from .stealth import stealth
 
 class browser:
-    def __init__(self, url, language='en', proxy=None, find_redirect=False, api_url=None, debug=False):
+    def __init__(self, url, language='en', proxy=None, find_redirect=False, api_url=None, debug=False, newParams=False):
         self.url = url
         self.debug = debug
         self.proxy = proxy
@@ -21,6 +21,7 @@ class browser:
         self.language = language
 
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.0 Safari/537.36)"
+        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
         self.args = [
             "--no-sandbox",
             "--disable-setuid-sandbox",
@@ -54,8 +55,26 @@ class browser:
 
         if find_redirect:
             loop.run_until_complete(self.find_redirect())
+        elif newParams:
+            loop.run_until_complete(self.newParams())
         else:
             loop.run_until_complete(self.start())
+
+    async def newParams(self):
+        self.browser = await pyppeteer.launch(self.options)
+        self.page = await self.browser.newPage()
+        await self.page.goto("about:blank")
+
+        self.browser_language = await self.page.evaluate("""() => { return navigator.language || navigator.userLanguage; }""")
+        self.timezone_name = await self.page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
+        self.browser_platform = await self.page.evaluate("""() => { return window.navigator.platform; }""")
+        self.browser_name = await self.page.evaluate("""() => { return window.navigator.appCodeName; }""")
+        self.browser_version = await self.page.evaluate("""() => { return window.navigator.appVersion; }""")
+        self.width = await self.page.evaluate("""() => { return screen.width; }""")
+        self.height = await self.page.evaluate("""() => { return screen.height; }""")
+
+        await self.browser.close()
+        self.browser.process.communicate()
 
     async def start(self):
         self.browser = await pyppeteer.launch(self.options)
@@ -74,13 +93,6 @@ class browser:
                 })
 
         await stealth(self.page)
-
-        # await self.page.emulate({
-        #    'viewport': {'width': random.randint(320, 1920), 'height': random.randint(320, 1920), },
-        #    'deviceScaleFactor': random.randint(1, 3),
-        #    'isMobile': random.random() > 0.5,
-        #    'hasTouch': random.random() > 0.5
-        # })
 
         # might have to switch to a tiktok url if they improve security
         await self.page.goto("about:blank", {
@@ -107,10 +119,8 @@ class browser:
                                 })
 
             self.data = await self.page.content()
-            print(self.data)
-            #self.data = await json.loads(self.data)
+            self.data = json.loads(self.data.replace("</pre></body></html>", "").replace('<html><head></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">', ""))
 
-        await self.browser.close()
         await self.browser.close()
         self.browser.process.communicate()
 

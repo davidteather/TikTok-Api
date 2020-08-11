@@ -19,6 +19,21 @@ class TikTokApi:
             print("Class initialized")
 
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.0 Safari/537.36)"
+        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
+
+        # Get Browser Params
+        b = browser('newParam', newParams=True)
+
+        self.timezone_name = self.__format_new_params__(b.timezone_name)
+        self.browser_language = self.__format_new_params__(b.browser_language)
+        self.browser_platform = self.__format_new_params__(b.browser_platform)
+        self.browser_name = self.__format_new_params__(b.browser_name)
+        self.browser_version = self.__format_new_params__(b.browser_version)
+        self.width = b.width
+        self.height = b.height
+
+    def __format_new_params__(self, parm):
+        return parm.replace("/", "%2F").replace(" ", "+").replace(";", "%3B")
 
     def getData(self, api_url, b, language='en', proxy=None):
         """
@@ -234,7 +249,7 @@ class TikTokApi:
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b, proxy=proxy)
 
-    def byHashtag(self, hashtag, count=30, language='en', proxy=None):
+    def byHashtag(self, hashtag, count=30, language='en', proxy=None, region='US'):
         """
           Gets tiktoks by hashtag
         """
@@ -251,6 +266,10 @@ class TikTokApi:
 
             api_url = "https://m.tiktok.com/share/item/list?secUid=&id={}&type=3&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}".format(
                 str(id), str(realCount), str(maxCursor), language)
+
+            api_url = "https://m.tiktok.com/share/item/list?aid=1988&app_name=tiktok_web&device_platform=web&referer=&user_agent={}&cookie_enabled=true&screen_width={}&screen_height={}&browser_language={}&browser_platform={}&browser_name={}&browser_version={}&browser_online=true&timezone_name={}&priority_region=&appId=1233&region={}&appType=m&isAndroid=false&isMobile=false&isIOS=false&OS=windows&did=6770705797447566850&secUid=&id={}&type=3&count={}&minCursor=0&maxCursor={}&shareUid=&recType=&lang={}".format(
+                self.__format_new_params__(self.userAgent), self.width, self.height, self.browser_language, self.browser_platform, self.browser_name, self.browser_version, self.timezone_name, region, str(id), str(count), str(maxCursor), language
+            )
             b = browser(api_url, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy, language=language)
 
@@ -510,6 +529,7 @@ class TikTokApi:
             tmp = r.text.split("vid:")
             if len(tmp) > 1:
                 key = tmp[1].split("%")[0]
+                print(key)
 
                 if key[-1:] == ' ':
                     key = key[1:]
@@ -520,10 +540,10 @@ class TikTokApi:
             else:
                 key = ""
 
-            cleanVideo = "https://api.tiktokv.com/aweme/v1/playwm/?video_id=" + key
+            cleanVideo = "https://api.tiktokv.com/aweme/v1/playwm/?video_id=" + key + "&line=0&ratio=default&media_type=4&vr_type=0"
 
             b = browser(cleanVideo, find_redirect=True, proxy=proxy)
-
+            print(b.redirect_url)
             if return_bytes == 0:
                 return b.redirect_url
             else:
