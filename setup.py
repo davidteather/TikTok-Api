@@ -21,7 +21,6 @@ setuptools.setup(
   install_requires=[
           'requests',
           'selenium',
-          'bs4',
           'pyppeteer'
       ],
   classifiers=[

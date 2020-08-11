@@ -2,7 +2,6 @@ import asyncio
 import pyppeteer
 import random
 import time
-import json
 import string
 import atexit
 import requests
@@ -51,14 +50,17 @@ class browser:
             'handleSIGHUP': False
         }
 
-        loop = asyncio.new_event_loop()
-
-        if find_redirect:
-            loop.run_until_complete(self.find_redirect())
-        elif newParams:
-            loop.run_until_complete(self.newParams())
-        else:
-            loop.run_until_complete(self.start())
+        try :
+            self.loop = asyncio.new_event_loop()
+            if find_redirect:
+                self.loop.run_until_complete(self.find_redirect())
+            elif newParams:
+                loop.run_until_complete(self.newParams())
+            else:
+                self.loop.run_until_complete(self.start())
+        finally :
+            self.loop.stop()
+            self.loop.close()
 
     async def newParams(self):
         self.browser = await pyppeteer.launch(self.options)
@@ -104,7 +106,7 @@ class browser:
         self.verifyFp = ''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for i in range(16))
 
         await self.page.evaluate("() => { " + self.__get_js(proxy=self.proxy) + " }")
-        
+
         self.signature = await self.page.evaluate('''() => {
         var url = "''' + self.url + "&verifyFp=" + self.verifyFp + '''"
         var token = window.byted_acrawler.sign({url: url});
