@@ -8,15 +8,28 @@ from selenium import webdriver
 
 
 class TikTokApi:
-    def __init__(self, debug=False, request_delay=None):
+    def __init__(self, debug=False, request_delay=None, cookie_string = None):
         """
           The TikTokApi class constructor
+
+          Parameters
+          ----------
+          cookie_string : String
+            Cookies from a logged in session. This is a; delimited list of name value pairs, each separated by =.
+            To generate this:
+            1. Login to TikTok in chrome
+            2. Open developer tools
+            3. Examine a request to TikTok. One of the header parameters will be the cookies. Copy this string
         """
         self.debug = debug
         if debug:
             print("Class initialized")
 
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
+        if cookie_string is not None:
+            self.cookies = dict([v.split('=') for v in cookie_string.split('; ')])
+        else:
+            self.cookies = None
 
         # Get Browser Params
         b = browser('newParam', newParams=True)
@@ -53,10 +66,8 @@ class TikTokApi:
             'sec-fetch-mode': 'cors',
             'sec-fetch-site': 'same-site',
             "user-agent": b.userAgent
-
-
-
         }, proxies=self.__format_proxy(proxy))
+
         try:
             return r.json()
         except:
@@ -547,6 +558,43 @@ class TikTokApi:
                 r = requests.get(
                     b.redirect_url, proxies=self.__format_proxy(proxy))
                 return r.content
+    def get_insights(self, username, videoID, proxy=None):
+        """
+          Get insights (what TikTok Pro calls "analytics") for a video.
+          Note: this method requires cookies to be set in order to work, as you need to be logged in.
+        """
+        if self.cookies is None:
+            raise 'This method requires cookies to be set in order to work'
+        api_url = "https://api.tiktok.com/aweme/v1/data/insighs/?tz_offset=-25200&aid=1233&carrier_region=US"
+        referrer =  f"https://www.tiktok.com/@{username}/video/{videoID}"
+        insights = ['video_info', 'video_page_percent', 'video_region_percent', 'video_total_duration',
+                    'video_per_duration']
+        # Note: this list of parameters has to be in exactly this order with exactly this format
+        # or else you will get "Invalid parameters"
+        def build_insight(insight, videoID):
+            return f'{{"insigh_type":"{insight}","aweme_id":"{videoID}"}}'
+        insight_string = ','.join([build_insight(i, videoID) for i in insights])
+        insight_string = insight_string + ',{"insigh_type": "user_info"}' +\
+            f',{{"insigh_type":"video_uv","aweme_id":"{videoID}"}}'  + \
+            ',{"insigh_type":"vv_history","days":8}'       
+
+        r = requests.post(api_url, headers = {
+                "accept": "*/*",
+                "accept-language": "en-US,en;q=0.9",
+                "content-type": "application/x-www-form-urlencoded",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-site",
+                "referrer": "https://www.tiktok.com/@benthamite/video/6860178143399955718",
+                "referrerPolicy": "no-referrer-when-downgrade",
+                "method": "POST",
+                "mode": "cors",
+                "credentials": "include"
+            }, data = f"type_requests=[{insight_string}]"
+            , proxies=self.__format_proxy(proxy)
+            , cookies = self.cookies)
+        return r.json()
+
     #
     # PRIVATE METHODS
     #
@@ -575,4 +623,3 @@ class TikTokApi:
             "&browser_online=true&timezone_name={}&priority_region=&appId=1233&appType=m&isAndroid=false&isMobile=false".format(self.timezone_name) + \
             "&isIOS=false&OS=windows&did=" + \
             str(random.randint(10000, 999999999))
-
