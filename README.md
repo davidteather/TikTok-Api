@@ -43,6 +43,7 @@ Consider sponsoring me [here](https://github.com/sponsors/davidteather)
         - [get_Video_No_Watermark](#the-get_video_no_watermark-method)
         - [userLiked](#the-userliked-method)
         - [userLikedbyUsername](#the-userlikedbyusername-method)
+        - [get_insights](#the-get_insights-method)
 - [Built With](#built-with)
 - [Authors](#authors)
 - [License](#license)
@@ -348,6 +349,13 @@ This endpoint returns a url that is able to be opened in any browser, but sacrif
 video_url - the url of the video you wish to download
 
 return_bytes - if you want to return bytes or a url
+
+#### The get_insights Method
+```
+r = get_insights(self, username, videoID, proxy=None)
+```
+
+This endpoint returns the insights (what TikTok Pro calls "analytics"). Note that cookies must be set for this to work.
 
 ## Built With
 
