@@ -10,6 +10,7 @@ import logging
 # Import Detection From Stealth
 from .stealth import stealth
 
+
 class browser:
     def __init__(self, url, language='en', proxy=None, find_redirect=False, api_url=None, debug=False, newParams=False):
         self.url = url
@@ -27,7 +28,7 @@ class browser:
             "--window-position=0,0",
             "--ignore-certifcate-errors",
             "--ignore-certifcate-errors-spki-list",
-             "--user-agent=" + self.userAgent
+            "--user-agent=" + self.userAgent
         ]
 
         #self.args = []
@@ -65,11 +66,27 @@ class browser:
         self.page = await self.browser.newPage()
         await self.page.goto("about:blank")
 
-        self.browser_language = await self.page.evaluate("""() => { return navigator.language || navigator.userLanguage; }""")
-        self.timezone_name = await self.page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
-        self.browser_platform = await self.page.evaluate("""() => { return window.navigator.platform; }""")
-        self.browser_name = await self.page.evaluate("""() => { return window.navigator.appCodeName; }""")
-        self.browser_version = await self.page.evaluate("""() => { return window.navigator.appVersion; }""")
+        try:
+            self.browser_language = await self.page.evaluate("""() => { return navigator.language || navigator.userLanguage; }""")
+        except:
+            self.browser_language = ""
+        try:
+            self.timezone_name = await self.page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
+        except:
+            self.timezone_name = ""
+        try:
+            self.browser_platform = await self.page.evaluate("""() => { return window.navigator.platform; }""")
+        except:
+            self.browser_platform = ""
+        try:
+            self.browser_name = await self.page.evaluate("""() => { return window.navigator.appCodeName; }""")
+        except:
+            self.browser_name = ""
+        try:
+            self.browser_version = await self.page.evaluate("""() => { return window.navigator.appVersion; }""")
+        except:
+            self.browser_version = ""
+
         self.width = await self.page.evaluate("""() => { return screen.width; }""")
         self.height = await self.page.evaluate("""() => { return screen.height; }""")
 
@@ -101,7 +118,8 @@ class browser:
 
         self.userAgent = await self.page.evaluate("""() => {return navigator.userAgent; }""")
 
-        self.verifyFp = ''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for i in range(16))
+        self.verifyFp = ''.join(random.choice(
+            string.ascii_lowercase + string.ascii_uppercase + string.digits) for i in range(16))
 
         await self.page.evaluate("() => { " + self.__get_js(proxy=self.proxy) + " }")
 
@@ -113,13 +131,14 @@ class browser:
 
         if self.api_url != None:
             await self.page.goto(self.url +
-                                "&verifyFp=" + self.verifyFp +
-                                "&_signature=" + self.signature, {
-                                    'waitUntil': "load"
-                                })
+                                 "&verifyFp=" + self.verifyFp +
+                                 "&_signature=" + self.signature, {
+                                     'waitUntil': "load"
+                                 })
 
             self.data = await self.page.content()
-            self.data = json.loads(self.data.replace("</pre></body></html>", "").replace('<html><head></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">', ""))
+            self.data = json.loads(self.data.replace("</pre></body></html>", "").replace(
+                '<html><head></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">', ""))
 
         await self.browser.close()
         self.browser.process.communicate()
