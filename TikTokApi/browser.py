@@ -66,26 +66,16 @@ class browser:
         self.page = await self.browser.newPage()
         await self.page.goto("about:blank")
 
-        try:
-            self.browser_language = await self.page.evaluate("""() => { return navigator.language || navigator.userLanguage; }""")
-        except:
-            self.browser_language = ""
-        try:
-            self.timezone_name = await self.page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
-        except:
-            self.timezone_name = ""
-        try:
-            self.browser_platform = await self.page.evaluate("""() => { return window.navigator.platform; }""")
-        except:
-            self.browser_platform = ""
-        try:
-            self.browser_name = await self.page.evaluate("""() => { return window.navigator.appCodeName; }""")
-        except:
-            self.browser_name = ""
-        try:
-            self.browser_version = await self.page.evaluate("""() => { return window.navigator.appVersion; }""")
-        except:
-            self.browser_version = ""
+        #self.browser_language = await self.page.evaluate("""() => { return navigator.language || navigator.userLanguage; }""")
+        self.browser_language = ""
+        #self.timezone_name = await self.page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
+        self.timezone_name = ""
+        #self.browser_platform = await self.page.evaluate("""() => { return window.navigator.platform; }""")
+        self.browser_platform = ""
+        #self.browser_name = await self.page.evaluate("""() => { return window.navigator.appCodeName; }""")
+        self.browser_name = ""
+        #self.browser_version = await self.page.evaluate("""() => { return window.navigator.appVersion; }""")
+        self.browser_version = ""
 
         self.width = await self.page.evaluate("""() => { return screen.width; }""")
         self.height = await self.page.evaluate("""() => { return screen.height; }""")
