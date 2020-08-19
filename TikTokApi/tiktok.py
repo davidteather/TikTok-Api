@@ -21,13 +21,27 @@ class TikTokApi:
         # Get Browser Params
         b = browser('newParam', newParams=True)
 
-        self.timezone_name = self.__format_new_params__(b.timezone_name)
-        self.browser_language = self.__format_new_params__(b.browser_language)
-        self.browser_platform = self.__format_new_params__(b.browser_platform)
-        self.browser_name = self.__format_new_params__(b.browser_name)
-        self.browser_version = self.__format_new_params__(b.browser_version)
-        self.width = b.width
-        self.height = b.height
+        try:
+            self.timezone_name = self.__format_new_params__(b.timezone_name)
+            self.browser_language = self.__format_new_params__(b.browser_language)
+            self.browser_platform = self.__format_new_params__(b.browser_platform)
+            self.browser_name = self.__format_new_params__(b.browser_name)
+            self.browser_version = self.__format_new_params__(b.browser_version)
+            self.width = b.width
+            self.height = b.height
+        except Exception as e:
+            if debug:
+                print("The following error occurred, but it was ignored.")
+                print(e)
+
+            self.timezone_name = ""
+            self.browser_language = ""
+            self.browser_platform = ""
+            self.browser_name = ""
+            self.browser_version = ""
+            self.width = "1920"
+            self.height = "1080"
+
 
         self.request_delay = request_delay
 
