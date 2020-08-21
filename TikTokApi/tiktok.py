@@ -9,8 +9,10 @@ from selenium import webdriver
 
 class TikTokApi:
     def __init__(self, debug=False, request_delay=None):
-        """
-          The TikTokApi class constructor
+        """The TikTokApi class. Used to interact with TikTok.
+
+          :param debug: If you want debugging to be enabled.
+          :param request_delay: The amount of time to wait before making a request.
         """
         self.debug = debug
         if debug:
@@ -46,8 +48,16 @@ class TikTokApi:
         self.request_delay = request_delay
 
     def getData(self, api_url, b, language='en', proxy=None):
-        """
-          Method that retrives data from the api
+        """Returns a dictionary of a response from TikTok.
+
+          :param api_url: the base string without a signature
+
+          :param b: The browser object that contains the signature
+
+          :param language: The two digit language code to make requests to TikTok with.
+                           Note: This doesn't seem to actually change things from the API.
+            
+          :param proxy: The IP address of a proxy server to request from.
         """
         if self.request_delay != None:
             time.sleep(self.request_delay)
@@ -81,8 +91,16 @@ class TikTokApi:
             raise Exception('Invalid Response')
 
     def getBytes(self, api_url, b, proxy=None):
-        """
-          Method that retrives bytes from the api
+        """Returns bytes of a response from TikTok.
+
+          :param api_url: the base string without a signature
+
+          :param b: The browser object that contains the signature
+
+          :param language: The two digit language code to make requests to TikTok with.
+                           Note: This doesn't seem to actually change things from the API.
+            
+          :param proxy: The IP address of a proxy server to request from.
         """
         url = api_url + \
             "&_verifyFp=" + b.verifyFp + \
@@ -130,8 +148,17 @@ class TikTokApi:
         return response[:count]
 
     def userPosts(self, userID, secUID, count=30, language='en', region='US', proxy=None):
-        """
-          Gets a specific user's tiktoks
+        """Returns a dictionary listing TikToks given a user's ID and secUID
+
+          :param userID: The userID of the user, which TikTok assigns.
+          :param secUID: The secUID of the user, which TikTok assigns.
+          :param count: The number of posts to return.
+                        Note: seems to only support up to ~2,000
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param region: The 2 letter region code.
+                         Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         response = []
         maxCount = 50
@@ -164,15 +191,33 @@ class TikTokApi:
         return response[:count]
 
     def byUsername(self, username, count=30, proxy=None, language='en', region='US'):
-        """
-          Gets a specific user's tiktoks by username
+        """Returns a dictionary listing TikToks given a user's username.
+
+          :param username: The username of the user.
+          :param count: The number of posts to return.
+                        Note: seems to only support up to ~2,000
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param region: The 2 letter region code.
+                         Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         data = self.getUserObject(username, proxy=proxy)
         return self.userPosts(data['id'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
 
     def userLiked(self, userID, secUID, count=30, language='en', region='US', proxy=None):
-        """
-          Gets a user's liked posts
+        """Returns a dictionary listing TikToks that a given a user has liked.
+             Note: The user's likes must be public
+
+          :param userID: The userID of the user, which TikTok assigns.
+          :param secUID: The secUID of the user, which TikTok assigns.
+          :param count: The number of posts to return.
+                        Note: seems to only support up to ~2,000
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param region: The 2 letter region code.
+                         Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         response = []
         maxCount = 50
@@ -213,17 +258,33 @@ class TikTokApi:
         return response[:count]
 
     def userLikedbyUsername(self, username, count=30, proxy=None, language='en', region='US'):
-        """
-          Gets a specific user's likes by username
+        """Returns a dictionary listing TikToks a user has liked by username.
+             Note: The user's likes must be public
+
+          :param username: The username of the user.
+          :param count: The number of posts to return.
+                        Note: seems to only support up to ~2,000
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param region: The 2 letter region code.
+                         Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         data = self.getUserObject(username, proxy=proxy)
         return self.userLiked(data['id'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
 
     def bySound(self, id, count=30, language='en', proxy=None):
-        """
-          Gets tiktoks by music ID
+        """Returns a dictionary listing TikToks with a specific sound.
 
-          id - the sound ID
+          :param id: The sound id to search by.
+                     Note: Can be found in the URL of the sound specific page or with other methods.
+          :param count: The number of posts to return.
+                        Note: seems to only support up to ~2,000
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param region: The 2 letter region code.
+                         Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         response = []
         maxCount = 50
@@ -253,8 +314,12 @@ class TikTokApi:
         return response[:count]
 
     def getMusicObject(self, id, language='en', proxy=None):
-        """
-          Gets the music object
+        """Returns a music object for a specific sound id.
+
+          :param id: The sound id to search by.
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         api_url = "https://m.tiktok.com/api/music/detail/?{}&musicId={}&language={}&verifyFp=".format(
             self.__add_new_params__(), str(id), language)
@@ -262,8 +327,16 @@ class TikTokApi:
         return self.getData(api_url, b, proxy=proxy)
 
     def byHashtag(self, hashtag, count=30, language='en', proxy=None, region='US'):
-        """
-          Gets tiktoks by hashtag
+        """Returns a dictionary listing TikToks with a specific hashtag.
+
+          :param hashtag: The hashtag to search by.
+          :param count: The number of posts to return.
+                        Note: seems to only support up to ~2,000
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param region: The 2 letter region code.
+                         Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         id = self.getHashtagObject(hashtag)['challengeInfo']['challenge']['id']
         response = []
@@ -296,8 +369,12 @@ class TikTokApi:
         return response[:count]
 
     def getHashtagObject(self, hashtag, language='en', proxy=None):
-        """
-          Gets tiktoks by hashtag (for use in byHashtag)
+        """Returns a hashtag object.
+
+          :param hashtag: The hashtag to search by.
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         api_url = "https://m.tiktok.com/api/challenge/detail/?{}&challengeName={}&language={}".format(
             self.__add_new_params__(), str(hashtag.encode('utf-8'))[2:-1].replace("\\x", "%").upper(), language)
@@ -305,8 +382,12 @@ class TikTokApi:
         return self.getData(api_url, b, proxy=proxy)
 
     def getRecommendedTikToksByVideoID(self, id, language='en', proxy=None):
-        """
-           Get a tiktok object with another tiktok's id
+        """Returns a dictionary listing reccomended TikToks for a specific TikTok video.
+
+          :param id: The id of the video to get suggestions for.
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         api_url = "https://m.tiktok.com/share/item/list?{}&secUid=&id={}&type=0&count=24&minCursor=0&maxCursor=0&shareUid=&recType=3&lang={}&verifyFp=".format(
             self.__add_new_params__(), id, language)
@@ -314,8 +395,12 @@ class TikTokApi:
         return self.getData(api_url, b, proxy=proxy)['body']
 
     def getTikTokById(self, id, language='en', proxy=None):
-        """
-          Gets a tiktok object by ID
+        """Returns a dictionary of a specific TikTok.
+
+          :param id: The id of the TikTok you want to get the object for.
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         api_url = "https://m.tiktok.com/api/item/detail/?{}&itemId={}&language={}&verifyFp=".format(
             self.__add_new_params__(), id, language)
@@ -323,8 +408,12 @@ class TikTokApi:
         return self.getData(api_url, b, proxy=proxy)
 
     def getTikTokByUrl(self, url, language='en', proxy=None):
-        """
-          Get a tiktok object by url
+        """Returns a dictionary of a TikTok object by url.
+
+          :param url: The TikTok url you want to retrieve.
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         if "@" in url and "/video/" in url:
             post_id = url.split("/video/")[1].split("?")[0]
@@ -335,39 +424,52 @@ class TikTokApi:
         return self.getTikTokById(post_id, language=language, proxy=proxy)
 
     def discoverHashtags(self, proxy=None):
-        """
-          Discover page, consists challenges (hashtags)
+        """Discover page, consists challenges (hashtags)
+
+          :param proxy: The IP address of a proxy server.
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=1&userCount=30&scene=0&verifyFp=".format(self.__add_new_params__())
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b, proxy=proxy)['body'][1]['exploreList']
 
     def discoverMusic(self, proxy=None):
-        """
-          Discover page, consists of music
+        """Discover page, consists of music
+
+          :param proxy: The IP address of a proxy server.
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=1&userCount=30&scene=0&verifyFp=".format(self.__add_new_params__())
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b, proxy=proxy)['body'][2]['exploreList']
 
     def getUserObject(self, username, language='en', proxy=None):
-        """
-          Gets a user object for id and secUid
+        """Gets a user object (dictionary)
+
+          :param username: The username of the user.
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         return self.getUser(username, language, proxy=proxy)['userInfo']['user']
 
     def getUser(self, username, language='en', proxy=None):
-        """
-          Gets the full exposed user object
+        """Gets the full exposed user object
+
+          :param username: The username of the user.
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         api_url = "https://m.tiktok.com/api/user/detail/?{}&uniqueId={}&language={}".format(
             self.__add_new_params__(), username, language)
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b, proxy=proxy)
 
-    def getSuggestedUsersbyID(self, count=30, userId='6745191554350760966', language='en', proxy=None):
-        """
-          Get Suggested Users for given userID
+    def getSuggestedUsersbyID(self, userId='6745191554350760966', count=30 ,language='en', proxy=None):
+        """Returns suggested users given a different TikTok user.
+
+          :param userId: The id of the user to get suggestions for.
+          :param count: The amount of users to return.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
             self.__add_new_params__(), userId, userId, str(count))
@@ -379,8 +481,12 @@ class TikTokApi:
         return res[:count]
 
     def getSuggestedUsersbyIDCrawler(self, count=30, startingId='6745191554350760966', language='en', proxy=None):
-        """
-          Crawler for Suggested Users
+        """Crawls for listing of all user objects it can find.
+
+          :param count: The amount of users to crawl for.
+          :param startingId: The ID of a TikTok user to start at.
+          :param language: The language parameter.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         users = []
         unusedIDS = [startingId]
@@ -398,8 +504,11 @@ class TikTokApi:
         return users[:count]
 
     def getSuggestedHashtagsbyID(self, count=30, userId='6745191554350760966', language='en', proxy=None):
-        """
-          Get suggested hashtags given userID
+        """Returns suggested hashtags given a TikTok user.
+
+          :param userId: The id of the user to get suggestions for.
+          :param count: The amount of users to return.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
             self.__add_new_params__(), userId, userId, str(count))
@@ -411,8 +520,12 @@ class TikTokApi:
         return res[:count]
 
     def getSuggestedHashtagsbyIDCrawler(self, count=30, startingId='6745191554350760966', language='en', proxy=None):
-        """
-          Crawler for Suggested Hashtags
+        """Crawls for as many hashtags as it can find.
+
+          :param count: The amount of users to crawl for.
+          :param startingId: The ID of a TikTok user to start at.
+          :param language: The language parameter.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         hashtags = []
         ids = self.getSuggestedUsersbyIDCrawler(
@@ -430,8 +543,11 @@ class TikTokApi:
         return hashtags[:count]
 
     def getSuggestedMusicbyID(self, count=30, userId='6745191554350760966', language='en', proxy=None):
-        """
-          Get suggested music by given userID
+        """Returns suggested music given a TikTok user.
+
+          :param userId: The id of the user to get suggestions for.
+          :param count: The amount of users to return.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
             self.__add_new_params__(), userId, userId, str(count))
@@ -443,8 +559,12 @@ class TikTokApi:
         return res[:count]
 
     def getSuggestedMusicIDCrawler(self, count=30, startingId='6745191554350760966', language='en', proxy=None):
-        """
-          Crawler for Suggested Music
+        """Crawls for hashtags.
+
+          :param count: The amount of users to crawl for.
+          :param startingId: The ID of a TikTok user to start at.
+          :param language: The language parameter.
+          :param proxy: The IP address of a proxy to make requests from. 
         """
         musics = []
         ids = self.getSuggestedUsersbyIDCrawler(
@@ -462,22 +582,26 @@ class TikTokApi:
         return musics[:count]
 
     def get_Video_By_TikTok(self, data, proxy=None):
-        """
-          Downloads video from TikTok using a TikTok object
+        """Downloads video from TikTok using a TikTok object
+
+          :param data: A TikTok object
+          :param proxy: The IP address of your proxy.
         """
         api_url = data['video']['downloadAddr']
         return self.get_Video_By_DownloadURL(api_url, proxy=proxy)
 
     def get_Video_By_DownloadURL(self, download_url, proxy=None):
-        """
-          Downloads video from TikTok using download url in a tiktok object
+        """Downloads video from TikTok using download url in a TikTok object
+
+          :param download_url: The download url key value in a TikTok object.
+          :param proxy: The IP for your proxy.
         """
         b = browser(download_url, proxy=proxy)
         return self.getBytes(download_url, b, proxy=proxy)
 
     def get_Video_By_Url(self, video_url, return_bytes=0, chromedriver_path=None):
-        """
-           Gets the source url of a given url for a tiktok
+        """(DEPRECRATED)
+            Gets the source url of a given url for a tiktok
 
             video_url - the url of the video
             return_bytes - 0 is just the url, 1 is the actual video bytes
@@ -486,8 +610,11 @@ class TikTokApi:
         raise Exception("Deprecated. Other Methods Work Better.")
 
     def get_Video_No_Watermark_ID(self, video_id, return_bytes=0, proxy=None):
-        """
-          No Water Mark
+        """Returns a TikTok video with no water mark
+          
+          :param video_id: The ID of the TikTok you want to download
+          :param return_bytes: Set this to 1 if you want bytes, 0 if you want url.
+          :param proxy: The IP address of your proxy.
         """
         video_info = self.getTikTokById(video_id)
         video_url = video_info["itemInfo"]["itemStruct"]["video"]["downloadAddr"]
@@ -508,15 +635,21 @@ class TikTokApi:
             return video_data_no_wm.content
 
     def get_Video_No_Watermark_Faster(self, video_url, return_bytes=0, proxy=None):
-        """
-          No Water Mark method, but may be faster
+        """No Water Mark method, but may be faster
+
+          :param video_url: The url of the video you want to download
+          :param return_bytes: Set this to 1 if you want bytes, set it to 0 for url.
+          :param proxy: The IP of your proxy.
         """
         video_id = video_url.split("/video/")[1].split("?")[0]
         return self.get_Video_No_Watermark_ID(video_id, return_bytes, proxy=proxy)
 
     def get_Video_No_Watermark(self, video_url, return_bytes=0, proxy=None):
-        """
-          Gets the video with no watermark that you can open in any browser w/ any useragent
+        """Gets the video with no watermark
+
+          :param video_url: The url of the video you want to download
+          :param return_bytes: Set this to 0 if you want url, 1 if you want bytes.
+          :param proxy: The IP address of your proxy.
         """
         r = requests.get(video_url, headers={"method": "GET",
                                              "accept-encoding": "utf-8",
