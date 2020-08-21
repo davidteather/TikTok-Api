@@ -7,6 +7,9 @@ assignees: ''
 
 ---
 
+# Read Below!!! If this doesn't fix your issue delete these two lines
+**You may need to install chromedriver for your machine globally. Download it [here](https://sites.google.com/a/chromium.org/chromedriver/) and add it to your path.**
+
 **Describe the bug**
 
 A clear and concise description of what the bug is.

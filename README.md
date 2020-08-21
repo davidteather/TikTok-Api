@@ -64,7 +64,10 @@ The script should download pypppeteer by default, but if it doesn't run the foll
 pyppeteer-install
 ```
 
-If you still run into issues you may need to install chromedriver for your machine globally. Download it [here](https://sites.google.com/a/chromium.org/chromedriver/) and add it to your path.
+If you run into any issue try the fix below before posting an issue.
+
+
+**If you still run into issues you may need to install chromedriver for your machine globally. Download it [here](https://sites.google.com/a/chromium.org/chromedriver/) and add it to your path.**
 
 ### Common Issues
 
