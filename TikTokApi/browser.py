@@ -10,6 +10,7 @@ import logging
 # Import Detection From Stealth
 from .stealth import stealth
 
+from .get_acrawler import get_acrawler
 
 class browser:
     def __init__(self, url, language='en', proxy=None, find_redirect=False, api_url=None, debug=False, newParams=False):
@@ -30,9 +31,6 @@ class browser:
             "--ignore-certifcate-errors-spki-list",
             "--user-agent=" + self.userAgent
         ]
-
-        #self.args = []
-        # "--user-agent=" + self.userAgent,
 
         if proxy != None:
             if "@" in proxy:
@@ -111,7 +109,7 @@ class browser:
         self.verifyFp = ''.join(random.choice(
             string.ascii_lowercase + string.ascii_uppercase + string.digits) for i in range(16))
 
-        await self.page.evaluate("() => { " + self.__get_js(proxy=self.proxy) + " }")
+        await self.page.evaluate("() => { " + get_acrawler() + " }")
 
         self.signature = await self.page.evaluate('''() => {
         var url = "''' + self.url + "&verifyFp=" + self.verifyFp + '''"
