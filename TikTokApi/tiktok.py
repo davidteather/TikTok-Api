@@ -1,4 +1,4 @@
-import asyncio
+
 import pyppeteer
 import random
 import requests

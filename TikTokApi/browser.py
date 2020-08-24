@@ -3,15 +3,20 @@ import pyppeteer
 import random
 import time
 import string
-import atexit
 import requests
 import logging
 from threading import Thread
+import nest_asyncio
 
 # Import Detection From Stealth
 from .stealth import stealth
 
 from .get_acrawler import get_acrawler
+
+async_support = False
+def set_async():
+    global async_support
+    async_support = True
 
 class browser:
     def __init__(self, url, language='en', proxy=None, find_redirect=False, api_url=None, debug=False, newParams=False):
@@ -48,12 +53,10 @@ class browser:
             'handleSIGTERM': False,
             'handleSIGHUP': False
         }
-
-        try:
+        
+        if async_support:
             loop = asyncio.new_event_loop()
-
-            t = Thread(target=self.__start_background_loop, args=(loop, ))
-            t.setDaemon(True)
+            t = Thread(target=self.__start_background_loop, args=(loop, ), daemon=True)
             t.start()
             if find_redirect:
                 fut = asyncio.run_coroutine_threadsafe(self.find_redirect(), loop)
@@ -62,10 +65,24 @@ class browser:
             else:
                 fut = asyncio.run_coroutine_threadsafe(self.start(), loop)
             fut.result()
-        except:
-            loop.close()
+        else:
+            try:
+                self.loop = asyncio.new_event_loop()
+                if find_redirect:
+                    self.loop.run_until_complete(self.find_redirect())
+                elif newParams:
+                    self.loop.run_until_complete(self.newParams())
+                else:
+                    self.loop.run_until_complete(self.start())
+            except:
+                self.loop.close()
 
-    async def newParams(self):
+    def __start_background_loop(self, loop):
+        asyncio.set_event_loop(loop)
+        loop.run_forever()
+
+        
+    async def newParams(self) -> None:
         self.browser = await pyppeteer.launch(self.options)
         self.page = await self.browser.newPage()
         await self.page.goto("about:blank")
@@ -86,6 +103,8 @@ class browser:
 
         await self.browser.close()
         self.browser.process.communicate()
+
+        return 0
 
     async def start(self):
         self.browser = await pyppeteer.launch(self.options)
@@ -189,7 +208,3 @@ class browser:
 
     def __get_js(self, proxy=None):
         return requests.get("https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js", proxies=self.__format_proxy(proxy)).text
-
-    def __start_background_loop(self, loop):
-        asyncio.set_event_loop(loop)
-        loop.run_forever()
