@@ -6,7 +6,6 @@ import string
 import requests
 import logging
 from threading import Thread
-import nest_asyncio
 
 # Import Detection From Stealth
 from .stealth import stealth
