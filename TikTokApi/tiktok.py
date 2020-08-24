@@ -683,7 +683,7 @@ class TikTokApi:
             else:
                 key = ""
 
-            cleanVideo = "https://api.tiktokv.com/aweme/v1/playwm/?video_id=" + \
+            cleanVideo = "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=" + \
                 key + "&line=0&ratio=default&media_type=4&vr_type=0"
 
             b = browser(cleanVideo, find_redirect=True, proxy=proxy)
