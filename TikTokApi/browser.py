@@ -6,6 +6,7 @@ import string
 import atexit
 import requests
 import logging
+from threading import Thread
 
 # Import Detection From Stealth
 from .stealth import stealth
@@ -49,15 +50,20 @@ class browser:
         }
 
         try:
-            self.loop = asyncio.new_event_loop()
+            loop = asyncio.new_event_loop()
+
+            t = Thread(target=self.__start_background_loop, args=(loop, ))
+            t.setDaemon(True)
+            t.start()
             if find_redirect:
-                self.loop.run_until_complete(self.find_redirect())
+                fut = asyncio.run_coroutine_threadsafe(self.find_redirect(), loop)
             elif newParams:
-                self.loop.run_until_complete(self.newParams())
+                fut = asyncio.run_coroutine_threadsafe(self.newParams(), loop)
             else:
-                self.loop.run_until_complete(self.start())
+                fut = asyncio.run_coroutine_threadsafe(self.start(), loop)
+            fut.result()
         except:
-            self.loop.close()
+            loop.close()
 
     async def newParams(self):
         self.browser = await pyppeteer.launch(self.options)
@@ -110,7 +116,6 @@ class browser:
             string.ascii_lowercase + string.ascii_uppercase + string.digits) for i in range(16))
 
         await self.page.evaluate("() => { " + get_acrawler() + " }")
-
         self.signature = await self.page.evaluate('''() => {
         var url = "''' + self.url + "&verifyFp=" + self.verifyFp + '''"
         var token = window.byted_acrawler.sign({url: url});
@@ -125,8 +130,8 @@ class browser:
                                  })
 
             self.data = await self.page.content()
-            self.data = json.loads(self.data.replace("</pre></body></html>", "").replace(
-                '<html><head></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">', ""))
+            #self.data = json.loads(self.data.replace("</pre></body></html>", "").replace(
+            #    '<html><head></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">', ""))
 
         await self.browser.close()
         self.browser.process.communicate()
@@ -184,3 +189,7 @@ class browser:
 
     def __get_js(self, proxy=None):
         return requests.get("https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js", proxies=self.__format_proxy(proxy)).text
+
+    def __start_background_loop(self, loop):
+        asyncio.set_event_loop(loop)
+        loop.run_forever()
