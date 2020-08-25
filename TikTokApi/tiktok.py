@@ -205,6 +205,69 @@ class TikTokApi:
         data = self.getUserObject(username, proxy=proxy)
         return self.userPosts(data['id'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
 
+    def userPage(
+        self, userID, secUID, page_size=30, before=0, after=0, language='en',
+        region='US', proxy=None
+    ) -> dict:
+        """Returns a dictionary listing of one page of TikToks given a user's ID and secUID
+
+          :param userID: The userID of the user, which TikTok assigns.
+          :param secUID: The secUID of the user, which TikTok assigns.
+          :param page_size: The number of posts to return per page.
+          :param min_cursor: time stamp for the earliest TikTok to retrieve
+          :param max_cursor: time stamp for the latest TikTok to retrieve
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param region: The 2 letter region code.
+                         Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from.
+        """
+        api_url = (
+            "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}"
+            "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}".format(
+                self.__add_new_params__(), page_size, str(userID), str(secUID),
+                after, before, region, language
+            )
+        )
+        b = browser(api_url, proxy=proxy)
+        return self.getData(api_url, b, proxy=proxy)
+
+    def getUserPager(self, username, page_size=30, proxy=None, language='en', region='US'):
+        """Returns a generator to page through a user's feed
+
+          :param username: The username of the user.
+          :param page_size: The number of posts to return in a page.
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param region: The 2 letter region code.
+                         Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from.
+        """
+        data = self.getUserObject(username, proxy=proxy)
+
+        max_cursor = 0
+
+        while True:
+            page = None
+
+            resp = self.userPage(
+                data['id'], data['secUid'], page_size=page_size,
+                before=max_cursor, proxy=proxy, language=language, region=region
+            )
+
+            try:
+                page = resp['items']
+            except KeyError:
+                # No mo results
+                return
+
+            max_cursor = resp['maxCursor']
+
+            yield page
+
+            if not resp['hasMore']:
+                return  # all done
+
     def userLiked(self, userID, secUID, count=30, language='en', region='US', proxy=None) -> dict:
         """Returns a dictionary listing TikToks that a given a user has liked.
              Note: The user's likes must be public
