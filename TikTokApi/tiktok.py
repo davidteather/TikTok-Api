@@ -587,7 +587,10 @@ class TikTokApi:
           :param data: A TikTok object
           :param proxy: The IP address of your proxy.
         """
-        api_url = data['video']['downloadAddr']
+        try:
+            api_url = data['video']['downloadAddr']
+        except:
+            api_url = data['itemInfos']['video']['urls'][0]
         return self.get_Video_By_DownloadURL(api_url, proxy=proxy)
 
     def get_Video_By_DownloadURL(self, download_url, proxy=None):
