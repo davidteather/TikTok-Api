@@ -83,7 +83,7 @@ class TikTokApi:
         }, proxies=self.__format_proxy(proxy))
         try:
             return r.json()
-        except:
+        except Exception:
             print(r.request.headers)
             print("Converting response to JSON failed response is below (probably empty)")
             print(r.text)
@@ -237,7 +237,7 @@ class TikTokApi:
 
             try:
                 res['items']
-            except:
+            except Exception:
                 if self.debug:
                     print("Most Likely User's List is Empty")
                 return []
@@ -589,7 +589,7 @@ class TikTokApi:
         """
         try:
             api_url = data['video']['downloadAddr']
-        except:
+        except Exception:
             api_url = data['itemInfos']['video']['urls'][0]
         return self.get_Video_By_DownloadURL(api_url, proxy=proxy)
 
