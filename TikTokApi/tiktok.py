@@ -1,7 +1,9 @@
 import random
 import requests
-from .browser import browser
 import time
+from urllib.parse import urlencode
+
+from .browser import browser
 
 
 class TikTokApi:
@@ -61,9 +63,9 @@ class TikTokApi:
         """
         if self.request_delay is not None:
             time.sleep(self.request_delay)
-        url = b.url + \
-            "&verifyFp=" + b.verifyFp + \
-            "&_signature=" + b.signature
+
+        query = {'verifyFp': b.verifyFp, '_signature': b.signature}
+        url = "{}&{}".format(b.url, urlencode(query))
         r = requests.get(url, headers={
             'authority': 'm.tiktok.com',
             "method": "GET",
@@ -99,9 +101,8 @@ class TikTokApi:
 
           :param proxy: The IP address of a proxy server to request from.
         """
-        url = api_url + \
-            "&_verifyFp=" + b.verifyFp + \
-            "&_signature=" + b.signature
+        query = {'verifyFp': b.verifyFp, '_signature': b.signature}
+        url = "{}&{}".format(b.url, urlencode(query))
         r = requests.get(url, headers={"method": "GET",
                                        "accept-encoding": "gzip, deflate, br",
                                        "referrer": b.referrer,
