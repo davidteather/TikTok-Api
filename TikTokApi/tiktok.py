@@ -56,7 +56,7 @@ class TikTokApi:
 
           :param language: The two digit language code to make requests to TikTok with.
                            Note: This doesn't seem to actually change things from the API.
-            
+
           :param proxy: The IP address of a proxy server to request from.
         """
         if self.request_delay != None:
@@ -99,7 +99,7 @@ class TikTokApi:
 
           :param language: The two digit language code to make requests to TikTok with.
                            Note: This doesn't seem to actually change things from the API.
-            
+
           :param proxy: The IP address of a proxy server to request from.
         """
         url = api_url + \
@@ -158,7 +158,7 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param region: The 2 letter region code.
                          Note: Doesn't seem to have an affect.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         response = []
         maxCount = 50
@@ -200,7 +200,7 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param region: The 2 letter region code.
                          Note: Doesn't seem to have an affect.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         data = self.getUserObject(username, proxy=proxy)
         return self.userPosts(data['id'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
@@ -217,7 +217,7 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param region: The 2 letter region code.
                          Note: Doesn't seem to have an affect.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         response = []
         maxCount = 50
@@ -268,7 +268,7 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param region: The 2 letter region code.
                          Note: Doesn't seem to have an affect.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         data = self.getUserObject(username, proxy=proxy)
         return self.userLiked(data['id'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
@@ -284,7 +284,7 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param region: The 2 letter region code.
                          Note: Doesn't seem to have an affect.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         response = []
         maxCount = 50
@@ -319,7 +319,7 @@ class TikTokApi:
           :param id: The sound id to search by.
           :param language: The 2 letter code of the language to return.
                            Note: Doesn't seem to have an affect.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         api_url = "https://m.tiktok.com/api/music/detail/?{}&musicId={}&language={}&verifyFp=".format(
             self.__add_new_params__(), str(id), language)
@@ -336,7 +336,7 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param region: The 2 letter region code.
                          Note: Doesn't seem to have an affect.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         id = self.getHashtagObject(hashtag)['challengeInfo']['challenge']['id']
         response = []
@@ -374,7 +374,7 @@ class TikTokApi:
           :param hashtag: The hashtag to search by.
           :param language: The 2 letter code of the language to return.
                            Note: Doesn't seem to have an affect.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         api_url = "https://m.tiktok.com/api/challenge/detail/?{}&challengeName={}&language={}".format(
             self.__add_new_params__(), str(hashtag.encode('utf-8'))[2:-1].replace("\\x", "%").upper(), language)
@@ -387,7 +387,7 @@ class TikTokApi:
           :param id: The id of the video to get suggestions for.
           :param language: The 2 letter code of the language to return.
                            Note: Doesn't seem to have an affect.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         api_url = "https://m.tiktok.com/share/item/list?{}&secUid=&id={}&type=0&count=24&minCursor=0&maxCursor=0&shareUid=&recType=3&lang={}&verifyFp=".format(
             self.__add_new_params__(), id, language)
@@ -400,7 +400,7 @@ class TikTokApi:
           :param id: The id of the TikTok you want to get the object for.
           :param language: The 2 letter code of the language to return.
                            Note: Doesn't seem to have an affect.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         api_url = "https://m.tiktok.com/api/item/detail/?{}&itemId={}&language={}&verifyFp=".format(
             self.__add_new_params__(), id, language)
@@ -413,7 +413,7 @@ class TikTokApi:
           :param url: The TikTok url you want to retrieve.
           :param language: The 2 letter code of the language to return.
                            Note: Doesn't seem to have an affect.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         if "@" in url and "/video/" in url:
             post_id = url.split("/video/")[1].split("?")[0]
@@ -447,7 +447,7 @@ class TikTokApi:
           :param username: The username of the user.
           :param language: The 2 letter code of the language to return.
                            Note: Doesn't seem to have an affect.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         return self.getUser(username, language, proxy=proxy)['userInfo']['user']
 
@@ -457,7 +457,7 @@ class TikTokApi:
           :param username: The username of the user.
           :param language: The 2 letter code of the language to return.
                            Note: Doesn't seem to have an affect.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         api_url = "https://m.tiktok.com/api/user/detail/?{}&uniqueId={}&language={}".format(
             self.__add_new_params__(), username, language)
@@ -469,7 +469,7 @@ class TikTokApi:
 
           :param userId: The id of the user to get suggestions for.
           :param count: The amount of users to return.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
             self.__add_new_params__(), userId, userId, str(count))
@@ -486,7 +486,7 @@ class TikTokApi:
           :param count: The amount of users to crawl for.
           :param startingId: The ID of a TikTok user to start at.
           :param language: The language parameter.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         users = []
         unusedIDS = [startingId]
@@ -508,7 +508,7 @@ class TikTokApi:
 
           :param userId: The id of the user to get suggestions for.
           :param count: The amount of users to return.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
             self.__add_new_params__(), userId, userId, str(count))
@@ -525,7 +525,7 @@ class TikTokApi:
           :param count: The amount of users to crawl for.
           :param startingId: The ID of a TikTok user to start at.
           :param language: The language parameter.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         hashtags = []
         ids = self.getSuggestedUsersbyIDCrawler(
@@ -547,7 +547,7 @@ class TikTokApi:
 
           :param userId: The id of the user to get suggestions for.
           :param count: The amount of users to return.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
             self.__add_new_params__(), userId, userId, str(count))
@@ -564,7 +564,7 @@ class TikTokApi:
           :param count: The amount of users to crawl for.
           :param startingId: The ID of a TikTok user to start at.
           :param language: The language parameter.
-          :param proxy: The IP address of a proxy to make requests from. 
+          :param proxy: The IP address of a proxy to make requests from.
         """
         musics = []
         ids = self.getSuggestedUsersbyIDCrawler(
@@ -608,13 +608,13 @@ class TikTokApi:
 
             video_url - the url of the video
             return_bytes - 0 is just the url, 1 is the actual video bytes
-            chromedriver_path - path to your chrome driver executable 
+            chromedriver_path - path to your chrome driver executable
         """
         raise Exception("Deprecated. Other Methods Work Better.")
 
     def get_Video_No_Watermark_ID(self, video_id, return_bytes=0, proxy=None) -> bytes:
         """Returns a TikTok video with no water mark
-          
+
           :param video_id: The ID of the TikTok you want to download
           :param return_bytes: Set this to 1 if you want bytes, 0 if you want url.
           :param proxy: The IP address of your proxy.
@@ -725,4 +725,3 @@ class TikTokApi:
             "&browser_online=true&timezone_name={}&priority_region=&appId=1233&appType=m&isAndroid=false&isMobile=false".format(self.timezone_name) + \
             "&isIOS=false&OS=windows&did=" + \
             str(random.randint(10000, 999999999))
-
