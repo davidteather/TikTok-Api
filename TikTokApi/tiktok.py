@@ -340,15 +340,9 @@ class TikTokApi:
         """
         id = self.getHashtagObject(hashtag)['challengeInfo']['challenge']['id']
         response = []
-        maxCount = 50
         maxCursor = 0
 
         while len(response) < count:
-            if count < maxCount:
-                realCount = count
-            else:
-                realCount = maxCount
-
             api_url = "https://m.tiktok.com/share/item/list?{}&region={}&secUid=&id={}&type=3&count={}&minCursor=0&maxCursor={}&shareUid=&recType=&lang={}".format(
                 self.__add_new_params__(), region, str(
                     id), str(count), str(maxCursor), language
@@ -363,7 +357,6 @@ class TikTokApi:
                 print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
-            realCount = count - len(response)
             maxCursor = res['body']['maxCursor']
 
         return response[:count]
