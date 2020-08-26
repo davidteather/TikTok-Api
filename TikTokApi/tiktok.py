@@ -59,7 +59,7 @@ class TikTokApi:
 
           :param proxy: The IP address of a proxy server to request from.
         """
-        if self.request_delay != None:
+        if self.request_delay is not None:
             time.sleep(self.request_delay)
         url = b.url + \
             "&verifyFp=" + b.verifyFp + \
@@ -705,7 +705,7 @@ class TikTokApi:
         """
           Formats the proxy object
         """
-        if proxy != None:
+        if proxy is not None:
             return {
                 'http': proxy,
                 'https': proxy
