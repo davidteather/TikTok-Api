@@ -6,6 +6,9 @@ from urllib.parse import urlencode
 from .browser import browser
 
 
+BASE_URL = "https://m.tiktok.com/"
+
+
 class TikTokApi:
     def __init__(self, debug=False, request_delay=None):
         """The TikTokApi class. Used to interact with TikTok.
@@ -124,8 +127,22 @@ class TikTokApi:
                 realCount = count
             else:
                 realCount = maxCount
-            api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region={}&language={}".format(
-                self.__add_new_params__(), str(realCount), str(maxCursor), str(region), str(language))
+
+            query = {
+                'count': realCount,
+                'id': 1,
+                'type': 5,
+                'secUid': '',
+                'maxCursor': maxCursor,
+                'minCursor': 0,
+                'sourceType': 12,
+                'appId': 1233,
+                'region': region,
+                'language': language
+            }
+            api_url = "{}api/item_list/?{}&{}".format(
+                BASE_URL, self.__add_new_params__(), urlencode(query)
+            )
             b = browser(api_url, language=language, proxy=proxy)
             res = self.getData(b, proxy=proxy)
 
