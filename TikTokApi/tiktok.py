@@ -47,7 +47,7 @@ class TikTokApi:
 
         self.request_delay = request_delay
 
-    def getData(self, api_url, b, language='en', proxy=None) -> dict:
+    def getData(self, b, language='en', proxy=None) -> dict:
         """Returns a dictionary of a response from TikTok.
 
           :param api_url: the base string without a signature
@@ -77,9 +77,6 @@ class TikTokApi:
             'sec-fetch-mode': 'cors',
             'sec-fetch-site': 'same-site',
             "user-agent": b.userAgent
-
-
-
         }, proxies=self.__format_proxy(proxy))
         try:
             return r.json()
@@ -90,7 +87,7 @@ class TikTokApi:
 
             raise Exception('Invalid Response')
 
-    def getBytes(self, api_url, b, proxy=None) -> bytes:
+    def getBytes(self, b, proxy=None) -> bytes:
         """Returns bytes of a response from TikTok.
 
           :param api_url: the base string without a signature
@@ -129,7 +126,7 @@ class TikTokApi:
             api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region={}&language={}".format(
                 self.__add_new_params__(), str(realCount), str(maxCursor), str(region), str(language))
             b = browser(api_url, language=language, proxy=proxy)
-            res = self.getData(api_url, b, proxy=proxy)
+            res = self.getData(b, proxy=proxy)
 
             if 'items' in res.keys():
                 for t in res['items']:
@@ -173,7 +170,7 @@ class TikTokApi:
             api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region={}&language={}".format(
                 self.__add_new_params__(), str(realCount), str(userID), str(secUID), str(maxCursor), str(region), str(language))
             b = browser(api_url, proxy=proxy)
-            res = self.getData(api_url, b, proxy=proxy)
+            res = self.getData(b, proxy=proxy)
 
             if 'items' in res.keys():
                 for t in res['items']:
@@ -233,7 +230,7 @@ class TikTokApi:
             api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=2&secUid={}&maxCursor={}&minCursor=0&sourceType=9&appId=1233&region={}&language={}&verifyFp=".format(
                 self.__add_new_params__(), str(realCount), str(userID), str(secUID), str(maxCursor), str(region), str(language))
             b = browser(api_url, proxy=proxy)
-            res = self.getData(api_url, b, proxy=proxy)
+            res = self.getData(b, proxy=proxy)
 
             try:
                 res['items']
@@ -299,7 +296,7 @@ class TikTokApi:
             api_url = "https://m.tiktok.com/share/item/list?{}&secUid=&id={}&type=4&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}&verifyFp=".format(
                 self.__add_new_params__(), str(id), str(realCount), str(maxCursor), str(language))
             b = browser(api_url, proxy=proxy)
-            res = self.getData(api_url, b, proxy=proxy)
+            res = self.getData(b, proxy=proxy)
 
             for t in res['body']['itemListData']:
                 response.append(t)
@@ -324,7 +321,7 @@ class TikTokApi:
         api_url = "https://m.tiktok.com/api/music/detail/?{}&musicId={}&language={}&verifyFp=".format(
             self.__add_new_params__(), str(id), language)
         b = browser(api_url, proxy=proxy)
-        return self.getData(api_url, b, proxy=proxy)
+        return self.getData(b, proxy=proxy)
 
     def byHashtag(self, hashtag, count=30, language='en', proxy=None, region='US') -> dict:
         """Returns a dictionary listing TikToks with a specific hashtag.
@@ -348,7 +345,7 @@ class TikTokApi:
                     id), str(count), str(maxCursor), language
             )
             b = browser(api_url, proxy=proxy)
-            res = self.getData(api_url, b, proxy=proxy, language=language)
+            res = self.getData(b, proxy=proxy, language=language)
 
             for t in res['body']['itemListData']:
                 response.append(t)
@@ -372,7 +369,7 @@ class TikTokApi:
         api_url = "https://m.tiktok.com/api/challenge/detail/?{}&challengeName={}&language={}".format(
             self.__add_new_params__(), str(hashtag.encode('utf-8'))[2:-1].replace("\\x", "%").upper(), language)
         b = browser(api_url, proxy=proxy)
-        return self.getData(api_url, b, proxy=proxy)
+        return self.getData(b, proxy=proxy)
 
     def getRecommendedTikToksByVideoID(self, id, language='en', proxy=None) -> dict:
         """Returns a dictionary listing reccomended TikToks for a specific TikTok video.
@@ -385,7 +382,7 @@ class TikTokApi:
         api_url = "https://m.tiktok.com/share/item/list?{}&secUid=&id={}&type=0&count=24&minCursor=0&maxCursor=0&shareUid=&recType=3&lang={}&verifyFp=".format(
             self.__add_new_params__(), id, language)
         b = browser(api_url, proxy=proxy)
-        return self.getData(api_url, b, proxy=proxy)['body']
+        return self.getData(b, proxy=proxy)['body']
 
     def getTikTokById(self, id, language='en', proxy=None) -> dict:
         """Returns a dictionary of a specific TikTok.
@@ -398,7 +395,7 @@ class TikTokApi:
         api_url = "https://m.tiktok.com/api/item/detail/?{}&itemId={}&language={}&verifyFp=".format(
             self.__add_new_params__(), id, language)
         b = browser(api_url, proxy=proxy)
-        return self.getData(api_url, b, proxy=proxy)
+        return self.getData(b, proxy=proxy)
 
     def getTikTokByUrl(self, url, language='en', proxy=None) -> dict:
         """Returns a dictionary of a TikTok object by url.
@@ -423,7 +420,7 @@ class TikTokApi:
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=1&userCount=30&scene=0&verifyFp=".format(self.__add_new_params__())
         b = browser(api_url, proxy=proxy)
-        return self.getData(api_url, b, proxy=proxy)['body'][1]['exploreList']
+        return self.getData(b, proxy=proxy)['body'][1]['exploreList']
 
     def discoverMusic(self, proxy=None) -> dict:
         """Discover page, consists of music
@@ -432,7 +429,7 @@ class TikTokApi:
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=1&userCount=30&scene=0&verifyFp=".format(self.__add_new_params__())
         b = browser(api_url, proxy=proxy)
-        return self.getData(api_url, b, proxy=proxy)['body'][2]['exploreList']
+        return self.getData(b, proxy=proxy)['body'][2]['exploreList']
 
     def getUserObject(self, username, language='en', proxy=None) -> dict:
         """Gets a user object (dictionary)
@@ -455,7 +452,7 @@ class TikTokApi:
         api_url = "https://m.tiktok.com/api/user/detail/?{}&uniqueId={}&language={}".format(
             self.__add_new_params__(), username, language)
         b = browser(api_url, proxy=proxy)
-        return self.getData(api_url, b, proxy=proxy)
+        return self.getData(b, proxy=proxy)
 
     def getSuggestedUsersbyID(self, userId='6745191554350760966', count=30, language='en', proxy=None) -> list:
         """Returns suggested users given a different TikTok user.
@@ -469,7 +466,7 @@ class TikTokApi:
         b = browser(api_url, proxy=proxy)
 
         res = []
-        for x in self.getData(api_url, b, proxy=proxy)['body'][0]['exploreList']:
+        for x in self.getData(b, proxy=proxy)['body'][0]['exploreList']:
             res.append(x['cardItem'])
         return res[:count]
 
@@ -508,7 +505,7 @@ class TikTokApi:
         b = browser(api_url, proxy=proxy)
 
         res = []
-        for x in self.getData(api_url, b, proxy=proxy)['body'][1]['exploreList']:
+        for x in self.getData(b, proxy=proxy)['body'][1]['exploreList']:
             res.append(x['cardItem'])
         return res[:count]
 
@@ -547,7 +544,7 @@ class TikTokApi:
         b = browser(api_url, proxy=proxy)
 
         res = []
-        for x in self.getData(api_url, b, proxy=proxy)['body'][2]['exploreList']:
+        for x in self.getData(b, proxy=proxy)['body'][2]['exploreList']:
             res.append(x['cardItem'])
         return res[:count]
 
@@ -593,7 +590,7 @@ class TikTokApi:
           :param proxy: The IP for your proxy.
         """
         b = browser(download_url, proxy=proxy)
-        return self.getBytes(download_url, b, proxy=proxy)
+        return self.getBytes(b, proxy=proxy)
 
     def get_Video_By_Url(self, video_url, return_bytes=0, chromedriver_path=None) -> bytes:
         """(DEPRECRATED)
