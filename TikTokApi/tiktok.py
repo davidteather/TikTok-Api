@@ -842,14 +842,37 @@ class TikTokApi:
             return None
 
     def __get_js(self, proxy=None) -> str:
-        return requests.get("https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js", proxies=self.__format_proxy(proxy)).text
+        return requests.get(
+            "https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js",
+            proxies=self.__format_proxy(proxy)
+        ).text
 
     def __format_new_params__(self, parm) -> str:
         return parm.replace("/", "%2F").replace(" ", "+").replace(";", "%3B")
 
     def __add_new_params__(self) -> str:
-        return "aid=1988&app_name=tiktok_web&device_platform=web&referer=&user_agent={}&cookie_enabled=true".format(self.__format_new_params__(self.userAgent)) + \
-            "&screen_width={}&screen_height={}&browser_language={}&browser_platform={}&browser_name={}&browser_version={}".format(self.width, self.height, self.browser_language, self.browser_platform, self.browser_name, self.browser_version) + \
-            "&browser_online=true&timezone_name={}&priority_region=&appId=1233&appType=m&isAndroid=false&isMobile=false".format(self.timezone_name) + \
-            "&isIOS=false&OS=windows&did=" + \
-            str(random.randint(10000, 999999999))
+        query = {
+            'aid': 1988,
+            'app_name': 'tiktok_web',
+            'device_platform': 'web',
+            'referer': '',
+            'user_agent': self.__format_new_params__(self.userAgent),
+            'cookie_enabled': True,
+            'screen_width': self.width,
+            'screen_height': self.height,
+            'browser_language': self.browser_language,
+            'browser_platform': self.browser_platform,
+            'browser_name': self.browser_name,
+            'browser_version': self.browser_version,
+            'browser_online': True,
+            'timezone_name': self.timezone_name,
+            'priority_region': '',
+            'appId': 1233,
+            'appType': 'm',
+            'isAndroid': False,
+            'isMobile': False,
+            'isIOS': False,
+            'OS': 'windows',
+            'did': random.randint(10000, 999999999),
+        }
+        return urlencode(query)
