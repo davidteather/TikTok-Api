@@ -185,8 +185,22 @@ class TikTokApi:
                 realCount = count
             else:
                 realCount = maxCount
-            api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region={}&language={}".format(
-                self.__add_new_params__(), str(realCount), str(userID), str(secUID), str(maxCursor), str(region), str(language))
+
+            query = {
+                'count': realCount,
+                'id': userID,
+                'type': 1,
+                'secUid': secUID,
+                'maxCursor': maxCursor,
+                'minCursor': 0,
+                'sourceType': 8,
+                'appId': 1233,
+                'region': region,
+                'language': language
+            }
+            api_url = "{}api/item_list/?{}&{}".format(
+                BASE_URL, self.__add_new_params__(), urlencode(query)
+            )
             b = browser(api_url, proxy=proxy)
             res = self.getData(b, proxy=proxy)
 
@@ -245,8 +259,21 @@ class TikTokApi:
             else:
                 realCount = maxCount
 
-            api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=2&secUid={}&maxCursor={}&minCursor=0&sourceType=9&appId=1233&region={}&language={}&verifyFp=".format(
-                self.__add_new_params__(), str(realCount), str(userID), str(secUID), str(maxCursor), str(region), str(language))
+            query = {
+                'count': realCount,
+                'id': userID,
+                'type': 2,
+                'secUid': secUID,
+                'maxCursor': maxCursor,
+                'minCursor': 0,
+                'sourceType': 9,
+                'appId': 1233,
+                'region': region,
+                'language': language
+            }
+            api_url = "{}api/item_list/?{}&{}".format(
+                BASE_URL, self.__add_new_params__(), urlencode(query)
+            )
             b = browser(api_url, proxy=proxy)
             res = self.getData(b, proxy=proxy)
 
@@ -311,8 +338,19 @@ class TikTokApi:
             else:
                 realCount = maxCount
 
-            api_url = "https://m.tiktok.com/share/item/list?{}&secUid=&id={}&type=4&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}&verifyFp=".format(
-                self.__add_new_params__(), str(id), str(realCount), str(maxCursor), str(language))
+            query = {
+                'count': realCount,
+                'id': id,
+                'type': 4,
+                'secUid': '',
+                'maxCursor': maxCursor,
+                'minCursor': 0,
+                'shareUid': '',
+                'lang': language
+            }
+            api_url = "{}share/item/list?{}&{}".format(
+                BASE_URL, self.__add_new_params__(), urlencode(query)
+            )
             b = browser(api_url, proxy=proxy)
             res = self.getData(b, proxy=proxy)
 
@@ -336,8 +374,13 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        api_url = "https://m.tiktok.com/api/music/detail/?{}&musicId={}&language={}&verifyFp=".format(
-            self.__add_new_params__(), str(id), language)
+        query = {
+            'musicId': id,
+            'lang': language
+        }
+        api_url = "{}api/music/detail/?{}&{}".format(
+            BASE_URL, self.__add_new_params__(), urlencode(query)
+        )
         b = browser(api_url, proxy=proxy)
         return self.getData(b, proxy=proxy)
 
@@ -358,9 +401,20 @@ class TikTokApi:
         maxCursor = 0
 
         while len(response) < count:
-            api_url = "https://m.tiktok.com/share/item/list?{}&region={}&secUid=&id={}&type=3&count={}&minCursor=0&maxCursor={}&shareUid=&recType=&lang={}".format(
-                self.__add_new_params__(), region, str(
-                    id), str(count), str(maxCursor), language
+            query = {
+                'count': count,
+                'id': id,
+                'type': 3,
+                'secUid': '',
+                'maxCursor': maxCursor,
+                'minCursor': 0,
+                'shareUid': '',
+                'recType': '',
+                'region': region,
+                'lang': language,
+            }
+            api_url = "{}share/item/list?{}&{}".format(
+                BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             b = browser(api_url, proxy=proxy)
             res = self.getData(b, proxy=proxy, language=language)
@@ -384,8 +438,13 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        api_url = "https://m.tiktok.com/api/challenge/detail/?{}&challengeName={}&language={}".format(
-            self.__add_new_params__(), str(hashtag.encode('utf-8'))[2:-1].replace("\\x", "%").upper(), language)
+        query = {
+            'challengeName': str(hashtag.encode('utf-8'))[2:-1].replace("\\x", "%").upper(),
+            'language': language
+        }
+        api_url = "{}api/challenge/detail/?{}&{}".format(
+            BASE_URL, self.__add_new_params__(), urlencode(query)
+        )
         b = browser(api_url, proxy=proxy)
         return self.getData(b, proxy=proxy)
 
@@ -397,8 +456,20 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        api_url = "https://m.tiktok.com/share/item/list?{}&secUid=&id={}&type=0&count=24&minCursor=0&maxCursor=0&shareUid=&recType=3&lang={}&verifyFp=".format(
-            self.__add_new_params__(), id, language)
+        query = {
+            'count': 24,
+            'id': id,
+            'type': 0,
+            'secUid': '',
+            'maxCursor': 0,
+            'minCursor': 0,
+            'shareUid': '',
+            'recType': 3,
+            'lang': language,
+        }
+        api_url = "{}share/item/list?{}&{}".format(
+            BASE_URL, self.__add_new_params__(), urlencode(query)
+        )
         b = browser(api_url, proxy=proxy)
         return self.getData(b, proxy=proxy)['body']
 
@@ -410,8 +481,14 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        api_url = "https://m.tiktok.com/api/item/detail/?{}&itemId={}&language={}&verifyFp=".format(
-            self.__add_new_params__(), id, language)
+
+        query = {
+            'itemId': id,
+            'lang': language,
+        }
+        api_url = "{}api/item/detail/?{}&{}".format(
+            BASE_URL, self.__add_new_params__(), urlencode(query)
+        )
         b = browser(api_url, proxy=proxy)
         return self.getData(b, proxy=proxy)
 
@@ -436,7 +513,14 @@ class TikTokApi:
 
           :param proxy: The IP address of a proxy server.
         """
-        api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=1&userCount=30&scene=0&verifyFp=".format(self.__add_new_params__())
+        query = {
+            'noUser': 1,
+            'userCount': 30,
+            'scene': 0
+        }
+        api_url = "{}node/share/discover?{}&{}".format(
+            BASE_URL, self.__add_new_params__(), urlencode(query)
+        )
         b = browser(api_url, proxy=proxy)
         return self.getData(b, proxy=proxy)['body'][1]['exploreList']
 
@@ -445,7 +529,14 @@ class TikTokApi:
 
           :param proxy: The IP address of a proxy server.
         """
-        api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=1&userCount=30&scene=0&verifyFp=".format(self.__add_new_params__())
+        query = {
+            'noUser': 1,
+            'userCount': 30,
+            'scene': 0
+        }
+        api_url = "{}node/share/discover?{}&{}".format(
+            BASE_URL, self.__add_new_params__(), urlencode(query)
+        )
         b = browser(api_url, proxy=proxy)
         return self.getData(b, proxy=proxy)['body'][2]['exploreList']
 
@@ -467,8 +558,13 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        api_url = "https://m.tiktok.com/api/user/detail/?{}&uniqueId={}&language={}".format(
-            self.__add_new_params__(), username, language)
+        query = {
+            'uniqueId': username,
+            'language': language
+        }
+        api_url = "{}api/user/detail/?{}&{}".format(
+            BASE_URL, self.__add_new_params__(), urlencode(query)
+        )
         b = browser(api_url, proxy=proxy)
         return self.getData(b, proxy=proxy)
 
@@ -479,8 +575,16 @@ class TikTokApi:
           :param count: The amount of users to return.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
-            self.__add_new_params__(), userId, userId, str(count))
+        query = {
+            'noUser': 0,
+            'pageId': userId,
+            'userId': userId,
+            'userCount': count,
+            'scene': 15
+        }
+        api_url = "{}node/share/discover?{}&{}".format(
+            BASE_URL, self.__add_new_params__(), urlencode(query)
+        )
         b = browser(api_url, proxy=proxy)
 
         res = []
@@ -518,8 +622,16 @@ class TikTokApi:
           :param count: The amount of users to return.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
-            self.__add_new_params__(), userId, userId, str(count))
+        query = {
+            'noUser': 0,
+            'pageId': userId,
+            'userId': userId,
+            'userCount': count,
+            'scene': 15
+        }
+        api_url = "{}node/share/discover?{}&{}".format(
+            BASE_URL, self.__add_new_params__(), urlencode(query)
+        )
         b = browser(api_url, proxy=proxy)
 
         res = []
@@ -557,8 +669,16 @@ class TikTokApi:
           :param count: The amount of users to return.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
-            self.__add_new_params__(), userId, userId, str(count))
+        query = {
+            'noUser': 0,
+            'pageId': userId,
+            'userId': userId,
+            'userCount': count,
+            'scene': 15
+        }
+        api_url = "{}node/share/discover?{}&{}".format(
+            BASE_URL, self.__add_new_params__(), urlencode(query)
+        )
         b = browser(api_url, proxy=proxy)
 
         res = []
