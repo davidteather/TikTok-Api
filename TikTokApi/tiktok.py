@@ -15,7 +15,11 @@ class TikTokApi:
         if debug:
             print("Class initialized")
 
-        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
+        self.userAgent = (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/84.0.4147.125 Safari/537.36"
+        )
 
         # Get Browser Params
         b = browser('newParam', newParams=True)
@@ -40,7 +44,6 @@ class TikTokApi:
             self.browser_version = ""
             self.width = "1920"
             self.height = "1080"
-
 
         self.request_delay = request_delay
 
