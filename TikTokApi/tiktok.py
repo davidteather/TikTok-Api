@@ -127,7 +127,7 @@ class TikTokApi:
             else:
                 realCount = maxCount
             api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region={}&language={}".format(
-                self.__add_new_params__() ,str(realCount), str(maxCursor), str(region), str(language))
+                self.__add_new_params__(), str(realCount), str(maxCursor), str(region), str(language))
             b = browser(api_url, language=language, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
 
@@ -140,7 +140,7 @@ class TikTokApi:
                     print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
-            realCount = count-len(response)
+            realCount = count - len(response)
             maxCursor = res['maxCursor']
 
             first = False
@@ -183,7 +183,7 @@ class TikTokApi:
                 print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
-            realCount = count-len(response)
+            realCount = count - len(response)
             maxCursor = res['maxCursor']
 
             first = False
@@ -250,7 +250,7 @@ class TikTokApi:
                 print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
-            realCount = count-len(response)
+            realCount = count - len(response)
             maxCursor = res['maxCursor']
 
             first = False
@@ -297,7 +297,7 @@ class TikTokApi:
                 realCount = maxCount
 
             api_url = "https://m.tiktok.com/share/item/list?{}&secUid=&id={}&type=4&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}&verifyFp=".format(
-                self.__add_new_params__(),str(id), str(realCount), str(maxCursor), str(language))
+                self.__add_new_params__(), str(id), str(realCount), str(maxCursor), str(language))
             b = browser(api_url, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
 
@@ -308,7 +308,7 @@ class TikTokApi:
                 print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
-            realCount = count-len(response)
+            realCount = count - len(response)
             maxCursor = res['body']['maxCursor']
 
         return response[:count]
@@ -363,7 +363,7 @@ class TikTokApi:
                 print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
-            realCount = count-len(response)
+            realCount = count - len(response)
             maxCursor = res['body']['maxCursor']
 
         return response[:count]
@@ -464,7 +464,7 @@ class TikTokApi:
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b, proxy=proxy)
 
-    def getSuggestedUsersbyID(self, userId='6745191554350760966', count=30 ,language='en', proxy=None) -> list:
+    def getSuggestedUsersbyID(self, userId='6745191554350760966', count=30, language='en', proxy=None) -> list:
         """Returns suggested users given a different TikTok user.
 
           :param userId: The id of the user to get suggestions for.
@@ -628,7 +628,7 @@ class TikTokApi:
             return None
         video_url_no_wm = "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id={" \
                           "}&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4" \
-            .format(video_data[pos+4:pos+36])
+            .format(video_data[pos + 4:pos + 36])
         if return_bytes == 0:
             return video_url_no_wm
         else:
