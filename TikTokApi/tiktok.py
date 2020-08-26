@@ -504,7 +504,9 @@ class TikTokApi:
             post_id = url.split("/video/")[1].split("?")[0]
         else:
             raise Exception(
-                "URL format not supported. Below is an example of a supported url.\nhttps://www.tiktok.com/@therock/video/6829267836783971589")
+                "URL format not supported. Below is an example of a supported url.\n"
+                "https://www.tiktok.com/@therock/video/6829267836783971589"
+            )
 
         return self.getTikTokById(post_id, language=language, proxy=proxy)
 
@@ -592,7 +594,9 @@ class TikTokApi:
             res.append(x['cardItem'])
         return res[:count]
 
-    def getSuggestedUsersbyIDCrawler(self, count=30, startingId='6745191554350760966', language='en', proxy=None) -> list:
+    def getSuggestedUsersbyIDCrawler(
+        self, count=30, startingId='6745191554350760966', language='en', proxy=None
+    ) -> list:
         """Crawls for listing of all user objects it can find.
 
           :param count: The amount of users to crawl for.
@@ -639,7 +643,9 @@ class TikTokApi:
             res.append(x['cardItem'])
         return res[:count]
 
-    def getSuggestedHashtagsbyIDCrawler(self, count=30, startingId='6745191554350760966', language='en', proxy=None) -> list:
+    def getSuggestedHashtagsbyIDCrawler(
+        self, count=30, startingId='6745191554350760966', language='en', proxy=None
+    ) -> list:
         """Crawls for as many hashtags as it can find.
 
           :param count: The amount of users to crawl for.
@@ -754,9 +760,11 @@ class TikTokApi:
         pos = video_data.find("vid:")
         if pos == -1:
             return None
-        video_url_no_wm = "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id={" \
-                          "}&vr_type=0&is_play_url=1&source=PackSourceEnum_PUBLISH&media_type=4" \
+        video_url_no_wm = (
+            "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id={}&vr_type=0&is_play_url=1"
+            "&source=PackSourceEnum_PUBLISH&media_type=4"
             .format(video_data[pos + 4:pos + 36])
+        )
         if return_bytes == 0:
             return video_url_no_wm
         else:
@@ -792,13 +800,16 @@ class TikTokApi:
         check = data.split('video":{"urls":["')
         if len(check) > 1:
             contentURL = check[1].split("\"")[0]
-            r = requests.get(contentURL, headers={"method": "GET",
-                                                  "accept-encoding": "gzip, deflate, br",
-                                                  'accept-Language': 'en-US,en;q=0.9',
-                                                  'Range': 'bytes=0-200000',
-                                                  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                                                  "user-agent": self.userAgent,
-                                                  }, proxies=self.__format_proxy(proxy))
+            r = requests.get(contentURL, headers={
+                "method": "GET",
+                "accept-encoding": "gzip, deflate, br",
+                'accept-Language': 'en-US,en;q=0.9',
+                'Range': 'bytes=0-200000',
+                'Accept':
+                    'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;'
+                    'q=0.8,application/signed-exchange;v=b3;q=0.9',
+                "user-agent": self.userAgent,
+            }, proxies=self.__format_proxy(proxy))
 
             tmp = r.text.split("vid:")
             if len(tmp) > 1:
@@ -814,8 +825,10 @@ class TikTokApi:
             else:
                 key = ""
 
-            cleanVideo = "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=" + \
-                key + "&line=0&ratio=default&media_type=4&vr_type=0"
+            cleanVideo = (
+                "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id={}&line=0&ratio=default"
+                "&media_type=4&vr_type=0"
+            ).format(key)
 
             b = browser(cleanVideo, find_redirect=True, proxy=proxy)
             print(b.redirect_url)
