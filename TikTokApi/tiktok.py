@@ -1,10 +1,7 @@
-
-import pyppeteer
 import random
 import requests
 from .browser import browser
 import time
-from selenium import webdriver
 
 
 class TikTokApi:
