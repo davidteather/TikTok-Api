@@ -396,6 +396,49 @@ video_url - the url of the video you wish to download
 
 return_bytes - if you want to return bytes or a url
 
+##### The getUserPager method
+```
+api.getUserPager(username, page_size=30, before=0, after=0)
+```
+This endpoint returns a generator, which emits pages of tiktok records posted by the user specified by `username`.
+The size of the pages can be specified with `page_size`.  The generator will request the next `page` of results
+lazily, and terminate once the TikTok api indicates that the feed has been exhausted.
+
+`before` and `after` are cursor parameters that accept millisecond-precision UNIX timestamps. Note that the generator
+does use these values internally to manage paging, but if you pass them in here that will only set their 'starting
+points.  For `after`, that means setting a hard limit on how far back in the user's feed to go, bur `before` sets the
+starting point for pagination.  If they are not passed (or 0 is passed for them), then the pager will be able to
+traverse the user's entire feed.
+
+One more note: The pages of results are often one or two records short of the full `page_size` specified, even if
+there are more results.  This doesn't mean that tiktoks are being missed, just that TikTok didn't deign to fill the
+page completely.
+
+username - TikTok username for the user from which to request tiktoks
+
+page_size - integer specifying the maximum number of tiktoks to return in a page (default 30)
+
+after - millisecond-precision UNIX timestamp. only tiktoks posted after that time will be retrieved. (default 0)
+
+before - millisecond-precision UNIX timestamp.  only tiktoks posted before that time will be retrieved. (default infinity)
+
+##### The getHashtagPager method
+```
+api.getHashtagPager(hashtag, page_size=30)
+```
+This endpoint returns a generator, which emits pages of tiktok records posted under a given hashtag. The size
+of the pages can be specified with `page_size`.  The generator will request the next `page` of results lazily, and
+terminate once the TikTok api indicates that the feed has been exhausted.
+
+One more note: The pages of results are often one or two records short of the full `page_size` specified, even if
+there are more results.  This doesn't mean that tiktoks are being missed, just that TikTok didn't deign to fill the
+page completely.
+
+hashtag - string representation of the hashtag in question (without the '#' prefix)
+
+page_size - integer specifying the maximum number of tiktoks to return in a page (default 30)
+
+
 ## Built With
 
 * [Python 3.7](https://www.python.org/) - The web framework used
