@@ -618,6 +618,8 @@ class TikTokApi:
             yield page
             max_pages -= 1
 
+            # comparing directly to zero so that the default max_pages (0) will never trip this
+            # therefore paging to the end.
             if max_pages == 0:
                 has_more = False
 
