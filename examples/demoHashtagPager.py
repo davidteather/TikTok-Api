@@ -3,11 +3,13 @@ from TikTokApi import TikTokApi
 
 api = TikTokApi(debug=True)
 
+
 def printPage(page):
     """Just prints out each post with timestamp and description"""
     for p in page:
         post = p['itemInfos']
         print("{}: {}".format(datetime.fromtimestamp(int(post['createTime'])), post['text']))
+
 
 count = 50
 hashtag = 'funny'
@@ -26,7 +28,7 @@ for posts in pager:
         if created_at < oldest:
             oldest = created_at
 
-    printPage(posts)
+    # printPage(posts)
     total += len(posts)
 
 if oldest is None:
