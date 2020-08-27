@@ -85,6 +85,7 @@ class TikTokApi:
             "user-agent": b.userAgent,
             'cookie': 'tt_webid_v2=' + b.did
         }, proxies=self.__format_proxy(proxy))
+
         try:
             return response.json()
         except Exception as exc:
@@ -585,6 +586,17 @@ class TikTokApi:
         return response[:count]
 
     def getHashtagPager(self, hashtag, page_size=30, max_pages=0, proxy=None, language='en', region='US'):
+        """Returns a generator to page through results for a hashtag
+
+        :param hashtag: The hashtag to search by
+        :param page_size: Maximum # of results to be returned per page (may be fewer)
+        :param max_pages: Maximum pages to go through.  default will page until tiktok stops it.
+        :param language: The 2 letter code of the language to return.
+                         Note: Doesn't seem to have an affect.
+        :param region: The 2 letter region code.
+                       Note: Doesn't seem to have an affect.
+        :param proxy: The IP address of a proxy to make requests from.
+        """
         id = self.getHashtagObject(hashtag)['challengeInfo']['challenge']['id']
 
         before = 0
@@ -613,6 +625,17 @@ class TikTokApi:
                 return  # all done
 
     def hashtagPage(self, id, page_size=30, before=0, language='en', region='US', proxy=None):
+        """Request a page of hashtag results from tiktok
+
+        :param id: id of the hashtag ('challenge') to search
+        :param page_size: Maximum # of results to be returned per page (may be fewer)
+        :param before: pagination cursor value.  Used by the paging generator.
+        :param language: The 2 letter code of the language to return.
+                         Note: Doesn't seem to have an affect.
+        :param region: The 2 letter region code.
+                       Note: Doesn't seem to have an affect.
+        :param proxy: The IP address of a proxy to make requests from.
+        """
         query = {
             'count': page_size,
             'id': id,
