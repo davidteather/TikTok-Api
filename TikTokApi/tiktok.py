@@ -584,12 +584,13 @@ class TikTokApi:
 
         return response[:count]
 
-    def getHashtagPager(self, hashtag, page_size=30, before=0, after=0, proxy=None, language='en', region='US'):
+    def getHashtagPager(self, hashtag, page_size=30, max_pages=0, proxy=None, language='en', region='US'):
         id = self.getHashtagObject(hashtag)['challengeInfo']['challenge']['id']
 
+        before = 0
         while True:
             resp = self.hashtagPage(
-                id, page_size=page_size, before=before, after=after, proxy=proxy, language=language, region=region
+                id, page_size=page_size, before=before, proxy=proxy, language=language, region=region
             )
 
             has_more = resp['body']['hasMore']
@@ -603,18 +604,22 @@ class TikTokApi:
             before = resp['body']['maxCursor']
 
             yield page
+            max_pages -= 1
+
+            if max_pages == 0:
+                has_more = False
 
             if not has_more:
                 return  # all done
 
-    def hashtagPage(self, id, page_size=30, before=0, after=0, language='en', region='US', proxy=None):
+    def hashtagPage(self, id, page_size=30, before=0, language='en', region='US', proxy=None):
         query = {
             'count': page_size,
             'id': id,
             'type': 3,
             'secUid': '',
             'minCursor': before,
-            'maxCursor': after,
+            'maxCursor': 0,
             'shareUid': '',
             'recType': '',
             'region': region,
