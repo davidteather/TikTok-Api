@@ -70,7 +70,7 @@ class TikTokApi:
 
         query = {'verifyFp': b.verifyFp, 'did': b.did, '_signature': b.signature}
         url = "{}&{}".format(b.url, urlencode(query))
-        r = requests.get(url, headers={
+        response = requests.get(url, headers={
             'authority': 'm.tiktok.com',
             "method": "GET",
             'path': url.split("tiktok.com")[1],
@@ -86,13 +86,13 @@ class TikTokApi:
             'cookie': 'tt_webid_v2=' + b.did
         }, proxies=self.__format_proxy(proxy))
         try:
-            return r.json()
-        except Exception as e:
+            return response.json()
+        except Exception as exc:
             if self.debug:
-                print(e)
-            print(r.request.headers)
+                print(exc)
+            print(response.request.headers)
             print("Converting response to JSON failed response is below (probably empty)")
-            print(r.text)
+            print(response.text)
 
             raise Exception('Invalid Response')
 
@@ -169,7 +169,7 @@ class TikTokApi:
         return response[:count]
 
     def search_for_users(self, search_term, count=28, **kwargs) -> list:
-        """Returns a list of users that match the search_term 
+        """Returns a list of users that match the search_term
 
           :param search_term: The string to search by.
           :param count: The number of posts to return.
@@ -178,16 +178,16 @@ class TikTokApi:
         return self.discover_type(search_term, prefix='user', count=count, **kwargs)
 
     def search_for_music(self, search_term, count=28, **kwargs) -> list:
-        """Returns a list of music that match the search_term 
+        """Returns a list of music that match the search_term
 
           :param search_term: The string to search by.
           :param count: The number of posts to return.
           :param proxy: The IP address of a proxy to make requests from.
         """
         return self.discover_type(search_term, prefix='music', count=count, **kwargs)
-    
+
     def search_for_hashtags(self, search_term, count=28, **kwargs) -> list:
-        """Returns a list of hashtags that match the search_term 
+        """Returns a list of hashtags that match the search_term
 
           :param search_term: The string to search by.
           :param count: The number of posts to return.
@@ -196,7 +196,7 @@ class TikTokApi:
         return self.discover_type(search_term, prefix='challenge', count=count, **kwargs)
 
     def discover_type(self, search_term, prefix, count=28, **kwargs) -> list:
-        """Returns a list of whatever the prefix type you pass in 
+        """Returns a list of whatever the prefix type you pass in
 
           :param search_term: The string to search by.
           :param prefix: The type of post to search by user/music/challenge.
@@ -323,6 +323,8 @@ class TikTokApi:
           :param userID: The userID of the user, which TikTok assigns.
           :param secUID: The secUID of the user, which TikTok assigns.
           :param page_size: The number of posts to return per page.
+
+          below params are part of kwargs:
           :param after: time stamp for the earliest TikTok to retrieve
           :param before: time stamp for the latest TikTok to retrieve
           :param language: The 2 letter code of the language to return.
@@ -332,15 +334,22 @@ class TikTokApi:
           :param proxy: The IP address of a proxy to make requests from.
         """
         region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
-
-        api_url = (
-            "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}"
-            "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}".format(
-                self.__add_new_params__(), page_size, str(userID), str(secUID),
-                minCursor, maxCursor, region, language
-            )
+        query = {
+            'count': page_size,
+            'id': userID,
+            'type': 1,
+            'secUid': secUID,
+            'minCursor': minCursor,
+            'maxCursor': maxCursor,
+            'sourceType': 8,
+            'appId': 1233,
+            'region': region,
+            'language': language
+        }
+        api_url = "{}api/item_list/?{}&{}".format(
+            BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+        b = browser(api_url, proxy=proxy)
         return self.getData(b, proxy=proxy)
 
     def getUserPager(self, username, page_size=30, **kwargs):
@@ -574,6 +583,48 @@ class TikTokApi:
             maxCursor = res['body']['maxCursor']
 
         return response[:count]
+
+    def getHashtagPager(self, hashtag, page_size=30, before=0, after=0, proxy=None, language='en', region='US'):
+        id = self.getHashtagObject(hashtag)['challengeInfo']['challenge']['id']
+
+        while True:
+            resp = self.hashtagPage(
+                id, page_size=page_size, before=before, after=after, proxy=proxy, language=language, region=region
+            )
+
+            has_more = resp['body']['hasMore']
+            try:
+                page = resp['body']['itemListData']
+            except KeyError:
+                # No mo results
+                page = []
+                has_more = False
+
+            before = resp['body']['maxCursor']
+
+            yield page
+
+            if not has_more:
+                return  # all done
+
+    def hashtagPage(self, id, page_size=30, before=0, after=0, language='en', region='US', proxy=None):
+        query = {
+            'count': page_size,
+            'id': id,
+            'type': 3,
+            'secUid': '',
+            'minCursor': before,
+            'maxCursor': after,
+            'shareUid': '',
+            'recType': '',
+            'region': region,
+            'lang': language,
+        }
+        api_url = "{}share/item/list?{}&{}".format(
+            BASE_URL, self.__add_new_params__(), urlencode(query)
+        )
+        b = browser(api_url, proxy=proxy)
+        return self.getData(b, proxy=proxy, language=language)
 
     def getHashtagObject(self, hashtag, **kwargs) -> dict:
         """Returns a hashtag object.
