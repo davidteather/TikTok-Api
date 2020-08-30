@@ -25,6 +25,7 @@ class browser:
         self.api_url = api_url
         self.referrer = "https://www.tiktok.com/"
         self.language = language
+        self.executablePath = "/usr/lib/chromium-browser/chromium-browser"
 
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
         self.args = [
@@ -50,7 +51,8 @@ class browser:
             'userDataDir': "./tmp",
             'handleSIGINT': False,
             'handleSIGTERM': False,
-            'handleSIGHUP': False
+            'handleSIGHUP': False,
+            'executablePath': self.executablePath
         }
         
         if async_support:
