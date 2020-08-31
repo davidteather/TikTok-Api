@@ -8,7 +8,7 @@ from selenium import webdriver
 
 
 class TikTokApi:
-    def __init__(self, debug=False, request_delay=None):
+    def __init__(self, debug=False, request_delay=None, executablePath=None):
         """The TikTokApi class. Used to interact with TikTok.
 
           :param debug: If you want debugging to be enabled.
@@ -17,11 +17,11 @@ class TikTokApi:
         self.debug = debug
         if debug:
             print("Class initialized")
-
+        self.executablePath = executablePath
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
 
         # Get Browser Params
-        b = browser('newParam', newParams=True)
+        b = browser('newParam', newParams=True, executablePath=executablePath)
 
         try:
             self.timezone_name = self.__format_new_params__(b.timezone_name)
@@ -128,7 +128,7 @@ class TikTokApi:
                 realCount = maxCount
             api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id=1&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region={}&language={}".format(
                 self.__add_new_params__() ,str(realCount), str(maxCursor), str(region), str(language))
-            b = browser(api_url, language=language, proxy=proxy)
+            b = browser(api_url, language=language, proxy=proxy, executablePath=self.executablePath)
             res = self.getData(api_url, b, proxy=proxy)
 
             if 'items' in res.keys():
@@ -172,7 +172,7 @@ class TikTokApi:
                 realCount = maxCount
             api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}&maxCursor={}&minCursor=0&sourceType=8&appId=1233&region={}&language={}".format(
                 self.__add_new_params__(), str(realCount), str(userID), str(secUID), str(maxCursor), str(region), str(language))
-            b = browser(api_url, proxy=proxy)
+            b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
             res = self.getData(api_url, b, proxy=proxy)
 
             if 'items' in res.keys():
@@ -232,7 +232,7 @@ class TikTokApi:
 
             api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=2&secUid={}&maxCursor={}&minCursor=0&sourceType=9&appId=1233&region={}&language={}&verifyFp=".format(
                 self.__add_new_params__(), str(realCount), str(userID), str(secUID), str(maxCursor), str(region), str(language))
-            b = browser(api_url, proxy=proxy)
+            b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
             res = self.getData(api_url, b, proxy=proxy)
 
             try:
@@ -298,7 +298,7 @@ class TikTokApi:
 
             api_url = "https://m.tiktok.com/share/item/list?{}&secUid=&id={}&type=4&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}&verifyFp=".format(
                 self.__add_new_params__(),str(id), str(realCount), str(maxCursor), str(language))
-            b = browser(api_url, proxy=proxy)
+            b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
             res = self.getData(api_url, b, proxy=proxy)
 
             for t in res['body']['itemListData']:
@@ -323,7 +323,7 @@ class TikTokApi:
         """
         api_url = "https://m.tiktok.com/api/music/detail/?{}&musicId={}&language={}&verifyFp=".format(
             self.__add_new_params__(), str(id), language)
-        b = browser(api_url, proxy=proxy)
+        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
         return self.getData(api_url, b, proxy=proxy)
 
     def byHashtag(self, hashtag, count=30, language='en', proxy=None, region='US'):
@@ -353,7 +353,7 @@ class TikTokApi:
                 self.__add_new_params__(), region, str(
                     id), str(count), str(maxCursor), language
             )
-            b = browser(api_url, proxy=proxy)
+            b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
             res = self.getData(api_url, b, proxy=proxy, language=language)
 
             for t in res['body']['itemListData']:
@@ -378,7 +378,7 @@ class TikTokApi:
         """
         api_url = "https://m.tiktok.com/api/challenge/detail/?{}&challengeName={}&language={}".format(
             self.__add_new_params__(), str(hashtag.encode('utf-8'))[2:-1].replace("\\x", "%").upper(), language)
-        b = browser(api_url, proxy=proxy)
+        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
         return self.getData(api_url, b, proxy=proxy)
 
     def getRecommendedTikToksByVideoID(self, id, language='en', proxy=None):
@@ -391,7 +391,7 @@ class TikTokApi:
         """
         api_url = "https://m.tiktok.com/share/item/list?{}&secUid=&id={}&type=0&count=24&minCursor=0&maxCursor=0&shareUid=&recType=3&lang={}&verifyFp=".format(
             self.__add_new_params__(), id, language)
-        b = browser(api_url, proxy=proxy)
+        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
         return self.getData(api_url, b, proxy=proxy)['body']
 
     def getTikTokById(self, id, language='en', proxy=None):
@@ -404,7 +404,7 @@ class TikTokApi:
         """
         api_url = "https://m.tiktok.com/api/item/detail/?{}&itemId={}&language={}&verifyFp=".format(
             self.__add_new_params__(), id, language)
-        b = browser(api_url, proxy=proxy)
+        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
         return self.getData(api_url, b, proxy=proxy)
 
     def getTikTokByUrl(self, url, language='en', proxy=None):
@@ -429,7 +429,7 @@ class TikTokApi:
           :param proxy: The IP address of a proxy server.
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=1&userCount=30&scene=0&verifyFp=".format(self.__add_new_params__())
-        b = browser(api_url, proxy=proxy)
+        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
         return self.getData(api_url, b, proxy=proxy)['body'][1]['exploreList']
 
     def discoverMusic(self, proxy=None):
@@ -438,7 +438,7 @@ class TikTokApi:
           :param proxy: The IP address of a proxy server.
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=1&userCount=30&scene=0&verifyFp=".format(self.__add_new_params__())
-        b = browser(api_url, proxy=proxy)
+        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
         return self.getData(api_url, b, proxy=proxy)['body'][2]['exploreList']
 
     def getUserObject(self, username, language='en', proxy=None):
@@ -461,7 +461,7 @@ class TikTokApi:
         """
         api_url = "https://m.tiktok.com/api/user/detail/?{}&uniqueId={}&language={}".format(
             self.__add_new_params__(), username, language)
-        b = browser(api_url, proxy=proxy)
+        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
         return self.getData(api_url, b, proxy=proxy)
 
     def getSuggestedUsersbyID(self, userId='6745191554350760966', count=30 ,language='en', proxy=None):
@@ -473,7 +473,7 @@ class TikTokApi:
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
             self.__add_new_params__(), userId, userId, str(count))
-        b = browser(api_url, proxy=proxy)
+        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
 
         res = []
         for x in self.getData(api_url, b, proxy=proxy)['body'][0]['exploreList']:
@@ -512,7 +512,7 @@ class TikTokApi:
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
             self.__add_new_params__(), userId, userId, str(count))
-        b = browser(api_url, proxy=proxy)
+        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
 
         res = []
         for x in self.getData(api_url, b, proxy=proxy)['body'][1]['exploreList']:
@@ -551,7 +551,7 @@ class TikTokApi:
         """
         api_url = "https://m.tiktok.com/node/share/discover?{}&noUser=0&pageId={}&userId={}&userCount={}&scene=15&verifyFp=".format(
             self.__add_new_params__(), userId, userId, str(count))
-        b = browser(api_url, proxy=proxy)
+        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
 
         res = []
         for x in self.getData(api_url, b, proxy=proxy)['body'][2]['exploreList']:
@@ -596,7 +596,7 @@ class TikTokApi:
           :param download_url: The download url key value in a TikTok object.
           :param proxy: The IP for your proxy.
         """
-        b = browser(download_url, proxy=proxy)
+        b = browser(download_url, proxy=proxy, executablePath=self.executablePath)
         return self.getBytes(download_url, b, proxy=proxy)
 
     def get_Video_By_Url(self, video_url, return_bytes=0, chromedriver_path=None):
@@ -686,7 +686,7 @@ class TikTokApi:
             cleanVideo = "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=" + \
                 key + "&line=0&ratio=default&media_type=4&vr_type=0"
 
-            b = browser(cleanVideo, find_redirect=True, proxy=proxy)
+            b = browser(cleanVideo, find_redirect=True, proxy=proxy, executablePath=self.executablePath)
             print(b.redirect_url)
             if return_bytes == 0:
                 return b.redirect_url
