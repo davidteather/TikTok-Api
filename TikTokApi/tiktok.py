@@ -67,7 +67,7 @@ class TikTokApi:
         if self.request_delay is not None:
             time.sleep(self.request_delay)
 
-        query = {'verifyFp': b.verifyFp, '_signature': b.signature}
+        query = {'verifyFp': b.verifyFp, 'did': b.did, '_signature': b.signature}
         url = "{}&{}".format(b.url, urlencode(query))
         r = requests.get(url, headers={
             'authority': 'm.tiktok.com',
@@ -81,11 +81,14 @@ class TikTokApi:
             'sec-fetch-dest': 'empty',
             'sec-fetch-mode': 'cors',
             'sec-fetch-site': 'same-site',
-            "user-agent": b.userAgent
+            "user-agent": b.userAgent,
+            'cookie': 'tt_webid_v2=' + b.did
         }, proxies=self.__format_proxy(proxy))
         try:
             return r.json()
-        except Exception:
+        except Exception as e:
+            if self.debug:
+                print(e)
             print(r.request.headers)
             print("Converting response to JSON failed response is below (probably empty)")
             print(r.text)
@@ -445,7 +448,7 @@ class TikTokApi:
         b = browser(api_url, proxy=proxy)
         return self.getData(b, proxy=proxy)
 
-    def byHashtag(self, hashtag, count=30, language='en', proxy=None, region='US') -> dict:
+    def byHashtag(self, hashtag, count=30, language='en', proxy=None, region='') -> dict:
         """Returns a dictionary listing TikToks with a specific hashtag.
 
           :param hashtag: The hashtag to search by.
@@ -471,7 +474,7 @@ class TikTokApi:
                 'minCursor': 0,
                 'shareUid': '',
                 'recType': '',
-                'region': region,
+                'priority_region': region,
                 'lang': language,
             }
             api_url = "{}share/item/list?{}&{}".format(
@@ -931,14 +934,15 @@ class TikTokApi:
             'device_platform': 'web',
             'referer': '',
             'user_agent': self.__format_new_params__(self.userAgent),
-            'cookie_enabled': True,
+            'cookie_enabled': 'true',
             'screen_width': self.width,
             'screen_height': self.height,
             'browser_language': self.browser_language,
             'browser_platform': self.browser_platform,
             'browser_name': self.browser_name,
             'browser_version': self.browser_version,
-            'browser_online': True,
+            'browser_online': 'true',
+            'ac': '4g',
             'timezone_name': self.timezone_name,
             'priority_region': '',
             'appId': 1233,
@@ -946,7 +950,6 @@ class TikTokApi:
             'isAndroid': False,
             'isMobile': False,
             'isIOS': False,
-            'OS': 'windows',
-            'did': random.randint(10000, 999999999),
+            'OS': 'windows'
         }
         return urlencode(query)
