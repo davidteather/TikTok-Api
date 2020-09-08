@@ -94,6 +94,14 @@ for tiktok in trending:
 
 print(len(trending))
 ```
+
+To run the example scripts from the repository root, make sure you use the
+module form of python the interpreter
+
+```sh
+python -m examples.getTrending
+```
+
 [Here's](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d) an example of what a tiktok dictionary looks like.
 
 ## Detailed Documentation

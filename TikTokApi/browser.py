@@ -133,9 +133,11 @@ class browser:
         self.verifyFp = ''.join(random.choice(
             string.ascii_lowercase + string.ascii_uppercase + string.digits) for i in range(16))
 
+        self.did = str(random.randint(10000, 999999999))
+
         await self.page.evaluate("() => { " + get_acrawler() + " }")
         self.signature = await self.page.evaluate('''() => {
-        var url = "''' + self.url + "&verifyFp=" + self.verifyFp + '''"
+        var url = "''' + self.url + "&verifyFp=" + self.verifyFp + '''&did=''' + self.did + '''"
         var token = window.byted_acrawler.sign({url: url});
         return token;
         }''')
