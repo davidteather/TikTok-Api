@@ -264,7 +264,7 @@ class TikTokApi:
             )
         )
         b = browser(api_url, proxy=proxy)
-        return self.getData(api_url, b, proxy=proxy)
+        return self.getData(b, proxy=proxy)
 
     def getUserPager(self, username, page_size=30, before=0, after=0, proxy=None, language='en', region='US'):
         """Returns a generator to page through a user's feed
