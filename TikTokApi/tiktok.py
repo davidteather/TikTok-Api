@@ -141,6 +141,7 @@ class TikTokApi:
                 'sourceType': 12,
                 'appId': 1233,
                 'region': region,
+                'priority_region': region,
                 'language': language
             }
             api_url = "{}api/item_list/?{}&{}".format(
@@ -199,6 +200,7 @@ class TikTokApi:
                 'sourceType': 8,
                 'appId': 1233,
                 'region': region,
+                'priority_region': region,
                 'language': language
             }
             api_url = "{}api/item_list/?{}&{}".format(
@@ -333,6 +335,7 @@ class TikTokApi:
                 'sourceType': 9,
                 'appId': 1233,
                 'region': region,
+                'priority_region': region,
                 'language': language
             }
             api_url = "{}api/item_list/?{}&{}".format(
@@ -932,7 +935,7 @@ class TikTokApi:
             'aid': 1988,
             'app_name': 'tiktok_web',
             'device_platform': 'web',
-            'referer': '',
+            'Referer': '',
             'user_agent': self.__format_new_params__(self.userAgent),
             'cookie_enabled': 'true',
             'screen_width': self.width,
@@ -944,7 +947,6 @@ class TikTokApi:
             'browser_online': 'true',
             'ac': '4g',
             'timezone_name': self.timezone_name,
-            'priority_region': '',
             'appId': 1233,
             'appType': 'm',
             'isAndroid': False,
