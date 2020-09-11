@@ -228,6 +228,12 @@ class TikTokApi:
             if 'userInfoList' in data.keys():
                 for x in data['userInfoList']:
                     response.append(x)
+            elif 'musicInfoList' in data.keys():
+                for x in data['musicInfoList']:
+                    response.append(x)
+            elif 'challengeInfoList' in data.keys():
+                for x in data['challengeInfoList']:
+                    response.append(x)
             else:
                 if self.debug:
                     print("Nomore results being returned")
