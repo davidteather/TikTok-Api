@@ -188,7 +188,7 @@ class TikTokApi:
         """
         return self.discover_type(search_term, prefix='music', count=count, **kwargs)
     
-    def search_for_hashtag(self, search_term, count=28, **kwargs) -> list:
+    def search_for_hashtags(self, search_term, count=28, **kwargs) -> list:
         """Returns a list of hashtags that match the search_term 
 
           :param search_term: The string to search by.

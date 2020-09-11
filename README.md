@@ -43,7 +43,7 @@ Consider sponsoring me [here](https://github.com/sponsors/davidteather)
         - [get_Video_No_Watermark](#the-get_video_no_watermark-method)
         - [search_for_users](#the-search_for_users-method)
         - [search_for_music](#the-search_for_music-method)
-        - [search_for_hashtag](#the-search_for_hashtag-method)
+        - [search_for_hashtags](#the-search_for_hashtags-method)
         - [discover_type](#the-discover_type-method)
         - [userLiked](#the-userliked-method)
         - [userLikedbyUsername](#the-userlikedbyusername-method)
@@ -350,10 +350,10 @@ def search_for_music(self, search_term, count=28, **kwargs)
 
 Searches for music given a search term
 
-##### The search_for_hashtag Method
+##### The search_for_hashtags Method
 
 ```
-def search_for_hashtag(self, search_term, count=28, **kwargs)
+def search_for_hashtags(self, search_term, count=28, **kwargs)
 ```
 
 Searches for hashtags given a search term.
