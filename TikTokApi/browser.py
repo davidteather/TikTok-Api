@@ -13,9 +13,12 @@ from .stealth import stealth
 from .get_acrawler import get_acrawler
 
 async_support = False
+
+
 def set_async():
     global async_support
     async_support = True
+
 
 class browser:
     def __init__(self, url, language='en', proxy=None, find_redirect=False, api_url=None, debug=False, newParams=False):
@@ -52,7 +55,7 @@ class browser:
             'handleSIGTERM': False,
             'handleSIGHUP': False
         }
-        
+
         if async_support:
             loop = asyncio.new_event_loop()
             t = Thread(target=self.__start_background_loop, args=(loop, ), daemon=True)
@@ -80,21 +83,20 @@ class browser:
         asyncio.set_event_loop(loop)
         loop.run_forever()
 
-        
     async def newParams(self) -> None:
         self.browser = await pyppeteer.launch(self.options)
         self.page = await self.browser.newPage()
         await self.page.goto("about:blank")
 
-        #self.browser_language = await self.page.evaluate("""() => { return navigator.language || navigator.userLanguage; }""")
+        # self.browser_language = await self.page.evaluate("""() => { return navigator.language || navigator.userLanguage; }""")
         self.browser_language = ""
-        #self.timezone_name = await self.page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
+        # self.timezone_name = await self.page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
         self.timezone_name = ""
-        #self.browser_platform = await self.page.evaluate("""() => { return window.navigator.platform; }""")
+        # self.browser_platform = await self.page.evaluate("""() => { return window.navigator.platform; }""")
         self.browser_platform = ""
-        #self.browser_name = await self.page.evaluate("""() => { return window.navigator.appCodeName; }""")
+        # self.browser_name = await self.page.evaluate("""() => { return window.navigator.appCodeName; }""")
         self.browser_name = ""
-        #self.browser_version = await self.page.evaluate("""() => { return window.navigator.appVersion; }""")
+        # self.browser_version = await self.page.evaluate("""() => { return window.navigator.appVersion; }""")
         self.browser_version = ""
 
         self.width = await self.page.evaluate("""() => { return screen.width; }""")
@@ -150,7 +152,7 @@ class browser:
                                  })
 
             self.data = await self.page.content()
-            #self.data = json.loads(self.data.replace("</pre></body></html>", "").replace(
+            # self.data = json.loads(self.data.replace("</pre></body></html>", "").replace(
             #    '<html><head></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">', ""))
 
         await self.browser.close()
