@@ -170,6 +170,73 @@ class TikTokApi:
 
         return response[:count]
 
+    def search_for_users(self, search_term, count=28, **kwargs) -> list:
+        """Returns a list of users that match the search_term 
+
+          :param search_term: The string to search by.
+          :param count: The number of posts to return.
+          :param proxy: The IP address of a proxy to make requests from.
+        """
+        return self.discover_type(search_term, prefix='user', count=count, **kwargs)
+
+    def search_for_music(self, search_term, count=28, **kwargs) -> list:
+        """Returns a list of music that match the search_term 
+
+          :param search_term: The string to search by.
+          :param count: The number of posts to return.
+          :param proxy: The IP address of a proxy to make requests from.
+        """
+        return self.discover_type(search_term, prefix='music', count=count, **kwargs)
+    
+    def search_for_hashtag(self, search_term, count=28, **kwargs) -> list:
+        """Returns a list of hashtags that match the search_term 
+
+          :param search_term: The string to search by.
+          :param count: The number of posts to return.
+          :param proxy: The IP address of a proxy to make requests from.
+        """
+        return self.discover_type(search_term, prefix='challenge', count=count, **kwargs)
+
+    def discover_type(self, search_term, prefix, count=28, **kwargs) -> list:
+        """Returns a list of whatever the prefix type you pass in 
+
+          :param search_term: The string to search by.
+          :param prefix: The type of post to search by user/music/challenge.
+          :param count: The number of posts to return.
+          :param proxy: The IP address of a proxy to make requests from.
+        """
+        region, language, proxy = self.__process_kwargs__(kwargs)
+
+        response = []
+        offsetCount = 0
+        while len(response) < count:
+            query = {
+                    'discoverType': count,
+                    'needItemList': False,
+                    'keyWord': search_term,
+                    'offset': offsetCount,
+                    'count': 99,
+                    'useRecommend': False,
+                    'language': 'en',
+                }
+            api_url = "{}api/discover/{}/?{}&{}".format(
+                BASE_URL, prefix, self.__add_new_params__(), urlencode(query)
+            )
+            b = browser(api_url, proxy=proxy)
+            data = self.getData(b, proxy=proxy)
+
+            if 'userInfoList' in data.keys():
+                for x in data['userInfoList']:
+                    response.append(x)
+            else:
+                if self.debug:
+                    print("Nomore results being returned")
+                break
+
+            offsetCount = len(response)
+
+        return response[:count]
+
     def userPosts(self, userID, secUID, count=30, **kwargs) -> dict:
         """Returns a dictionary listing TikToks given a user's ID and secUID
 
@@ -637,7 +704,7 @@ class TikTokApi:
           :param proxy: The IP address of a proxy to make requests from.
         """
         region, language, proxy = self.__process_kwargs__(kwargs)
-        return self.getUser(username, language, proxy=proxy)['userInfo']['user']
+        return self.getUser(username, **kwargs)['userInfo']['user']
 
     def getUser(self, username, **kwargs) -> dict:
         """Gets the full exposed user object
@@ -936,6 +1003,7 @@ class TikTokApi:
                 r = requests.get(
                     b.redirect_url, proxies=self.__format_proxy(proxy))
                 return r.content
+
     #
     # PRIVATE METHODS
     #
