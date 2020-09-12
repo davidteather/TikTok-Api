@@ -64,7 +64,7 @@ class TikTokApi:
 
           :param proxy: The IP address of a proxy server to request from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         if self.request_delay is not None:
             time.sleep(self.request_delay)
 
@@ -108,7 +108,7 @@ class TikTokApi:
 
           :param proxy: The IP address of a proxy server to request from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         query = {'verifyFp': b.verifyFp, '_signature': b.signature}
         url = "{}&{}".format(b.url, urlencode(query))
         r = requests.get(url, headers={"method": "GET",
@@ -122,11 +122,9 @@ class TikTokApi:
         """
           Gets trending TikToks
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
 
         response = []
-        maxCount = 50
-        maxCursor = 0
         first = True
 
         while len(response) < count:
@@ -141,7 +139,7 @@ class TikTokApi:
                 'type': 5,
                 'secUid': '',
                 'maxCursor': maxCursor,
-                'minCursor': 0,
+                'minCursor': minCursor,
                 'sourceType': 12,
                 'appId': 1233,
                 'region': region,
@@ -205,7 +203,7 @@ class TikTokApi:
           :param count: The number of posts to return.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
 
         response = []
         offsetCount = 0
@@ -256,11 +254,9 @@ class TikTokApi:
                          Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
 
         response = []
-        maxCount = 50
-        maxCursor = 0
         first = True
 
         while len(response) < count:
@@ -275,7 +271,7 @@ class TikTokApi:
                 'type': 1,
                 'secUid': secUID,
                 'maxCursor': maxCursor,
-                'minCursor': 0,
+                'minCursor': minCursor,
                 'sourceType': 8,
                 'appId': 1233,
                 'region': region,
@@ -315,12 +311,12 @@ class TikTokApi:
                          Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         data = self.getUserObject(username, proxy=proxy)
         return self.userPosts(data['id'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
 
     def userPage(
-        self, userID, secUID, page_size=30, before=0, after=0, **kwargs
+        self, userID, secUID, page_size=30, **kwargs
     ) -> dict:
         """Returns a dictionary listing of one page of TikToks given a user's ID and secUID
 
@@ -335,19 +331,19 @@ class TikTokApi:
                          Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
 
         api_url = (
             "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}"
             "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}".format(
                 self.__add_new_params__(), page_size, str(userID), str(secUID),
-                after, before, region, language
+                minCursor, maxCursor, region, language
             )
         )
         b = browser(api_url, proxy=proxy)
         return self.getData(b, proxy=proxy)
 
-    def getUserPager(self, username, page_size=30, before=0, after=0, **kwargs):
+    def getUserPager(self, username, page_size=30, **kwargs):
         """Returns a generator to page through a user's feed
 
           :param username: The username of the user.
@@ -360,13 +356,13 @@ class TikTokApi:
                          Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         data = self.getUserObject(username, proxy=proxy)
 
         while True:
             resp = self.userPage(
                 data['id'], data['secUid'], page_size=page_size,
-                before=before, after=after, proxy=proxy, language=language, region=region
+                before=maxCursor, after=minCursor, proxy=proxy, language=language, region=region
             )
 
             try:
@@ -375,7 +371,7 @@ class TikTokApi:
                 # No mo results
                 return
 
-            before = resp['maxCursor']
+            maxCursor = resp['maxCursor']
 
             yield page
 
@@ -396,10 +392,8 @@ class TikTokApi:
                          Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         response = []
-        maxCount = 50
-        maxCursor = 0
         first = True
 
         while len(response) < count:
@@ -414,7 +408,7 @@ class TikTokApi:
                 'type': 2,
                 'secUid': secUID,
                 'maxCursor': maxCursor,
-                'minCursor': 0,
+                'minCursor': minCursor,
                 'sourceType': 9,
                 'appId': 1233,
                 'region': region,
@@ -462,7 +456,7 @@ class TikTokApi:
                          Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         data = self.getUserObject(username, proxy=proxy)
         return self.userLiked(data['id'], data['secUid'], count=count, proxy=proxy, language=language, region=region)
 
@@ -479,10 +473,8 @@ class TikTokApi:
                          Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         response = []
-        maxCount = 50
-        maxCursor = 0
 
         while len(response) < count:
             if count < maxCount:
@@ -496,7 +488,7 @@ class TikTokApi:
                 'type': 4,
                 'secUid': '',
                 'maxCursor': maxCursor,
-                'minCursor': 0,
+                'minCursor': minCursor,
                 'shareUid': '',
                 'lang': language
             }
@@ -526,7 +518,7 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         query = {
             'musicId': id,
             'lang': language
@@ -549,10 +541,9 @@ class TikTokApi:
                          Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         id = self.getHashtagObject(hashtag)['challengeInfo']['challenge']['id']
         response = []
-        maxCursor = 0
 
         while len(response) < count:
             query = {
@@ -561,7 +552,7 @@ class TikTokApi:
                 'type': 3,
                 'secUid': '',
                 'maxCursor': maxCursor,
-                'minCursor': 0,
+                'minCursor': minCursor,
                 'shareUid': '',
                 'recType': '',
                 'priority_region': region,
@@ -592,7 +583,7 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         query = {
             'challengeName': str(hashtag.encode('utf-8'))[2:-1].replace("\\x", "%").upper(),
             'language': language
@@ -611,14 +602,14 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         query = {
             'count': 24,
             'id': id,
             'type': 0,
             'secUid': '',
-            'maxCursor': 0,
-            'minCursor': 0,
+            'maxCursor': maxCursor,
+            'minCursor': minCursor,
             'shareUid': '',
             'recType': 3,
             'lang': language,
@@ -637,7 +628,7 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         query = {
             'itemId': id,
             'lang': language,
@@ -656,7 +647,7 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         if "@" in url and "/video/" in url:
             post_id = url.split("/video/")[1].split("?")[0]
         else:
@@ -672,7 +663,7 @@ class TikTokApi:
 
           :param proxy: The IP address of a proxy server.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         query = {
             'noUser': 1,
             'userCount': 30,
@@ -689,7 +680,7 @@ class TikTokApi:
 
           :param proxy: The IP address of a proxy server.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         query = {
             'noUser': 1,
             'userCount': 30,
@@ -709,7 +700,7 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         return self.getUser(username, **kwargs)['userInfo']['user']
 
     def getUser(self, username, **kwargs) -> dict:
@@ -720,7 +711,7 @@ class TikTokApi:
                            Note: Doesn't seem to have an affect.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         query = {
             'uniqueId': username,
             'language': language
@@ -738,7 +729,7 @@ class TikTokApi:
           :param count: The amount of users to return.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         query = {
             'noUser': 0,
             'pageId': userId,
@@ -766,7 +757,7 @@ class TikTokApi:
           :param language: The language parameter.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         users = []
         unusedIDS = [startingId]
         while len(users) < count:
@@ -789,7 +780,7 @@ class TikTokApi:
           :param count: The amount of users to return.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         query = {
             'noUser': 0,
             'pageId': userId,
@@ -817,7 +808,7 @@ class TikTokApi:
           :param language: The language parameter.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         hashtags = []
         ids = self.getSuggestedUsersbyIDCrawler(
             count=count, startingId=startingId, language=language, proxy=proxy)
@@ -840,7 +831,7 @@ class TikTokApi:
           :param count: The amount of users to return.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         query = {
             'noUser': 0,
             'pageId': userId,
@@ -866,7 +857,7 @@ class TikTokApi:
           :param language: The language parameter.
           :param proxy: The IP address of a proxy to make requests from.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         musics = []
         ids = self.getSuggestedUsersbyIDCrawler(
             count=count, startingId=startingId, language=language, proxy=proxy)
@@ -888,7 +879,7 @@ class TikTokApi:
           :param data: A TikTok object
           :param proxy: The IP address of your proxy.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         try:
             api_url = data['video']['downloadAddr']
         except Exception:
@@ -901,7 +892,7 @@ class TikTokApi:
           :param download_url: The download url key value in a TikTok object.
           :param proxy: The IP for your proxy.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         b = browser(download_url, proxy=proxy)
         return self.getBytes(b, proxy=proxy)
 
@@ -922,7 +913,7 @@ class TikTokApi:
           :param return_bytes: Set this to 1 if you want bytes, 0 if you want url.
           :param proxy: The IP address of your proxy.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         video_info = self.getTikTokById(video_id)
         video_url = video_info["itemInfo"]["itemStruct"]["video"]["downloadAddr"]
         headers = {"User-Agent": "okhttp", "Range": "bytes=1000-80000"}
@@ -950,7 +941,7 @@ class TikTokApi:
           :param return_bytes: Set this to 1 if you want bytes, set it to 0 for url.
           :param proxy: The IP of your proxy.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         video_id = video_url.split("/video/")[1].split("?")[0]
         return self.get_Video_No_Watermark_ID(video_id, return_bytes, proxy=proxy)
 
@@ -961,7 +952,7 @@ class TikTokApi:
           :param return_bytes: Set this to 0 if you want url, 1 if you want bytes.
           :param proxy: The IP address of your proxy.
         """
-        region, language, proxy = self.__process_kwargs__(kwargs)
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         r = requests.get(video_url, headers={"method": "GET",
                                              "accept-encoding": "utf-8",
                                              "user-agent": self.userAgent
@@ -1066,5 +1057,8 @@ class TikTokApi:
         region = kwargs.get('region', 'US')
         language = kwargs.get('language', 'en')
         proxy = kwargs.get('proxy', None)
+        maxCursor = kwargs.get('before', 0)
+        minCursor = kwargs.get('after', 0)
+        maxCount = kwargs.get('maxCount', 50)
 
-        return region, language, proxy
+        return region, language, proxy, minCursor, maxCursor, maxCount
