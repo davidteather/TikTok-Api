@@ -362,7 +362,7 @@ class TikTokApi:
         while True:
             resp = self.userPage(
                 data['id'], data['secUid'], page_size=page_size,
-                maxCursor=maxCursor, minCursor=minCursor, proxy=proxy, language=language, region=region
+                before=maxCursor, after=minCursor, proxy=proxy, language=language, region=region
             )
 
             try:
