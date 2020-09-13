@@ -585,7 +585,7 @@ class TikTokApi:
         """
         region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         query = {
-            'challengeName': str(hashtag.encode('utf-8'))[2:-1].replace("\\x", "%").upper(),
+            'challengeName': hashtag,
             'language': language
         }
         api_url = "{}api/challenge/detail/?{}&{}".format(
