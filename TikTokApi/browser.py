@@ -54,9 +54,11 @@ class browser:
             'userDataDir': "./tmp",
             'handleSIGINT': False,
             'handleSIGTERM': False,
-            'handleSIGHUP': False,
-            'executablePath': self.executablePath
+            'handleSIGHUP': False
         }
+
+        if self.executablePath != None:
+            self.options['executablePath'] = self.executablePath
 
         if async_support:
             loop = asyncio.new_event_loop()
