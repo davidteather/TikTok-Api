@@ -78,7 +78,7 @@ class TikTokApi:
             'accept': 'application/json, text/plain, */*',
             "accept-encoding": "gzip, deflate, br",
             'accept-language': 'en-US,en;q=0.9',
-            "referrer": b.referrer,
+            "referer": b.referrer,
             'sec-fetch-dest': 'empty',
             'sec-fetch-mode': 'cors',
             'sec-fetch-site': 'same-site',
@@ -113,7 +113,7 @@ class TikTokApi:
         url = "{}&{}".format(b.url, urlencode(query))
         r = requests.get(url, headers={"method": "GET",
                                        "accept-encoding": "gzip, deflate, br",
-                                       "referrer": b.referrer,
+                                       "referer": b.referrer,
                                        "user-agent": b.userAgent,
                                        }, proxies=self.__format_proxy(proxy))
         return r.content
