@@ -21,13 +21,14 @@ def set_async():
 
 
 class browser:
-    def __init__(self, url, language='en', proxy=None, find_redirect=False, api_url=None, debug=False, newParams=False):
+    def __init__(self, url, language='en', proxy=None, find_redirect=False, api_url=None, debug=False, newParams=False, executablePath=None):
         self.url = url
         self.debug = debug
         self.proxy = proxy
         self.api_url = api_url
         self.referrer = "https://www.tiktok.com/"
         self.language = language
+        self.executablePath = executablePath
 
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
         self.args = [
@@ -53,7 +54,8 @@ class browser:
             'userDataDir': "./tmp",
             'handleSIGINT': False,
             'handleSIGTERM': False,
-            'handleSIGHUP': False
+            'handleSIGHUP': False,
+            'executablePath': self.executablePath
         }
 
         if async_support:
