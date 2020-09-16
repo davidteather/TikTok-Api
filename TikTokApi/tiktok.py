@@ -281,7 +281,7 @@ class TikTokApi:
             api_url = "{}api/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            b = browser(api_url, proxy=proxy, executablePath=executablePath)
+            b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
             res = self.getData(b, proxy=proxy)
 
             if 'items' in res.keys():
@@ -340,7 +340,7 @@ class TikTokApi:
                 minCursor, maxCursor, region, language
             )
         )
-        b = browser(api_url, proxy=proxy, executablePath=executablePath)
+        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
         return self.getData(b, proxy=proxy)
 
     def getUserPager(self, username, page_size=30, **kwargs):
