@@ -41,6 +41,10 @@ Consider sponsoring me [here](https://github.com/sponsors/davidteather)
         - [get_Video_By_DownloadURL](#the-get_video_by_downloadurl-method)
         - [get_Video_By_Url](#the-get_video_by_url-method)
         - [get_Video_No_Watermark](#the-get_video_no_watermark-method)
+        - [search_for_users](#the-search_for_users-method)
+        - [search_for_music](#the-search_for_music-method)
+        - [search_for_hashtags](#the-search_for_hashtags-method)
+        - [discover_type](#the-discover_type-method)
         - [userLiked](#the-userliked-method)
         - [userLikedbyUsername](#the-userlikedbyusername-method)
 - [Built With](#built-with)
@@ -94,6 +98,14 @@ for tiktok in trending:
 
 print(len(trending))
 ```
+
+To run the example scripts from the repository root, make sure you use the
+module form of python the interpreter
+
+```sh
+python -m examples.getTrending
+```
+
 [Here's](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d) an example of what a tiktok dictionary looks like.
 
 ## Detailed Documentation
@@ -321,6 +333,38 @@ url = api.get_Video_No_Watermark_ID('6829267836783971589', return_bytes=0)
 import requests
 video_bytes = requests.get(url, headers={"User-Agent": "okhttp"}).content
 ```
+
+##### The search_for_users Method
+
+```
+def search_for_users(self, search_term, count=28, **kwargs)
+```
+
+Searches for users given a search term.
+
+##### The search_for_music Method
+
+```
+def search_for_music(self, search_term, count=28, **kwargs)
+```
+
+Searches for music given a search term
+
+##### The search_for_hashtags Method
+
+```
+def search_for_hashtags(self, search_term, count=28, **kwargs)
+```
+
+Searches for hashtags given a search term.
+
+##### The discover_type Method
+
+```
+discover_type(self, search_term, prefix, count=28, **kwargs)
+```
+
+You can use this method if you really want, but just use the 3 above it.
 
 ##### The get_Video_No_Watermark_ID Method
 
