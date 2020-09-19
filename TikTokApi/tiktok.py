@@ -566,16 +566,16 @@ class TikTokApi:
         if self.cookies is None:
             raise 'This method requires cookies to be set in order to work'
         api_url = "https://api.tiktok.com/aweme/v1/data/insighs/?tz_offset=-25200&aid=1233&carrier_region=US"
-        referrer =  f"https://www.tiktok.com/@{username}/video/{videoID}"
+        referrer =  "https://www.tiktok.com/@" + username + "/video/" + videoID
         insights = ['video_info', 'video_page_percent', 'video_region_percent', 'video_total_duration',
                     'video_per_duration']
         # Note: this list of parameters has to be in exactly this order with exactly this format
         # or else you will get "Invalid parameters"
         def build_insight(insight, videoID):
-            return f'{{"insigh_type":"{insight}","aweme_id":"{videoID}"}}'
+            return '{{"insigh_type":"' + insight + '","aweme_id":"' + videoID + '"}}'
         insight_string = ','.join([build_insight(i, videoID) for i in insights])
         insight_string = insight_string + ',{"insigh_type": "user_info"}' +\
-            f',{{"insigh_type":"video_uv","aweme_id":"{videoID}"}}'  + \
+            ',{{"insigh_type":"video_uv","aweme_id":"' + videoID + '"}}'  + \
             ',{"insigh_type":"vv_history","days":8}'       
 
         r = requests.post(api_url, headers = {
@@ -585,12 +585,12 @@ class TikTokApi:
                 "sec-fetch-dest": "empty",
                 "sec-fetch-mode": "cors",
                 "sec-fetch-site": "same-site",
-                "referrer": "https://www.tiktok.com/@benthamite/video/6860178143399955718",
+                "referrer": "https://www.tiktok.com/@" + username + "/video/" + videoID,
                 "referrerPolicy": "no-referrer-when-downgrade",
                 "method": "POST",
                 "mode": "cors",
                 "credentials": "include"
-            }, data = f"type_requests=[{insight_string}]"
+            }, data = "type_requests=[" +insight_string + "]"
             , proxies=self.__format_proxy(proxy)
             , cookies = self.cookies)
         return r.json()
