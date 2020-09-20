@@ -572,12 +572,11 @@ class TikTokApi:
         # Note: this list of parameters has to be in exactly this order with exactly this format
         # or else you will get "Invalid parameters"
         def build_insight(insight, videoID):
-            return '{{"insigh_type":"' + insight + '","aweme_id":"' + videoID + '"}}'
+            return '{"insigh_type":"' + insight + '","aweme_id":"' + videoID + '"}'
         insight_string = ','.join([build_insight(i, videoID) for i in insights])
         insight_string = insight_string + ',{"insigh_type": "user_info"}' +\
-            ',{{"insigh_type":"video_uv","aweme_id":"' + videoID + '"}}'  + \
+            ',{"insigh_type":"video_uv","aweme_id":"' + videoID + '"}'  + \
             ',{"insigh_type":"vv_history","days":8}'       
-
         r = requests.post(api_url, headers = {
                 "accept": "*/*",
                 "accept-language": "en-US,en;q=0.9",
