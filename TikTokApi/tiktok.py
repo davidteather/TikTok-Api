@@ -54,8 +54,6 @@ class TikTokApi:
             'sec-fetch-site': 'same-site',
             "user-agent": b.userAgent
 
-
-
         }, proxies=self.__format_proxy(proxy))
         try:
             return r.json()
@@ -214,6 +212,7 @@ class TikTokApi:
         response = []
         maxCount = 50
         maxCursor = 0
+        first = True
 
         while len(response) < count:
             if count < maxCount:
@@ -221,22 +220,27 @@ class TikTokApi:
             else:
                 realCount = maxCount
 
-            api_url = "https://m.tiktok.com/share/item/list?{}&secUid=&id={}&type=4&count={}&minCursor=0&maxCursor={}&shareUid=&lang={}&verifyFp=".format(
-                self.__add_new_params__(),str(id), str(realCount), str(maxCursor), str(language))
-            b = browser(api_url, proxy=proxy)
+            api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region=&language={}".format(
+                self.__add_new_params__() ,str(realCount), str(id), str(maxCursor), str(language))
+            b = browser(api_url, language=language, proxy=proxy)
             res = self.getData(api_url, b, proxy=proxy)
 
-            for t in res['body']['itemListData']:
-                response.append(t)
+            if 'items' in res.keys():
+                for t in res['items']:
+                    response.append(t)
 
-            if not res['body']['hasMore']:
-                print("TikTok isn't sending more TikToks beyond this point.")
+            if not res['hasMore'] and not first:
+                if self.debug:
+                    print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count-len(response)
-            maxCursor = res['body']['maxCursor']
+            maxCursor = res['maxCursor']
+
+            first = False
 
         return response[:count]
+
 
     def getMusicObject(self, id, language='en', proxy=None):
         """
@@ -247,6 +251,7 @@ class TikTokApi:
         b = browser(api_url, proxy=proxy)
         return self.getData(api_url, b, proxy=proxy)
 
+
     def byHashtag(self, hashtag, count=30, language='en', proxy=None, region='US'):
         """
           Gets tiktoks by hashtag
@@ -255,29 +260,31 @@ class TikTokApi:
         response = []
         maxCount = 50
         maxCursor = 0
+        first = True
 
         while len(response) < count:
             if count < maxCount:
                 realCount = count
             else:
                 realCount = maxCount
+            api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=5&secUid=&maxCursor={}&minCursor=0&sourceType=12&appId=1233&region={}&language={}".format(
+                self.__add_new_params__() ,str(realCount), str(id), str(maxCursor), str(region), str(language))
+            b = browser(api_url, language=language, proxy=proxy)
+            res = self.getData(api_url, b, proxy=proxy)
 
-            api_url = "https://m.tiktok.com/share/item/list?{}&region={}&secUid=&id={}&type=3&count={}&minCursor=0&maxCursor={}&shareUid=&recType=&lang={}".format(
-                self.__add_new_params__(), region, str(
-                    id), str(count), str(maxCursor), language
-            )
-            b = browser(api_url, proxy=proxy)
-            res = self.getData(api_url, b, proxy=proxy, language=language)
+            if 'items' in res.keys():
+                for t in res['items']:
+                    response.append(t)
 
-            for t in res['body']['itemListData']:
-                response.append(t)
-
-            if not res['body']['hasMore']:
-                print("TikTok isn't sending more TikToks beyond this point.")
+            if not res['hasMore'] and not first:
+                if self.debug:
+                    print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count-len(response)
-            maxCursor = res['body']['maxCursor']
+            maxCursor = res['maxCursor']
+
+            first = False
 
         return response[:count]
 
