@@ -4,15 +4,12 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
-  - "3.8-dev"
-  - "nightly"
   - "3.9-dev"
+  - "nightly"
 
 matrix:
   allow_failures:
-    - python: "3.8-dev"
     - python: "nightly"
-    - python: "3.9-dev"
 
 addons:
   firefox: "62.0.3"
