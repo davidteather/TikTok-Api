@@ -6,13 +6,12 @@ python:
   - "3.8"
   - "3.8-dev"
   - "nightly"
-  - "3.9"
+  - "3.9-dev"
 
 matrix:
   allow_failures:
     - python: "3.8-dev"
     - python: "nightly"
-    - python: "3.9"
     - python: "3.9-dev"
 
 addons:
