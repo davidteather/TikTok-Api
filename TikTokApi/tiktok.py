@@ -19,9 +19,8 @@ class TikTokApi:
         self.debug = debug
         if debug:
             print("Class initialized")
-        print("here1")
         self.executablePath = executablePath
-        print('here2')
+
         self.userAgent = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
