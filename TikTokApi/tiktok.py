@@ -19,7 +19,9 @@ class TikTokApi:
         self.debug = debug
         if debug:
             print("Class initialized")
+        print("here1")
         self.executablePath = executablePath
+        print('here2')
         self.userAgent = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -27,9 +29,7 @@ class TikTokApi:
         )
 
         # Get Browser Params
-        print('here1')
         b = browser('newParam', newParams=True, executablePath=self.executablePath)
-        print('here2')
 
         try:
             self.timezone_name = self.__format_new_params__(b.timezone_name)
