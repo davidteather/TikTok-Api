@@ -27,7 +27,9 @@ class TikTokApi:
         )
 
         # Get Browser Params
-        b = browser('newParam', newParams=True, executablePath=executablePath)
+        print('here1')
+        b = browser('newParam', newParams=True, executablePath=self.executablePath)
+        print('here2')
 
         try:
             self.timezone_name = self.__format_new_params__(b.timezone_name)
@@ -1031,7 +1033,7 @@ class TikTokApi:
             'aid': 1988,
             'app_name': 'tiktok_web',
             'device_platform': 'web',
-            'Referer': '',
+            'referer': "https://www.tiktok.com/",
             'user_agent': self.__format_new_params__(self.userAgent),
             'cookie_enabled': 'true',
             'screen_width': self.width,
