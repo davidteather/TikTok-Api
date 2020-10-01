@@ -15,6 +15,7 @@ class TikTokApi:
 
           :param debug: If you want debugging to be enabled.
           :param request_delay: The amount of time to wait before making a request.
+          :param executablePath: The location of the chromedriver.exe
         """
         self.debug = debug
         if debug:
