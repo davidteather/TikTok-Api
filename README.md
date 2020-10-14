@@ -116,19 +116,25 @@ python -m examples.getTrending
 
 #### Common Parameters
 
-* username - the userame of a user you want to find
+* username - the username of a user you want to find
 * secUid - the secUid of the user (you can find in the responses)
 * userId / id - The id of the user
 * proxy - the proxy address of your proxy
 * language - the 2 letter code for your language (this is included in the requests by default to TikTok, but it doesn't seem to do much for me at least)
+* language - Ex: en (doesn't seem to change data)
+* region - Ex: US (doesn't seem to change data)
 
 #### The TikTok class
 
 ```
-TikTokApi(self, debug=False)
+TikTokApi(self, debug=False, request_delay=None, executablePath=None)
 ```
 
 debug - Enable this if you need some more output.
+
+request_delay - The time to wait in seconds before sending a request.
+
+executablePath - The path to your chromedriver if you don't want global install of chromedriver.
 
 ##### The trending Method
 

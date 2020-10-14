@@ -1,7 +1,7 @@
 import random
 import requests
 import time
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 
 from .browser import browser
 
@@ -492,7 +492,7 @@ class TikTokApi:
                 'maxCursor': maxCursor,
                 'minCursor': minCursor,
                 'shareUid': '',
-                'lang': language
+                'language': language
             }
             api_url = "{}share/item/list?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
@@ -521,9 +521,10 @@ class TikTokApi:
           :param proxy: The IP address of a proxy to make requests from.
         """
         region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
+
         query = {
             'musicId': id,
-            'lang': language
+            'language': language
         }
         api_url = "{}api/music/detail/?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
@@ -558,7 +559,7 @@ class TikTokApi:
                 'shareUid': '',
                 'recType': '',
                 'priority_region': region,
-                'lang': language,
+                'language': language,
             }
             api_url = "{}share/item/list?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
@@ -596,6 +597,24 @@ class TikTokApi:
         b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
         return self.getData(b, proxy=proxy)
 
+    def getHashtagDetails(self, hashtag, **kwargs) -> dict:
+        """Returns a hashtag object.
+
+          :param hashtag: The hashtag to search by.
+          :param language: The 2 letter code of the language to return.
+                           Note: Doesn't seem to have an affect.
+          :param proxy: The IP address of a proxy to make requests from.
+        """
+        region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
+        query = {
+            'language': language
+        }
+        api_url = "{}node/share/tag/{}?{}&{}".format(
+            BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
+        )
+        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+        return self.getData(b, proxy=proxy)
+
     def getRecommendedTikToksByVideoID(self, id, **kwargs) -> dict:
         """Returns a dictionary listing reccomended TikToks for a specific TikTok video.
 
@@ -614,7 +633,7 @@ class TikTokApi:
             'minCursor': minCursor,
             'shareUid': '',
             'recType': 3,
-            'lang': language,
+            'language': language,
         }
         api_url = "{}share/item/list?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
@@ -633,7 +652,7 @@ class TikTokApi:
         region, language, proxy, minCursor, maxCursor, maxCount = self.__process_kwargs__(kwargs)
         query = {
             'itemId': id,
-            'lang': language,
+            'language': language,
         }
         api_url = "{}api/item/detail/?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
