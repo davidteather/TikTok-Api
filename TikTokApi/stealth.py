@@ -13,6 +13,7 @@ async def chrome_runtime(page: Page) -> None:
 """
     )
 
+
 async def console_debug(page: Page) -> None:
     await page.evaluateOnNewDocument(
         """
@@ -123,6 +124,7 @@ async def iframe_content_window(page: Page) -> None:
 """
     )
 
+
 async def media_codecs(page: Page) -> None:
     await page.evaluateOnNewDocument(
         """
@@ -194,8 +196,8 @@ async def media_codecs(page: Page) -> None:
   } catch (err) {}
 }
 """
-
     )
+
 
 async def navigator_languages(page: Page) -> None:
     await page.evaluateOnNewDocument(
@@ -207,6 +209,7 @@ async def navigator_languages(page: Page) -> None:
 }
     """
     )
+
 
 async def navigator_permissions(page: Page) -> None:
     await page.evaluateOnNewDocument(
@@ -240,6 +243,7 @@ async def navigator_permissions(page: Page) -> None:
 }
     """
     )
+
 
 async def navigator_plugins(page: Page) -> None:
     await page.evaluateOnNewDocument(
@@ -414,6 +418,7 @@ async def navigator_plugins(page: Page) -> None:
 """
     )
 
+
 async def navigator_webdriver(page: Page) -> None:
     await page.evaluateOnNewDocument(
         """
@@ -437,9 +442,12 @@ async def navigator_webdriver(page: Page) -> None:
 async def user_agent(page: Page) -> None:
     ua = await page.browser.userAgent()
     ua = ua.replace("HeadlessChrome", "Chrome")  # hide headless nature
-    ua = re.sub(r'\(([^)]+)\)', '(Windows NT 10.0; Win64; x64)', ua, 1)  # ensure windows
-    
+    ua = re.sub(
+        r"\(([^)]+)\)", "(Windows NT 10.0; Win64; x64)", ua, 1
+    )  # ensure windows
+
     await page.setUserAgent(ua)
+
 
 async def webgl_vendor(page: Page) -> None:
     await page.evaluateOnNewDocument(
@@ -461,6 +469,7 @@ async def webgl_vendor(page: Page) -> None:
 """
     )
 
+
 async def window_outerdimensions(page: Page) -> None:
     await page.evaluateOnNewDocument(
         """
@@ -477,18 +486,19 @@ async def window_outerdimensions(page: Page) -> None:
 """
     )
 
+
 async def stealth(page: Page) -> None:
     if not isinstance(page, Page):
         raise ValueError("page must is pyppeteer.page.Page")
 
-    #await chrome_runtime(page)
+    # await chrome_runtime(page)
     await console_debug(page)
     await iframe_content_window(page)
-    #await navigator_languages(page)
+    # await navigator_languages(page)
     await navigator_permissions(page)
     await navigator_plugins(page)
     await navigator_webdriver(page)
-    #await navigator_vendor(page)
+    # await navigator_vendor(page)
     await user_agent(page)
     await webgl_vendor(page)
     await window_outerdimensions(page)

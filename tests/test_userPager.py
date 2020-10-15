@@ -3,24 +3,25 @@ from TikTokApi import TikTokApi
 
 class TestUserPager:
     """Test the pager returned by getUserPager"""
+
     def test_page_size(self):
         """Pages should be pretty close to the specified size"""
         api = TikTokApi()
 
-        pager = api.getUserPager('therock', page_size=5)
+        pager = api.getUserPager("therock", page_size=5)
 
         page = pager.__next__()
-        assert abs(len(page)-5) <= 2
+        assert abs(len(page) - 5) <= 2
 
         page = pager.__next__()
-        assert abs(len(page)-5) <= 2
+        assert abs(len(page) - 5) <= 2
 
     def test_user_pager_before(self):
         """Should always request therock's first 19 tiktoks across 2 pages"""
         APR_24 = 1587757436000  # 2020-04-24 15:43:56 to be precise. Must be ms-precision timestamp
 
         api = TikTokApi()
-        pager = api.getUserPager('therock', page_size=10, before=APR_24)
+        pager = api.getUserPager("therock", page_size=10, before=APR_24)
 
         total_tts = 0
         pages = 0
@@ -37,7 +38,7 @@ class TestUserPager:
         AUG_10 = 1597076218000  # 2020-08-10 12:16:58
 
         api = TikTokApi()
-        pager = api.getUserPager('therock', page_size=3, after=APR_24, before=AUG_10)
+        pager = api.getUserPager("therock", page_size=3, after=APR_24, before=AUG_10)
 
         total_tts = 0
         pages = 0
