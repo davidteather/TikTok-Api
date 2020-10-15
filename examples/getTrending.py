@@ -1,4 +1,5 @@
 from TikTokApi import TikTokApi
+
 # Starts TikTokApi
 api = TikTokApi()
 
@@ -11,6 +12,6 @@ trending = api.trending(results)
 # Loops over every tiktok
 for tiktok in trending:
     # Prints the text of the tiktok
-    print(tiktok['desc'])
+    print(tiktok["desc"])
 
 print(len(trending))

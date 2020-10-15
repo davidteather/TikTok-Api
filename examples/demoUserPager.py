@@ -7,11 +7,11 @@ api = TikTokApi(debug=True)
 def printPage(page):
     """Just prints out each post with timestamp and description"""
     for post in page:
-        print("{}: {}".format(datetime.fromtimestamp(post['createTime']), post['desc']))
+        print("{}: {}".format(datetime.fromtimestamp(post["createTime"]), post["desc"]))
 
 
 count = 20
-username = 'therock'
+username = "therock"
 
 # count and list all of the posts for a given user with the pager
 total = 0
@@ -22,18 +22,18 @@ for page in pager:
     printPage(page)
     total += len(page)
 
-print('{} has {} posts'.format(username, total))
+print("{} has {} posts".format(username, total))
 all_posts = total
 
 # List all of the posts for a given user after a certain date
 
 APR_24 = 1587757438000  # 2020-04-24 15:43:58 to be precise. Must be ms-precision UNIX timestamp
 user = api.getUserObject(username)
-page = api.userPage(user['id'], user['secUid'], page_size=30, after=APR_24)
+page = api.userPage(user["id"], user["secUid"], page_size=30, after=APR_24)
 
-printPage(page['items'])
-new_posts = len(page['items'])
-print('{} has {} posts after {}'.format(username, new_posts, APR_24))
+printPage(page["items"])
+new_posts = len(page["items"])
+print("{} has {} posts after {}".format(username, new_posts, APR_24))
 
 
 # Count and list all of the posts before a certain date for a given user with the pager
@@ -45,5 +45,5 @@ for page in pager:
     printPage(page)
     total += len(page)
 
-print('{} has {} posts from before {}'.format(username, total, APR_24))
-print('Should be {}'.format(all_posts - new_posts))
+print("{} has {} posts from before {}".format(username, total, APR_24))
+print("Should be {}".format(all_posts - new_posts))
