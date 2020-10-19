@@ -407,18 +407,15 @@ class TikTokApi:
             maxCount,
         ) = self.__process_kwargs__(kwargs)
 
-        api_url = (
-            "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}"
-            "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}".format(
-                self.__add_new_params__(),
-                page_size,
-                str(userID),
-                str(secUID),
-                minCursor,
-                maxCursor,
-                region,
-                language,
-            )
+        api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}" "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}".format(
+            self.__add_new_params__(),
+            page_size,
+            str(userID),
+            str(secUID),
+            minCursor,
+            maxCursor,
+            region,
+            language,
         )
         b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
         return self.getData(b, proxy=proxy)
@@ -1143,7 +1140,10 @@ class TikTokApi:
         try:
             api_url = data["video"]["downloadAddr"]
         except Exception:
-            api_url = data["itemInfos"]["video"]["urls"][0]
+            try:
+                api_url = data["itemInfos"]["video"]["urls"][0]
+            except Exception:
+                api_url = data["itemInfo"]["itemStruct"]["video"]["downloadAddr"]
         return self.get_Video_By_DownloadURL(api_url, proxy=proxy)
 
     def get_Video_By_DownloadURL(self, download_url, **kwargs) -> bytes:
