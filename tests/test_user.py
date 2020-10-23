@@ -5,7 +5,7 @@ def test_user():
     api = TikTokApi()
 
     assert (
-        api.getUser("charlidamelio")["userInfo"]["user"]["uniqueId"] == "charlidamelio"
+        api.getUser("charlidamelio")["user"]["uniqueId"] == "charlidamelio"
     )
     assert api.getUserObject("charlidamelio")["uniqueId"] == "charlidamelio"
     assert (
@@ -47,5 +47,3 @@ def test_user():
         )
         <= 1
     )
-
-    # assert len(api.userLikedbyUsername(username="", count=30)) == 30

@@ -73,6 +73,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         if self.request_delay is not None:
             time.sleep(self.request_delay)
@@ -130,6 +131,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         query = {"verifyFp": b.verifyFp, "_signature": b.signature}
         url = "{}&{}".format(b.url, urlencode(query))
@@ -156,6 +158,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
 
         response = []
@@ -174,7 +177,7 @@ class TikTokApi:
                 "secUid": "",
                 "maxCursor": maxCursor,
                 "minCursor": minCursor,
-                "sourceType": 12,
+                "sourceType": 8,
                 "appId": 1233,
                 "region": region,
                 "priority_region": region,
@@ -191,14 +194,13 @@ class TikTokApi:
             )
             res = self.getData(b, proxy=proxy)
 
-            if "items" in res.keys():
-                for t in res["items"]:
-                    response.append(t)
+            for t in res.get("items", []):
+                response.append(t)
 
             if not res["hasMore"] and not first:
                 if self.debug:
                     print("TikTok isn't sending more TikToks beyond this point.")
-                return response
+                return response[:count]
 
             realCount = count - len(response)
             maxCursor = res["maxCursor"]
@@ -251,6 +253,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
 
         response = []
@@ -309,6 +312,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
 
         response = []
@@ -338,13 +342,13 @@ class TikTokApi:
             )
             b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
             res = self.getData(b, proxy=proxy)
-
             if "items" in res.keys():
                 for t in res["items"]:
                     response.append(t)
 
             if not res["hasMore"] and not first:
-                print("TikTok isn't sending more TikToks beyond this point.")
+                if self.debug:
+                    print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count - len(response)
@@ -373,6 +377,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         data = self.getUserObject(username, proxy=proxy)
         return self.userPosts(
@@ -405,20 +410,18 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
 
-        api_url = (
-            "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}"
-            "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}".format(
-                self.__add_new_params__(),
-                page_size,
-                str(userID),
-                str(secUID),
-                minCursor,
-                maxCursor,
-                region,
-                language,
-            )
+        api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}" "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}".format(
+            self.__add_new_params__(),
+            page_size,
+            str(userID),
+            str(secUID),
+            minCursor,
+            maxCursor,
+            region,
+            language,
         )
         b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
         return self.getData(b, proxy=proxy)
@@ -443,6 +446,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         data = self.getUserObject(username, proxy=proxy)
 
@@ -492,6 +496,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         response = []
         first = True
@@ -563,6 +568,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         data = self.getUserObject(username, proxy=proxy)
         return self.userLiked(
@@ -594,6 +600,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         response = []
 
@@ -646,6 +653,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
 
         query = {"musicId": id, "language": language}
@@ -674,6 +682,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         id = self.getHashtagObject(hashtag)["challengeInfo"]["challenge"]["id"]
         response = []
@@ -681,30 +690,28 @@ class TikTokApi:
         while len(response) < count:
             query = {
                 "count": count,
-                "id": id,
+                "challengeID": id,
                 "type": 3,
                 "secUid": "",
-                "maxCursor": maxCursor,
-                "minCursor": minCursor,
-                "shareUid": "",
-                "recType": "",
-                "priority_region": region,
+                "cursor": offset,
+                "sourceType": "8",
                 "language": language,
             }
-            api_url = "{}share/item/list?{}&{}".format(
+            api_url = "{}api/challenge/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
             res = self.getData(b, proxy=proxy, language=language)
 
-            for t in res["body"]["itemListData"]:
+            for t in res['itemList']:
                 response.append(t)
 
-            if not res["body"]["hasMore"]:
-                print("TikTok isn't sending more TikToks beyond this point.")
+            if not res["hasMore"]:
+                if self.debug:
+                    print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
-            maxCursor = res["body"]["maxCursor"]
+            offset = len(response)
 
         return response[:count]
 
@@ -723,6 +730,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         query = {"challengeName": hashtag, "language": language}
         api_url = "{}api/challenge/detail/?{}&{}".format(
@@ -746,6 +754,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         query = {"language": language}
         api_url = "{}node/share/tag/{}?{}&{}".format(
@@ -769,6 +778,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         query = {
             "count": 24,
@@ -802,6 +812,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         query = {
             "itemId": id,
@@ -828,6 +839,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         if "@" in url and "/video/" in url:
             post_id = url.split("/video/")[1].split("?")[0]
@@ -851,6 +863,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         query = {"noUser": 1, "userCount": 30, "scene": 0}
         api_url = "{}node/share/discover?{}&{}".format(
@@ -871,6 +884,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         query = {"noUser": 1, "userCount": 30, "scene": 0}
         api_url = "{}node/share/discover?{}&{}".format(
@@ -894,9 +908,9 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
-        return self.getUser(username, **kwargs)["userInfo"]["user"]
-
+        return self.getUser(username, **kwargs)['user']
     def getUser(self, username, **kwargs) -> dict:
         """Gets the full exposed user object
 
@@ -912,13 +926,14 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         query = {"uniqueId": username, "language": language}
         api_url = "{}api/user/detail/?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
         b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
-        return self.getData(b, proxy=proxy)
+        return self.getData(b, proxy=proxy)['userInfo']
 
     def getSuggestedUsersbyID(
         self, userId="6745191554350760966", count=30, **kwargs
@@ -936,6 +951,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         query = {
             "noUser": 0,
@@ -971,6 +987,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         users = []
         unusedIDS = [startingId]
@@ -1004,6 +1021,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         query = {
             "noUser": 0,
@@ -1039,6 +1057,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         hashtags = []
         ids = self.getSuggestedUsersbyIDCrawler(
@@ -1073,6 +1092,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         query = {
             "noUser": 0,
@@ -1108,6 +1128,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         musics = []
         ids = self.getSuggestedUsersbyIDCrawler(
@@ -1139,11 +1160,15 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         try:
             api_url = data["video"]["downloadAddr"]
         except Exception:
-            api_url = data["itemInfos"]["video"]["urls"][0]
+            try:
+                api_url = data["itemInfos"]["video"]["urls"][0]
+            except Exception:
+                api_url = data["itemInfo"]["itemStruct"]["video"]["downloadAddr"]
         return self.get_Video_By_DownloadURL(api_url, proxy=proxy)
 
     def get_Video_By_DownloadURL(self, download_url, **kwargs) -> bytes:
@@ -1159,6 +1184,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         b = browser(download_url, proxy=proxy, executablePath=self.executablePath)
         return self.getBytes(b, proxy=proxy)
@@ -1189,6 +1215,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         video_info = self.getTikTokById(video_id)
         video_url = video_info["itemInfo"]["itemStruct"]["video"]["downloadAddr"]
@@ -1228,6 +1255,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         video_id = video_url.split("/video/")[1].split("?")[0]
         return self.get_Video_No_Watermark_ID(video_id, return_bytes, proxy=proxy)
@@ -1246,6 +1274,7 @@ class TikTokApi:
             minCursor,
             maxCursor,
             maxCount,
+            offset,
         ) = self.__process_kwargs__(kwargs)
         r = requests.get(
             video_url,
@@ -1363,5 +1392,6 @@ class TikTokApi:
         maxCursor = kwargs.get("before", 0)
         minCursor = kwargs.get("after", 0)
         maxCount = kwargs.get("maxCount", 50)
+        offset = kwargs.get("offset", 0)
 
-        return region, language, proxy, minCursor, maxCursor, maxCount
+        return region, language, proxy, minCursor, maxCursor, maxCount, offset
