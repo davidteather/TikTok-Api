@@ -194,14 +194,13 @@ class TikTokApi:
             )
             res = self.getData(b, proxy=proxy)
 
-            if "items" in res.keys():
-                for t in res["items"]:
-                    response.append(t)
+            for t in res.get("items", []):
+                response.append(t)
 
             if not res["hasMore"] and not first:
                 if self.debug:
                     print("TikTok isn't sending more TikToks beyond this point.")
-                return response
+                return response[:count]
 
             realCount = count - len(response)
             maxCursor = res["maxCursor"]
