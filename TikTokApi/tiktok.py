@@ -702,7 +702,7 @@ class TikTokApi:
             b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
             res = self.getData(b, proxy=proxy, language=language)
 
-            for t in res['itemList']:
+            for t in res["itemList"]:
                 response.append(t)
 
             if not res["hasMore"]:
@@ -909,7 +909,8 @@ class TikTokApi:
             maxCount,
             offset,
         ) = self.__process_kwargs__(kwargs)
-        return self.getUser(username, **kwargs)['user']
+        return self.getUser(username, **kwargs)["user"]
+
     def getUser(self, username, **kwargs) -> dict:
         """Gets the full exposed user object
 
@@ -932,7 +933,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
         b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
-        return self.getData(b, proxy=proxy)['userInfo']
+        return self.getData(b, proxy=proxy)["userInfo"]
 
     def getSuggestedUsersbyID(
         self, userId="6745191554350760966", count=30, **kwargs
