@@ -25,7 +25,7 @@ class TikTokApi:
         self.userAgent = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/84.0.4147.125 Safari/537.36"
+            "Chrome/86.0.4240.111 Safari/537.36"
         )
 
         # Get Browser Params
@@ -1200,65 +1200,6 @@ class TikTokApi:
         chromedriver_path - path to your chrome driver executable
         """
         raise Exception("Deprecated. Other Methods Work Better.")
-
-    def get_Video_No_Watermark_ID(self, video_id, return_bytes=0, **kwargs) -> bytes:
-        """Returns a TikTok video with no water mark
-
-        :param video_id: The ID of the TikTok you want to download
-        :param return_bytes: Set this to 1 if you want bytes, 0 if you want url.
-        :param proxy: The IP address of your proxy.
-        """
-        (
-            region,
-            language,
-            proxy,
-            minCursor,
-            maxCursor,
-            maxCount,
-            offset,
-        ) = self.__process_kwargs__(kwargs)
-        video_info = self.getTikTokById(video_id)
-        video_url = video_info["itemInfo"]["itemStruct"]["video"]["downloadAddr"]
-        headers = {"User-Agent": "okhttp", "Range": "bytes=1000-80000"}
-        video_data = requests.get(video_url, params=None, headers=headers).text
-        pos = video_data.find("vid:")
-        if pos == -1:
-            return None
-        video_url_no_wm = (
-            "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id={}&vr_type=0&is_play_url=1"
-            "&source=PackSourceEnum_PUBLISH&media_type=4".format(
-                video_data[pos + 4 : pos + 36]
-            )
-        )
-        if return_bytes == 0:
-            return video_url_no_wm
-        else:
-            headers = {"User-Agent": "okhttp"}
-            video_data_no_wm = requests.get(
-                video_url_no_wm, params=None, headers=headers
-            )
-            return video_data_no_wm.content
-
-    def get_Video_No_Watermark_Faster(
-        self, video_url, return_bytes=0, **kwargs
-    ) -> bytes:
-        """No Water Mark method, but may be faster
-
-        :param video_url: The url of the video you want to download
-        :param return_bytes: Set this to 1 if you want bytes, set it to 0 for url.
-        :param proxy: The IP of your proxy.
-        """
-        (
-            region,
-            language,
-            proxy,
-            minCursor,
-            maxCursor,
-            maxCount,
-            offset,
-        ) = self.__process_kwargs__(kwargs)
-        video_id = video_url.split("/video/")[1].split("?")[0]
-        return self.get_Video_No_Watermark_ID(video_id, return_bytes, proxy=proxy)
 
     def get_Video_No_Watermark(self, video_url, return_bytes=0, **kwargs) -> bytes:
         """Gets the video with no watermark

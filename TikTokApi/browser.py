@@ -40,7 +40,7 @@ class browser:
         self.language = language
         self.executablePath = executablePath
 
-        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
+        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
         self.args = [
             "--no-sandbox",
             "--disable-setuid-sandbox",
