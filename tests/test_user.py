@@ -4,9 +4,7 @@ from TikTokApi import TikTokApi
 def test_user():
     api = TikTokApi()
 
-    assert (
-        api.getUser("charlidamelio")["user"]["uniqueId"] == "charlidamelio"
-    )
+    assert api.getUser("charlidamelio")["user"]["uniqueId"] == "charlidamelio"
     assert api.getUserObject("charlidamelio")["uniqueId"] == "charlidamelio"
     assert (
         abs(
