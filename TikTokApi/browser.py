@@ -71,7 +71,6 @@ class browser:
             "handleSIGINT": False,
             "handleSIGTERM": False,
             "handleSIGHUP": False,
-            "dumpio": True,
         }
 
         if self.executablePath != None:
