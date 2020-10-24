@@ -173,11 +173,10 @@ class TikTokApi:
             query = {
                 "count": realCount,
                 "id": 1,
-                "type": 5,
                 "secUid": "",
                 "maxCursor": maxCursor,
                 "minCursor": minCursor,
-                "sourceType": 8,
+                "sourceType": 12,
                 "appId": 1233,
                 "region": region,
                 "priority_region": region,
