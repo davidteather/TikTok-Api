@@ -14,6 +14,7 @@ from .get_acrawler import get_acrawler
 
 async_support = False
 
+
 def set_async():
     global async_support
     async_support = True
@@ -30,7 +31,7 @@ class browser:
         debug=False,
         newParams=False,
         executablePath=None,
-        custom_did=None
+        custom_did=None,
     ):
         self.url = url
         self.debug = debug
