@@ -138,10 +138,17 @@ class TikTokApi:
         r = requests.get(
             url,
             headers={
-                "method": "GET",
-                "accept-encoding": "gzip, deflate, br",
-                "referer": b.referrer,
-                "user-agent": b.userAgent,
+                "Accept": "*/*",
+                "Accept-Encoding": "identity;q=1, *;q=0",
+                "Accept-Language": "en-US;en;q=0.9",
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "cookie": "tt_webid_v2=" + b.did,
+                "Host": url.split("/")[2],
+                "Pragma": "no-cache",
+                "Range": "bytes=0-",
+                "Referer": "https://www.tiktok.com/",
+                "User-Agent": b.userAgent
             },
             proxies=self.__format_proxy(proxy),
         )
@@ -762,7 +769,7 @@ class TikTokApi:
         b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
         return self.getData(b, proxy=proxy)
 
-    def getRecommendedTikToksByVideoID(self, id, **kwargs) -> dict:
+    def getRecommendedTikToksByVideoID(self, id, count=30, **kwargs) -> dict:
         """Returns a dictionary listing reccomended TikToks for a specific TikTok video.
 
         :param id: The id of the video to get suggestions for.
@@ -779,22 +786,53 @@ class TikTokApi:
             maxCount,
             offset,
         ) = self.__process_kwargs__(kwargs)
-        query = {
-            "count": 24,
-            "id": id,
-            "type": 0,
-            "secUid": "",
-            "maxCursor": maxCursor,
-            "minCursor": minCursor,
-            "shareUid": "",
-            "recType": 3,
-            "language": language,
-        }
-        api_url = "{}share/item/list?{}&{}".format(
-            BASE_URL, self.__add_new_params__(), urlencode(query)
-        )
-        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
-        return self.getData(b, proxy=proxy)["body"]
+
+        response = []
+        first = True
+
+        while len(response) < count:
+            if count < maxCount:
+                realCount = count
+            else:
+                realCount = maxCount
+
+            query = {
+                "count": realCount,
+                "id": 1,
+                "secUid": "",
+                "maxCursor": maxCursor,
+                "minCursor": minCursor,
+                "sourceType": 12,
+                "appId": 1233,
+                "region": region,
+                "priority_region": region,
+                "language": language,
+            }
+            api_url = "{}api/recommend/item_list/?{}&{}".format(
+                BASE_URL, self.__add_new_params__(), urlencode(query)
+            )
+            b = browser(
+                api_url,
+                language=language,
+                proxy=proxy,
+                executablePath=self.executablePath,
+            )
+            res = self.getData(b, proxy=proxy)
+
+            for t in res.get("items", []):
+                response.append(t)
+
+            if not res["hasMore"] and not first:
+                if self.debug:
+                    print("TikTok isn't sending more TikToks beyond this point.")
+                return response[:count]
+
+            realCount = count - len(response)
+            maxCursor = res["maxCursor"]
+
+            first = False
+
+        return response[:count]
 
     def getTikTokById(self, id, **kwargs) -> dict:
         """Returns a dictionary of a specific TikTok.
@@ -813,6 +851,7 @@ class TikTokApi:
             maxCount,
             offset,
         ) = self.__process_kwargs__(kwargs)
+        did = kwargs.get("custom_did", None)
         query = {
             "itemId": id,
             "language": language,
@@ -820,7 +859,7 @@ class TikTokApi:
         api_url = "{}api/item/detail/?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+        b = browser(api_url, proxy=proxy, executablePath=self.executablePath, custom_did=did)
         return self.getData(b, proxy=proxy)
 
     def getTikTokByUrl(self, url, **kwargs) -> dict:
@@ -840,6 +879,7 @@ class TikTokApi:
             maxCount,
             offset,
         ) = self.__process_kwargs__(kwargs)
+        custom_did = kwargs.get("custom_did", None)
         if "@" in url and "/video/" in url:
             post_id = url.split("/video/")[1].split("?")[0]
         else:
@@ -848,7 +888,7 @@ class TikTokApi:
                 "https://www.tiktok.com/@therock/video/6829267836783971589"
             )
 
-        return self.getTikTokById(post_id, language=language, proxy=proxy)
+        return self.getTikTokById(post_id, language=language, proxy=proxy, custom_did=custom_did)
 
     def discoverHashtags(self, **kwargs) -> dict:
         """Discover page, consists challenges (hashtags)
@@ -1168,7 +1208,7 @@ class TikTokApi:
             try:
                 api_url = data["itemInfos"]["video"]["urls"][0]
             except Exception:
-                api_url = data["itemInfo"]["itemStruct"]["video"]["downloadAddr"]
+                api_url = data["itemInfo"]["itemStruct"]["video"]["playAddr"]
         return self.get_Video_By_DownloadURL(api_url, proxy=proxy)
 
     def get_Video_By_DownloadURL(self, download_url, **kwargs) -> bytes:
@@ -1190,16 +1230,24 @@ class TikTokApi:
         return self.getBytes(b, proxy=proxy)
 
     def get_Video_By_Url(
-        self, video_url, return_bytes=0, chromedriver_path=None
+        self, video_url, **kwargs
     ) -> bytes:
-        """(DEPRECRATED)
-        Gets the source url of a given url for a tiktok
+        (
+            region,
+            language,
+            proxy,
+            minCursor,
+            maxCursor,
+            maxCount,
+            offset,
+        ) = self.__process_kwargs__(kwargs)
+        did = str(random.randint(10000, 999999999))
+        
+        tiktok_schema = self.getTikTokByUrl(video_url, custom_did=did)
+        download_url = tiktok_schema['itemInfo']['itemStruct']['video']['downloadAddr']
 
-        video_url - the url of the video
-        return_bytes - 0 is just the url, 1 is the actual video bytes
-        chromedriver_path - path to your chrome driver executable
-        """
-        raise Exception("Deprecated. Other Methods Work Better.")
+        b = browser(download_url, proxy=proxy, custom_did=did)
+        return self.getBytes(b, proxy=proxy)
 
     def get_Video_No_Watermark(self, video_url, return_bytes=0, **kwargs) -> bytes:
         """Gets the video with no watermark

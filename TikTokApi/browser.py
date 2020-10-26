@@ -14,7 +14,6 @@ from .get_acrawler import get_acrawler
 
 async_support = False
 
-
 def set_async():
     global async_support
     async_support = True
@@ -31,6 +30,7 @@ class browser:
         debug=False,
         newParams=False,
         executablePath=None,
+        custom_did=None
     ):
         self.url = url
         self.debug = debug
@@ -39,6 +39,7 @@ class browser:
         self.referrer = "https://www.tiktok.com/"
         self.language = language
         self.executablePath = executablePath
+        self.did = custom_did
 
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
         self.args = [
@@ -165,7 +166,8 @@ class browser:
             for i in range(16)
         )
 
-        self.did = str(random.randint(10000, 999999999))
+        if self.did == None:
+            self.did = str(random.randint(10000, 999999999))
 
         await self.page.evaluate("() => { " + get_acrawler() + " }")
         self.signature = await self.page.evaluate(
