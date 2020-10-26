@@ -3,11 +3,6 @@ from TikTokApi import TikTokApi
 # Starts TikTokApi
 api = TikTokApi()
 
-# Below is if you have a DIRECT tiktok url
-tiktokData = api.get_Video_By_Url(
-    "https://www.tiktok.com/@ceciliaannborne/video/6817602864228207878", return_bytes=1
-)
-
 # Below is used if you have the download url from the tiktok object, but maybe not the full object
 tiktokData = api.get_Video_By_DownloadURL(
     api.trending(count=1)[0]["video"]["downloadAddr"]
