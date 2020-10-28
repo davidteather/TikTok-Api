@@ -695,7 +695,7 @@ class TikTokApi:
 
         while len(response) < count:
             query = {
-                "count": count,
+                "count": maxCount,
                 "challengeID": id,
                 "type": 3,
                 "secUid": "",
@@ -1242,7 +1242,7 @@ class TikTokApi:
             offset,
         ) = self.__process_kwargs__(kwargs)
         did = str(random.randint(10000, 999999999))
-        
+
         tiktok_schema = self.getTikTokByUrl(video_url, custom_did=did)
         download_url = tiktok_schema['itemInfo']['itemStruct']['video']['downloadAddr']
 
@@ -1380,7 +1380,7 @@ class TikTokApi:
         proxy = kwargs.get("proxy", None)
         maxCursor = kwargs.get("before", 0)
         minCursor = kwargs.get("after", 0)
-        maxCount = kwargs.get("maxCount", 50)
+        maxCount = kwargs.get("maxCount", 35)
         offset = kwargs.get("offset", 0)
 
         return region, language, proxy, minCursor, maxCursor, maxCount, offset
