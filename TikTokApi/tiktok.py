@@ -10,17 +10,17 @@ BASE_URL = "https://m.tiktok.com/"
 
 
 class TikTokApi:
-    def __init__(self, debug=False, request_delay=None, executablePath=None):
+    def __init__(self, **kwargs):
         """The TikTokApi class. Used to interact with TikTok.
 
         :param debug: If you want debugging to be enabled.
         :param request_delay: The amount of time to wait before making a request.
         :param executablePath: The location of the chromedriver.exe
         """
-        self.debug = debug
-        if debug:
+        self.debug = kwargs.get("debug", False)
+        if self.debug:
             print("Class initialized")
-        self.executablePath = executablePath
+        self.executablePath = kwargs.get("executablePath", None)
 
         self.userAgent = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -29,7 +29,7 @@ class TikTokApi:
         )
 
         # Get Browser Params
-        b = browser("newParam", newParams=True, executablePath=self.executablePath)
+        b = browser("newParam", newParams=True, **kwargs)
 
         try:
             self.timezone_name = self.__format_new_params__(b.timezone_name)
@@ -40,7 +40,7 @@ class TikTokApi:
             self.width = b.width
             self.height = b.height
         except Exception as e:
-            if debug:
+            if self.debug:
                 print("The following error occurred, but it was ignored.")
                 print(e)
 
@@ -52,7 +52,7 @@ class TikTokApi:
             self.width = "1920"
             self.height = "1080"
 
-        self.request_delay = request_delay
+        self.request_delay = kwargs.get("request_delay", None)
 
     def getData(self, b, **kwargs) -> dict:
         """Returns a dictionary of a response from TikTok.
@@ -148,7 +148,7 @@ class TikTokApi:
                 "Pragma": "no-cache",
                 "Range": "bytes=0-",
                 "Referer": "https://www.tiktok.com/",
-                "User-Agent": b.userAgent
+                "User-Agent": b.userAgent,
             },
             proxies=self.__format_proxy(proxy),
         )
@@ -193,10 +193,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             b = browser(
-                api_url,
-                language=language,
-                proxy=proxy,
-                executablePath=self.executablePath,
+                api_url, **kwargs
             )
             res = self.getData(b, proxy=proxy)
 
@@ -277,7 +274,7 @@ class TikTokApi:
             api_url = "{}api/discover/{}/?{}&{}".format(
                 BASE_URL, prefix, self.__add_new_params__(), urlencode(query)
             )
-            b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+            b = browser(api_url, **kwargs)
             data = self.getData(b, proxy=proxy)
 
             if "userInfoList" in data.keys():
@@ -346,7 +343,7 @@ class TikTokApi:
             api_url = "{}api/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+            b = browser(api_url, **kwargs)
             res = self.getData(b, proxy=proxy)
             if "items" in res.keys():
                 for t in res["items"]:
@@ -393,6 +390,7 @@ class TikTokApi:
             proxy=proxy,
             language=language,
             region=region,
+            **kwargs
         )
 
     def userPage(self, userID, secUID, page_size=30, **kwargs) -> dict:
@@ -429,7 +427,7 @@ class TikTokApi:
             region,
             language,
         )
-        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+        b = browser(api_url, **kwargs)
         return self.getData(b, proxy=proxy)
 
     def getUserPager(self, username, page_size=30, **kwargs):
@@ -529,7 +527,7 @@ class TikTokApi:
             api_url = "{}api/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+            b = browser(api_url, **kwargs)
             res = self.getData(b, proxy=proxy)
 
             try:
@@ -584,6 +582,7 @@ class TikTokApi:
             proxy=proxy,
             language=language,
             region=region,
+            **kwargs,
         )
 
     def bySound(self, id, count=30, **kwargs) -> dict:
@@ -629,7 +628,7 @@ class TikTokApi:
             api_url = "{}share/item/list?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+            b = browser(api_url, **kwargs)
             res = self.getData(b, proxy=proxy)
 
             for t in res["body"]["itemListData"]:
@@ -666,7 +665,7 @@ class TikTokApi:
         api_url = "{}api/music/detail/?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+        b = browser(api_url, **kwargs)
         return self.getData(b, proxy=proxy)
 
     def byHashtag(self, hashtag, count=30, **kwargs) -> dict:
@@ -706,7 +705,7 @@ class TikTokApi:
             api_url = "{}api/challenge/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+            b = browser(api_url, **kwargs)
             res = self.getData(b, proxy=proxy, language=language)
 
             for t in res["itemList"]:
@@ -742,7 +741,7 @@ class TikTokApi:
         api_url = "{}api/challenge/detail/?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+        b = browser(api_url, **kwargs)
         return self.getData(b, proxy=proxy)
 
     def getHashtagDetails(self, hashtag, **kwargs) -> dict:
@@ -766,7 +765,7 @@ class TikTokApi:
         api_url = "{}node/share/tag/{}?{}&{}".format(
             BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
         )
-        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+        b = browser(api_url, **kwargs)
         return self.getData(b, proxy=proxy)
 
     def getRecommendedTikToksByVideoID(self, id, count=30, **kwargs) -> dict:
@@ -812,10 +811,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             b = browser(
-                api_url,
-                language=language,
-                proxy=proxy,
-                executablePath=self.executablePath,
+                api_url,**kwargs
             )
             res = self.getData(b, proxy=proxy)
 
@@ -859,7 +855,9 @@ class TikTokApi:
         api_url = "{}api/item/detail/?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        b = browser(api_url, proxy=proxy, executablePath=self.executablePath, custom_did=did)
+        b = browser(
+            api_url, **kwargs
+        )
         return self.getData(b, proxy=proxy)
 
     def getTikTokByUrl(self, url, **kwargs) -> dict:
@@ -888,7 +886,9 @@ class TikTokApi:
                 "https://www.tiktok.com/@therock/video/6829267836783971589"
             )
 
-        return self.getTikTokById(post_id, language=language, proxy=proxy, custom_did=custom_did)
+        return self.getTikTokById(
+            post_id, **kwargs,
+        )
 
     def discoverHashtags(self, **kwargs) -> dict:
         """Discover page, consists challenges (hashtags)
@@ -908,7 +908,7 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+        b = browser(api_url, **kwargs)
         return self.getData(b, proxy=proxy)["body"][1]["exploreList"]
 
     def discoverMusic(self, **kwargs) -> dict:
@@ -929,7 +929,7 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+        b = browser(api_url, **kwargs)
         return self.getData(b, proxy=proxy)["body"][2]["exploreList"]
 
     def getUserObject(self, username, **kwargs) -> dict:
@@ -972,7 +972,7 @@ class TikTokApi:
         api_url = "{}api/user/detail/?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+        b = browser(api_url, **kwargs)
         return self.getData(b, proxy=proxy)["userInfo"]
 
     def getSuggestedUsersbyID(
@@ -1003,7 +1003,7 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+        b = browser(api_url, **kwargs)
 
         res = []
         for x in self.getData(b, proxy=proxy)["body"][0]["exploreList"]:
@@ -1073,7 +1073,7 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+        b = browser(api_url, **kwargs)
 
         res = []
         for x in self.getData(b, proxy=proxy)["body"][1]["exploreList"]:
@@ -1144,7 +1144,7 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        b = browser(api_url, proxy=proxy, executablePath=self.executablePath)
+        b = browser(api_url, **kwargs)
 
         res = []
         for x in self.getData(b, proxy=proxy)["body"][2]["exploreList"]:
@@ -1209,7 +1209,7 @@ class TikTokApi:
                 api_url = data["itemInfos"]["video"]["urls"][0]
             except Exception:
                 api_url = data["itemInfo"]["itemStruct"]["video"]["playAddr"]
-        return self.get_Video_By_DownloadURL(api_url, proxy=proxy)
+        return self.get_Video_By_DownloadURL(api_url, **kwargs)
 
     def get_Video_By_DownloadURL(self, download_url, **kwargs) -> bytes:
         """Downloads video from TikTok using download url in a TikTok object
@@ -1226,12 +1226,10 @@ class TikTokApi:
             maxCount,
             offset,
         ) = self.__process_kwargs__(kwargs)
-        b = browser(download_url, proxy=proxy, executablePath=self.executablePath)
-        return self.getBytes(b, proxy=proxy)
+        b = browser(download_url, **kwargs)
+        return self.getBytes(b, **kwargs)
 
-    def get_Video_By_Url(
-        self, video_url, **kwargs
-    ) -> bytes:
+    def get_Video_By_Url(self, video_url, **kwargs) -> bytes:
         (
             region,
             language,
@@ -1241,13 +1239,12 @@ class TikTokApi:
             maxCount,
             offset,
         ) = self.__process_kwargs__(kwargs)
-        did = str(random.randint(10000, 999999999))
-        
-        tiktok_schema = self.getTikTokByUrl(video_url, custom_did=did)
-        download_url = tiktok_schema['itemInfo']['itemStruct']['video']['downloadAddr']
 
-        b = browser(download_url, proxy=proxy, custom_did=did)
-        return self.getBytes(b, proxy=proxy)
+        tiktok_schema = self.getTikTokByUrl(video_url, **kwargs)
+        download_url = tiktok_schema["itemInfo"]["itemStruct"]["video"]["downloadAddr"]
+
+        b = browser(download_url, **kwargs)
+        return self.getBytes(b, **kwargs)
 
     def get_Video_No_Watermark(self, video_url, return_bytes=0, **kwargs) -> bytes:
         """Gets the video with no watermark
@@ -1313,10 +1310,7 @@ class TikTokApi:
             ).format(key)
 
             b = browser(
-                cleanVideo,
-                find_redirect=True,
-                proxy=proxy,
-                executablePath=self.executablePath,
+                cleanVideo, **kwargs
             )
             print(b.redirect_url)
             if return_bytes == 0:

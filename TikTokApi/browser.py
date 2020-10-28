@@ -24,23 +24,17 @@ class browser:
     def __init__(
         self,
         url,
-        language="en",
-        proxy=None,
-        find_redirect=False,
-        api_url=None,
-        debug=False,
-        newParams=False,
-        executablePath=None,
-        custom_did=None,
+        **kwargs,
     ):
         self.url = url
-        self.debug = debug
-        self.proxy = proxy
-        self.api_url = api_url
-        self.referrer = "https://www.tiktok.com/"
-        self.language = language
-        self.executablePath = executablePath
-        self.did = custom_did
+        self.debug = kwargs.get("debug", False)
+        self.proxy = kwargs.get("proxy", None)
+        self.api_url = kwargs.get("api_url", None)
+        self.referrer = kwargs.get("referer", "https://www.tiktok.com/")
+        self.language = kwargs.get("language", 'en')
+        self.executablePath = kwargs.get("executablePath", None)
+        self.did = kwargs.get("custom_did", None)
+        find_redirect = kwargs.get("find_redirect", False)
 
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
         self.args = [
@@ -53,18 +47,18 @@ class browser:
             "--user-agent=" + self.userAgent,
         ]
 
-        if proxy != None:
-            if "@" in proxy:
+        if self.proxy != None:
+            if "@" in self.proxy:
                 self.args.append(
                     "--proxy-server="
-                    + proxy.split(":")[0]
+                    + self.proxy.split(":")[0]
                     + "://"
-                    + proxy.split("://")[1].split(":")[1].split("@")[1]
+                    + self.proxy.split("://")[1].split(":")[1].split("@")[1]
                     + ":"
-                    + proxy.split("://")[1].split(":")[2]
+                    + self.proxy.split("://")[1].split(":")[2]
                 )
             else:
-                self.args.append("--proxy-server=" + proxy)
+                self.args.append("--proxy-server=" + self.proxy)
         self.options = {
             "args": self.args,
             "headless": True,
@@ -84,7 +78,7 @@ class browser:
             t.start()
             if find_redirect:
                 fut = asyncio.run_coroutine_threadsafe(self.find_redirect(), loop)
-            elif newParams:
+            elif kwargs.get("newParams", False):
                 fut = asyncio.run_coroutine_threadsafe(self.newParams(), loop)
             else:
                 fut = asyncio.run_coroutine_threadsafe(self.start(), loop)
@@ -94,7 +88,7 @@ class browser:
                 self.loop = asyncio.new_event_loop()
                 if find_redirect:
                     self.loop.run_until_complete(self.find_redirect())
-                elif newParams:
+                elif kwargs.get("newParams", False):
                     self.loop.run_until_complete(self.newParams())
                 else:
                     self.loop.run_until_complete(self.start())
@@ -254,8 +248,8 @@ class browser:
         else:
             return None
 
-    def __get_js(self, proxy=None):
+    def __get_js(self):
         return requests.get(
             "https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js",
-            proxies=self.__format_proxy(proxy),
+            proxies=self.__format_proxy(self.proxy),
         ).text
