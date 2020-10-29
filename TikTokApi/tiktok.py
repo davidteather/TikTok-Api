@@ -386,11 +386,7 @@ class TikTokApi:
         return self.userPosts(
             data["id"],
             data["secUid"],
-            count=count,
-            proxy=proxy,
-            language=language,
-            region=region,
-            **kwargs
+            **{**kwargs, "count":count, "proxy":proxy, "language":language, "region":region}
         )
 
     def userPage(self, userID, secUID, page_size=30, **kwargs) -> dict:
