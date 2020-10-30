@@ -135,6 +135,7 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         query = {"verifyFp": b.verifyFp, "_signature": b.signature}
         url = "{}&{}".format(b.url, urlencode(query))
+        print(b.did)
         r = requests.get(
             url,
             headers={
@@ -192,9 +193,7 @@ class TikTokApi:
             api_url = "{}api/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            b = browser(
-                api_url, **kwargs
-            )
+            b = browser(api_url, **kwargs)
             res = self.getData(b, proxy=proxy)
 
             for t in res.get("items", []):
@@ -390,7 +389,7 @@ class TikTokApi:
             proxy=proxy,
             language=language,
             region=region,
-            **kwargs
+            **kwargs,
         )
 
     def userPage(self, userID, secUID, page_size=30, **kwargs) -> dict:
@@ -692,7 +691,12 @@ class TikTokApi:
         id = self.getHashtagObject(hashtag)["challengeInfo"]["challenge"]["id"]
         response = []
 
-        while len(response) < count:
+        required_count = count
+
+        while len(response) < required_count:
+            if count > maxCount:
+                count = maxCount
+            added = 0
             query = {
                 "count": count,
                 "challengeID": id,
@@ -708,17 +712,21 @@ class TikTokApi:
             b = browser(api_url, **kwargs)
             res = self.getData(b, proxy=proxy, language=language)
 
-            for t in res["itemList"]:
-                response.append(t)
+            try:
+                for t in res["itemList"]:
+                    response.append(t)
+                    added += 1
+            except:
+                print(res)
 
             if not res["hasMore"]:
                 if self.debug:
                     print("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
-            offset = len(response)
+            offset += added
 
-        return response[:count]
+        return response[:required_count]
 
     def getHashtagObject(self, hashtag, **kwargs) -> dict:
         """Returns a hashtag object.
@@ -810,9 +818,7 @@ class TikTokApi:
             api_url = "{}api/recommend/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            b = browser(
-                api_url,**kwargs
-            )
+            b = browser(api_url, **kwargs)
             res = self.getData(b, proxy=proxy)
 
             for t in res.get("items", []):
@@ -855,9 +861,7 @@ class TikTokApi:
         api_url = "{}api/item/detail/?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        b = browser(
-            api_url, **kwargs
-        )
+        b = browser(api_url, **kwargs)
         return self.getData(b, proxy=proxy)
 
     def getTikTokByUrl(self, url, **kwargs) -> dict:
@@ -887,7 +891,8 @@ class TikTokApi:
             )
 
         return self.getTikTokById(
-            post_id, **kwargs,
+            post_id,
+            **kwargs,
         )
 
     def discoverHashtags(self, **kwargs) -> dict:
@@ -1309,9 +1314,7 @@ class TikTokApi:
                 "&media_type=4&vr_type=0"
             ).format(key)
 
-            b = browser(
-                cleanVideo, **kwargs
-            )
+            b = browser(cleanVideo, **kwargs)
             print(b.redirect_url)
             if return_bytes == 0:
                 return b.redirect_url
@@ -1374,7 +1377,7 @@ class TikTokApi:
         proxy = kwargs.get("proxy", None)
         maxCursor = kwargs.get("before", 0)
         minCursor = kwargs.get("after", 0)
-        maxCount = kwargs.get("maxCount", 50)
+        maxCount = kwargs.get("maxCount", 35)
         offset = kwargs.get("offset", 0)
 
         return region, language, proxy, minCursor, maxCursor, maxCount, offset

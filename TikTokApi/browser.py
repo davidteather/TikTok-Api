@@ -31,7 +31,7 @@ class browser:
         self.proxy = kwargs.get("proxy", None)
         self.api_url = kwargs.get("api_url", None)
         self.referrer = kwargs.get("referer", "https://www.tiktok.com/")
-        self.language = kwargs.get("language", 'en')
+        self.language = kwargs.get("language", "en")
         self.executablePath = kwargs.get("executablePath", None)
         self.did = kwargs.get("custom_did", None)
         find_redirect = kwargs.get("find_redirect", False)
