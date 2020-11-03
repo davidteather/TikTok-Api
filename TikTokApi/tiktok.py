@@ -135,7 +135,6 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         query = {"verifyFp": b.verifyFp, "_signature": b.signature}
         url = "{}&{}".format(b.url, urlencode(query))
-        print(b.did)
         r = requests.get(
             url,
             headers={
