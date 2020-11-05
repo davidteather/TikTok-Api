@@ -18,3 +18,4 @@ test.mp4
 test.txt
 .pytest_cache/*
 tests/__pycache__/*
+*.pyc
