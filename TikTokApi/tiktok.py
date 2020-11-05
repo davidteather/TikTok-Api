@@ -379,8 +379,8 @@ class TikTokApi:
         :param userID: The userID of the user, which TikTok assigns.
         :param secUID: The secUID of the user, which TikTok assigns.
         :param page_size: The number of posts to return per page.
-        :param after: time stamp for the earliest TikTok to retrieve
-        :param before: time stamp for the latest TikTok to retrieve
+        :param minCursor: time stamp for the earliest TikTok to retrieve
+        :param maxCursor: time stamp for the latest TikTok to retrieve
         :param language: The 2 letter code of the language to return.
                          Note: Doesn't seem to have an affect.
         :param region: The 2 letter region code.
@@ -412,8 +412,8 @@ class TikTokApi:
 
         :param username: The username of the user.
         :param page_size: The number of posts to return in a page.
-        :param after: time stamp for the earliest TikTok to retrieve
-        :param before: time stamp for the latest TikTok to retrieve
+        :param minCursor: time stamp for the earliest TikTok to retrieve
+        :param maxCursor: time stamp for the latest TikTok to retrieve
         :param language: The 2 letter code of the language to return.
                          Note: Doesn't seem to have an affect.
         :param region: The 2 letter region code.
@@ -433,8 +433,8 @@ class TikTokApi:
                 data["id"],
                 data["secUid"],
                 page_size=page_size,
-                before=maxCursor,
-                after=minCursor,
+                maxCursor=maxCursor,
+                minCursor=minCursor,
                 proxy=proxy,
                 language=language,
                 region=region,
