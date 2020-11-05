@@ -95,8 +95,8 @@ results = 10
 trending = api.trending(count=results)
 
 for tiktok in trending:
-    # Prints the text of the tiktok
-    print(tiktok['desc'])
+    # Prints the id of the tiktok
+    print(tiktok['id'])
 
 print(len(trending))
 ```
@@ -104,7 +104,7 @@ print(len(trending))
 To run the example scripts from the repository root, make sure you use the
 module form of python the interpreter
 
-```sh
+```
 python -m examples.getTrending
 ```
 
