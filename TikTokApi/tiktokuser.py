@@ -43,6 +43,9 @@ class TikTokUser:
             + videoID
             + '"}'
             + ',{"insigh_type":"vv_history","days":8}'
+            + ',{"insigh_type":"follower_num_history","days":9}'
+            + ',{"insigh_type":"follower_num"}'
+            + ',{"insigh_type":"user_info"}'
         )
         r = requests.post(
             api_url,

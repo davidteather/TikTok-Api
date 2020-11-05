@@ -21,7 +21,7 @@ class TestUserPager:
         APR_24 = 1587757436000  # 2020-04-24 15:43:56 to be precise. Must be ms-precision timestamp
 
         api = TikTokApi()
-        pager = api.getUserPager("therock", page_size=10, before=APR_24)
+        pager = api.getUserPager("therock", page_size=10, maxCursor=APR_24)
 
         total_tts = 0
         pages = 0
@@ -38,7 +38,7 @@ class TestUserPager:
         AUG_10 = 1597076218000  # 2020-08-10 12:16:58
 
         api = TikTokApi()
-        pager = api.getUserPager("therock", page_size=3, after=APR_24, before=AUG_10)
+        pager = api.getUserPager("therock", page_size=3, minCursor=APR_24, maxCursor=AUG_10)
 
         total_tts = 0
         pages = 0

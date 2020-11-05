@@ -19,6 +19,15 @@ def set_async():
     global async_support
     async_support = True
 
+options = {}
+def custom_options(to_add):
+    global options
+    options = to_add
+
+args = []
+def custom_args(to_add):
+    global args
+    args = to_add
 
 class browser:
     def __init__(
@@ -37,15 +46,23 @@ class browser:
         find_redirect = kwargs.get("find_redirect", False)
 
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
-        self.args = [
-            "--no-sandbox",
-            "--disable-setuid-sandbox",
-            "--disable-infobars",
-            "--window-position=0,0",
-            "--ignore-certifcate-errors",
-            "--ignore-certifcate-errors-spki-list",
-            "--user-agent=" + self.userAgent,
-        ]
+        
+        global args
+        global options
+
+        if len(args) == 0:
+            self.args = [
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-infobars",
+                "--window-position=0,0",
+                "--ignore-certifcate-errors",
+                "--ignore-certifcate-errors-spki-list",
+                "--user-agent=" + self.userAgent,
+            ]
+        else:
+            self.args = args
+            self.args.append("--user-agent=" + self.userAgent)
 
         if self.proxy != None:
             if "@" in self.proxy:
@@ -68,6 +85,8 @@ class browser:
             "handleSIGTERM": False,
             "handleSIGHUP": False,
         }
+
+        self.options.update(options)
 
         if self.executablePath != None:
             self.options["executablePath"] = self.executablePath
