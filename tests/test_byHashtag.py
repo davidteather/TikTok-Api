@@ -1,11 +1,13 @@
 from TikTokApi import TikTokApi
 
+
 def unique_count(tiktoks):
     tmp = []
     for t in tiktoks:
-        if t['id'] not in tmp:
-            tmp.append(t['id'])
+        if t["id"] not in tmp:
+            tmp.append(t["id"])
     return tmp
+
 
 def test_hashtag():
     api = TikTokApi()
