@@ -184,7 +184,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             b = browser(api_url, **kwargs)
-            res = self.getData(b, proxy=proxy)
+            res = self.getData(b, **kwargs)
 
             for t in res.get("items", []):
                 response.append(t)
@@ -261,7 +261,7 @@ class TikTokApi:
                 BASE_URL, prefix, self.__add_new_params__(), urlencode(query)
             )
             b = browser(api_url, **kwargs)
-            data = self.getData(b, proxy=proxy)
+            data = self.getData(b, **kwargs)
 
             if "userInfoList" in data.keys():
                 for x in data["userInfoList"]:
@@ -281,7 +281,9 @@ class TikTokApi:
 
         return response[:count]
 
-    def userPosts(self, userID, secUID, count=30, minCursor=0, maxCursor=0, **kwargs) -> dict:
+    def userPosts(
+        self, userID, secUID, count=30, minCursor=0, maxCursor=0, **kwargs
+    ) -> dict:
         """Returns a dictionary listing TikToks given a user's ID and secUID
 
         :param userID: The userID of the user, which TikTok assigns.
@@ -327,7 +329,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             b = browser(api_url, **kwargs)
-            res = self.getData(b, proxy=proxy)
+            res = self.getData(b, **kwargs)
             if "items" in res.keys():
                 for t in res["items"]:
                     response.append(t)
@@ -362,18 +364,17 @@ class TikTokApi:
             proxy,
             maxCount,
         ) = self.__process_kwargs__(kwargs)
-        data = self.getUserObject(username, proxy=proxy)
+        data = self.getUserObject(username, **kwargs)
         return self.userPosts(
             data["id"],
             data["secUid"],
             count=count,
-            proxy=proxy,
-            language=language,
-            region=region,
             **kwargs,
         )
 
-    def userPage(self, userID, secUID, page_size=30, minCursor=0, maxCursor=0, **kwargs) -> dict:
+    def userPage(
+        self, userID, secUID, page_size=30, minCursor=0, maxCursor=0, **kwargs
+    ) -> dict:
         """Returns a dictionary listing of one page of TikToks given a user's ID and secUID
 
         :param userID: The userID of the user, which TikTok assigns.
@@ -405,7 +406,7 @@ class TikTokApi:
             language,
         )
         b = browser(api_url, **kwargs)
-        return self.getData(b, proxy=proxy)
+        return self.getData(b, **kwargs)
 
     def getUserPager(self, username, page_size=30, minCursor=0, maxCursor=0, **kwargs):
         """Returns a generator to page through a user's feed
@@ -426,7 +427,7 @@ class TikTokApi:
             proxy,
             maxCount,
         ) = self.__process_kwargs__(kwargs)
-        data = self.getUserObject(username, proxy=proxy)
+        data = self.getUserObject(username, **kwargs)
 
         while True:
             resp = self.userPage(
@@ -435,9 +436,7 @@ class TikTokApi:
                 page_size=page_size,
                 maxCursor=maxCursor,
                 minCursor=minCursor,
-                proxy=proxy,
-                language=language,
-                region=region,
+                **kwargs,
             )
 
             try:
@@ -453,7 +452,9 @@ class TikTokApi:
             if not resp["hasMore"]:
                 return  # all done
 
-    def userLiked(self, userID, secUID, count=30, minCursor=0, maxCursor=0, **kwargs) -> dict:
+    def userLiked(
+        self, userID, secUID, count=30, minCursor=0, maxCursor=0, **kwargs
+    ) -> dict:
         """Returns a dictionary listing TikToks that a given a user has liked.
            Note: The user's likes must be public
 
@@ -499,7 +500,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             b = browser(api_url, **kwargs)
-            res = self.getData(b, proxy=proxy)
+            res = self.getData(b, **kwargs)
 
             try:
                 res["items"]
@@ -542,14 +543,11 @@ class TikTokApi:
             proxy,
             maxCount,
         ) = self.__process_kwargs__(kwargs)
-        data = self.getUserObject(username, proxy=proxy)
+        data = self.getUserObject(username, **kwargs)
         return self.userLiked(
             data["id"],
             data["secUid"],
             count=count,
-            proxy=proxy,
-            language=language,
-            region=region,
             **kwargs,
         )
 
@@ -579,7 +577,7 @@ class TikTokApi:
                 realCount = count
             else:
                 realCount = maxCount
-            
+
             query = {
                 "secUid": "",
                 "musicID": str(id),
@@ -592,7 +590,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             b = browser(api_url, **kwargs)
-            res = self.getData(b, proxy=proxy)
+            res = self.getData(b, **kwargs)
 
             for t in res.get("itemList", []):
                 response.append(t)
@@ -627,7 +625,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
         b = browser(api_url, **kwargs)
-        return self.getData(b, proxy=proxy)
+        return self.getData(b, **kwargs)
 
     def byHashtag(self, hashtag, count=30, offset=0, **kwargs) -> dict:
         """Returns a dictionary listing TikToks with a specific hashtag.
@@ -668,7 +666,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             b = browser(api_url, **kwargs)
-            res = self.getData(b, proxy=proxy, language=language)
+            res = self.getData(b, **kwargs)
 
             try:
                 for t in res["itemList"]:
@@ -705,7 +703,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
         b = browser(api_url, **kwargs)
-        return self.getData(b, proxy=proxy)
+        return self.getData(b, **kwargs)
 
     def getHashtagDetails(self, hashtag, **kwargs) -> dict:
         """Returns a hashtag object.
@@ -726,9 +724,11 @@ class TikTokApi:
             BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
         )
         b = browser(api_url, **kwargs)
-        return self.getData(b, proxy=proxy)
+        return self.getData(b, **kwargs)
 
-    def getRecommendedTikToksByVideoID(self, id, count=30, minCursor=0, maxCursor=0, **kwargs) -> dict:
+    def getRecommendedTikToksByVideoID(
+        self, id, count=30, minCursor=0, maxCursor=0, **kwargs
+    ) -> dict:
         """Returns a dictionary listing reccomended TikToks for a specific TikTok video.
 
         :param id: The id of the video to get suggestions for.
@@ -768,7 +768,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             b = browser(api_url, **kwargs)
-            res = self.getData(b, proxy=proxy)
+            res = self.getData(b, **kwargs)
 
             for t in res.get("items", []):
                 response.append(t)
@@ -808,7 +808,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
         b = browser(api_url, **kwargs)
-        return self.getData(b, proxy=proxy)
+        return self.getData(b, **kwargs)
 
     def getTikTokByUrl(self, url, **kwargs) -> dict:
         """Returns a dictionary of a TikTok object by url.
@@ -854,7 +854,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
         b = browser(api_url, **kwargs)
-        return self.getData(b, proxy=proxy)["body"][1]["exploreList"]
+        return self.getData(b, **kwargs)["body"][1]["exploreList"]
 
     def discoverMusic(self, **kwargs) -> dict:
         """Discover page, consists of music
@@ -872,7 +872,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
         b = browser(api_url, **kwargs)
-        return self.getData(b, proxy=proxy)["body"][2]["exploreList"]
+        return self.getData(b, **kwargs)["body"][2]["exploreList"]
 
     def getUserObject(self, username, **kwargs) -> dict:
         """Gets a user object (dictionary)
@@ -909,7 +909,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
         b = browser(api_url, **kwargs)
-        return self.getData(b, proxy=proxy)["userInfo"]
+        return self.getData(b, **kwargs)["userInfo"]
 
     def getSuggestedUsersbyID(
         self, userId="6745191554350760966", count=30, **kwargs
@@ -939,7 +939,7 @@ class TikTokApi:
         b = browser(api_url, **kwargs)
 
         res = []
-        for x in self.getData(b, proxy=proxy)["body"][0]["exploreList"]:
+        for x in self.getData(b, **kwargs)["body"][0]["exploreList"]:
             res.append(x["cardItem"])
         return res[:count]
 
@@ -963,9 +963,7 @@ class TikTokApi:
         unusedIDS = [startingId]
         while len(users) < count:
             userId = random.choice(unusedIDS)
-            newUsers = self.getSuggestedUsersbyID(
-                userId=userId, language=language, proxy=proxy
-            )
+            newUsers = self.getSuggestedUsersbyID(userId=userId, **kwargs)
             unusedIDS.remove(userId)
 
             for user in newUsers:
@@ -1003,7 +1001,7 @@ class TikTokApi:
         b = browser(api_url, **kwargs)
 
         res = []
-        for x in self.getData(b, proxy=proxy)["body"][1]["exploreList"]:
+        for x in self.getData(b, **kwargs)["body"][1]["exploreList"]:
             res.append(x["cardItem"])
         return res[:count]
 
@@ -1025,13 +1023,11 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         hashtags = []
         ids = self.getSuggestedUsersbyIDCrawler(
-            count=count, startingId=startingId, language=language, proxy=proxy
+            count=count, startingId=startingId, **kwargs
         )
         while len(hashtags) < count and len(ids) != 0:
             userId = random.choice(ids)
-            newTags = self.getSuggestedHashtagsbyID(
-                userId=userId["id"], language=language, proxy=proxy
-            )
+            newTags = self.getSuggestedHashtagsbyID(userId=userId["id"], **kwargs)
             ids.remove(userId)
 
             for hashtag in newTags:
@@ -1068,7 +1064,7 @@ class TikTokApi:
         b = browser(api_url, **kwargs)
 
         res = []
-        for x in self.getData(b, proxy=proxy)["body"][2]["exploreList"]:
+        for x in self.getData(b, **kwargs)["body"][2]["exploreList"]:
             res.append(x["cardItem"])
         return res[:count]
 
@@ -1090,13 +1086,11 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         musics = []
         ids = self.getSuggestedUsersbyIDCrawler(
-            count=count, startingId=startingId, language=language, proxy=proxy
+            count=count, startingId=startingId, **kwargs
         )
         while len(musics) < count and len(ids) != 0:
             userId = random.choice(ids)
-            newTags = self.getSuggestedMusicbyID(
-                userId=userId["id"], language=language, proxy=proxy
-            )
+            newTags = self.getSuggestedMusicbyID(userId=userId["id"], **kwargs)
             ids.remove(userId)
 
             for music in newTags:

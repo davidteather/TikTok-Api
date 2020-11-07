@@ -1,5 +1,6 @@
 from TikTokApi import TikTokApi
 import random
+
 # SEE https://github.com/davidteather/TikTok-Api/issues/311#issuecomment-721164493
 
 # Starts TikTokApi

@@ -38,7 +38,9 @@ class TestUserPager:
         AUG_10 = 1597076218000  # 2020-08-10 12:16:58
 
         api = TikTokApi()
-        pager = api.getUserPager("therock", page_size=3, minCursor=APR_24, maxCursor=AUG_10)
+        pager = api.getUserPager(
+            "therock", page_size=3, minCursor=APR_24, maxCursor=AUG_10
+        )
 
         total_tts = 0
         pages = 0
