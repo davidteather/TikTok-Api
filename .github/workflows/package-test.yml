@@ -7,16 +7,18 @@ on:
     branches:
       - master
       - nightly
+      - 'releases/*'
 
 jobs:
   Unit-Tests:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.7, 3.8, 3.9]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
       - uses: microsoft/playwright-github-action@v1
       - name: Install Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
