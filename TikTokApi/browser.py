@@ -48,7 +48,10 @@ class browser:
         self.did = kwargs.get("custom_did", None)
         find_redirect = kwargs.get("find_redirect", False)
 
-        self.playwright = sync_playwright().start()
+        try:
+            self.playwright = sync_playwright().start()
+        except Exception as e:
+            logging.critical(e)
 
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
 
@@ -164,8 +167,11 @@ class browser:
 
     def __del__(self):
         try:
-            self.browser.close()
             self.playwright.stop()
+        except:
+            pass
+        try:
+            self.browser.close()
         except:
             pass
 
