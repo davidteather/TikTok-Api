@@ -21,10 +21,21 @@ def get_playwright():
 
 
 class browser:
+    __instance = None
+    @staticmethod
+    def get_instance(**kwargs):
+        if not browser.__instance:
+            browser(**kwargs)
+        return browser.__instance
     def __init__(
         self,
         **kwargs,
     ):
+        # Forces Singleton
+        if browser.__instance is None:
+            browser.__instance = self
+        else:
+            raise Exception("Only one browser object is allowed")
         self.debug = kwargs.get("debug", False)
         self.proxy = kwargs.get("proxy", None)
         self.api_url = kwargs.get("api_url", None)
