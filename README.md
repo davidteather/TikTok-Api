@@ -62,7 +62,11 @@ If you run into an issue please check the closed issues on the github. You're mo
 
 ```
 pip install TikTokApi
-python -m playwright install
+```
+
+The script should download pypppeteer by default, but if it doesn't run the following command.
+```
+pyppeteer-install
 ```
 
 If you run into any issue try the fix below before posting an issue.
@@ -84,7 +88,7 @@ Here's a quick bit of code to get the most recent trending on TikTok. There's mo
 
 ```
 from TikTokApi import TikTokApi
-api = TikTokApi.get_instance()
+api = TikTokApi()
 
 results = 10
 
