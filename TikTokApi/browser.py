@@ -34,6 +34,14 @@ def custom_args(to_add):
     args = to_add
 
 
+try:
+    playwright = sync_playwright().start()
+except Exception as e:
+    raise e
+
+def get_playwright():
+    return playwright
+
 class browser:
     def __init__(
         self,
@@ -47,11 +55,6 @@ class browser:
         self.executablePath = kwargs.get("executablePath", None)
         self.did = kwargs.get("custom_did", None)
         find_redirect = kwargs.get("find_redirect", False)
-
-        try:
-            self.playwright = sync_playwright().start()
-        except Exception as e:
-            logging.critical(e)
 
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
 
@@ -99,7 +102,7 @@ class browser:
             self.options["executablePath"] = self.executablePath
 
         try:
-            self.browser = self.playwright.chromium.launch(args=self.args, **self.options)
+            self.browser = playwright.chromium.launch(args=self.args, **self.options)
         except Exception as e:
             logging.critical(e)
         
@@ -164,16 +167,10 @@ class browser:
         return token;
         }"""
         )
+        
 
-    def __del__(self):
-        try:
-            self.playwright.stop()
-        except:
-            pass
-        try:
-            self.browser.close()
-        except:
-            pass
+    def clean_up(self):
+        self.browser.close()
 
     def find_redirect(self, url):
         self.page.goto(url, {"waitUntil": "load"})

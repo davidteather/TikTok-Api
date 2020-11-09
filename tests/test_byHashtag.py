@@ -1,5 +1,6 @@
 from TikTokApi import TikTokApi
-api = TikTokApi()
+import logging
+api = TikTokApi(log_level=logging.INFO)
 
 def unique_count(tiktoks):
     tmp = []
