@@ -11,6 +11,7 @@ on:
 
 jobs:
   Unit-Tests:
+    timeout-minutes: 10
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -30,6 +31,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest
+          python -m playwright install
 
       - name: Run Tests
         run: pytest tests
