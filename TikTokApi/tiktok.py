@@ -1,6 +1,7 @@
 import random
 import requests
 import time
+import logging
 from urllib.parse import urlencode, quote
 from .browser import browser
 from playwright import sync_playwright
@@ -13,13 +14,12 @@ class TikTokApi:
     def __init__(self, **kwargs):
         """The TikTokApi class. Used to interact with TikTok.
 
-        :param debug: If you want debugging to be enabled.
+        :param logging_level: The logging level you want the program to run at
         :param request_delay: The amount of time to wait before making a request.
         :param executablePath: The location of the chromedriver.exe
         """
-        self.debug = kwargs.get("debug", False)
-        if self.debug:
-            print("Class initialized")
+        logging.basicConfig(level=kwargs.get("logging_level", logging.CRITICAL))
+        logging.info("Class initalized")
         self.executablePath = kwargs.get("executablePath", None)
 
         self.userAgent = (
@@ -40,9 +40,7 @@ class TikTokApi:
             self.width = self.browser.width
             self.height = self.browser.height
         except Exception as e:
-            if self.debug:
-                print("The following error occurred, but it was ignored.")
-                print(e)
+            logging.warning("An error occured but it was ignored.")
 
             self.timezone_name = ""
             self.browser_language = ""
@@ -100,14 +98,8 @@ class TikTokApi:
         try:
             return r.json()
         except Exception as e:
-            if self.debug:
-                print(e)
-            print(r.request.headers)
-            print(
-                "Converting response to JSON failed response is below (probably empty)"
-            )
-            print(r.text)
-
+            logging.error(e)
+            logging.error("Converting response to JSON failed response is below (probably empty)")
             raise Exception("Invalid Response")
 
     def getBytes(self, b, **kwargs) -> bytes:
@@ -191,8 +183,7 @@ class TikTokApi:
                 response.append(t)
 
             if not res["hasMore"] and not first:
-                if self.debug:
-                    print("TikTok isn't sending more TikToks beyond this point.")
+                logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response[:count]
 
             realCount = count - len(response)
@@ -273,8 +264,7 @@ class TikTokApi:
                 for x in data["challengeInfoList"]:
                     response.append(x)
             else:
-                if self.debug:
-                    print("Nomore results being returned")
+                logging.info("TikTok is not sending videos beyond this point.")
                 break
 
             offsetCount = len(response)
@@ -335,8 +325,7 @@ class TikTokApi:
                     response.append(t)
 
             if not res["hasMore"] and not first:
-                if self.debug:
-                    print("TikTok isn't sending more TikToks beyond this point.")
+                logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count - len(response)
@@ -505,8 +494,7 @@ class TikTokApi:
             try:
                 res["items"]
             except Exception:
-                if self.debug:
-                    print("Most Likely User's List is Empty")
+                logging.error("User's likes are most likely private")
                 return []
 
             if "items" in res.keys():
@@ -514,7 +502,7 @@ class TikTokApi:
                     response.append(t)
 
             if not res["hasMore"] and not first:
-                print("TikTok isn't sending more TikToks beyond this point.")
+                logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count - len(response)
@@ -596,8 +584,7 @@ class TikTokApi:
                 response.append(t)
 
             if not res["hasMore"]:
-                if self.debug:
-                    print("TikTok isn't sending more TikToks beyond this point.")
+                logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count - len(response)
@@ -668,16 +655,11 @@ class TikTokApi:
             self.browser.sign_url(api_url, **kwargs)
             res = self.getData(self.browser, **kwargs)
 
-            try:
-                for t in res["itemList"]:
-                    response.append(t)
-            except:
-                if self.debug:
-                    print(res)
+            for t in res["itemList"]:
+                response.append(t)
 
             if not res["hasMore"]:
-                if self.debug:
-                    print("TikTok isn't sending more TikToks beyond this point.")
+                logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             offset += maxCount
@@ -774,8 +756,7 @@ class TikTokApi:
                 response.append(t)
 
             if not res["hasMore"] and not first:
-                if self.debug:
-                    print("TikTok isn't sending more TikToks beyond this point.")
+                logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response[:count]
 
             realCount = count - len(response)
@@ -1194,7 +1175,6 @@ class TikTokApi:
             tmp = r.text.split("vid:")
             if len(tmp) > 1:
                 key = tmp[1].split("%")[0]
-                print(key)
                 if key[-1:] == " ":
                     key = key[1:]
 
@@ -1210,7 +1190,6 @@ class TikTokApi:
             ).format(key)
 
             b = browser(cleanVideo, **kwargs)
-            print(b.redirect_url)
             if return_bytes == 0:
                 return b.redirect_url
             else:

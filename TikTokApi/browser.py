@@ -125,16 +125,8 @@ class browser:
         )
 
         stealth(page)
-
-        # might have to switch to a tiktok url if they improve security
         page.goto("about:blank")
 
-        self.userAgent = page.evaluate(
-            """() => {return navigator.userAgent; }"""
-        )
-
-        # self.browser.close()
-        # self.browser.process.communicate()
         return page
     
 
