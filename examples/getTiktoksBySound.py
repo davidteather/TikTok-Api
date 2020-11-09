@@ -1,6 +1,6 @@
 from TikTokApi import TikTokApi
 
-api = TikTokApi()
+api = TikTokApi.get_instance()
 
 count = 30
 

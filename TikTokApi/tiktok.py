@@ -10,8 +10,8 @@ from .utilities import update_messager
 
 BASE_URL = "https://m.tiktok.com/"
 
-
 class TikTokApi:
+    __instance = None
     def __init__(self, **kwargs):
         """The TikTokApi class. Used to interact with TikTok.
 
@@ -19,6 +19,11 @@ class TikTokApi:
         :param request_delay: The amount of time to wait before making a request.
         :param executablePath: The location of the chromedriver.exe
         """
+        # Forces Singleton
+        if TikTokApi.__instance is None:
+            TikTokApi.__instance = self
+        else:
+            raise Exception("Only one TikTokApi object is allowed")
         logging.basicConfig(level=kwargs.get("logging_level", logging.CRITICAL))
         logging.info("Class initalized")
         self.executablePath = kwargs.get("executablePath", None)
@@ -59,12 +64,24 @@ class TikTokApi:
 
         self.request_delay = kwargs.get("request_delay", None)
 
+    @staticmethod
+    def get_instance():
+        if not TikTokApi.__instance:
+            TikTokApi()
+        return TikTokApi.__instance
+
     def clean_up(self):
         self.__del__()
 
     def __del__(self):
-        self.browser.clean_up()
-        get_playwright().stop()
+        try:
+            self.browser.clean_up()
+        except:
+            pass
+        try:
+            get_playwright().stop()
+        except:
+            pass
 
     def getData(self, b, **kwargs) -> dict:
         """Returns a dictionary of a response from TikTok.

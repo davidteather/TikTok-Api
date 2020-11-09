@@ -84,7 +84,7 @@ Here's a quick bit of code to get the most recent trending on TikTok. There's mo
 
 ```
 from TikTokApi import TikTokApi
-api = TikTokApi()
+api = TikTokApi.get_instance()
 
 results = 10
 

@@ -155,7 +155,10 @@ class browser:
         page.close()
 
     def clean_up(self):
-        self.browser.close()
+        try:
+            self.browser.close()
+        except:
+            logging.info("cleanup failed")
         # playwright.stop()
 
     def find_redirect(self, url):
