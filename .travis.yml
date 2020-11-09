@@ -6,6 +6,9 @@ python:
   - "3.9-dev"
   - "nightly"
 
+services:
+  - docker
+
 addons:
   apt:
     packages:
@@ -47,5 +50,4 @@ install:
   - "python -m playwright install"
 
 script:
-  - python -m playwright install
   - pytest tests
