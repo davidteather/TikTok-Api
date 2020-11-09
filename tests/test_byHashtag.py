@@ -1,5 +1,5 @@
 from TikTokApi import TikTokApi
-
+api = TikTokApi()
 
 def unique_count(tiktoks):
     tmp = []
@@ -10,7 +10,6 @@ def unique_count(tiktoks):
 
 
 def test_hashtag():
-    api = TikTokApi()
     assert len(api.byHashtag("funny", 5)) == 5
     assert len(api.byHashtag("funny", 10)) == 10
     assert len(api.byHashtag("funny", 20)) == 20
@@ -18,5 +17,4 @@ def test_hashtag():
 
 
 def test_non_latin1():
-    api = TikTokApi()
     assert len(api.byHashtag("селфи", count=3)) == 3
