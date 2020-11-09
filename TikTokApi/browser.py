@@ -95,7 +95,10 @@ class browser:
         if self.executablePath != None:
             self.options["executablePath"] = self.executablePath
 
-        self.browser = self.playwright.chromium.launch(args=self.args, **self.options)
+        try:
+            self.browser = self.playwright.chromium.launch(args=self.args, **self.options)
+        except Exception as e:
+            logging.critical(e)
         
         tmp_page = self.create_page()
         self.get_params(tmp_page)
@@ -160,8 +163,11 @@ class browser:
         )
 
     def __del__(self):
-        self.browser.close()
-        self.playwright.stop()
+        try:
+            self.browser.close()
+            self.playwright.stop()
+        except:
+            pass
 
     def find_redirect(self, url):
         self.page.goto(url, {"waitUntil": "load"})
