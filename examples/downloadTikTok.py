@@ -4,7 +4,7 @@ import random
 # SEE https://github.com/davidteather/TikTok-Api/issues/311#issuecomment-721164493
 
 # Starts TikTokApi
-api = TikTokApi()
+api = TikTokApi.get_instance()
 
 # This is generating the tt_webid_v2 cookie
 # need to pass it to methods you want to download

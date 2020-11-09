@@ -1,7 +1,7 @@
 from TikTokApi import TikTokApi
 
 # Starts TikTokApi
-api = TikTokApi()
+api = TikTokApi.get_instance()
 
 # The Number of trending TikToks you want to be displayed
 results = 10
