@@ -20,11 +20,10 @@ matrix:
 
 install:
   - pip install pytest
+  - python -m playwright install
 
 before_script:
   - "pip install -r requirements.txt"
   - "python setup.py install_lib"
-  - "python -m playwright install"
-
 script:
   - pytest tests
