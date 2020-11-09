@@ -54,10 +54,10 @@ class TikTokApi:
 
     def clean_up(self):
         return
-        self.__del__()
+        #self.__del__()
 
     def __del__(self):
-        #self.browser.clean_up()
+        self.browser.clean_up()
         get_playwright().stop()
 
     def getData(self, b, **kwargs) -> dict:

@@ -106,8 +106,9 @@ class browser:
         except Exception as e:
             logging.critical(e)
         
-        self.page = self.create_page()
-        self.get_params(self.page)
+        page = self.create_page()
+        self.get_params(page)
+        page.close()
 
     def get_params(self, page) -> None:
         # self.browser_language = await self.page.evaluate("""() => { return navigator.language || navigator.userLanguage; }""")
@@ -125,22 +126,16 @@ class browser:
         self.height = page.evaluate("""() => { return screen.height; }""")
 
     def create_page(self):
-        
         page = self.browser.newPage()
-        page.evaluate(
-            """() => {
-        delete navigator.__proto__.webdriver;
-        }"""
-        )
-
         stealth(page)
         page.goto("about:blank")
+        
 
         return page
     
 
     def sign_url(self, url):
-        page = self.page
+        page = self.create_page()
         verifyFp = "".join(
             random.choice(
                 string.ascii_lowercase + string.ascii_uppercase + string.digits
@@ -167,10 +162,11 @@ class browser:
         return token;
         }"""
         )
-        
+        page.close()
 
     def clean_up(self):
         self.browser.close()
+        #playwright.stop()
 
     def find_redirect(self, url):
         self.page.goto(url, {"waitUntil": "load"})
