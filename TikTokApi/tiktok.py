@@ -35,22 +35,22 @@ class TikTokApi:
         )
         self.proxy = kwargs.get("proxy", None)
         if kwargs.get("persistent_browser", True):
-            self.browser = browser.get_instance(**kwargs)
+            self.browser = browser(**kwargs)
 
         try:
-            self.timezone_name = self.__format_new_params__(browser.get_instance().timezone_name)
+            self.timezone_name = self.__format_new_params__(self.browser.timezone_name)
             self.browser_language = self.__format_new_params__(
-                browser.get_instance().browser_language
+                self.browser.browser_language
             )
             self.browser_platform = self.__format_new_params__(
-                browser.get_instance().browser_platform
+                self.browser.browser_platform
             )
-            self.browser_name = self.__format_new_params__(browser.get_instance().browser_name)
+            self.browser_name = self.__format_new_params__(self.browser.browser_name)
             self.browser_version = self.__format_new_params__(
-                browser.get_instance().browser_version
+                self.browser.browser_version
             )
-            self.width = browser.get_instance().width
-            self.height = browser.get_instance().height
+            self.width = self.browser.width
+            self.height = self.browser.height
         except Exception as e:
             logging.warning("An error occured but it was ignored.")
 
@@ -75,7 +75,7 @@ class TikTokApi:
 
     def __del__(self):
         try:
-            browser.get_instance().clean_up()
+            self.browser.clean_up()
         except:
             pass
         try:
@@ -108,7 +108,7 @@ class TikTokApi:
         if self.proxy != None:
             proxy = self.proxy
 
-        verify_fp, did, signature = browser.get_instance().sign_url(kwargs["url"])
+        verify_fp, did, signature = self.browser.sign_url(kwargs["url"])
         query = {"verifyFp": verify_fp, "did": did, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
         r = requests.get(
@@ -121,11 +121,11 @@ class TikTokApi:
                 "accept": "application/json, text/plain, */*",
                 "accept-encoding": "gzip, deflate, br",
                 "accept-language": "en-US,en;q=0.9",
-                "referer": browser.get_instance().referrer,
+                "referer": self.browser.referrer,
                 "sec-fetch-dest": "empty",
                 "sec-fetch-mode": "cors",
                 "sec-fetch-site": "same-site",
-                "user-agent": browser.get_instance().userAgent,
+                "user-agent": self.browser.userAgent,
                 "cookie": "tt_webid_v2=" + did,
             },
             proxies=self.__format_proxy(proxy),
@@ -215,7 +215,7 @@ class TikTokApi:
             api_url = "{}api/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            res = self.getData(browser.get_instance(), url=api_url, **kwargs)
+            res = self.getData(self.browser, url=api_url, **kwargs)
 
             for t in res.get("items", []):
                 response.append(t)
@@ -290,7 +290,7 @@ class TikTokApi:
             api_url = "{}api/discover/{}/?{}&{}".format(
                 BASE_URL, prefix, self.__add_new_params__(), urlencode(query)
             )
-            data = self.getData(browser.get_instance(), url=api_url, **kwargs)
+            data = self.getData(self.browser, url=api_url, **kwargs)
 
             if "userInfoList" in data.keys():
                 for x in data["userInfoList"]:
@@ -357,7 +357,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(browser.get_instance(), url=api_url, **kwargs)
+            res = self.getData(self.browser, url=api_url, **kwargs)
             if "items" in res.keys():
                 for t in res["items"]:
                     response.append(t)
@@ -433,7 +433,7 @@ class TikTokApi:
             language,
         )
 
-        return self.getData(browser.get_instance(), url=api_url, **kwargs)
+        return self.getData(self.browser, url=api_url, **kwargs)
 
     def getUserPager(self, username, page_size=30, minCursor=0, maxCursor=0, **kwargs):
         """Returns a generator to page through a user's feed
@@ -527,7 +527,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(browser.get_instance(), url=api_url, **kwargs)
+            res = self.getData(self.browser, url=api_url, **kwargs)
 
             try:
                 res["items"]
@@ -616,7 +616,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(browser.get_instance(), url=api_url, **kwargs)
+            res = self.getData(self.browser, url=api_url, **kwargs)
 
             for t in res.get("itemList", []):
                 response.append(t)
@@ -650,7 +650,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        return self.getData(browser.get_instance(), url=api_url, **kwargs)
+        return self.getData(self.browser, url=api_url, **kwargs)
 
     def byHashtag(self, hashtag, count=30, offset=0, **kwargs) -> dict:
         """Returns a dictionary listing TikToks with a specific hashtag.
@@ -690,7 +690,7 @@ class TikTokApi:
             api_url = "{}api/challenge/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            res = self.getData(browser.get_instance(), url=api_url, **kwargs)
+            res = self.getData(self.browser, url=api_url, **kwargs)
 
             for t in res["itemList"]:
                 response.append(t)
@@ -721,7 +721,7 @@ class TikTokApi:
         api_url = "{}api/challenge/detail/?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        return self.getData(browser.get_instance(), url=api_url, **kwargs)
+        return self.getData(self.browser, url=api_url, **kwargs)
 
     def getHashtagDetails(self, hashtag, **kwargs) -> dict:
         """Returns a hashtag object.
@@ -742,7 +742,7 @@ class TikTokApi:
             BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
         )
 
-        return self.getData(browser.get_instance(), url=api_url, **kwargs)
+        return self.getData(self.browser, url=api_url, **kwargs)
 
     def getRecommendedTikToksByVideoID(
         self, id, count=30, minCursor=0, maxCursor=0, **kwargs
@@ -786,7 +786,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(browser.get_instance(), url=api_url, **kwargs)
+            res = self.getData(self.browser, url=api_url, **kwargs)
 
             for t in res.get("items", []):
                 response.append(t)
@@ -825,7 +825,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        return self.getData(browser.get_instance(), url=api_url, **kwargs)
+        return self.getData(self.browser, url=api_url, **kwargs)
 
     def getTikTokByUrl(self, url, **kwargs) -> dict:
         """Returns a dictionary of a TikTok object by url.
@@ -871,7 +871,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        return self.getData(browser.get_instance(), url=api_url, **kwargs)["body"][1][
+        return self.getData(self.browser, url=api_url, **kwargs)["body"][1][
             "exploreList"
         ]
 
@@ -891,7 +891,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        return self.getData(browser.get_instance(), url=api_url, **kwargs)["body"][2][
+        return self.getData(self.browser, url=api_url, **kwargs)["body"][2][
             "exploreList"
         ]
 
@@ -930,7 +930,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        return self.getData(browser.get_instance(), url=api_url, **kwargs)["userInfo"]
+        return self.getData(self.browser, url=api_url, **kwargs)["userInfo"]
 
     def getSuggestedUsersbyID(
         self, userId="6745191554350760966", count=30, **kwargs
@@ -959,7 +959,7 @@ class TikTokApi:
         )
 
         res = []
-        for x in self.getData(browser.get_instance(), url=api_url, **kwargs)["body"][0][
+        for x in self.getData(self.browser, url=api_url, **kwargs)["body"][0][
             "exploreList"
         ]:
             res.append(x["cardItem"])
@@ -1022,7 +1022,7 @@ class TikTokApi:
         )
 
         res = []
-        for x in self.getData(browser.get_instance(), url=api_url, **kwargs)["body"][1][
+        for x in self.getData(self.browser, url=api_url, **kwargs)["body"][1][
             "exploreList"
         ]:
             res.append(x["cardItem"])
@@ -1086,7 +1086,7 @@ class TikTokApi:
         )
 
         res = []
-        for x in self.getData(browser.get_instance(), url=api_url, **kwargs)["body"][2][
+        for x in self.getData(self.browser, url=api_url, **kwargs)["body"][2][
             "exploreList"
         ]:
             res.append(x["cardItem"])
