@@ -8,14 +8,12 @@ on:
       - master
       - nightly
 
-
-strategy:
-  matrix:
-    os: [ubuntu-latest, macos-latest, windows-latest]
-    python-version: [3.7, 3.8, 3.9]
-
 jobs:
   Unit-Tests:
+    strategy:
+    matrix:
+      os: [ubuntu-latest, macos-latest, windows-latest]
+      python-version: [3.7, 3.8, 3.9]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
