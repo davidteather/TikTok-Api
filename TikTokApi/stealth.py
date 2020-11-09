@@ -1,7 +1,7 @@
 import re
 
 
-def chrome_runtime(page: Page) -> None:
+def chrome_runtime(page) -> None:
     page.evaluateHandle(
         """
 () => {
@@ -13,7 +13,7 @@ def chrome_runtime(page: Page) -> None:
     )
 
 
-def console_debug(page: Page) -> None:
+def console_debug(page) -> None:
     page.evaluateHandle(
         """
 () => {
@@ -25,7 +25,7 @@ def console_debug(page: Page) -> None:
     )
 
 
-def iframe_content_window(page: Page) -> None:
+def iframe_content_window(page) -> None:
     page.evaluateHandle(
         """
 () => {
@@ -124,7 +124,7 @@ def iframe_content_window(page: Page) -> None:
     )
 
 
-def media_codecs(page: Page) -> None:
+def media_codecs(page) -> None:
     page.evaluateHandle(
         """
     () => {
@@ -198,7 +198,7 @@ def media_codecs(page: Page) -> None:
     )
 
 
-def navigator_languages(page: Page) -> None:
+def navigator_languages(page) -> None:
     page.evaluateHandle(
         """
 () => {
@@ -210,7 +210,7 @@ def navigator_languages(page: Page) -> None:
     )
 
 
-def navigator_permissions(page: Page) -> None:
+def navigator_permissions(page) -> None:
     page.evaluateHandle(
         """
 () => {
@@ -244,7 +244,7 @@ def navigator_permissions(page: Page) -> None:
     )
 
 
-def navigator_plugins(page: Page) -> None:
+def navigator_plugins(page) -> None:
     page.evaluateHandle(
         """
 () => {
@@ -418,7 +418,7 @@ def navigator_plugins(page: Page) -> None:
     )
 
 
-def navigator_webdriver(page: Page) -> None:
+def navigator_webdriver(page) -> None:
     page.evaluateHandle(
         """
 () => {
@@ -438,7 +438,7 @@ def navigator_webdriver(page: Page) -> None:
     )
 
 
-def user_agent(page: Page) -> None:
+def user_agent(page) -> None:
     return
     ua = page.browser.userAgent()
     ua = ua.replace("HeadlessChrome", "Chrome")  # hide headless nature
@@ -449,7 +449,7 @@ def user_agent(page: Page) -> None:
     page.setUserAgent(ua)
 
 
-def webgl_vendor(page: Page) -> None:
+def webgl_vendor(page) -> None:
     page.evaluateHandle(
         """
 () => {
@@ -470,7 +470,7 @@ def webgl_vendor(page: Page) -> None:
     )
 
 
-def window_outerdimensions(page: Page) -> None:
+def window_outerdimensions(page) -> None:
     page.evaluateHandle(
         """
 () => {
@@ -487,7 +487,7 @@ def window_outerdimensions(page: Page) -> None:
     )
 
 
-def stealth(page: Page) -> None:
+def stealth(page) -> None:
     # chrome_runtime(page)
     console_debug(page)
     iframe_content_window(page)
