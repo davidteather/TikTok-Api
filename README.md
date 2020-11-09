@@ -62,11 +62,7 @@ If you run into an issue please check the closed issues on the github. You're mo
 
 ```
 pip install TikTokApi
-```
-
-The script should download pypppeteer by default, but if it doesn't run the following command.
-```
-pyppeteer-install
+python -m playwright install
 ```
 
 If you run into any issue try the fix below before posting an issue.
