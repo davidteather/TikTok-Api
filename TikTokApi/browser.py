@@ -81,7 +81,7 @@ class browser:
             "handleSIGTERM": False,
             "handleSIGHUP": False,
         }
-
+        
         if self.proxy != None:
             if "@" in self.proxy:
                 server_prefix = self.proxy.split("://")[0]
@@ -106,9 +106,8 @@ class browser:
         except Exception as e:
             logging.critical(e)
         
-        tmp_page = self.create_page()
-        self.get_params(tmp_page)
-        tmp_page.close()
+        self.page = self.create_page()
+        self.get_params(self.page)
 
     def get_params(self, page) -> None:
         # self.browser_language = await self.page.evaluate("""() => { return navigator.language || navigator.userLanguage; }""")
@@ -126,10 +125,11 @@ class browser:
         self.height = page.evaluate("""() => { return screen.height; }""")
 
     def create_page(self):
+        
         page = self.browser.newPage()
-        page.evaluateHandle(
+        page.evaluate(
             """() => {
-    delete navigator.__proto__.webdriver;
+        delete navigator.__proto__.webdriver;
         }"""
         )
 
@@ -140,7 +140,7 @@ class browser:
     
 
     def sign_url(self, url):
-        page = self.create_page()
+        page = self.page
         verifyFp = "".join(
             random.choice(
                 string.ascii_lowercase + string.ascii_uppercase + string.digits

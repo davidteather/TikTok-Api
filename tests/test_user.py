@@ -1,9 +1,7 @@
 from TikTokApi import TikTokApi
-
+api = TikTokApi()
 
 def test_user():
-    api = TikTokApi()
-
     assert api.getUser("charlidamelio")["user"]["uniqueId"] == "charlidamelio"
     assert api.getUserObject("charlidamelio")["uniqueId"] == "charlidamelio"
     assert (
