@@ -40,24 +40,16 @@ class browser:
         self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
 
         if len(args) == 0:
-            self.args = [
-                "--no-sandbox",
-                "--disable-setuid-sandbox",
-                "--disable-infobars",
-                "--window-position=0,0",
-                "--ignore-certifcate-errors",
-                "--ignore-certifcate-errors-spki-list",
-            ]
+            self.args = []
         else:
             self.args = args
-
-        self.args.append("--user-agent=" + self.userAgent)
 
         self.options = {
             "headless": True,
             "handleSIGINT": True,
             "handleSIGTERM": True,
             "handleSIGHUP": True,
+            "userAgent": self.userAgent
         }
 
         if self.proxy != None:
