@@ -1,0 +1,29 @@
+dist: xenial
+language: python
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "3.9-dev"
+  - "nightly"
+
+matrix:
+  allow_failures:
+    - python: "nightly"
+
+addons:
+  firefox: "62.0.3"
+  chrome: stable
+
+install:
+  - pip install pytest
+
+before_script:
+  - "sudo apt-get install unzip"
+  - "wget https://chromedriver.storage.googleapis.com/83.0.4103.39/chromedriver_linux64.zip -O /tmp/chromedriver.zip && unzip /tmp/chromedriver.zip -d /opt && sudo chmod 755 /opt/chromedriver && sudo ln -fs /opt/chromedriver /usr/bin/chromedriver && sudo ln -fs /opt/chromedriver /usr/local/bin/chromedriver"
+  - "sudo apt-get install java-common"
+  - "pip install -r requirements.txt"
+  - "python setup.py install_lib"
+
+script:
+  - pytest tests
