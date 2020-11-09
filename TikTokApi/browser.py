@@ -105,7 +105,6 @@ class browser:
         if set_useragent:
             self.userAgent = iphone["userAgent"]
         page = context.newPage()
-        page.goto("about:blank")
 
         return page
 
@@ -123,7 +122,7 @@ class browser:
         else:
             did = self.did
 
-        page.evaluate("() => { " + get_acrawler() + " }")
+        page.setContent("<script> " + get_acrawler() + " </script>")
         return (
             verifyFp,
             did,
