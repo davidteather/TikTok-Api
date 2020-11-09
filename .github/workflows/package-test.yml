@@ -8,12 +8,15 @@ on:
       - master
       - nightly
 
+
+strategy:
+  matrix:
+    os: [ubuntu:latest, macos:latest, windows:latest]
+    python-version: [3.7, 3.8, 3.9]
+
 jobs:
   Unit-Tests:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        python-version: [3.7, 3.8, 3.9]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - uses: microsoft/playwright-github-action@v1
