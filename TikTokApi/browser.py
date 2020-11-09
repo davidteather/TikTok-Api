@@ -105,6 +105,7 @@ class browser:
         try:
             self.browser = playwright.webkit.launch(args=self.args, **self.options)
         except Exception as e:
+            raise e
             logging.critical(e)
 
         page = self.create_page(set_useragent=True)

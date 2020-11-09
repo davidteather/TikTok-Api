@@ -9,7 +9,7 @@ on:
       - nightly
 
 jobs:
-  python-lint:
+  Unit-Tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
