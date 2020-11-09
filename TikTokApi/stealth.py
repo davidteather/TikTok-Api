@@ -1,9 +1,8 @@
-from pyppeteer.page import Page
 import re
 
 
-async def chrome_runtime(page: Page) -> None:
-    await page.evaluateOnNewDocument(
+def chrome_runtime(page) -> None:
+    page.evaluateHandle(
         """
 () => {
     window.chrome = {
@@ -14,8 +13,8 @@ async def chrome_runtime(page: Page) -> None:
     )
 
 
-async def console_debug(page: Page) -> None:
-    await page.evaluateOnNewDocument(
+def console_debug(page) -> None:
+    page.evaluateHandle(
         """
 () => {
     window.console.debug = () => {
@@ -26,8 +25,8 @@ async def console_debug(page: Page) -> None:
     )
 
 
-async def iframe_content_window(page: Page) -> None:
-    await page.evaluateOnNewDocument(
+def iframe_content_window(page) -> None:
+    page.evaluateHandle(
         """
 () => {
   try {
@@ -125,8 +124,8 @@ async def iframe_content_window(page: Page) -> None:
     )
 
 
-async def media_codecs(page: Page) -> None:
-    await page.evaluateOnNewDocument(
+def media_codecs(page) -> None:
+    page.evaluateHandle(
         """
     () => {
   try {
@@ -199,8 +198,8 @@ async def media_codecs(page: Page) -> None:
     )
 
 
-async def navigator_languages(page: Page) -> None:
-    await page.evaluateOnNewDocument(
+def navigator_languages(page) -> None:
+    page.evaluateHandle(
         """
 () => {
     Object.defineProperty(navigator, 'languages', {
@@ -211,8 +210,8 @@ async def navigator_languages(page: Page) -> None:
     )
 
 
-async def navigator_permissions(page: Page) -> None:
-    await page.evaluateOnNewDocument(
+def navigator_permissions(page) -> None:
+    page.evaluateHandle(
         """
 () => {
     const originalQuery = window.navigator.permissions.query
@@ -245,8 +244,8 @@ async def navigator_permissions(page: Page) -> None:
     )
 
 
-async def navigator_plugins(page: Page) -> None:
-    await page.evaluateOnNewDocument(
+def navigator_plugins(page) -> None:
+    page.evaluateHandle(
         """
 () => {
     function mockPluginsAndMimeTypes() {
@@ -419,8 +418,8 @@ async def navigator_plugins(page: Page) -> None:
     )
 
 
-async def navigator_webdriver(page: Page) -> None:
-    await page.evaluateOnNewDocument(
+def navigator_webdriver(page) -> None:
+    page.evaluateHandle(
         """
 () => {
     Object.defineProperty(window, 'navigator', {
@@ -439,18 +438,19 @@ async def navigator_webdriver(page: Page) -> None:
     )
 
 
-async def user_agent(page: Page) -> None:
-    ua = await page.browser.userAgent()
+def user_agent(page) -> None:
+    return
+    ua = page.browser.userAgent()
     ua = ua.replace("HeadlessChrome", "Chrome")  # hide headless nature
     ua = re.sub(
         r"\(([^)]+)\)", "(Windows NT 10.0; Win64; x64)", ua, 1
     )  # ensure windows
 
-    await page.setUserAgent(ua)
+    page.setUserAgent(ua)
 
 
-async def webgl_vendor(page: Page) -> None:
-    await page.evaluateOnNewDocument(
+def webgl_vendor(page) -> None:
+    page.evaluateHandle(
         """
 () => {
     try {
@@ -470,8 +470,8 @@ async def webgl_vendor(page: Page) -> None:
     )
 
 
-async def window_outerdimensions(page: Page) -> None:
-    await page.evaluateOnNewDocument(
+def window_outerdimensions(page) -> None:
+    page.evaluateHandle(
         """
 () => {
     try {
@@ -487,19 +487,16 @@ async def window_outerdimensions(page: Page) -> None:
     )
 
 
-async def stealth(page: Page) -> None:
-    if not isinstance(page, Page):
-        raise ValueError("page must is pyppeteer.page.Page")
-
-    # await chrome_runtime(page)
-    await console_debug(page)
-    await iframe_content_window(page)
-    # await navigator_languages(page)
-    await navigator_permissions(page)
-    await navigator_plugins(page)
-    await navigator_webdriver(page)
-    # await navigator_vendor(page)
-    await user_agent(page)
-    await webgl_vendor(page)
-    await window_outerdimensions(page)
-    await media_codecs(page)
+def stealth(page) -> None:
+    # chrome_runtime(page)
+    console_debug(page)
+    iframe_content_window(page)
+    # navigator_languages(page)
+    navigator_permissions(page)
+    navigator_plugins(page)
+    navigator_webdriver(page)
+    # navigator_vendor(page)
+    user_agent(page)
+    webgl_vendor(page)
+    window_outerdimensions(page)
+    media_codecs(page)

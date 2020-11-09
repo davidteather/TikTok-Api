@@ -1,6 +1,6 @@
 from TikTokApi import TikTokApi
 
-api = TikTokApi()
+api = TikTokApi.get_instance()
 
 # Gets array of trending music objects
 trendingMusic = api.discoverMusic()
