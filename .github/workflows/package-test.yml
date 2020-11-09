@@ -10,7 +10,7 @@ on:
 
 jobs:
   Unit-Tests:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       - uses: microsoft/playwright-github-action@v1
