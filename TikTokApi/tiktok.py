@@ -319,7 +319,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             self.browser.sign_url(api_url, **kwargs)
-            res = self.getData(self.browser, **kwargs)
+            res = self.getData(self.browser, url=api_url, **kwargs)
             if "items" in res.keys():
                 for t in res["items"]:
                     response.append(t)
@@ -395,7 +395,7 @@ class TikTokApi:
             language,
         )
         self.browser.sign_url(api_url, **kwargs)
-        return self.getData(self.browser, **kwargs)
+        return self.getData(self.browser, url=api_url, **kwargs)
 
     def getUserPager(self, username, page_size=30, minCursor=0, maxCursor=0, **kwargs):
         """Returns a generator to page through a user's feed
@@ -489,7 +489,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             self.browser.sign_url(api_url, **kwargs)
-            res = self.getData(self.browser, **kwargs)
+            res = self.getData(self.browser, url=api_url, **kwargs)
 
             try:
                 res["items"]
@@ -578,7 +578,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             self.browser.sign_url(api_url, **kwargs)
-            res = self.getData(self.browser, **kwargs)
+            res = self.getData(self.browser, url=api_url, **kwargs)
 
             for t in res.get("itemList", []):
                 response.append(t)
@@ -612,7 +612,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
         self.browser.sign_url(api_url, **kwargs)
-        return self.getData(self.browser, **kwargs)
+        return self.getData(self.browser, url=api_url, **kwargs)
 
     def byHashtag(self, hashtag, count=30, offset=0, **kwargs) -> dict:
         """Returns a dictionary listing TikToks with a specific hashtag.
@@ -653,7 +653,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             self.browser.sign_url(api_url, **kwargs)
-            res = self.getData(self.browser, **kwargs)
+            res = self.getData(self.browser, url=api_url, **kwargs)
 
             for t in res["itemList"]:
                 response.append(t)
@@ -685,7 +685,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
         self.browser.sign_url(api_url, **kwargs)
-        return self.getData(self.browser, **kwargs)
+        return self.getData(self.browser, url=api_url, **kwargs)
 
     def getHashtagDetails(self, hashtag, **kwargs) -> dict:
         """Returns a hashtag object.
@@ -706,7 +706,7 @@ class TikTokApi:
             BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
         )
         self.browser.sign_url(api_url, **kwargs)
-        return self.getData(self.browser, **kwargs)
+        return self.getData(self.browser, url=api_url, **kwargs)
 
     def getRecommendedTikToksByVideoID(
         self, id, count=30, minCursor=0, maxCursor=0, **kwargs
@@ -750,7 +750,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             self.browser.sign_url(api_url, **kwargs)
-            res = self.getData(self.browser, **kwargs)
+            res = self.getData(self.browser, url=api_url, **kwargs)
 
             for t in res.get("items", []):
                 response.append(t)
@@ -789,7 +789,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
         self.browser.sign_url(api_url, **kwargs)
-        return self.getData(self.browser, **kwargs)
+        return self.getData(self.browser, url=api_url, **kwargs)
 
     def getTikTokByUrl(self, url, **kwargs) -> dict:
         """Returns a dictionary of a TikTok object by url.
@@ -835,7 +835,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
         self.browser.sign_url(api_url, **kwargs)
-        return self.getData(self.browser, **kwargs)["body"][1]["exploreList"]
+        return self.getData(self.browser, url=api_url, **kwargs)["body"][1]["exploreList"]
 
     def discoverMusic(self, **kwargs) -> dict:
         """Discover page, consists of music
@@ -853,7 +853,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
         self.browser.sign_url(api_url, **kwargs)
-        return self.getData(self.browser, **kwargs)["body"][2]["exploreList"]
+        return self.getData(self.browser, url=api_url, **kwargs)["body"][2]["exploreList"]
 
     def getUserObject(self, username, **kwargs) -> dict:
         """Gets a user object (dictionary)
@@ -890,7 +890,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
         self.browser.sign_url(api_url, **kwargs)
-        return self.getData(self.browser, **kwargs)["userInfo"]
+        return self.getData(self.browser, url=api_url, **kwargs)["userInfo"]
 
     def getSuggestedUsersbyID(
         self, userId="6745191554350760966", count=30, **kwargs
@@ -920,7 +920,7 @@ class TikTokApi:
         self.browser.sign_url(api_url, **kwargs)
 
         res = []
-        for x in self.getData(self.browser, **kwargs)["body"][0]["exploreList"]:
+        for x in self.getData(self.browser, url=api_url, **kwargs)["body"][0]["exploreList"]:
             res.append(x["cardItem"])
         return res[:count]
 
@@ -982,7 +982,7 @@ class TikTokApi:
         self.browser.sign_url(api_url, **kwargs)
 
         res = []
-        for x in self.getData(self.browser, **kwargs)["body"][1]["exploreList"]:
+        for x in self.getData(self.browser, url=api_url, **kwargs)["body"][1]["exploreList"]:
             res.append(x["cardItem"])
         return res[:count]
 
@@ -1045,7 +1045,7 @@ class TikTokApi:
         self.browser.sign_url(api_url, **kwargs)
 
         res = []
-        for x in self.getData(self.browser, **kwargs)["body"][2]["exploreList"]:
+        for x in self.getData(self.browser, url=api_url, **kwargs)["body"][2]["exploreList"]:
             res.append(x["cardItem"])
         return res[:count]
 
