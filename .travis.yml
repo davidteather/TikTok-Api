@@ -12,6 +12,7 @@ matrix:
 
 install:
   - pip install pytest
+  - apt-get -y install gstreamer1.0-libav
 
 before_script:
   - "pip install -r requirements.txt"
