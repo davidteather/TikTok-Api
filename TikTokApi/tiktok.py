@@ -33,7 +33,7 @@ class TikTokApi:
             "AppleWebKit/537.36 (KHTML, like Gecko) "
             "Chrome/86.0.4240.111 Safari/537.36"
         )
-
+        self.proxy = kwargs.get("proxy", None)
         if kwargs.get("persistent_browser", True):
             self.browser = browser.get_instance(**kwargs)
 
@@ -104,6 +104,9 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         if self.request_delay is not None:
             time.sleep(self.request_delay)
+
+        if self.proxy != None:
+            proxy = self.proxy
 
         verify_fp, did, signature = browser.get_instance().sign_url(kwargs["url"])
         query = {"verifyFp": verify_fp, "did": did, "_signature": signature}
