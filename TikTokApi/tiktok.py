@@ -82,6 +82,7 @@ class TikTokApi:
             get_playwright().stop()
         except:
             pass
+        TikTokApi.__instance = None
 
     def getData(self, b, **kwargs) -> dict:
         """Returns a dictionary of a response from TikTok.

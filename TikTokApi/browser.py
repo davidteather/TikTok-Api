@@ -156,6 +156,7 @@ class browser:
     def clean_up(self):
         try:
             self.browser.close()
+            browser.__instance = None
         except:
             logging.info("cleanup failed")
         # playwright.stop()
