@@ -2,7 +2,7 @@ import random
 import requests
 import time
 from urllib.parse import urlencode, quote
-
+from .utilities import update_messager
 from .browser import browser
 
 
@@ -27,6 +27,9 @@ class TikTokApi:
             "AppleWebKit/537.36 (KHTML, like Gecko) "
             "Chrome/86.0.4240.111 Safari/537.36"
         )
+
+        if not kwargs.get("ignore_version", False):
+            update_messager()
 
         # Get Browser Params
         b = browser("newParam", newParams=True, **kwargs)
