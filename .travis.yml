@@ -11,6 +11,8 @@ addons:
     packages:
     # This is required to run chromium
     - libgbm1
+    - libgles2
+    - gstreamer1.0-libav
 
 matrix:
   allow_failures:
