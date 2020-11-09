@@ -1,5 +1,7 @@
 from TikTokApi import TikTokApi
+
 api = TikTokApi()
+
 
 def test_tiktok_object():
     assert len(api.getTikTokById("6829267836783971589")) > 0

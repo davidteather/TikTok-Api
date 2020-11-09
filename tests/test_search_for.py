@@ -1,5 +1,7 @@
 from TikTokApi import TikTokApi
+
 api = TikTokApi()
+
 
 def test_search_for():
     assert len(api.search_for_hashtags("a")) >= 20

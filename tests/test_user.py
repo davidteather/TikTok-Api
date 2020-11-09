@@ -1,5 +1,7 @@
 from TikTokApi import TikTokApi
+
 api = TikTokApi()
+
 
 def test_user():
     assert api.getUser("charlidamelio")["user"]["uniqueId"] == "charlidamelio"

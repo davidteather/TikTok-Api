@@ -1,5 +1,7 @@
 from TikTokApi import TikTokApi
+
 api = TikTokApi()
+
 
 class TestUserPager:
     """Test the pager returned by getUserPager"""

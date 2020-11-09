@@ -1,5 +1,7 @@
 from TikTokApi import TikTokApi
+
 api = TikTokApi()
+
 
 def test_suggested():
     assert len(api.getSuggestedHashtagsbyID()) > 0

@@ -1,4 +1,5 @@
 from TikTokApi import TikTokApi
+
 api = TikTokApi()
 
 

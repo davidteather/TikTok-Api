@@ -488,7 +488,6 @@ def window_outerdimensions(page) -> None:
 
 
 def stealth(page) -> None:
-    
     # chrome_runtime(page)
     console_debug(page)
     iframe_content_window(page)

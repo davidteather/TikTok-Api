@@ -33,10 +33,16 @@ class TikTokApi:
 
         try:
             self.timezone_name = self.__format_new_params__(self.browser.timezone_name)
-            self.browser_language = self.__format_new_params__(self.browser.browser_language)
-            self.browser_platform = self.__format_new_params__(self.browser.browser_platform)
+            self.browser_language = self.__format_new_params__(
+                self.browser.browser_language
+            )
+            self.browser_platform = self.__format_new_params__(
+                self.browser.browser_platform
+            )
             self.browser_name = self.__format_new_params__(self.browser.browser_name)
-            self.browser_version = self.__format_new_params__(self.browser.browser_version)
+            self.browser_version = self.__format_new_params__(
+                self.browser.browser_version
+            )
             self.width = self.browser.width
             self.height = self.browser.height
         except Exception as e:
@@ -53,8 +59,7 @@ class TikTokApi:
         self.request_delay = kwargs.get("request_delay", None)
 
     def clean_up(self):
-        return
-        #self.__del__()
+        self.__del__()
 
     def __del__(self):
         self.browser.clean_up()
@@ -81,9 +86,9 @@ class TikTokApi:
         if self.request_delay is not None:
             time.sleep(self.request_delay)
 
-        verify_fp, did, signature = self.browser.sign_url(kwargs['url'])
+        verify_fp, did, signature = self.browser.sign_url(kwargs["url"])
         query = {"verifyFp": verify_fp, "did": did, "_signature": signature}
-        url = "{}&{}".format(kwargs['url'], urlencode(query))
+        url = "{}&{}".format(kwargs["url"], urlencode(query))
         r = requests.get(
             url,
             headers={
@@ -107,7 +112,9 @@ class TikTokApi:
             return r.json()
         except Exception as e:
             logging.error(e)
-            logging.error("Converting response to JSON failed response is below (probably empty)")
+            logging.error(
+                "Converting response to JSON failed response is below (probably empty)"
+            )
             logging.info(r.text)
             raise Exception("Invalid Response")
 
@@ -129,9 +136,9 @@ class TikTokApi:
             proxy,
             maxCount,
         ) = self.__process_kwargs__(kwargs)
-        verify_fp, signature = b.sign_url(kwargs['url'])
+        verify_fp, signature = b.sign_url(kwargs["url"])
         query = {"verifyFp": verify_fp, "_signature": signature}
-        url = "{}&{}".format(kwargs['url'], urlencode(query))
+        url = "{}&{}".format(kwargs["url"], urlencode(query))
         r = requests.get(
             url,
             headers={
@@ -327,7 +334,7 @@ class TikTokApi:
             api_url = "{}api/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            
+
             res = self.getData(self.browser, url=api_url, **kwargs)
             if "items" in res.keys():
                 for t in res["items"]:
@@ -403,7 +410,7 @@ class TikTokApi:
             region,
             language,
         )
-        
+
         return self.getData(self.browser, url=api_url, **kwargs)
 
     def getUserPager(self, username, page_size=30, minCursor=0, maxCursor=0, **kwargs):
@@ -497,7 +504,7 @@ class TikTokApi:
             api_url = "{}api/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            
+
             res = self.getData(self.browser, url=api_url, **kwargs)
 
             try:
@@ -586,7 +593,7 @@ class TikTokApi:
             api_url = "{}api/music/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            
+
             res = self.getData(self.browser, url=api_url, **kwargs)
 
             for t in res.get("itemList", []):
@@ -620,7 +627,7 @@ class TikTokApi:
         api_url = "{}api/music/detail/?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        
+
         return self.getData(self.browser, url=api_url, **kwargs)
 
     def byHashtag(self, hashtag, count=30, offset=0, **kwargs) -> dict:
@@ -712,7 +719,7 @@ class TikTokApi:
         api_url = "{}node/share/tag/{}?{}&{}".format(
             BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
         )
-        
+
         return self.getData(self.browser, url=api_url, **kwargs)
 
     def getRecommendedTikToksByVideoID(
@@ -756,7 +763,7 @@ class TikTokApi:
             api_url = "{}api/recommend/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            
+
             res = self.getData(self.browser, url=api_url, **kwargs)
 
             for t in res.get("items", []):
@@ -795,7 +802,7 @@ class TikTokApi:
         api_url = "{}api/item/detail/?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        
+
         return self.getData(self.browser, url=api_url, **kwargs)
 
     def getTikTokByUrl(self, url, **kwargs) -> dict:
@@ -841,8 +848,10 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        
-        return self.getData(self.browser, url=api_url, **kwargs)["body"][1]["exploreList"]
+
+        return self.getData(self.browser, url=api_url, **kwargs)["body"][1][
+            "exploreList"
+        ]
 
     def discoverMusic(self, **kwargs) -> dict:
         """Discover page, consists of music
@@ -859,8 +868,10 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        
-        return self.getData(self.browser, url=api_url, **kwargs)["body"][2]["exploreList"]
+
+        return self.getData(self.browser, url=api_url, **kwargs)["body"][2][
+            "exploreList"
+        ]
 
     def getUserObject(self, username, **kwargs) -> dict:
         """Gets a user object (dictionary)
@@ -896,7 +907,7 @@ class TikTokApi:
         api_url = "{}api/user/detail/?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        
+
         return self.getData(self.browser, url=api_url, **kwargs)["userInfo"]
 
     def getSuggestedUsersbyID(
@@ -924,10 +935,11 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        
 
         res = []
-        for x in self.getData(self.browser, url=api_url, **kwargs)["body"][0]["exploreList"]:
+        for x in self.getData(self.browser, url=api_url, **kwargs)["body"][0][
+            "exploreList"
+        ]:
             res.append(x["cardItem"])
         return res[:count]
 
@@ -986,10 +998,11 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        
 
         res = []
-        for x in self.getData(self.browser, url=api_url, **kwargs)["body"][1]["exploreList"]:
+        for x in self.getData(self.browser, url=api_url, **kwargs)["body"][1][
+            "exploreList"
+        ]:
             res.append(x["cardItem"])
         return res[:count]
 
@@ -1049,10 +1062,11 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        
 
         res = []
-        for x in self.getData(self.browser, url=api_url, **kwargs)["body"][2]["exploreList"]:
+        for x in self.getData(self.browser, url=api_url, **kwargs)["body"][2][
+            "exploreList"
+        ]:
             res.append(x["cardItem"])
         return res[:count]
 

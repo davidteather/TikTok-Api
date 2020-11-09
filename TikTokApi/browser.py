@@ -13,6 +13,7 @@ from .get_acrawler import get_acrawler
 async_support = False
 from playwright import sync_playwright
 
+
 def set_async():
     global async_support
     async_support = True
@@ -39,8 +40,10 @@ try:
 except Exception as e:
     raise e
 
+
 def get_playwright():
     return playwright
+
 
 class browser:
     def __init__(
@@ -72,7 +75,7 @@ class browser:
             ]
         else:
             self.args = args
-            
+
         self.args.append("--user-agent=" + self.userAgent)
 
         self.options = {
@@ -81,20 +84,18 @@ class browser:
             "handleSIGTERM": False,
             "handleSIGHUP": False,
         }
-        
+
         if self.proxy != None:
             if "@" in self.proxy:
                 server_prefix = self.proxy.split("://")[0]
                 address = self.proxy.split("@")[1]
-                self.options['proxy'] = {
+                self.options["proxy"] = {
                     "server": server_prefix + "://" + address,
                     "username": self.proxy.split("://")[1].split(":")[0],
                     "password": self.proxy.split("://")[1].split("@")[0].split(":")[1],
                 }
             else:
-                self.options['proxy'] = {
-                    "server": self.proxy
-                }
+                self.options["proxy"] = {"server": self.proxy}
 
         self.options.update(options)
 
@@ -102,11 +103,11 @@ class browser:
             self.options["executablePath"] = self.executablePath
 
         try:
-            self.browser = playwright.chromium.launch(args=self.args, **self.options)
+            self.browser = playwright.webkit.launch(args=self.args, **self.options)
         except Exception as e:
             logging.critical(e)
-        
-        page = self.create_page()
+
+        page = self.create_page(set_useragent=True)
         self.get_params(page)
         page.close()
 
@@ -125,14 +126,23 @@ class browser:
         self.width = page.evaluate("""() => { return screen.width; }""")
         self.height = page.evaluate("""() => { return screen.height; }""")
 
-    def create_page(self):
-        page = self.browser.newPage()
-        stealth(page)
+    def create_page(self, set_useragent=False):
+        iphone = playwright.devices["iPhone 11 Pro"]
+        iphone["viewport"] = {
+            "width": random.randint(320, 1920),
+            "height": random.randint(320, 1920),
+        }
+        iphone["deviceScaleFactor"] = random.randint(1, 3)
+        iphone["isMobile"] = random.randint(1, 2) == 1
+        iphone["hasTouch"] = random.randint(1, 2) == 1
+
+        context = self.browser.newContext(**iphone)
+        if set_useragent:
+            self.userAgent = iphone["userAgent"]
+        page = context.newPage()
         page.goto("about:blank")
-        
 
         return page
-    
 
     def sign_url(self, url):
         page = self.create_page()
@@ -149,24 +159,28 @@ class browser:
             did = self.did
 
         page.evaluate("() => { " + get_acrawler() + " }")
-        return verifyFp, did, page.evaluate(
-            '''() => {
+        return (
+            verifyFp,
+            did,
+            page.evaluate(
+                '''() => {
         var url = "'''
-            + url
-            + "&verifyFp="
-            + verifyFp
-            + """&did="""
-            + did
-            + """"
+                + url
+                + "&verifyFp="
+                + verifyFp
+                + """&did="""
+                + did
+                + """"
         var token = window.byted_acrawler.sign({url: url});
         return token;
         }"""
+            ),
         )
         page.close()
 
     def clean_up(self):
         self.browser.close()
-        #playwright.stop()
+        # playwright.stop()
 
     def find_redirect(self, url):
         self.page.goto(url, {"waitUntil": "load"})
