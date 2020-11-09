@@ -7,33 +7,8 @@ from threading import Thread
 
 # Import Detection From Stealth
 from .stealth import stealth
-
 from .get_acrawler import get_acrawler
-
-async_support = False
 from playwright import sync_playwright
-
-
-def set_async():
-    global async_support
-    async_support = True
-
-
-options = {}
-
-
-def custom_options(to_add):
-    global options
-    options = to_add
-
-
-args = []
-
-
-def custom_args(to_add):
-    global args
-    args = to_add
-
 
 try:
     playwright = sync_playwright().start()
@@ -59,10 +34,10 @@ class browser:
         self.did = kwargs.get("custom_did", None)
         find_redirect = kwargs.get("find_redirect", False)
 
-        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
+        args = kwargs.get("browser_args", [])
+        options = kwargs.get("browser_options", {})
 
-        global args
-        global options
+        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
 
         if len(args) == 0:
             self.args = [
@@ -80,9 +55,9 @@ class browser:
 
         self.options = {
             "headless": True,
-            "handleSIGINT": False,
-            "handleSIGTERM": False,
-            "handleSIGHUP": False,
+            "handleSIGINT": True,
+            "handleSIGTERM": True,
+            "handleSIGHUP": True,
         }
 
         if self.proxy != None:
