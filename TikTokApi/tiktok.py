@@ -6,6 +6,7 @@ from urllib.parse import urlencode, quote
 from .browser import browser, get_playwright
 from playwright import sync_playwright
 import logging
+from .utilities import update_messager
 
 BASE_URL = "https://m.tiktok.com/"
 
