@@ -36,6 +36,7 @@ class TikTokApi:
         self.proxy = kwargs.get("proxy", None)
         if kwargs.get("persistent_browser", True):
             self.browser = browser(**kwargs)
+            self.userAgent = self.browser.userAgent
 
         try:
             self.timezone_name = self.__format_new_params__(self.browser.timezone_name)
