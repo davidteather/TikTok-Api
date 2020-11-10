@@ -27,12 +27,9 @@ class TikTokApi:
             "AppleWebKit/537.36 (KHTML, like Gecko) "
             "Chrome/86.0.4240.111 Safari/537.36"
         )
-
-        if not kwargs.get("ignore_version", False):
-            update_messager()
-
-        # Get Browser Params
-        b = browser("newParam", newParams=True, **kwargs)
+        self.proxy = kwargs.get("proxy", None)
+        if kwargs.get("persistent_browser", True):
+            self.browser = browser(**kwargs)
 
         try:
             self.timezone_name = self.__format_new_params__(b.timezone_name)
@@ -98,8 +95,12 @@ class TikTokApi:
         if self.request_delay is not None:
             time.sleep(self.request_delay)
 
-        query = {"verifyFp": b.verifyFp, "did": b.did, "_signature": b.signature}
-        url = "{}&{}".format(b.url, urlencode(query))
+        if self.proxy != None:
+            proxy = self.proxy
+
+        verify_fp, did, signature = self.browser.sign_url(kwargs["url"])
+        query = {"verifyFp": verify_fp, "did": did, "_signature": signature}
+        url = "{}&{}".format(kwargs["url"], urlencode(query))
         r = requests.get(
             url,
             headers={
