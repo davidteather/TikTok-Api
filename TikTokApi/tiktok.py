@@ -91,10 +91,15 @@ class TikTokApi:
         TikTokApi.__instance = None
 
     def external_signer(self, url, custom_did=None):
-        query = {
-                "url": url,
-                "custom_did": custom_did
-        }
+        if custom_did != None:
+            query = {
+                    "url": url,
+                    "custom_did": custom_did
+            }
+        else:
+            query = {
+                    "url": url,
+            }
         data = requests.get(self.signer_url + "?{}".format(urlencode(query)))
         parsed_data = data.json()
 
