@@ -109,7 +109,7 @@ class TikTokApi:
         if self.proxy != None:
             proxy = self.proxy
 
-        verify_fp, did, signature = self.browser.sign_url(kwargs["url"])
+        verify_fp, did, signature = self.browser.sign_url(**kwargs)
         query = {"verifyFp": verify_fp, "did": did, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
         r = requests.get(
@@ -159,7 +159,7 @@ class TikTokApi:
             proxy,
             maxCount,
         ) = self.__process_kwargs__(kwargs)
-        verify_fp, signature = b.sign_url(kwargs["url"])
+        verify_fp, did, signature = b.sign_url(**kwargs)
         query = {"verifyFp": verify_fp, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
         r = requests.get(
@@ -170,7 +170,7 @@ class TikTokApi:
                 "Accept-Language": "en-US;en;q=0.9",
                 "Cache-Control": "no-cache",
                 "Connection": "keep-alive",
-                "cookie": "tt_webid_v2=" + b.did,
+                "cookie": "tt_webid_v2=" + did,
                 "Host": url.split("/")[2],
                 "Pragma": "no-cache",
                 "Range": "bytes=0-",
@@ -1157,8 +1157,7 @@ class TikTokApi:
             proxy,
             maxCount,
         ) = self.__process_kwargs__(kwargs)
-        b = browser(download_url, **kwargs)
-        return self.getBytes(b, **kwargs)
+        return self.getBytes(self.browser, url=download_url, **kwargs)
 
     def get_Video_By_Url(self, video_url, **kwargs) -> bytes:
         (
@@ -1171,8 +1170,7 @@ class TikTokApi:
         tiktok_schema = self.getTikTokByUrl(video_url, **kwargs)
         download_url = tiktok_schema["itemInfo"]["itemStruct"]["video"]["downloadAddr"]
 
-        b = browser(download_url, **kwargs)
-        return self.getBytes(b, **kwargs)
+        return self.getBytes(self.browser, url=download_url, **kwargs)
 
     def get_Video_No_Watermark(self, video_url, return_bytes=0, **kwargs) -> bytes:
         """Gets the video with no watermark
