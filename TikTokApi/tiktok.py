@@ -57,6 +57,26 @@ class TikTokApi:
 
         self.request_delay = kwargs.get("request_delay", None)
 
+    @staticmethod
+    def get_instance(**kwargs):
+        if not TikTokApi.__instance:
+            TikTokApi(**kwargs)
+        return TikTokApi.__instance
+
+    def clean_up(self):
+        self.__del__()
+
+    def __del__(self):
+        try:
+            self.browser.clean_up()
+        except:
+            pass
+        try:
+            get_playwright().stop()
+        except:
+            pass
+        TikTokApi.__instance = None
+
     def getData(self, b, **kwargs) -> dict:
         """Returns a dictionary of a response from TikTok.
 
