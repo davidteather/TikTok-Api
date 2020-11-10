@@ -108,7 +108,10 @@ class browser:
 
         return page
 
-    def sign_url(self, url):
+    def sign_url(self, **kwargs):
+        url = kwargs.get("url", None)
+        if url == None:
+            raise Exception("sign_url required a url parameter")
         page = self.create_page()
         verifyFp = "".join(
             random.choice(
@@ -117,7 +120,9 @@ class browser:
             for i in range(16)
         )
 
-        if self.did == None:
+        if kwargs.get("custom_did", None) != None:
+            did = kwargs.get("custom_did", None)
+        elif self.did == None:
             did = str(random.randint(10000, 999999999))
         else:
             did = self.did
