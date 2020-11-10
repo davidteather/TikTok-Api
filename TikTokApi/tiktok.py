@@ -65,9 +65,9 @@ class TikTokApi:
         self.request_delay = kwargs.get("request_delay", None)
 
     @staticmethod
-    def get_instance():
+    def get_instance(**kwargs):
         if not TikTokApi.__instance:
-            TikTokApi()
+            TikTokApi(**kwargs)
         return TikTokApi.__instance
 
     def clean_up(self):
