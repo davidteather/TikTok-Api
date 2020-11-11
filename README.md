@@ -65,10 +65,8 @@ pip install TikTokApi
 python -m playwright install
 ```
 
-If you run into any issue try the fix below before posting an issue.
+If you're on MacOS you may need to install [XCode Developer Tools](https://webkit.org/build-tools/)
 
-
-**If you still run into issues you may need to install chromedriver for your machine globally. Download it [here](https://sites.google.com/a/chromium.org/chromedriver/) and add it to your path.**
 
 ### Common Issues
 
