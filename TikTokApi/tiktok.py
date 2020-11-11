@@ -1002,8 +1002,8 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs['custom_did'] = did
         query = {"uniqueId": username, "language": language, "isUniqueId": True, "validUniqueId": username}
-        api_url = "{}node/share/user/@{}?{}&{}".format(
-            BASE_URL, quote(username), self.__add_new_params__(), urlencode(query)
+        api_url = "{}api/user/detail/?{}&{}".format(
+            BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
         return self.getData(url=api_url, **kwargs)["userInfo"]
