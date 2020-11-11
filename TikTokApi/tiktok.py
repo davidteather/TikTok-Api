@@ -26,7 +26,7 @@ class TikTokApi:
             TikTokApi.__instance = self
         else:
             raise Exception("Only one TikTokApi object is allowed")
-        logging.basicConfig(level=kwargs.get("logging_level", logging.CRITICAL))
+        logging.basicConfig(level=kwargs.get("logging_level", logging.WARNING))
         logging.info("Class initalized")
         self.executablePath = kwargs.get("executablePath", None)
 
@@ -701,8 +701,8 @@ class TikTokApi:
         kwargs['custom_did'] = did
 
         query = {"musicId": id, "language": language}
-        api_url = "{}api/music/detail/?{}&{}".format(
-            BASE_URL, self.__add_new_params__(), urlencode(query)
+        api_url = "{}node/share/music/{}?{}&{}".format(
+            BASE_URL, self.get_music_title(id) + "-" + str(id), self.__add_new_params__(), urlencode(query)
         )
 
         return self.getData(url=api_url, **kwargs)
@@ -776,9 +776,9 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs['custom_did'] = did
-        query = {"challengeName": hashtag, "language": language}
-        api_url = "{}api/challenge/detail/?{}&{}".format(
-            BASE_URL, self.__add_new_params__(), urlencode(query)
+        query = {"name": hashtag, "isName": True, "lang": language}
+        api_url = "{}node/share/tag/{}?{}&{}".format(
+            BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
         )
         return self.getData(url=api_url, **kwargs)
 
@@ -790,6 +790,7 @@ class TikTokApi:
                          Note: Doesn't seem to have an affect.
         :param proxy: The IP address of a proxy to make requests from.
         """
+        logging.warning("The getHashtagDetails will be deprecated in a future version. Replace it with getHashtagObject")
         (
             region,
             language,
@@ -798,7 +799,7 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs['custom_did'] = did
-        query = {"language": language}
+        query = {"lang": language}
         api_url = "{}node/share/tag/{}?{}&{}".format(
             BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
         )
@@ -1000,7 +1001,7 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs['custom_did'] = did
-        query = {"language": language}
+        query = {"uniqueId": username, "language": language, "isUniqueId": True, "validUniqueId": username}
         api_url = "{}node/share/user/@{}?{}&{}".format(
             BASE_URL, quote(username), self.__add_new_params__(), urlencode(query)
         )
@@ -1332,6 +1333,11 @@ class TikTokApi:
                 r = requests.get(b.redirect_url, proxies=self.__format_proxy(proxy))
                 return r.content
 
+    def get_music_title(self, id):
+        r = requests.get("https://www.tiktok.com/music/-{}".format(id))
+        text = r.text.split('TikTok","desc":')[0]
+        on_tiktok = text.split(" | ")
+        return on_tiktok[len(on_tiktok)-2].split(" ")[1]
     #
     # PRIVATE METHODS
     #
@@ -1377,6 +1383,7 @@ class TikTokApi:
             "isMobile": False,
             "isIOS": False,
             "OS": "windows",
+            "page_referer": "https://www.tiktok.com/"
         }
         return urlencode(query)
 
