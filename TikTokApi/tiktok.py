@@ -701,7 +701,7 @@ class TikTokApi:
 
         query = {"musicId": id, "language": language}
         api_url = "{}node/share/music/{}?{}&{}".format(
-            BASE_URL, self.get_music_title(id) + "-" + str(id), self.__add_new_params__(), urlencode(query)
+            BASE_URL, self.get_music_title(id, **kwargs) + "-" + str(id), self.__add_new_params__(), urlencode(query)
         )
 
         return self.getData(url=api_url, **kwargs)
@@ -1332,8 +1332,8 @@ class TikTokApi:
                 r = requests.get(b.redirect_url, proxies=self.__format_proxy(proxy))
                 return r.content
 
-    def get_music_title(self, id):
-        r = requests.get("https://www.tiktok.com/music/-{}".format(id))
+    def get_music_title(self, id, **kwargs):
+        r = requests.get("https://www.tiktok.com/music/-{}".format(id), proxies=self.__format_proxy(kwargs.get("proxy", None)))
         text = r.text.split('TikTok","desc":')[0]
         on_tiktok = text.split(" | ")
         return on_tiktok[len(on_tiktok)-2].split(" ")[1]
