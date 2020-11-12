@@ -297,7 +297,7 @@ class TikTokApi:
             search_term, prefix="challenge", count=count, **kwargs
         )
 
-    def discover_type(self, search_term, prefix, count=28, **kwargs) -> list:
+    def discover_type(self, search_term, prefix, count=28, offset=0, **kwargs) -> list:
         """Returns a list of whatever the prefix type you pass in
 
         :param search_term: The string to search by.
@@ -315,13 +315,12 @@ class TikTokApi:
         kwargs['custom_did'] = did
 
         response = []
-        offsetCount = 0
         while len(response) < count:
             query = {
                 "discoverType": count,
                 "needItemList": False,
                 "keyWord": search_term,
-                "offset": offsetCount,
+                "offset": offset,
                 "count": 99,
                 "useRecommend": False,
                 "language": "en",
@@ -344,7 +343,7 @@ class TikTokApi:
                 logging.info("TikTok is not sending videos beyond this point.")
                 break
 
-            offsetCount = len(response)
+            offset += maxCount
 
         return response[:count]
 
