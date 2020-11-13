@@ -4,7 +4,7 @@ api = TikTokApi.get_instance()
 
 
 def test_user():
-    assert api.getUser("charlidamelio")["user"]["uniqueId"] == "charlidamelio"
+    assert api.getUser("charlidamelio")['userInfo']["user"]["uniqueId"] == "charlidamelio"
     assert api.getUserObject("charlidamelio")["uniqueId"] == "charlidamelio"
     assert (
         abs(

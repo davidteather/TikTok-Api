@@ -297,7 +297,7 @@ class TikTokApi:
             search_term, prefix="challenge", count=count, **kwargs
         )
 
-    def discover_type(self, search_term, prefix, count=28, **kwargs) -> list:
+    def discover_type(self, search_term, prefix, count=28, offset=0, **kwargs) -> list:
         """Returns a list of whatever the prefix type you pass in
 
         :param search_term: The string to search by.
@@ -315,13 +315,12 @@ class TikTokApi:
         kwargs['custom_did'] = did
 
         response = []
-        offsetCount = 0
         while len(response) < count:
             query = {
                 "discoverType": count,
                 "needItemList": False,
                 "keyWord": search_term,
-                "offset": offsetCount,
+                "offset": offset,
                 "count": 99,
                 "useRecommend": False,
                 "language": "en",
@@ -344,7 +343,7 @@ class TikTokApi:
                 logging.info("TikTok is not sending videos beyond this point.")
                 break
 
-            offsetCount = len(response)
+            offset += maxCount
 
         return response[:count]
 
@@ -702,7 +701,7 @@ class TikTokApi:
 
         query = {"musicId": id, "language": language}
         api_url = "{}node/share/music/{}?{}&{}".format(
-            BASE_URL, self.get_music_title(id) + "-" + str(id), self.__add_new_params__(), urlencode(query)
+            BASE_URL, self.get_music_title(id, **kwargs) + "-" + str(id), self.__add_new_params__(), urlencode(query)
         )
 
         return self.getData(url=api_url, **kwargs)
@@ -983,7 +982,7 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs['custom_did'] = did
-        return self.getUser(username, **kwargs)["user"]
+        return self.getUser(username, **kwargs)["userInfo"]['user']
 
     def getUser(self, username, **kwargs) -> dict:
         """Gets the full exposed user object
@@ -1001,12 +1000,13 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs['custom_did'] = did
-        query = {"uniqueId": username, "language": language, "isUniqueId": True, "validUniqueId": username}
-        api_url = "{}api/user/detail/?{}&{}".format(
-            BASE_URL, self.__add_new_params__(), urlencode(query)
+        secUid = self.get_secUid(username)
+        query = {"uniqueId": username, "language": language, "isUniqueId": True, "validUniqueId": username, "sec_uid": "", "secUid": secUid}
+        api_url = "{}node/share/user/@{}?{}&{}".format(
+            BASE_URL, quote(username), self.__add_new_params__(), urlencode(query)
         )
 
-        return self.getData(url=api_url, **kwargs)["userInfo"]
+        return self.getData(url=api_url, **kwargs)
 
     def getSuggestedUsersbyID(
         self, userId="6745191554350760966", count=30, **kwargs
@@ -1333,11 +1333,27 @@ class TikTokApi:
                 r = requests.get(b.redirect_url, proxies=self.__format_proxy(proxy))
                 return r.content
 
-    def get_music_title(self, id):
-        r = requests.get("https://www.tiktok.com/music/-{}".format(id))
+    def get_music_title(self, id, **kwargs):
+        r = requests.get("https://www.tiktok.com/music/-{}".format(id), proxies=self.__format_proxy(kwargs.get("proxy", None)))
         text = r.text.split('TikTok","desc":')[0]
         on_tiktok = text.split(" | ")
         return on_tiktok[len(on_tiktok)-2].split(" ")[1]
+
+    def get_secUid(self, username, **kwargs):
+        r = requests.get("https://tiktok.com/@{}?lang=en".format(username), headers={
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate",
+            "Connection": "keep-alive",
+            "Host": "www.tiktok.com",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+            "Cookie": "s_v_web_id=" + kwargs.get("custom_verifyFp", "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
+        }, proxies=self.__format_proxy(kwargs.get("proxy", None)))
+        try:
+            return r.text.split('"secUid":"')[1].split('","secret":')[0]
+        except IndexError as e:
+            logging.info(r.text)
+            logging.error(e)
+            raise Exception("Retrieving the user secUid failed. Likely due to TikTok wanting captcha validation. Try to use a proxy.")
     #
     # PRIVATE METHODS
     #
@@ -1346,6 +1362,8 @@ class TikTokApi:
         """
         Formats the proxy object
         """
+        if proxy == None and self.proxy != None:
+            proxy = self.proxy
         if proxy is not None:
             return {"http": proxy, "https": proxy}
         else:
