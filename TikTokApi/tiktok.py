@@ -747,6 +747,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             res = self.getData(url=api_url, **kwargs)
+            print(res)
 
             for t in res["itemList"]:
                 response.append(t)
@@ -1340,12 +1341,13 @@ class TikTokApi:
         return on_tiktok[len(on_tiktok)-2].split(" ")[1]
 
     def get_secUid(self, username, **kwargs):
-        r = requests.get("https://tiktok.com/@therock?lang=en", headers={
+        r = requests.get("https://tiktok.com/@{}?lang=en".format(username), headers={
             "Accept": "*/*",
             "Accept-Encoding": "gzip, deflate",
             "Connection": "keep-alive",
             "Host": "www.tiktok.com",
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+            "Cookie": "s_v_web_id=" + kwargs.get("custom_verifyFp", "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
         }, proxies=self.__format_proxy(kwargs.get("proxy", None)))
         try:
             return r.text.split('"secUid":"')[1].split('","secret":')[0]

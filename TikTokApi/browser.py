@@ -167,7 +167,10 @@ class browser:
             for i in range(16)
         )
 
-        verifyFp = kwargs.get("custom_verifyFp", self.gen_verifyFp())
+        if kwargs.get("gen_new_verifyFp", False):
+            verifyFp = self.gen_verifyFp()
+        else:
+            verifyFp = kwargs.get("custom_verifyFp", "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX")
 
 
         if kwargs.get("custom_did", None) != None:
