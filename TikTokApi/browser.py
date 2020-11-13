@@ -123,8 +123,6 @@ class browser:
             for i in range(16)
         )
 
-        verifyFp = "verify_khgepmjd_L8THrD9Y_RqbR_4l9N_8cgF_dVPpzvJzxp9r"
-
         if kwargs.get("custom_did", None) != None:
             did = kwargs.get("custom_did", None)
         elif self.did == None:
