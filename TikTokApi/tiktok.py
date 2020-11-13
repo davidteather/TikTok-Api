@@ -747,7 +747,6 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             res = self.getData(url=api_url, **kwargs)
-            print(res)
 
             for t in res["itemList"]:
                 response.append(t)
