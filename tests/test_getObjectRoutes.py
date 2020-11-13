@@ -1,6 +1,6 @@
 from TikTokApi import TikTokApi
-
-api = TikTokApi.get_instance()
+import os
+api = TikTokApi.get_instance(proxy=os.environ.get("PROXY", None))
 
 
 def test_tiktok_object():

@@ -34,4 +34,6 @@ jobs:
           python -m playwright install
 
       - name: Run Tests
+        env:
+          PROXY: ${{ secrets.PROXY }}
         run: pytest tests
