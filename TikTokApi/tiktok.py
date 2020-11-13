@@ -982,7 +982,7 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs['custom_did'] = did
-        return self.getUser(username, **kwargs)["user"]
+        return self.getUser(username, **kwargs)["userInfo"]['user']
 
     def getUser(self, username, **kwargs) -> dict:
         """Gets the full exposed user object
@@ -1000,12 +1000,13 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs['custom_did'] = did
-        query = {"uniqueId": username, "language": language, "isUniqueId": True, "validUniqueId": username}
-        api_url = "{}api/user/detail/?{}&{}".format(
-            BASE_URL, self.__add_new_params__(), urlencode(query)
+        secUid = self.get_secUid(username)
+        query = {"uniqueId": username, "language": language, "isUniqueId": True, "validUniqueId": username, "sec_uid": "", "secUid": secUid}
+        api_url = "{}node/share/user/@{}?{}&{}".format(
+            BASE_URL, quote(username), self.__add_new_params__(), urlencode(query)
         )
 
-        return self.getData(url=api_url, **kwargs)["userInfo"]
+        return self.getData(url=api_url, **kwargs)
 
     def getSuggestedUsersbyID(
         self, userId="6745191554350760966", count=30, **kwargs
@@ -1337,6 +1338,19 @@ class TikTokApi:
         text = r.text.split('TikTok","desc":')[0]
         on_tiktok = text.split(" | ")
         return on_tiktok[len(on_tiktok)-2].split(" ")[1]
+
+    def get_secUid(self, username, **kwargs):
+        r = requests.get("https://tiktok.com/@therock?lang=en", headers={
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate",
+            "Connection": "keep-alive",
+            "Host": "www.tiktok.com",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+        }, proxies=self.__format_proxy(kwargs.get("proxy", None)))
+        try:
+            return r.text.split('"secUid":"')[1].split('","secret":')[0]
+        except IndexError as e:
+            raise Exception("Retrieving the user secUid failed. Likely due to TikTok wanting captcha validation. Try to use a proxy.")
     #
     # PRIVATE METHODS
     #
@@ -1345,6 +1359,8 @@ class TikTokApi:
         """
         Formats the proxy object
         """
+        if proxy == None and self.proxy != None:
+            proxy = self.proxy
         if proxy is not None:
             return {"http": proxy, "https": proxy}
         else:

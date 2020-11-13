@@ -10,13 +10,16 @@ from .stealth import stealth
 from .get_acrawler import get_acrawler
 from playwright import sync_playwright
 
-try:
-    playwright = sync_playwright().start()
-except Exception as e:
-    raise e
-
+playwright = None
 
 def get_playwright():
+    global playwright
+    if playwright == None:
+        try:
+            playwright = sync_playwright().start()
+        except Exception as e:
+            raise e
+    
     return playwright
 
 
@@ -67,7 +70,7 @@ class browser:
             self.options["executablePath"] = self.executablePath
 
         try:
-            self.browser = playwright.webkit.launch(args=self.args, **self.options)
+            self.browser = get_playwright().webkit.launch(args=self.args, **self.options)
         except Exception as e:
             raise e
             logging.critical(e)
@@ -119,6 +122,8 @@ class browser:
             )
             for i in range(16)
         )
+
+        verifyFp = "verify_khgepmjd_L8THrD9Y_RqbR_4l9N_8cgF_dVPpzvJzxp9r"
 
         if kwargs.get("custom_did", None) != None:
             did = kwargs.get("custom_did", None)
