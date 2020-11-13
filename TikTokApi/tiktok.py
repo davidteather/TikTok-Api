@@ -1350,6 +1350,8 @@ class TikTokApi:
         try:
             return r.text.split('"secUid":"')[1].split('","secret":')[0]
         except IndexError as e:
+            logging.info(r.text)
+            logging.error(e)
             raise Exception("Retrieving the user secUid failed. Likely due to TikTok wanting captcha validation. Try to use a proxy.")
     #
     # PRIVATE METHODS

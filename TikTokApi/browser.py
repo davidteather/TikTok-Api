@@ -4,6 +4,9 @@ import string
 import requests
 import logging
 from threading import Thread
+import time, datetime
+import random
+
 
 # Import Detection From Stealth
 from .stealth import stealth
@@ -111,6 +114,47 @@ class browser:
 
         return page
 
+    def base36encode(self, number, alphabet='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'):
+        """Converts an integer to a base36 string."""
+        base36 = ''
+        sign = ''
+
+        if number < 0:
+            sign = '-'
+            number = -number
+
+        if 0 <= number < len(alphabet):
+            return sign + alphabet[number]
+
+        while number != 0:
+            number, i = divmod(number, len(alphabet))
+            base36 = alphabet[i] + base36
+
+        return sign + base36
+
+    def gen_verifyFp(self):
+        start_time = int(time.time() * 1000)
+        chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"[:]
+        chars_len = len(chars)
+        scenarioTitle = self.base36encode(int(time.time() * 1000))
+        uuid = [0] * 36
+        uuid[8] = '_'
+        uuid[13] = '_'
+        uuid[18] = '_'
+        uuid[23] = '_'
+        uuid[14] = "4"
+        r = None
+        for i in range(36):
+            if uuid[i] == 0:
+                if r == None:
+                    r = 0
+                else:
+                    r = random.random() * chars_len
+                uuid[i] = chars[int(r)]
+        ending = ""
+        for x in uuid:
+            ending += str(x)
+        return "verify_" + scenarioTitle + "_" + ending
     def sign_url(self, **kwargs):
         url = kwargs.get("url", None)
         if url == None:
@@ -122,6 +166,9 @@ class browser:
             )
             for i in range(16)
         )
+
+        verifyFp = kwargs.get("custom_verifyFp", self.gen_verifyFp())
+
 
         if kwargs.get("custom_did", None) != None:
             did = kwargs.get("custom_did", None)
