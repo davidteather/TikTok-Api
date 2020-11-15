@@ -61,11 +61,8 @@ To get started using this api follow the instructions below.
 If you run into an issue please check the closed issues on the github. You're most likely not the first person to experience this issue. If nothing works feel free to open an issue.
 
 ```
-pip install TikTokApi
-python -m playwright install
+pip install TikTokApi-pyppeteer
 ```
-
-If you're on MacOS you may need to install [XCode Developer Tools](https://webkit.org/build-tools/)
 
 
 ### Common Issues
