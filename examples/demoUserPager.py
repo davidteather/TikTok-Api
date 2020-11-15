@@ -1,7 +1,7 @@
 from datetime import datetime
 from TikTokApi import TikTokApi
 
-api = TikTokApi(debug=True)
+api = TikTokApi()(debug=True)
 
 
 def printPage(page):

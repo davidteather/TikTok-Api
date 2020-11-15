@@ -1,6 +1,8 @@
 
 # Unofficial TikTok API in Python
 
+[PLAYWRIGHT VERSION](https://github.com/davidteather/TikTok-Api)
+
 This is an unofficial api wrapper for TikTok.com in python. With this api you are able to call most trending and fetch specific user information as well as much more.
 
  [![GitHub release (latest by date)](https://img.shields.io/github/v/release/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/releases) [![Build Status](https://travis-ci.com/davidteather/TikTok-Api.svg?branch=master)](https://travis-ci.com/davidteather/TikTok-Api) [![GitHub](https://img.shields.io/github/license/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/tiktokapi)](https://pypi.org/project/TikTokApi/) ![](https://visitor-badge.laobi.icu/badge?page_id=davidteather.TikTok-Api)
@@ -61,11 +63,8 @@ To get started using this api follow the instructions below.
 If you run into an issue please check the closed issues on the github. You're most likely not the first person to experience this issue. If nothing works feel free to open an issue.
 
 ```
-pip install TikTokApi
-python -m playwright install
+pip install TikTokApi-pyppeteer
 ```
-
-If you're on MacOS you may need to install [XCode Developer Tools](https://webkit.org/build-tools/)
 
 
 ### Common Issues
@@ -82,7 +81,7 @@ Here's a quick bit of code to get the most recent trending on TikTok. There's mo
 
 ```
 from TikTokApi import TikTokApi
-api = TikTokApi.get_instance()
+api = TikTokApi()
 
 results = 10
 

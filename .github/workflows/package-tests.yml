@@ -4,6 +4,9 @@ on:
     branches:
       - master
   pull_request:
+    on:
+      pull_request
+      push
     branches:
       - master
       - nightly
@@ -16,12 +19,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest]
-        python-version: [3.7, 3.8, 3.9]
+        os: [macos-latest, windows-latest, ubuntu]
+        python-version: [3.6, 3.7, 3.8, 3.9]
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-      - uses: microsoft/playwright-github-action@v1
       - name: Install Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -31,9 +32,5 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest
-          python -m playwright install
-
       - name: Run Tests
-        env:
-          PROXY: ${{ secrets.PROXY }}
         run: pytest tests

@@ -1,8 +1,9 @@
+from pyppeteer.page import Page
 import re
 
 
-def chrome_runtime(page) -> None:
-    page.evaluateHandle(
+async def chrome_runtime(page: Page) -> None:
+    await page.evaluateOnNewDocument(
         """
 () => {
     window.chrome = {
@@ -13,8 +14,8 @@ def chrome_runtime(page) -> None:
     )
 
 
-def console_debug(page) -> None:
-    page.evaluateHandle(
+async def console_debug(page: Page) -> None:
+    await page.evaluateOnNewDocument(
         """
 () => {
     window.console.debug = () => {
@@ -25,8 +26,8 @@ def console_debug(page) -> None:
     )
 
 
-def iframe_content_window(page) -> None:
-    page.evaluateHandle(
+async def iframe_content_window(page: Page) -> None:
+    await page.evaluateOnNewDocument(
         """
 () => {
   try {
@@ -124,8 +125,8 @@ def iframe_content_window(page) -> None:
     )
 
 
-def media_codecs(page) -> None:
-    page.evaluateHandle(
+async def media_codecs(page: Page) -> None:
+    await page.evaluateOnNewDocument(
         """
     () => {
   try {
@@ -198,8 +199,8 @@ def media_codecs(page) -> None:
     )
 
 
-def navigator_languages(page) -> None:
-    page.evaluateHandle(
+async def navigator_languages(page: Page) -> None:
+    await page.evaluateOnNewDocument(
         """
 () => {
     Object.defineProperty(navigator, 'languages', {
@@ -210,8 +211,8 @@ def navigator_languages(page) -> None:
     )
 
 
-def navigator_permissions(page) -> None:
-    page.evaluateHandle(
+async def navigator_permissions(page: Page) -> None:
+    await page.evaluateOnNewDocument(
         """
 () => {
     const originalQuery = window.navigator.permissions.query
@@ -244,8 +245,8 @@ def navigator_permissions(page) -> None:
     )
 
 
-def navigator_plugins(page) -> None:
-    page.evaluateHandle(
+async def navigator_plugins(page: Page) -> None:
+    await page.evaluateOnNewDocument(
         """
 () => {
     function mockPluginsAndMimeTypes() {
@@ -418,8 +419,8 @@ def navigator_plugins(page) -> None:
     )
 
 
-def navigator_webdriver(page) -> None:
-    page.evaluateHandle(
+async def navigator_webdriver(page: Page) -> None:
+    await page.evaluateOnNewDocument(
         """
 () => {
     Object.defineProperty(window, 'navigator', {
@@ -438,19 +439,18 @@ def navigator_webdriver(page) -> None:
     )
 
 
-def user_agent(page) -> None:
-    return
-    ua = page.browser.userAgent()
+async def user_agent(page: Page) -> None:
+    ua = await page.browser.userAgent()
     ua = ua.replace("HeadlessChrome", "Chrome")  # hide headless nature
     ua = re.sub(
         r"\(([^)]+)\)", "(Windows NT 10.0; Win64; x64)", ua, 1
     )  # ensure windows
 
-    page.setUserAgent(ua)
+    await page.setUserAgent(ua)
 
 
-def webgl_vendor(page) -> None:
-    page.evaluateHandle(
+async def webgl_vendor(page: Page) -> None:
+    await page.evaluateOnNewDocument(
         """
 () => {
     try {
@@ -470,8 +470,8 @@ def webgl_vendor(page) -> None:
     )
 
 
-def window_outerdimensions(page) -> None:
-    page.evaluateHandle(
+async def window_outerdimensions(page: Page) -> None:
+    await page.evaluateOnNewDocument(
         """
 () => {
     try {
@@ -487,16 +487,19 @@ def window_outerdimensions(page) -> None:
     )
 
 
-def stealth(page) -> None:
-    # chrome_runtime(page)
-    console_debug(page)
-    iframe_content_window(page)
-    # navigator_languages(page)
-    navigator_permissions(page)
-    navigator_plugins(page)
-    navigator_webdriver(page)
-    # navigator_vendor(page)
-    user_agent(page)
-    webgl_vendor(page)
-    window_outerdimensions(page)
-    media_codecs(page)
+async def stealth(page: Page) -> None:
+    if not isinstance(page, Page):
+        raise ValueError("page must is pyppeteer.page.Page")
+
+    # await chrome_runtime(page)
+    await console_debug(page)
+    await iframe_content_window(page)
+    # await navigator_languages(page)
+    await navigator_permissions(page)
+    await navigator_plugins(page)
+    await navigator_webdriver(page)
+    # await navigator_vendor(page)
+    await user_agent(page)
+    await webgl_vendor(page)
+    await window_outerdimensions(page)
+    await media_codecs(page)
