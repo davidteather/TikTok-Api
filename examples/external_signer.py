@@ -46,5 +46,5 @@ if __name__ == "__main__":
 # Example script below for production use
 
 # from TikTokApi import TikTokApi
-# api = TikTokApi(external_signer="http://localhost:5000/sign")
+# api = TikTokApi()(external_signer="http://localhost:5000/sign")
 # print(api.trending())

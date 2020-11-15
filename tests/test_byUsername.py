@@ -1,6 +1,6 @@
 from TikTokApi import TikTokApi
 import os
-api = TikTokApi.get_instance()
+api = TikTokApi()
 
 def test_trending():
     assert abs(len(api.byUsername("therock", 5)) - 5) <= 2

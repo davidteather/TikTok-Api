@@ -1,2 +1,4 @@
 requests
-playwright
+pyppeteer
+selenium
+pyppeteer_stealth

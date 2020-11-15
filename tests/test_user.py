@@ -1,6 +1,6 @@
 from TikTokApi import TikTokApi
 
-api = TikTokApi.get_instance()
+api = TikTokApi()
 
 
 def test_user():
