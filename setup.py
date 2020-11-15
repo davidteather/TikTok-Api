@@ -6,8 +6,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="TikTokApi-pyppeteer",
-    packages=["TikTokApi-pyppeteer"],
+    name="TikTokApi-Pyppeteer",
+    packages=["TikTokApi"],
     version="3.7.9",
     license="MIT",
     description="The Unofficial TikTok API Wrapper But Pyppeteer in Python 3.",
