@@ -3,6 +3,8 @@
 
 This is an unofficial api wrapper for TikTok.com in python. With this api you are able to call most trending and fetch specific user information as well as much more.
 
+[Pyppeteer VERSION](https://github.com/TikTokApi-Pyppeteer/TikTok-Api-Pyppeteer)
+
  [![GitHub release (latest by date)](https://img.shields.io/github/v/release/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/releases) [![Build Status](https://travis-ci.com/davidteather/TikTok-Api.svg?branch=master)](https://travis-ci.com/davidteather/TikTok-Api) [![GitHub](https://img.shields.io/github/license/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/tiktokapi)](https://pypi.org/project/TikTokApi/) ![](https://visitor-badge.laobi.icu/badge?page_id=davidteather.TikTok-Api)
 
 If you want to use this API as a service visit the [RapidAPI](https://rapidapi.com/rapidapideveloper/api/tiktok2)
@@ -411,7 +413,7 @@ debug - Enable this if you need some more output.
 
 Will be denoted by user for the methods below
 
-##### The get_Video_No_Watermark Method
+##### The get_insights Method
 ```
 user.get_insights(videoID, username=None)
 ```
