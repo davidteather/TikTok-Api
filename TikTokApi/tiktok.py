@@ -189,7 +189,7 @@ class TikTokApi:
                     "Converting response to JSON failed response is below (probably empty)"
                 )
                 logging.error(e)
-                raise Exception("Invalid Response") from None
+                raise Exception("Invalid Response") from e
 
     def getBytes(self, **kwargs) -> bytes:
         """Returns bytes of a response from TikTok.
