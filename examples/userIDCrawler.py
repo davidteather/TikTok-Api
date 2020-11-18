@@ -1,6 +1,6 @@
 from TikTokApi import TikTokApi
 
-api = TikTokApi()
+api = TikTokApi.get_instance()
 
 # If you want to get a variety of users from suggested users you need to provide various
 # userIds to the getSuggestedUsersbyID function. So here's an example to do that.

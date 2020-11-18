@@ -1,109 +1,88 @@
-import asyncio
-import pyppeteer
 import random
 import time
 import string
 import requests
 import logging
 from threading import Thread
+import time, datetime
+import random
+
 
 # Import Detection From Stealth
 from .stealth import stealth
-
 from .get_acrawler import get_acrawler
+from playwright import sync_playwright
 
-async_support = False
+playwright = None
 
-
-def set_async():
-    global async_support
-    async_support = True
+def get_playwright():
+    global playwright
+    if playwright == None:
+        try:
+            playwright = sync_playwright().start()
+        except Exception as e:
+            raise e
+    
+    return playwright
 
 
 class browser:
     def __init__(
         self,
-        url,
         **kwargs,
     ):
-        self.url = url
         self.debug = kwargs.get("debug", False)
         self.proxy = kwargs.get("proxy", None)
         self.api_url = kwargs.get("api_url", None)
         self.referrer = kwargs.get("referer", "https://www.tiktok.com/")
-        self.language = kwargs.get("language", 'en')
+        self.language = kwargs.get("language", "en")
         self.executablePath = kwargs.get("executablePath", None)
         self.did = kwargs.get("custom_did", None)
         find_redirect = kwargs.get("find_redirect", False)
 
-        self.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
-        self.args = [
-            "--no-sandbox",
-            "--disable-setuid-sandbox",
-            "--disable-infobars",
-            "--window-position=0,0",
-            "--ignore-certifcate-errors",
-            "--ignore-certifcate-errors-spki-list",
-            "--user-agent=" + self.userAgent,
-        ]
+        args = kwargs.get("browser_args", [])
+        options = kwargs.get("browser_options", {})
+
+        if len(args) == 0:
+            self.args = []
+        else:
+            self.args = args
+
+        self.options = {
+            "headless": True,
+            "handleSIGINT": True,
+            "handleSIGTERM": True,
+            "handleSIGHUP": True,
+        }
 
         if self.proxy != None:
             if "@" in self.proxy:
-                self.args.append(
-                    "--proxy-server="
-                    + self.proxy.split(":")[0]
-                    + "://"
-                    + self.proxy.split("://")[1].split(":")[1].split("@")[1]
-                    + ":"
-                    + self.proxy.split("://")[1].split(":")[2]
-                )
+                server_prefix = self.proxy.split("://")[0]
+                address = self.proxy.split("@")[1]
+                self.options["proxy"] = {
+                    "server": server_prefix + "://" + address,
+                    "username": self.proxy.split("://")[1].split(":")[0],
+                    "password": self.proxy.split("://")[1].split("@")[0].split(":")[1],
+                }
             else:
-                self.args.append("--proxy-server=" + self.proxy)
-        self.options = {
-            "args": self.args,
-            "headless": True,
-            "ignoreHTTPSErrors": True,
-            "userDataDir": "./tmp",
-            "handleSIGINT": False,
-            "handleSIGTERM": False,
-            "handleSIGHUP": False,
-        }
+                self.options["proxy"] = {"server": self.proxy}
+
+        self.options.update(options)
 
         if self.executablePath != None:
             self.options["executablePath"] = self.executablePath
 
-        if async_support:
-            loop = asyncio.new_event_loop()
-            t = Thread(target=self.__start_background_loop, args=(loop,), daemon=True)
-            t.start()
-            if find_redirect:
-                fut = asyncio.run_coroutine_threadsafe(self.find_redirect(), loop)
-            elif kwargs.get("newParams", False):
-                fut = asyncio.run_coroutine_threadsafe(self.newParams(), loop)
-            else:
-                fut = asyncio.run_coroutine_threadsafe(self.start(), loop)
-            fut.result()
-        else:
-            try:
-                self.loop = asyncio.new_event_loop()
-                if find_redirect:
-                    self.loop.run_until_complete(self.find_redirect())
-                elif kwargs.get("newParams", False):
-                    self.loop.run_until_complete(self.newParams())
-                else:
-                    self.loop.run_until_complete(self.start())
-            except:
-                self.loop.close()
+        try:
+            self.browser = get_playwright().webkit.launch(args=self.args, **self.options)
+        except Exception as e:
+            raise e
+            logging.critical(e)
 
-    def __start_background_loop(self, loop):
-        asyncio.set_event_loop(loop)
-        loop.run_forever()
+        page = self.create_page(set_useragent=True)
+        self.get_params(page)
+        page.close()
 
-    async def newParams(self) -> None:
-        self.browser = await pyppeteer.launch(self.options)
-        self.page = await self.browser.newPage()
-        await self.page.goto("about:blank")
-
+    def get_params(self, page) -> None:
         # self.browser_language = await self.page.evaluate("""() => { return navigator.language || navigator.userLanguage; }""")
         self.browser_language = ""
         # self.timezone_name = await self.page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
@@ -115,132 +94,122 @@ class browser:
         # self.browser_version = await self.page.evaluate("""() => { return window.navigator.appVersion; }""")
         self.browser_version = ""
 
-        self.width = await self.page.evaluate("""() => { return screen.width; }""")
-        self.height = await self.page.evaluate("""() => { return screen.height; }""")
+        self.width = page.evaluate("""() => { return screen.width; }""")
+        self.height = page.evaluate("""() => { return screen.height; }""")
 
-        await self.browser.close()
-        self.browser.process.communicate()
+    def create_page(self, set_useragent=False):
+        iphone = playwright.devices["iPhone 11 Pro"]
+        iphone["viewport"] = {
+            "width": random.randint(320, 1920),
+            "height": random.randint(320, 1920),
+        }
+        iphone["deviceScaleFactor"] = random.randint(1, 3)
+        iphone["isMobile"] = random.randint(1, 2) == 1
+        iphone["hasTouch"] = random.randint(1, 2) == 1
 
-        return 0
+        context = self.browser.newContext(**iphone)
+        if set_useragent:
+            self.userAgent = iphone["userAgent"]
+        page = context.newPage()
 
-    async def start(self):
-        self.browser = await pyppeteer.launch(self.options)
-        self.page = await self.browser.newPage()
+        return page
 
-        await self.page.evaluateOnNewDocument(
-            """() => {
-    delete navigator.__proto__.webdriver;
-        }"""
-        )
+    def base36encode(self, number, alphabet='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'):
+        """Converts an integer to a base36 string."""
+        base36 = ''
+        sign = ''
 
-        # Check for user:pass proxy
-        if self.proxy != None:
-            if "@" in self.proxy:
-                await self.page.authenticate(
-                    {
-                        "username": self.proxy.split("://")[1].split(":")[0],
-                        "password": self.proxy.split("://")[1]
-                        .split(":")[1]
-                        .split("@")[0],
-                    }
-                )
+        if number < 0:
+            sign = '-'
+            number = -number
 
-        await stealth(self.page)
+        if 0 <= number < len(alphabet):
+            return sign + alphabet[number]
 
-        # might have to switch to a tiktok url if they improve security
-        await self.page.goto("about:blank", {"waitUntil": "load"})
+        while number != 0:
+            number, i = divmod(number, len(alphabet))
+            base36 = alphabet[i] + base36
 
-        self.userAgent = await self.page.evaluate(
-            """() => {return navigator.userAgent; }"""
-        )
+        return sign + base36
 
-        self.verifyFp = "".join(
+    def gen_verifyFp(self):
+        start_time = int(time.time() * 1000)
+        chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"[:]
+        chars_len = len(chars)
+        scenarioTitle = self.base36encode(int(time.time() * 1000))
+        uuid = [0] * 36
+        uuid[8] = '_'
+        uuid[13] = '_'
+        uuid[18] = '_'
+        uuid[23] = '_'
+        uuid[14] = "4"
+        r = None
+        for i in range(36):
+            if uuid[i] == 0:
+                if r == None:
+                    r = 0
+                else:
+                    r = random.random() * chars_len
+                uuid[i] = chars[int(r)]
+        ending = ""
+        for x in uuid:
+            ending += str(x)
+        return "verify_" + scenarioTitle + "_" + ending
+    def sign_url(self, **kwargs):
+        url = kwargs.get("url", None)
+        if url == None:
+            raise Exception("sign_url required a url parameter")
+        page = self.create_page()
+        verifyFp = "".join(
             random.choice(
                 string.ascii_lowercase + string.ascii_uppercase + string.digits
             )
             for i in range(16)
         )
 
-        if self.did == None:
-            self.did = str(random.randint(10000, 999999999))
+        if kwargs.get("gen_new_verifyFp", False):
+            verifyFp = self.gen_verifyFp()
+        else:
+            verifyFp = kwargs.get("custom_verifyFp", "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX")
 
-        await self.page.evaluate("() => { " + get_acrawler() + " }")
-        self.signature = await self.page.evaluate(
-            '''() => {
+
+        if kwargs.get("custom_did", None) != None:
+            did = kwargs.get("custom_did", None)
+        elif self.did == None:
+            did = str(random.randint(10000, 999999999))
+        else:
+            did = self.did
+
+        page.setContent("<script> " + get_acrawler() + " </script>")
+        return (
+            verifyFp,
+            did,
+            page.evaluate(
+                '''() => {
         var url = "'''
-            + self.url
-            + "&verifyFp="
-            + self.verifyFp
-            + """&did="""
-            + self.did
-            + """"
+                + url
+                + "&verifyFp="
+                + verifyFp
+                + """&did="""
+                + did
+                + """"
         var token = window.byted_acrawler.sign({url: url});
         return token;
         }"""
+            ),
         )
+        page.close()
 
-        if self.api_url != None:
-            await self.page.goto(
-                self.url
-                + "&verifyFp="
-                + self.verifyFp
-                + "&_signature="
-                + self.signature,
-                {"waitUntil": "load"},
-            )
-
-            self.data = await self.page.content()
-            # self.data = json.loads(self.data.replace("</pre></body></html>", "").replace(
-            #    '<html><head></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">', ""))
-
-        await self.browser.close()
-        self.browser.process.communicate()
-
-    async def find_redirect(self):
+    def clean_up(self):
         try:
-            self.browser = await pyppeteer.launch(self.options)
-            self.page = await self.browser.newPage()
-
-            await self.page.evaluateOnNewDocument(
-                """() => {
-        delete navigator.__proto__.webdriver;
-    }"""
-            )
-
-            # Check for user:pass proxy
-            if self.proxy != None:
-                if "@" in self.proxy:
-                    await self.page.authenticate(
-                        {
-                            "username": self.proxy.split("://")[1].split(":")[0],
-                            "password": self.proxy.split("://")[1]
-                            .split(":")[1]
-                            .split("@")[0],
-                        }
-                    )
-
-            await stealth(self.page)
-
-            # await self.page.emulate({'viewport': {
-            #    'width': random.randint(320, 1920),
-            #    'height': random.randint(320, 1920),
-            #    'deviceScaleFactor': random.randint(1, 3),
-            #    'isMobile': random.random() > 0.5,
-            #    'hasTouch': random.random() > 0.5
-            # }})
-
-            # await self.page.setUserAgent(self.userAgent)
-
-            await self.page.goto(self.url, {"waitUntil": "load"})
-
-            self.redirect_url = self.page.url
-
-            await self.browser.close()
-            self.browser.process.communicate()
-
+            self.browser.close()
         except:
-            await self.browser.close()
-            self.browser.process.communicate()
+            logging.info("cleanup failed")
+        # playwright.stop()
+
+    def find_redirect(self, url):
+        self.page.goto(url, {"waitUntil": "load"})
+        self.redirect_url = self.page.url
 
     def __format_proxy(self, proxy):
         if proxy != None:

@@ -1,20 +1,19 @@
 from TikTokApi import TikTokApi
+import random
+
+# SEE https://github.com/davidteather/TikTok-Api/issues/311#issuecomment-721164493
 
 # Starts TikTokApi
-api = TikTokApi()
+api = TikTokApi.get_instance()
 
-# Below is used if you have the download url from the tiktok object, but maybe not the full object
-tiktokData = api.get_Video_By_DownloadURL(
-    api.trending(count=1)[0]["video"]["downloadAddr"]
-)
+# This is generating the tt_webid_v2 cookie
+# need to pass it to methods you want to download
+did = str(random.randint(10000, 999999999))
+
+trending = api.trending(custom_did=did)
 
 # Below is if the method used if you have the full tiktok object
-tiktokData = api.get_Video_By_TikTok(api.trending(count=1)[0])
-
-# Below is used if you want no watermarks
-tiktokData = api.get_Video_No_Watermark(
-    "https://www.tiktok.com/@ceciliaannborne/video/6817602864228207878", return_bytes=1
-)
+tiktokData = api.get_Video_By_TikTok(trending[0], custom_did=did)
 
 with open("video.mp4", "wb") as out:
     out.write(tiktokData)

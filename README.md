@@ -62,17 +62,11 @@ If you run into an issue please check the closed issues on the github. You're mo
 
 ```
 pip install TikTokApi
+python -m playwright install
 ```
 
-The script should download pypppeteer by default, but if it doesn't run the following command.
-```
-pyppeteer-install
-```
+If you're on MacOS you may need to install [XCode Developer Tools](https://webkit.org/build-tools/)
 
-If you run into any issue try the fix below before posting an issue.
-
-
-**If you still run into issues you may need to install chromedriver for your machine globally. Download it [here](https://sites.google.com/a/chromium.org/chromedriver/) and add it to your path.**
 
 ### Common Issues
 
@@ -88,15 +82,15 @@ Here's a quick bit of code to get the most recent trending on TikTok. There's mo
 
 ```
 from TikTokApi import TikTokApi
-api = TikTokApi()
+api = TikTokApi.get_instance()
 
 results = 10
 
 trending = api.trending(count=results)
 
 for tiktok in trending:
-    # Prints the text of the tiktok
-    print(tiktok['desc'])
+    # Prints the id of the tiktok
+    print(tiktok['id'])
 
 print(len(trending))
 ```
@@ -104,7 +98,7 @@ print(len(trending))
 To run the example scripts from the repository root, make sure you use the
 module form of python the interpreter
 
-```sh
+```
 python -m examples.getTrending
 ```
 
