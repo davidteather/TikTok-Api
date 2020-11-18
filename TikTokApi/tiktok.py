@@ -13,8 +13,10 @@ os.environ['no_proxy'] = '127.0.0.1,localhost'
 
 BASE_URL = "https://m.tiktok.com/"
 
+
 class TikTokApi:
     __instance = None
+
     def __init__(self, **kwargs):
         """The TikTokApi class. Used to interact with TikTok.
 
@@ -39,10 +41,9 @@ class TikTokApi:
         self.proxy = kwargs.get("proxy", None)
 
         self.signer_url = kwargs.get("external_signer", None)
-        if self.signer_url == None:
+        if self.signer_url is None:
             self.browser = browser(**kwargs)
             self.userAgent = self.browser.userAgent
-        
 
         try:
             self.timezone_name = self.__format_new_params__(self.browser.timezone_name)
@@ -83,23 +84,23 @@ class TikTokApi:
     def __del__(self):
         try:
             self.browser.clean_up()
-        except:
+        except BaseException:
             pass
         try:
             get_playwright().stop()
-        except:
+        except BaseException:
             pass
         TikTokApi.__instance = None
 
     def external_signer(self, url, custom_did=None):
-        if custom_did != None:
+        if custom_did is not None:
             query = {
-                    "url": url,
-                    "custom_did": custom_did
+                "url": url,
+                "custom_did": custom_did
             }
         else:
             query = {
-                    "url": url,
+                "url": url,
             }
         data = requests.get(self.signer_url + "?{}".format(urlencode(query)))
         parsed_data = data.json()
@@ -129,15 +130,16 @@ class TikTokApi:
         if self.request_delay is not None:
             time.sleep(self.request_delay)
 
-        if self.proxy != None:
+        if self.proxy is not None:
             proxy = self.proxy
 
-        if self.signer_url == None:
+        if self.signer_url is None:
             verify_fp, did, signature = self.browser.sign_url(**kwargs)
             userAgent = self.browser.userAgent
             referrer = self.browser.referrer
         else:
-            verify_fp, did, signature, userAgent, referrer = self.external_signer(kwargs['url'], custom_did=kwargs.get('custom_did', None))
+            verify_fp, did, signature, userAgent, referrer = self.external_signer(
+                kwargs['url'], custom_did=kwargs.get('custom_did', None))
         query = {"verifyFp": verify_fp, "did": did, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
         r = requests.get(
@@ -155,7 +157,12 @@ class TikTokApi:
                 "sec-fetch-mode": "cors",
                 "sec-fetch-site": "same-site",
                 "user-agent": userAgent,
-                "cookie": "tt_webid_v2=" + did + ';s_v_web_id=' + kwargs.get("custom_verifyFp", "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
+                "cookie": "tt_webid_v2=" +
+                did +
+                ';s_v_web_id=' +
+                kwargs.get(
+                    "custom_verifyFp",
+                    "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
             },
             proxies=self.__format_proxy(proxy),
         )
@@ -189,12 +196,13 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs['custom_did'] = did
-        if self.signer_url == None:
+        if self.signer_url is None:
             verify_fp, did, signature = self.browser.sign_url(**kwargs)
             userAgent = self.browser.userAgent
             referrer = self.browser.referrer
         else:
-            verify_fp, did, signature, userAgent, referrer = self.external_signer(kwargs['url'], custom_did=kwargs.get('custom_did', None))
+            verify_fp, did, signature, userAgent, referrer = self.external_signer(
+                kwargs['url'], custom_did=kwargs.get('custom_did', None))
         query = {"verifyFp": verify_fp, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
         r = requests.get(
@@ -468,15 +476,7 @@ class TikTokApi:
         kwargs['custom_did'] = did
 
         api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}" "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}".format(
-            self.__add_new_params__(),
-            page_size,
-            str(userID),
-            str(secUID),
-            minCursor,
-            maxCursor,
-            region,
-            language,
-        )
+            self.__add_new_params__(), page_size, str(userID), str(secUID), minCursor, maxCursor, region, language, )
 
         return self.getData(url=api_url, **kwargs)
 
@@ -708,17 +708,27 @@ class TikTokApi:
             maxCount,
             did,
         ) = self.__process_kwargs__(kwargs)
-        r = requests.get("https://www.tiktok.com/music/-{}".format(id), headers={
+        r = requests.get(
+            "https://www.tiktok.com/music/-{}".format(id),
+            headers={
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                 "authority": "www.tiktok.com",
                 "Accept-Encoding": "gzip, deflate",
                 "Connection": "keep-alive",
                 "Host": "www.tiktok.com",
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
-                "Cookie": "s_v_web_id=" + kwargs.get("custom_verifyFp", "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
-            }, proxies=self.__format_proxy(kwargs.get("proxy", None)))
+                "Cookie": "s_v_web_id=" +
+                kwargs.get(
+                    "custom_verifyFp",
+                    "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
+            },
+            proxies=self.__format_proxy(
+                kwargs.get(
+                    "proxy",
+                    None)))
         t = r.text
-        j_raw = t.split('<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">')[1].split("</script>")[0]
+        j_raw = t.split(
+            '<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">')[1].split("</script>")[0]
         return json.loads(j_raw)['props']['pageProps']['musicInfo']
 
     def byHashtag(self, hashtag, count=30, offset=0, **kwargs) -> dict:
@@ -1014,21 +1024,31 @@ class TikTokApi:
             maxCount,
             did,
         ) = self.__process_kwargs__(kwargs)
-        r = requests.get("https://tiktok.com/@{}?lang=en".format(username), headers={
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-            "authority": "www.tiktok.com",
-            "path": "/{}".format(username),
-            "Accept-Encoding": "gzip, deflate",
-            "Connection": "keep-alive",
-            "Host": "www.tiktok.com",
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
-            "Cookie": "s_v_web_id=" + kwargs.get("custom_verifyFp", "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
-        }, proxies=self.__format_proxy(kwargs.get("proxy", None)))
+        r = requests.get(
+            "https://tiktok.com/@{}?lang=en".format(username),
+            headers={
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                "authority": "www.tiktok.com",
+                "path": "/{}".format(username),
+                "Accept-Encoding": "gzip, deflate",
+                "Connection": "keep-alive",
+                "Host": "www.tiktok.com",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+                "Cookie": "s_v_web_id=" +
+                kwargs.get(
+                    "custom_verifyFp",
+                    "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
+            },
+            proxies=self.__format_proxy(
+                kwargs.get(
+                    "proxy",
+                    None)))
 
         t = r.text
 
-        j_raw = t.split('<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">')[1].split("</script>")[0]
-         
+        j_raw = t.split(
+            '<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">')[1].split("</script>")[0]
+
         return json.loads(j_raw)['props']['pageProps']
 
     def getSuggestedUsersbyID(
@@ -1357,36 +1377,56 @@ class TikTokApi:
                 return r.content
 
     def get_music_title(self, id, **kwargs):
-        r = requests.get("https://www.tiktok.com/music/-{}".format(id), headers={
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-            "authority": "www.tiktok.com",
-            "Accept-Encoding": "gzip, deflate",
-            "Connection": "keep-alive",
-            "Host": "www.tiktok.com",
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
-            "Cookie": "s_v_web_id=" + kwargs.get("custom_verifyFp", "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
-        }, proxies=self.__format_proxy(kwargs.get("proxy", None)))
+        r = requests.get(
+            "https://www.tiktok.com/music/-{}".format(id),
+            headers={
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                "authority": "www.tiktok.com",
+                "Accept-Encoding": "gzip, deflate",
+                "Connection": "keep-alive",
+                "Host": "www.tiktok.com",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+                "Cookie": "s_v_web_id=" +
+                kwargs.get(
+                    "custom_verifyFp",
+                    "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
+            },
+            proxies=self.__format_proxy(
+                kwargs.get(
+                    "proxy",
+                    None)))
         t = r.text
-        j_raw = t.split('<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">')[1].split("</script>")[0]
+        j_raw = t.split(
+            '<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">')[1].split("</script>")[0]
         return json.loads(j_raw)['props']['pageProps']['musicInfo']['title']
 
     def get_secUid(self, username, **kwargs):
-        r = requests.get("https://tiktok.com/@{}?lang=en".format(username), headers={
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-            "authority": "www.tiktok.com",
-            "path": "/{}".format(username),
-            "Accept-Encoding": "gzip, deflate",
-            "Connection": "keep-alive",
-            "Host": "www.tiktok.com",
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
-            "Cookie": "s_v_web_id=" + kwargs.get("custom_verifyFp", "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
-        }, proxies=self.__format_proxy(kwargs.get("proxy", None)))
+        r = requests.get(
+            "https://tiktok.com/@{}?lang=en".format(username),
+            headers={
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                "authority": "www.tiktok.com",
+                "path": "/{}".format(username),
+                "Accept-Encoding": "gzip, deflate",
+                "Connection": "keep-alive",
+                "Host": "www.tiktok.com",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+                "Cookie": "s_v_web_id=" +
+                kwargs.get(
+                    "custom_verifyFp",
+                    "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
+            },
+            proxies=self.__format_proxy(
+                kwargs.get(
+                    "proxy",
+                    None)))
         try:
             return r.text.split('"secUid":"')[1].split('","secret":')[0]
         except IndexError as e:
             logging.info(r.text)
             logging.error(e)
-            raise Exception("Retrieving the user secUid failed. Likely due to TikTok wanting captcha validation. Try to use a proxy.")
+            raise Exception(
+                "Retrieving the user secUid failed. Likely due to TikTok wanting captcha validation. Try to use a proxy.")
     #
     # PRIVATE METHODS
     #
@@ -1395,7 +1435,7 @@ class TikTokApi:
         """
         Formats the proxy object
         """
-        if proxy == None and self.proxy != None:
+        if proxy is None and self.proxy is not None:
             proxy = self.proxy
         if proxy is not None:
             return {"http": proxy, "https": proxy}
