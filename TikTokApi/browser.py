@@ -207,7 +207,7 @@ class browser:
     def clean_up(self):
         try:
             self.browser.close()
-        except BaseException:
+        except Exception:
             logging.info("cleanup failed")
         # playwright.stop()
 
