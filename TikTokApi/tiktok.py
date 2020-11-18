@@ -146,7 +146,7 @@ class TikTokApi:
             referrer = self.browser.referrer
         else:
             verify_fp, did, signature, userAgent, referrer = self.external_signer(
-                kwargs['url'], custom_did=kwargs.get('custom_did', None))
+                kwargs['url'], custom_did=kwargs.get('custom_did'))
         query = {"verifyFp": verify_fp, "did": did, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
         r = requests.get(
