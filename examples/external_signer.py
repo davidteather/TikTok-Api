@@ -38,11 +38,11 @@ if __name__ == "__main__":
     print('Cleaning Up')
     try:
         signing_browser.clean_up()
-    except BaseException:
+    except Exception:
         pass
     try:
         browser.get_playwright().stop()
-    except BaseException:
+    except Exception:
         pass
 
 # Example script below for production use
