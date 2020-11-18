@@ -16,8 +16,13 @@ os.environ['no_proxy'] = '127.0.0.1,localhost'
 
 BASE_URL = "https://m.tiktok.com/"
 
-class TikTokCaptchError(Exception):
+class TikTokCaptchaError(Exception):
     def __init__(self, message="TikTok blocks this request displaying a Captcha \nTip: Consider using a proxy or a custom_verifyFp as method parameters"):
+        self.message = message
+        super().__init__(self.message )
+
+class TikTokNotFoundError(Exception):
+    def __init__(self, message="The requested object does not exists"):
         self.message = message
         super().__init__(self.message )
 
@@ -177,7 +182,7 @@ class TikTokApi:
             json = r.json()
             if json.get('type') == 'verify' :
                 logging.error("Tiktok wants to display a catcha. Response is:\n" + r.text)
-                raise TikTokCaptchError()
+                raise TikTokCaptchaError()
             return r.json()
         except JSONDecodeError as e:
             text = r.text
@@ -820,7 +825,10 @@ class TikTokApi:
         api_url = "{}node/share/tag/{}?{}&{}".format(
             BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
         )
-        return self.getData(url=api_url, **kwargs)
+        data = self.getData(url=api_url, **kwargs)
+        if data['challengeInfo'].get('challenge') is None:
+            raise TikTokNotFoundError("Challenge {} does not exist".format(hashtag))
+        return data
 
     def getHashtagDetails(self, hashtag, **kwargs) -> dict:
         """Returns a hashtag object.
@@ -1069,7 +1077,7 @@ class TikTokApi:
                 logging.error("Tiktok response is empty")
             else :
                 logging.error("Tiktok response: \n " + t)
-            raise TikTokCaptchError() from None
+            raise TikTokCaptchaError() from None
 
         return json.loads(j_raw)['props']['pageProps']
 
