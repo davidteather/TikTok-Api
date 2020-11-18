@@ -1065,7 +1065,7 @@ class TikTokApi:
         try:
             j_raw = t.split('<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">')[1].split("</script>")[0]
         except IndexError:
-            if (len(t) == 0):
+            if not t:
                 logging.error("Tiktok response is empty")
             else :
                 logging.error("Tiktok response: \n " + t)
