@@ -175,7 +175,7 @@ class TikTokApi:
         )
         try:
             json = r.json()
-            if "type" in json and json["type"] == "verify" :
+            if json.get('type') == 'verify' :
                 logging.error("Tiktok wants to display a catcha. Response is:\n" + r.text)
                 raise TikTokCaptchError()
             return r.json()
