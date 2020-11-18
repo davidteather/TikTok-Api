@@ -91,11 +91,11 @@ class TikTokApi:
     def __del__(self):
         try:
             self.browser.clean_up()
-        except BaseException:
+        except Exception:
             pass
         try:
             get_playwright().stop()
-        except BaseException:
+        except Exception:
             pass
         TikTokApi.__instance = None
 
