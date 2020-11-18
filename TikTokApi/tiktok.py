@@ -9,9 +9,18 @@ from playwright import sync_playwright
 import logging
 import os
 from .utilities import update_messager
+
+from simplejson import JSONDecodeError
+
 os.environ['no_proxy'] = '127.0.0.1,localhost'
 
 BASE_URL = "https://m.tiktok.com/"
+
+class TikTokCaptchError(Exception):
+    def __init__(self, message="TikTok blocks this request displaying a Captcha \nTip: Consider using a proxy or a custom_verifyFp as method parameters"):
+        self.message = message
+        super().__init__(self.message )
+
 
 class TikTokApi:
     __instance = None
@@ -42,7 +51,7 @@ class TikTokApi:
         if self.signer_url == None:
             self.browser = browser(**kwargs)
             self.userAgent = self.browser.userAgent
-        
+
 
         try:
             self.timezone_name = self.__format_new_params__(self.browser.timezone_name)
@@ -160,14 +169,22 @@ class TikTokApi:
             proxies=self.__format_proxy(proxy),
         )
         try:
+            json = r.json()
+            if "type" in json and json["type"] == "verify" :
+                logging.error("Tiktok wants to display a catcha. Response is:\n" + r.text)
+                raise TikTokCaptchError()
             return r.json()
-        except Exception as e:
-            logging.error(e)
-            logging.error(
-                "Converting response to JSON failed response is below (probably empty)"
-            )
-            logging.info(r.text)
-            raise Exception("Invalid Response")
+        except JSONDecodeError as e:
+            text = r.text
+            logging.error("TikTok response: " + text)
+            if len(text) == 0 :
+                raise Exception("Empty response from Tiktok to " + url) from None
+            else :
+                logging.error(
+                    "Converting response to JSON failed response is below (probably empty)"
+                )
+                logging.error(e)
+                raise Exception("Invalid Response") from None
 
     def getBytes(self, **kwargs) -> bytes:
         """Returns bytes of a response from TikTok.
@@ -399,6 +416,7 @@ class TikTokApi:
             )
 
             res = self.getData(url=api_url, **kwargs)
+
             if "items" in res.keys():
                 for t in res["items"]:
                     response.append(t)
@@ -1027,8 +1045,14 @@ class TikTokApi:
 
         t = r.text
 
-        j_raw = t.split('<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">')[1].split("</script>")[0]
-         
+        try:
+            j_raw = t.split('<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">')[1].split("</script>")[0]
+        except IndexError :
+            if (len(t) == 0):
+                logging.error("Tiktok response is empty")
+            else :
+                logging.error("Tiktok response: \n " + t)
+            raise TikTokCaptchError() from None
         return json.loads(j_raw)['props']['pageProps']
 
     def getSuggestedUsersbyID(
