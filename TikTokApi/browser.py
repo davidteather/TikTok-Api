@@ -4,7 +4,8 @@ import string
 import requests
 import logging
 from threading import Thread
-import time, datetime
+import time
+import datetime
 import random
 
 
@@ -15,14 +16,15 @@ from playwright import sync_playwright
 
 playwright = None
 
+
 def get_playwright():
     global playwright
-    if playwright == None:
+    if playwright is None:
         try:
             playwright = sync_playwright().start()
         except Exception as e:
             raise e
-    
+
     return playwright
 
 
@@ -55,7 +57,7 @@ class browser:
             "handleSIGHUP": True,
         }
 
-        if self.proxy != None:
+        if self.proxy is not None:
             if "@" in self.proxy:
                 server_prefix = self.proxy.split("://")[0]
                 address = self.proxy.split("@")[1]
@@ -69,7 +71,7 @@ class browser:
 
         self.options.update(options)
 
-        if self.executablePath != None:
+        if self.executablePath is not None:
             self.options["executablePath"] = self.executablePath
 
         try:
@@ -83,9 +85,11 @@ class browser:
         page.close()
 
     def get_params(self, page) -> None:
-        # self.browser_language = await self.page.evaluate("""() => { return navigator.language || navigator.userLanguage; }""")
+        # self.browser_language = await self.page.evaluate("""() => { return
+        # navigator.language || navigator.userLanguage; }""")
         self.browser_language = ""
-        # self.timezone_name = await self.page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
+        # self.timezone_name = await self.page.evaluate("""() => { return
+        # Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
         self.timezone_name = ""
         # self.browser_platform = await self.page.evaluate("""() => { return window.navigator.platform; }""")
         self.browser_platform = ""
@@ -146,7 +150,7 @@ class browser:
         r = None
         for i in range(36):
             if uuid[i] == 0:
-                if r == None:
+                if r is None:
                     r = 0
                 else:
                     r = random.random() * chars_len
@@ -155,9 +159,10 @@ class browser:
         for x in uuid:
             ending += str(x)
         return "verify_" + scenarioTitle + "_" + ending
+
     def sign_url(self, **kwargs):
         url = kwargs.get("url", None)
-        if url == None:
+        if url is None:
             raise Exception("sign_url required a url parameter")
         page = self.create_page()
         verifyFp = "".join(
@@ -172,10 +177,9 @@ class browser:
         else:
             verifyFp = kwargs.get("custom_verifyFp", "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX")
 
-
-        if kwargs.get("custom_did", None) != None:
+        if kwargs.get("custom_did", None) is not None:
             did = kwargs.get("custom_did", None)
-        elif self.did == None:
+        elif self.did is None:
             did = str(random.randint(10000, 999999999))
         else:
             did = self.did
@@ -203,7 +207,7 @@ class browser:
     def clean_up(self):
         try:
             self.browser.close()
-        except:
+        except BaseException:
             logging.info("cleanup failed")
         # playwright.stop()
 
@@ -212,7 +216,7 @@ class browser:
         self.redirect_url = self.page.url
 
     def __format_proxy(self, proxy):
-        if proxy != None:
+        if proxy is not None:
             return {"http": proxy, "https": proxy}
         else:
             return None
