@@ -1,6 +1,7 @@
 from TikTokApi import TikTokApi
+import os
 
-api = TikTokApi.get_instance()
+api = TikTokApi.get_instance(custom_verifyFp=os.environ.get("verifyFp", None))
 
 
 class TestUserPager:
