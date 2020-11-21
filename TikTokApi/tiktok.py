@@ -42,6 +42,7 @@ class TikTokApi:
             "Chrome/86.0.4240.111 Safari/537.36"
         )
         self.proxy = kwargs.get("proxy", None)
+        self.custom_verifyFp = kwargs.get("custom_verifyFp")
 
         self.signer_url = kwargs.get("external_signer", None)
         if self.signer_url is None:
@@ -97,11 +98,9 @@ class TikTokApi:
 
     def external_signer(self, url, custom_did=None, verifyFp=None):
         if custom_did is not None:
-            query = {"url": url, "custom_did": custom_did, 'verifyFp':verifyFp}
+            query = {"url": url, "custom_did": custom_did, "verifyFp": verifyFp}
         else:
-            query = {
-                "url": url, 'verifyFp':verifyFp
-            }
+            query = {"url": url, "verifyFp": verifyFp}
         data = requests.get(self.signer_url + "?{}".format(urlencode(query)))
         parsed_data = data.json()
 
@@ -145,7 +144,9 @@ class TikTokApi:
             referrer = self.browser.referrer
         else:
             verify_fp, did, signature, userAgent, referrer = self.external_signer(
-                kwargs["url"], custom_did=kwargs.get("custom_did"), verifyFp=kwargs.get("custom_verifyFp")
+                kwargs["url"],
+                custom_did=kwargs.get("custom_did"),
+                verifyFp=kwargs.get("custom_verifyFp"),
             )
         query = {"verifyFp": verify_fp, "did": did, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
@@ -174,6 +175,7 @@ class TikTokApi:
                 logging.error(
                     "Tiktok wants to display a catcha. Response is:\n" + r.text
                 )
+                logging.error(self.get_cookies(**kwargs))
                 raise TikTokCaptchaError()
             return r.json()
         except ValueError as e:
@@ -188,7 +190,13 @@ class TikTokApi:
                 logging.error(e)
                 raise JSONDecodeFailure() from e
 
-    def get_cookies(self, did, **kwargs):
+    def get_cookies(self, **kwargs):
+        did = kwargs.get("did", str(random.randint(10000, 999999999)))
+        if kwargs.get("custom_verifyFp") == None:
+            if self.custom_verifyFp != None:
+                verifyFp = self.custom_verifyFp
+        else:
+            verifyFp = "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"
         return {
             "tt_webid": did,
             "tt_webid_v2": did,
@@ -196,10 +204,7 @@ class TikTokApi:
                 random.choice(string.ascii_uppercase + string.ascii_lowercase)
                 for i in range(16)
             ),
-            "verify_Fp": kwargs.get(
-                "custom_verifyFp",
-                "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq",
-            ),
+            "s_v_web_id": verifyFp,
         }
 
     def getBytes(self, **kwargs) -> bytes:
@@ -240,7 +245,6 @@ class TikTokApi:
                 "Accept-Language": "en-US;en;q=0.9",
                 "Cache-Control": "no-cache",
                 "Connection": "keep-alive",
-                "cookie": "tt_webid_v2=" + did,
                 "Host": url.split("/")[2],
                 "Pragma": "no-cache",
                 "Range": "bytes=0-",
@@ -248,6 +252,7 @@ class TikTokApi:
                 "User-Agent": userAgent,
             },
             proxies=self.__format_proxy(proxy),
+            cookies=self.get_cookies(**kwargs),
         )
         return r.content
 
@@ -511,22 +516,19 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
 
-        api_url = (
-            "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}"
-            "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}&verifyFp={}".format(
-                self.__add_new_params__(),
-                page_size,
-                str(userID),
-                str(secUID),
-                minCursor,
-                maxCursor,
-                region,
-                language,
-                kwargs.get(
-                    "custom_verifyFp",
-                    "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq",
-                ),
-            )
+        api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}" "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}&verifyFp={}".format(
+            self.__add_new_params__(),
+            page_size,
+            str(userID),
+            str(secUID),
+            minCursor,
+            maxCursor,
+            region,
+            language,
+            kwargs.get(
+                "custom_verifyFp",
+                "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq",
+            ),
         )
 
         return self.getData(url=api_url, **kwargs)
@@ -768,13 +770,9 @@ class TikTokApi:
                 "Connection": "keep-alive",
                 "Host": "www.tiktok.com",
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
-                "Cookie": "s_v_web_id="
-                + kwargs.get(
-                    "custom_verifyFp",
-                    "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq",
-                ),
             },
             proxies=self.__format_proxy(kwargs.get("proxy", None)),
+            cookies=self.get_cookies(**kwargs),
         )
         t = r.text
         j_raw = t.split(
@@ -1086,13 +1084,9 @@ class TikTokApi:
                 "Connection": "keep-alive",
                 "Host": "www.tiktok.com",
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
-                "Cookie": "s_v_web_id="
-                + kwargs.get(
-                    "custom_verifyFp",
-                    "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq",
-                ),
             },
             proxies=self.__format_proxy(kwargs.get("proxy", None)),
+            cookies=self.get_cookies(**kwargs),
         )
 
         t = r.text
@@ -1384,6 +1378,7 @@ class TikTokApi:
                 "user-agent": self.userAgent,
             },
             proxies=self.__format_proxy(proxy),
+            cookies=self.get_cookies(**kwargs),
         )
 
         data = r.text
@@ -1403,6 +1398,7 @@ class TikTokApi:
                     "user-agent": self.userAgent,
                 },
                 proxies=self.__format_proxy(proxy),
+                cookies=self.get_cookies(**kwargs),
             )
 
             tmp = r.text.split("vid:")
@@ -1439,13 +1435,9 @@ class TikTokApi:
                 "Connection": "keep-alive",
                 "Host": "www.tiktok.com",
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
-                "Cookie": "s_v_web_id="
-                + kwargs.get(
-                    "custom_verifyFp",
-                    "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq",
-                ),
             },
             proxies=self.__format_proxy(kwargs.get("proxy", None)),
+            cookies=self.get_cookies(**kwargs),
         )
         t = r.text
         j_raw = t.split(
@@ -1464,13 +1456,10 @@ class TikTokApi:
                 "Connection": "keep-alive",
                 "Host": "www.tiktok.com",
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
-                "Cookie": "s_v_web_id="
-                + kwargs.get(
-                    "custom_verifyFp",
-                    "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq",
-                ),
             },
-            proxies=self.__format_proxy(kwargs.get("proxy", None)),
+            proxies=self.__format_proxy(
+                kwargs.get("proxy", None), cookies=self.get_cookies(**kwargs)
+            ),
         )
         try:
             return r.text.split('"secUid":"')[1].split('","secret":')[0]

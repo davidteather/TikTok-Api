@@ -150,10 +150,10 @@ class browser:
         uuid[14] = "4"
 
         for i in range(36):
-        	if uuid[i] != 0:
-        		continue
-        	r = int(random.random() * chars_len)
-        	uuid[i] = chars[int( (3 & r) | 8 if i == 19 else r )]
+            if uuid[i] != 0:
+                continue
+            r = int(random.random() * chars_len)
+            uuid[i] = chars[int((3 & r) | 8 if i == 19 else r)]
 
         return f'verify_{scenario_title.lower()}_{"".join(uuid)}'
 
