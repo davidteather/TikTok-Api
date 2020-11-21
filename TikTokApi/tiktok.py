@@ -10,22 +10,11 @@ import string
 import logging
 import os
 from .utilities import update_messager
-
-from simplejson import JSONDecodeError
+from .exceptions import *
 
 os.environ['no_proxy'] = '127.0.0.1,localhost'
 
 BASE_URL = "https://m.tiktok.com/"
-
-class TikTokCaptchaError(Exception):
-    def __init__(self, message="TikTok blocks this request displaying a Captcha \nTip: Consider using a proxy or a custom_verifyFp as method parameters"):
-        self.message = message
-        super().__init__(self.message )
-
-class TikTokNotFoundError(Exception):
-    def __init__(self, message="The requested object does not exists"):
-        self.message = message
-        super().__init__(self.message )
 
 class TikTokApi:
     __instance = None
@@ -179,17 +168,17 @@ class TikTokApi:
                 logging.error("Tiktok wants to display a catcha. Response is:\n" + r.text)
                 raise TikTokCaptchaError()
             return r.json()
-        except JSONDecodeError as e:
+        except ValueError as e:
             text = r.text
             logging.error("TikTok response: " + text)
             if len(text) == 0 :
-                raise Exception("Empty response from Tiktok to " + url) from None
+                raise EmptyResponseError("Empty response from Tiktok to " + url) from None
             else :
                 logging.error(
-                    "Converting response to JSON failed response is below (probably empty)"
+                    "Converting response to JSON failed"
                 )
                 logging.error(e)
-                raise Exception("Invalid Response") from e
+                raise JSONDecodeFailure() from e
 
     def get_cookies(self, did, **kwargs):
         return {
