@@ -67,6 +67,16 @@ python -m playwright install
 
 If you're on MacOS you may need to install [XCode Developer Tools](https://webkit.org/build-tools/)
 
+#### Docker Installation
+
+Clone this repository onto a local machine then run the following commands.
+
+```
+docker build . -t tiktokapi:latest
+docker run -v TikTokApi --rm tiktokapi:latest python3 your_script.py
+```
+
+**Note** this assumes your script is named your_script.py and lives in the root of this directory.
 
 ### Common Issues
 
