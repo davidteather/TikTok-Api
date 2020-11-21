@@ -19,7 +19,7 @@ class TikTokUser:
         :param videoID: The TikTok ID to look up the insights for.
         """
         api_url = "https://api.tiktok.com/aweme/v1/data/insighs/?tz_offset=-25200&aid=1233&carrier_region=US"
-        if username != None:
+        if username is not None:
             referrer = "https://www.tiktok.com/@" + username + "/video/" + videoID
         else:
             referrer = "https://www.tiktok.com/"
@@ -32,6 +32,7 @@ class TikTokUser:
         ]
         # Note: this list of parameters has to be in exactly this order with exactly this format
         # or else you will get "Invalid parameters"
+
         def build_insight(insight, videoID):
             return '{"insigh_type":"' + insight + '","aweme_id":"' + videoID + '"}'
 
@@ -68,7 +69,7 @@ class TikTokUser:
         )
         try:
             return r.json()
-        except:
+        except Exception:
             if debug:
                 print(f"Failed converting following to JSON\n{r.text}")
             raise Exception("Invalid Response (from TikTok)")
@@ -90,7 +91,7 @@ class TikTokUser:
         Turns a cookie string into a dict for
         use in the requests module
         """
-        if type(cookie_string) == dict:
+        if isinstance(cookie_string, dict):
             return cookie_string
 
         cookie_dict = {}

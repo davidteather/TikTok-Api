@@ -67,6 +67,16 @@ python -m playwright install
 
 If you're on MacOS you may need to install [XCode Developer Tools](https://webkit.org/build-tools/)
 
+#### Docker Installation
+
+Clone this repository onto a local machine then run the following commands.
+
+```
+docker build . -t tiktokapi:latest
+docker run -v TikTokApi --rm tiktokapi:latest python3 your_script.py
+```
+
+**Note** this assumes your script is named your_script.py and lives in the root of this directory.
 
 ### Common Issues
 
@@ -86,7 +96,9 @@ api = TikTokApi.get_instance()
 
 results = 10
 
-trending = api.trending(count=results)
+# Since TikTok changed their API you need to use the custom_verifyFp option. 
+# In your web browser you will need to go to TikTok, Log in and get the s_v_web_id value.
+trending = api.trending(count=results, custom_verifyFp="")
 
 for tiktok in trending:
     # Prints the id of the tiktok
@@ -133,7 +145,7 @@ executablePath - The path to your chromedriver if you don't want global install 
 ##### The trending Method
 
 ```
-api.trending(self, count=30, referrer="https://www.tiktok.com/@ondymikula/video/6756762109670477061", language='en', proxy=None)
+api.trending(self, count=30, referrer="https://www.tiktok.com/@ondymikula/video/6756762109670477061", language='en', proxy=None, , custom_verifyFp="")
 ```
 
 count - this is how many trending Tiktoks you want to be returned.
@@ -143,7 +155,7 @@ Trending returns an array of dictionaries. Example structure [here](https://www.
 ##### The get_Video_By_TikTok Method
 
 ```
-api.get_Video_By_TikTok(data, language='en', proxy=None)
+api.get_Video_By_TikTok(data, language='en', proxy=None, , custom_verifyFp="")
 ```
 
 data - The tiktok dictionary returned from the API. Will return bytes.
@@ -302,7 +314,7 @@ getSuggestedMusicIDCrawler(self, count=30, startingId='6745191554350760966', lan
 ##### The get_Video_By_DownloadURL Method
 
 ```
-api.get_Video_By_DownloadURL(url, language='en', proxy=None)
+api.get_Video_By_DownloadURL(url, language='en', proxy=None, custom_verifyFp="")
 ```
 
 url - The download url that's found in the TikTok dictionary. TikTok['video']['downloadAddr']
@@ -311,7 +323,7 @@ url - The download url that's found in the TikTok dictionary. TikTok['video']['d
 ##### The get_Video_By_Url Method
 
 ```
-api.get_Video_By_Url(video_url, return_bytes=0)
+api.get_Video_By_Url(video_url, return_bytes=0, custom_verifyFp="")
 ```
 
 video_url - The video you want to get url.
@@ -321,7 +333,7 @@ return_bytes - The default value is 0, when it is set to 1 the function instead 
 ##### The get_Video_No_Watermark_Faster Method
 
 ```
-api.get_Video_No_Watermark(video_url, return_bytes=0, language='en', proxy=None)
+api.get_Video_No_Watermark(video_url, return_bytes=0, language='en', proxy=None, custom_verifyFp="")
 ```
 
 video_url - The video you want to get url.
@@ -330,7 +342,7 @@ return_bytes - The default value is 0, when it is set to 1 the function instead 
 
 If you request without bytes you will need to make a call to the URL it responds yourself to get bytes.
 ```
-url = api.get_Video_No_Watermark_ID('6829267836783971589', return_bytes=0)
+url = api.get_Video_No_Watermark_ID('6829267836783971589', return_bytes=0, custom_verifyFp="")
 
 import requests
 video_bytes = requests.get(url, headers={"User-Agent": "okhttp"}).content
@@ -371,7 +383,7 @@ You can use this method if you really want, but just use the 3 above it.
 ##### The get_Video_No_Watermark_ID Method
 
 ```
-api.get_Video_No_Watermark_ID(self, video_id, return_bytes=1, proxy=None)
+api.get_Video_No_Watermark_ID(self, video_id, return_bytes=1, proxy=None, custom_verifyFp="")
 ```
 
 video_id - The video id you want to get.
@@ -389,7 +401,7 @@ video_bytes = requests.get(url, headers={"User-Agent": "okhttp"}).content
 
 ##### The get_Video_No_Watermark Method
 ```
-api.get_Video_No_Watermark(self, video_url, return_bytes=0, proxy=None)
+api.get_Video_No_Watermark(self, video_url, return_bytes=0, proxy=None, custom_verifyFp="")
 ```
 
 This endpoint returns a url that is able to be opened in any browser, but sacrifices speed for this convenience. Any old request library can return the bytes if you decide to return a url.

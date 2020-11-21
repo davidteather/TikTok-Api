@@ -1,5 +1,6 @@
 from TikTokApi import TikTokApi
-import os 
+import os
+
 api = TikTokApi.get_instance()
 
 
