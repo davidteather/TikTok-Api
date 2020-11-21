@@ -6,6 +6,7 @@ import json
 from urllib.parse import urlencode, quote
 from .browser import browser, get_playwright
 from playwright import sync_playwright
+import string
 import logging
 import os
 from .utilities import update_messager
@@ -157,13 +158,7 @@ class TikTokApi:
                 "sec-fetch-mode": "cors",
                 "sec-fetch-site": "same-site",
                 "user-agent": userAgent,
-                "cookie": "tt_webid_v2=" +
-                did +
-                ';s_v_web_id=' +
-                kwargs.get(
-                    "custom_verifyFp",
-                    "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
-            },
+            }, cookies=self.get_cookies(**kwargs),
             proxies=self.__format_proxy(proxy),
         )
         try:
@@ -175,6 +170,15 @@ class TikTokApi:
             )
             logging.info(r.text)
             raise Exception("Invalid Response")
+
+    def get_cookies(self, did, **kwargs):
+        return {
+            'tt_webid': did,
+            'tt_webid_v2': did,
+            'tt_csrf_token': ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase) for i in range(16)),
+            'verify_Fp': kwargs.get("custom_verifyFp", 'verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq')
+        }
+
 
     def getBytes(self, **kwargs) -> bytes:
         """Returns bytes of a response from TikTok.
@@ -257,6 +261,9 @@ class TikTokApi:
                 "region": region,
                 "priority_region": region,
                 "language": language,
+                'verifyFp': kwargs.get(
+                    "custom_verifyFp",
+                    "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"),
             }
             api_url = "{}api/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
@@ -401,6 +408,9 @@ class TikTokApi:
                 "region": region,
                 "priority_region": region,
                 "language": language,
+                'verifyFp': kwargs.get(
+                    "custom_verifyFp",
+                    "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq")
             }
             api_url = "{}api/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
@@ -475,8 +485,10 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs['custom_did'] = did
 
-        api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}" "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}".format(
-            self.__add_new_params__(), page_size, str(userID), str(secUID), minCursor, maxCursor, region, language, )
+        api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}" "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}&verifyFp={}".format(
+            self.__add_new_params__(), page_size, str(userID), str(secUID), minCursor, maxCursor, region, language, kwargs.get(
+                    "custom_verifyFp",
+                    "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"))
 
         return self.getData(url=api_url, **kwargs)
 
@@ -720,7 +732,7 @@ class TikTokApi:
                 "Cookie": "s_v_web_id=" +
                 kwargs.get(
                     "custom_verifyFp",
-                    "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
+                    "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"),
             },
             proxies=self.__format_proxy(
                 kwargs.get(
@@ -1037,7 +1049,7 @@ class TikTokApi:
                 "Cookie": "s_v_web_id=" +
                 kwargs.get(
                     "custom_verifyFp",
-                    "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
+                    "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"),
             },
             proxies=self.__format_proxy(
                 kwargs.get(
@@ -1389,7 +1401,7 @@ class TikTokApi:
                 "Cookie": "s_v_web_id=" +
                 kwargs.get(
                     "custom_verifyFp",
-                    "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
+                    "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"),
             },
             proxies=self.__format_proxy(
                 kwargs.get(
@@ -1414,7 +1426,7 @@ class TikTokApi:
                 "Cookie": "s_v_web_id=" +
                 kwargs.get(
                     "custom_verifyFp",
-                    "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX"),
+                    "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"),
             },
             proxies=self.__format_proxy(
                 kwargs.get(
