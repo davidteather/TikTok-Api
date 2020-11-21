@@ -195,8 +195,10 @@ class TikTokApi:
         if kwargs.get("custom_verifyFp") == None:
             if self.custom_verifyFp != None:
                 verifyFp = self.custom_verifyFp
+            else:
+                verifyFp = "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"
         else:
-            verifyFp = "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"
+            verifyFp = kwargs.get('custom_verifyFp')
         return {
             "tt_webid": did,
             "tt_webid_v2": did,

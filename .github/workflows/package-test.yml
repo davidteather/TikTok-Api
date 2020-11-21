@@ -36,4 +36,5 @@ jobs:
       - name: Run Tests
         env:
           PROXY: ${{ secrets.PROXY }}
+          verifyFp: ${{ secrets.verifyFp }}
         run: pytest tests
