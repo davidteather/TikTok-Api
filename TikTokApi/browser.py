@@ -75,7 +75,9 @@ class browser:
             self.options["executablePath"] = self.executablePath
 
         try:
-            self.browser = get_playwright().webkit.launch(args=self.args, **self.options)
+            self.browser = get_playwright().webkit.launch(
+                args=self.args, **self.options
+            )
         except Exception as e:
             raise e
             logging.critical(e)
@@ -118,13 +120,13 @@ class browser:
 
         return page
 
-    def base36encode(self, number, alphabet='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'):
+    def base36encode(self, number, alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
         """Converts an integer to a base36 string."""
-        base36 = ''
-        sign = ''
+        base36 = ""
+        sign = ""
 
         if number < 0:
-            sign = '-'
+            sign = "-"
             number = -number
 
         if 0 <= number < len(alphabet):
@@ -142,10 +144,10 @@ class browser:
         chars_len = len(chars)
         scenarioTitle = self.base36encode(int(time.time() * 1000))
         uuid = [0] * 36
-        uuid[8] = '_'
-        uuid[13] = '_'
-        uuid[18] = '_'
-        uuid[23] = '_'
+        uuid[8] = "_"
+        uuid[13] = "_"
+        uuid[18] = "_"
+        uuid[23] = "_"
         uuid[14] = "4"
         r = None
         for i in range(36):
@@ -175,7 +177,10 @@ class browser:
         if kwargs.get("gen_new_verifyFp", False):
             verifyFp = self.gen_verifyFp()
         else:
-            verifyFp = kwargs.get("custom_verifyFp", "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX")
+            verifyFp = kwargs.get(
+                "custom_verifyFp",
+                "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX",
+            )
 
         if kwargs.get("custom_did") is not None:
             did = kwargs.get("custom_did", None)
