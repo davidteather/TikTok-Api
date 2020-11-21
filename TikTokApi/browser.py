@@ -139,28 +139,23 @@ class browser:
         return sign + base36
 
     def gen_verifyFp(self):
-        start_time = int(time.time() * 1000)
         chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"[:]
         chars_len = len(chars)
-        scenarioTitle = self.base36encode(int(time.time() * 1000))
+        scenario_title = self.base36encode(int(time.time() * 1000))
         uuid = [0] * 36
         uuid[8] = "_"
         uuid[13] = "_"
         uuid[18] = "_"
         uuid[23] = "_"
         uuid[14] = "4"
-        r = None
+
         for i in range(36):
-            if uuid[i] == 0:
-                if r is None:
-                    r = 0
-                else:
-                    r = random.random() * chars_len
-                uuid[i] = chars[int(r)]
-        ending = ""
-        for x in uuid:
-            ending += str(x)
-        return "verify_" + scenarioTitle + "_" + ending
+        	if uuid[i] != 0:
+        		continue
+        	r = int(random.random() * chars_len)
+        	uuid[i] = chars[int( (3 & r) | 8 if i == 19 else r )]
+
+        return f'verify_{scenario_title.lower()}_{"".join(uuid)}'
 
     def sign_url(self, **kwargs):
         url = kwargs.get("url", None)
