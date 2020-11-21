@@ -95,12 +95,12 @@ class TikTokApi:
             pass
         TikTokApi.__instance = None
 
-    def external_signer(self, url, custom_did=None):
+    def external_signer(self, url, custom_did=None, verifyFp=None):
         if custom_did is not None:
-            query = {"url": url, "custom_did": custom_did}
+            query = {"url": url, "custom_did": custom_did, 'verifyFp':verifyFp}
         else:
             query = {
-                "url": url,
+                "url": url, 'verifyFp':verifyFp
             }
         data = requests.get(self.signer_url + "?{}".format(urlencode(query)))
         parsed_data = data.json()
@@ -145,7 +145,7 @@ class TikTokApi:
             referrer = self.browser.referrer
         else:
             verify_fp, did, signature, userAgent, referrer = self.external_signer(
-                kwargs["url"], custom_did=kwargs.get("custom_did")
+                kwargs["url"], custom_did=kwargs.get("custom_did"), verifyFp=kwargs.get("custom_verifyFp")
             )
         query = {"verifyFp": verify_fp, "did": did, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
