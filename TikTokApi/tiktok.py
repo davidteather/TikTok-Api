@@ -10,10 +10,22 @@ import string
 import logging
 import os
 from .utilities import update_messager
+
+from simplejson import JSONDecodeError
+
 os.environ['no_proxy'] = '127.0.0.1,localhost'
 
 BASE_URL = "https://m.tiktok.com/"
 
+class TikTokCaptchaError(Exception):
+    def __init__(self, message="TikTok blocks this request displaying a Captcha \nTip: Consider using a proxy or a custom_verifyFp as method parameters"):
+        self.message = message
+        super().__init__(self.message )
+
+class TikTokNotFoundError(Exception):
+    def __init__(self, message="The requested object does not exists"):
+        self.message = message
+        super().__init__(self.message )
 
 class TikTokApi:
     __instance = None
@@ -85,11 +97,11 @@ class TikTokApi:
     def __del__(self):
         try:
             self.browser.clean_up()
-        except BaseException:
+        except Exception:
             pass
         try:
             get_playwright().stop()
-        except BaseException:
+        except Exception:
             pass
         TikTokApi.__instance = None
 
@@ -140,7 +152,7 @@ class TikTokApi:
             referrer = self.browser.referrer
         else:
             verify_fp, did, signature, userAgent, referrer = self.external_signer(
-                kwargs['url'], custom_did=kwargs.get('custom_did', None))
+                kwargs['url'], custom_did=kwargs.get('custom_did'))
         query = {"verifyFp": verify_fp, "did": did, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
         r = requests.get(
@@ -162,14 +174,22 @@ class TikTokApi:
             proxies=self.__format_proxy(proxy),
         )
         try:
+            json = r.json()
+            if json.get('type') == 'verify' :
+                logging.error("Tiktok wants to display a catcha. Response is:\n" + r.text)
+                raise TikTokCaptchaError()
             return r.json()
-        except Exception as e:
-            logging.error(e)
-            logging.error(
-                "Converting response to JSON failed response is below (probably empty)"
-            )
-            logging.info(r.text)
-            raise Exception("Invalid Response")
+        except JSONDecodeError as e:
+            text = r.text
+            logging.error("TikTok response: " + text)
+            if len(text) == 0 :
+                raise Exception("Empty response from Tiktok to " + url) from None
+            else :
+                logging.error(
+                    "Converting response to JSON failed response is below (probably empty)"
+                )
+                logging.error(e)
+                raise Exception("Invalid Response") from e
 
     def get_cookies(self, did, **kwargs):
         return {
@@ -417,6 +437,7 @@ class TikTokApi:
             )
 
             res = self.getData(url=api_url, **kwargs)
+
             if "items" in res.keys():
                 for t in res["items"]:
                     response.append(t)
@@ -816,7 +837,10 @@ class TikTokApi:
         api_url = "{}node/share/tag/{}?{}&{}".format(
             BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
         )
-        return self.getData(url=api_url, **kwargs)
+        data = self.getData(url=api_url, **kwargs)
+        if data['challengeInfo'].get('challenge') is None:
+            raise TikTokNotFoundError("Challenge {} does not exist".format(hashtag))
+        return data
 
     def getHashtagDetails(self, hashtag, **kwargs) -> dict:
         """Returns a hashtag object.
@@ -1058,8 +1082,14 @@ class TikTokApi:
 
         t = r.text
 
-        j_raw = t.split(
-            '<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">')[1].split("</script>")[0]
+        try:
+            j_raw = t.split('<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">')[1].split("</script>")[0]
+        except IndexError:
+            if not t:
+                logging.error("Tiktok response is empty")
+            else :
+                logging.error("Tiktok response: \n " + t)
+            raise TikTokCaptchaError() from None
 
         return json.loads(j_raw)['props']['pageProps']
 

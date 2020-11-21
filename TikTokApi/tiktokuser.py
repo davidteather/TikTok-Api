@@ -69,7 +69,7 @@ class TikTokUser:
         )
         try:
             return r.json()
-        except BaseException:
+        except Exception:
             if debug:
                 print(f"Failed converting following to JSON\n{r.text}")
             raise Exception("Invalid Response (from TikTok)")

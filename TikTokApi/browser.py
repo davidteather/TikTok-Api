@@ -177,7 +177,7 @@ class browser:
         else:
             verifyFp = kwargs.get("custom_verifyFp", "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX")
 
-        if kwargs.get("custom_did", None) is not None:
+        if kwargs.get("custom_did") is not None:
             did = kwargs.get("custom_did", None)
         elif self.did is None:
             did = str(random.randint(10000, 999999999))
@@ -207,7 +207,7 @@ class browser:
     def clean_up(self):
         try:
             self.browser.close()
-        except BaseException:
+        except Exception:
             logging.info("cleanup failed")
         # playwright.stop()
 
