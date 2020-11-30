@@ -394,6 +394,11 @@ class TikTokApi:
             if "items" in res.keys():
                 for t in res["items"]:
                     response.append(t)
+            elif 'hasMore' in res.keys():
+                # a response in json without any items but nothing more than
+                # {"statusCode":0,"hasMore":true,"maxCursor":"1605327825000","minCursor":"1605714414000"}
+                # it seems to appear on when a user does not exist anymore
+                raise TikTokNotFoundError("TiktokUser with id {} does not exist".format(userID))
 
             if not res["hasMore"] and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
