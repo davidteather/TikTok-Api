@@ -1065,7 +1065,11 @@ class TikTokApi:
                 logging.error("Tiktok response: \n " + t)
             raise TikTokCaptchaError() from None
 
-        return json.loads(j_raw)['props']['pageProps']
+        user = json.loads(j_raw)['props']['pageProps']
+        if user['serverCode'] == 404 :
+            raise TikTokNotFoundError("TiktokUser with username {} does not exist".format(username))
+
+        return user
 
     def getSuggestedUsersbyID(
         self, userId="6745191554350760966", count=30, **kwargs
