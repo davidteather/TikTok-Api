@@ -7,14 +7,7 @@ from urllib.parse import urlencode, quote
 import logging
 import os
 from .utilities import update_messager
-<<<<<<< HEAD
 from .browser import browser
-=======
-
-from simplejson import JSONDecodeError
-
-os.environ['no_proxy'] = '127.0.0.1,localhost'
->>>>>>> feature/better-error-handling
 
 BASE_URL = "https://m.tiktok.com/"
 
@@ -29,11 +22,6 @@ class TikTokNotFoundError(Exception):
         super().__init__(self.message )
 
 class TikTokApi:
-<<<<<<< HEAD
-=======
-    __instance = None
-
->>>>>>> feature/better-error-handling
     def __init__(self, **kwargs):
         """The TikTokApi class. Used to interact with TikTok.
 
@@ -54,15 +42,8 @@ class TikTokApi:
             "Chrome/86.0.4240.111 Safari/537.36"
         )
 
-<<<<<<< HEAD
         # Get Browser Params
         b = browser("newParam", newParams=True, **kwargs)
-=======
-        self.signer_url = kwargs.get("external_signer", None)
-        if self.signer_url is None:
-            self.browser = browser(**kwargs)
-            self.userAgent = self.browser.userAgent
->>>>>>> feature/better-error-handling
 
         try:
             self.timezone_name = self.__format_new_params__(b.timezone_name)
@@ -87,29 +68,6 @@ class TikTokApi:
 
         self.request_delay = kwargs.get("request_delay", None)
 
-<<<<<<< HEAD
-=======
-    @staticmethod
-    def get_instance(**kwargs):
-        if not TikTokApi.__instance:
-            TikTokApi(**kwargs)
-        return TikTokApi.__instance
-
-    def clean_up(self):
-        self.__del__()
-
-    def __del__(self):
-        try:
-            self.browser.clean_up()
-        except Exception:
-            pass
-        try:
-            get_playwright().stop()
-        except Exception:
-            pass
-        TikTokApi.__instance = None
-
->>>>>>> feature/better-error-handling
     def external_signer(self, url, custom_did=None):
         if custom_did is not None:
             query = {
@@ -151,7 +109,6 @@ class TikTokApi:
         if self.proxy is not None:
             proxy = self.proxy
 
-<<<<<<< HEAD
         if self.signer_url == None:
             userAgent = b.userAgent
             referrer = b.referrer
@@ -159,17 +116,6 @@ class TikTokApi:
             verify_fp, did, signature, userAgent, referrer = self.external_signer(kwargs['url'], custom_did=kwargs.get('custom_did', None))
         query = {"verifyFp": b.verifyFp, "did": b.did, "_signature": b.signature}
         url = "{}&{}".format(b.url, urlencode(query))
-=======
-        if self.signer_url is None:
-            verify_fp, did, signature = self.browser.sign_url(**kwargs)
-            userAgent = self.browser.userAgent
-            referrer = self.browser.referrer
-        else:
-            verify_fp, did, signature, userAgent, referrer = self.external_signer(
-                kwargs['url'], custom_did=kwargs.get('custom_did'))
-        query = {"verifyFp": verify_fp, "did": did, "_signature": signature}
-        url = "{}&{}".format(kwargs["url"], urlencode(query))
->>>>>>> feature/better-error-handling
         r = requests.get(
             url,
             headers={
@@ -232,7 +178,6 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs['custom_did'] = did
-<<<<<<< HEAD
         if self.signer_url == None:
             userAgent = b.userAgent
             referrer = b.referrer
@@ -240,17 +185,6 @@ class TikTokApi:
             verify_fp, did, signature, userAgent, referrer = self.external_signer(kwargs['url'], custom_did=kwargs.get('custom_did', None))
         query = {"verifyFp": b.verifyFp, "did": b.did, "_signature": b.signature}
         url = "{}&{}".format(b.url, urlencode(query))
-=======
-        if self.signer_url is None:
-            verify_fp, did, signature = self.browser.sign_url(**kwargs)
-            userAgent = self.browser.userAgent
-            referrer = self.browser.referrer
-        else:
-            verify_fp, did, signature, userAgent, referrer = self.external_signer(
-                kwargs['url'], custom_did=kwargs.get('custom_did', None))
-        query = {"verifyFp": verify_fp, "_signature": signature}
-        url = "{}&{}".format(kwargs["url"], urlencode(query))
->>>>>>> feature/better-error-handling
         r = requests.get(
             url,
             headers={
@@ -454,13 +388,8 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-<<<<<<< HEAD
             b = browser(api_url, **kwargs)
             res = self.getData(b, **kwargs)
-=======
-            res = self.getData(url=api_url, **kwargs)
-
->>>>>>> feature/better-error-handling
             if "items" in res.keys():
                 for t in res["items"]:
                     response.append(t)
@@ -530,7 +459,6 @@ class TikTokApi:
         kwargs['custom_did'] = did
 
         api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}" "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}".format(
-<<<<<<< HEAD
             self.__add_new_params__(),
             page_size,
             str(userID),
@@ -542,11 +470,6 @@ class TikTokApi:
         )
         b = browser(api_url, **kwargs)
         return self.getData(b, **kwargs)
-=======
-            self.__add_new_params__(), page_size, str(userID), str(secUID), minCursor, maxCursor, region, language, )
-
-        return self.getData(url=api_url, **kwargs)
->>>>>>> feature/better-error-handling
 
     def getUserPager(self, username, page_size=30, minCursor=0, maxCursor=0, **kwargs):
         """Returns a generator to page through a user's feed
@@ -875,15 +798,12 @@ class TikTokApi:
         api_url = "{}node/share/tag/{}?{}&{}".format(
             BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
         )
-<<<<<<< HEAD
+
         b = browser(api_url, **kwargs)
-        return self.getData(b, **kwargs)
-=======
-        data = self.getData(url=api_url, **kwargs)
+        data = self.getData(b, **kwargs)
         if data['challengeInfo'].get('challenge') is None:
             raise TikTokNotFoundError("Challenge {} does not exist".format(hashtag))
         return data
->>>>>>> feature/better-error-handling
 
     def getHashtagDetails(self, hashtag, **kwargs) -> dict:
         """Returns a hashtag object.
