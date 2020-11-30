@@ -1,6 +1,11 @@
 from TikTokApi import TikTokApi
+<<<<<<< HEAD
 import os 
 api = TikTokApi()
+=======
+import os
+api = TikTokApi.get_instance()
+>>>>>>> feature/better-error-handling
 
 
 def unique_count(tiktoks):

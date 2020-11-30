@@ -72,7 +72,7 @@ class browser:
             self.args = args
             self.args.append("--user-agent=" + self.userAgent)
 
-        if self.proxy != None:
+        if self.proxy is not None:
             if "@" in self.proxy:
                 self.args.append(
                     "--proxy-server="
@@ -96,7 +96,7 @@ class browser:
 
         self.options.update(options)
 
-        if self.executablePath != None:
+        if self.executablePath is not None:
             self.options["executablePath"] = self.executablePath
 
         if async_support:
@@ -133,7 +133,8 @@ class browser:
 
         # self.browser_language = await self.page.evaluate("""() => { return navigator.language || navigator.userLanguage; }""")
         self.browser_language = ""
-        # self.timezone_name = await self.page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
+        # self.timezone_name = await self.page.evaluate("""() => { return
+        # Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
         self.timezone_name = ""
         # self.browser_platform = await self.page.evaluate("""() => { return window.navigator.platform; }""")
         self.browser_platform = ""
@@ -263,7 +264,7 @@ class browser:
             self.browser.process.communicate()
 
     def __format_proxy(self, proxy):
-        if proxy != None:
+        if proxy is not None:
             return {"http": proxy, "https": proxy}
         else:
             return None
