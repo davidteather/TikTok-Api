@@ -8,6 +8,7 @@ import logging
 import os
 from .utilities import update_messager
 from .browser import browser
+from simplejson import JSONDecodeError
 
 BASE_URL = "https://m.tiktok.com/"
 
