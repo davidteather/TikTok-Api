@@ -2,7 +2,7 @@ import re
 
 
 def chrome_runtime(page) -> None:
-    page.evaluateHandle(
+    page.evaluateOnNewDocument(
         """
 () => {
     window.chrome = {
@@ -14,7 +14,7 @@ def chrome_runtime(page) -> None:
 
 
 def console_debug(page) -> None:
-    page.evaluateHandle(
+    page.evaluateOnNewDocument(
         """
 () => {
     window.console.debug = () => {
@@ -26,7 +26,7 @@ def console_debug(page) -> None:
 
 
 def iframe_content_window(page) -> None:
-    page.evaluateHandle(
+    page.evaluateOnNewDocument(
         """
 () => {
   try {
@@ -125,7 +125,7 @@ def iframe_content_window(page) -> None:
 
 
 def media_codecs(page) -> None:
-    page.evaluateHandle(
+    page.evaluateOnNewDocument(
         """
     () => {
   try {
@@ -199,7 +199,7 @@ def media_codecs(page) -> None:
 
 
 def navigator_languages(page) -> None:
-    page.evaluateHandle(
+    page.evaluateOnNewDocument(
         """
 () => {
     Object.defineProperty(navigator, 'languages', {
@@ -211,7 +211,7 @@ def navigator_languages(page) -> None:
 
 
 def navigator_permissions(page) -> None:
-    page.evaluateHandle(
+    page.evaluateOnNewDocument(
         """
 () => {
     const originalQuery = window.navigator.permissions.query
@@ -245,7 +245,7 @@ def navigator_permissions(page) -> None:
 
 
 def navigator_plugins(page) -> None:
-    page.evaluateHandle(
+    page.evaluateOnNewDocument(
         """
 () => {
     function mockPluginsAndMimeTypes() {
@@ -419,7 +419,7 @@ def navigator_plugins(page) -> None:
 
 
 def navigator_webdriver(page) -> None:
-    page.evaluateHandle(
+    page.evaluateOnNewDocument(
         """
 () => {
     Object.defineProperty(window, 'navigator', {
@@ -450,7 +450,7 @@ def user_agent(page) -> None:
 
 
 def webgl_vendor(page) -> None:
-    page.evaluateHandle(
+    page.evaluateOnNewDocument(
         """
 () => {
     try {
@@ -471,7 +471,7 @@ def webgl_vendor(page) -> None:
 
 
 def window_outerdimensions(page) -> None:
-    page.evaluateHandle(
+    page.evaluateOnNewDocument(
         """
 () => {
     try {
