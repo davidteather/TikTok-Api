@@ -210,6 +210,7 @@ class TikTokApi:
                 random.choice(string.ascii_uppercase + string.ascii_lowercase)
                 for i in range(16)
             ),
+            "s_v_web_id": verifyFp
         }
 
     def getBytes(self, **kwargs) -> bytes:
@@ -315,7 +316,7 @@ class TikTokApi:
             maxCursor = res["maxCursor"]
 
             first = False
-
+        
         return response[:count]
 
     def search_for_users(self, search_term, count=28, **kwargs) -> list:
