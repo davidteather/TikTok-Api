@@ -4,7 +4,6 @@ import time
 import logging
 import json
 from urllib.parse import urlencode, quote
-from .browser import browser, get_playwright
 from playwright import sync_playwright
 import string
 import logging
@@ -43,6 +42,11 @@ class TikTokApi:
         )
         self.proxy = kwargs.get("proxy", None)
         self.custom_verifyFp = kwargs.get("custom_verifyFp")
+
+        if kwargs.get("use_selenium", False):
+            from .browser_selenium import browser
+        else:
+            from .browser import browser
 
         self.signer_url = kwargs.get("external_signer", None)
         if self.signer_url is None:
@@ -206,7 +210,7 @@ class TikTokApi:
                 random.choice(string.ascii_uppercase + string.ascii_lowercase)
                 for i in range(16)
             ),
-            "s_v_web_id": verifyFp,
+            "s_v_web_id": verifyFp
         }
 
     def getBytes(self, **kwargs) -> bytes:
@@ -312,7 +316,7 @@ class TikTokApi:
             maxCursor = res["maxCursor"]
 
             first = False
-
+        
         return response[:count]
 
     def search_for_users(self, search_term, count=28, **kwargs) -> list:
