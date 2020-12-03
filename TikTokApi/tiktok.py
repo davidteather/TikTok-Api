@@ -44,6 +44,7 @@ class TikTokApi:
         self.custom_verifyFp = kwargs.get("custom_verifyFp")
 
         if kwargs.get("use_test_endpoints", False):
+            global BASE_URL
             BASE_URL = "https://t.tiktok.com/"
         if kwargs.get("use_selenium", False):
             from .browser_selenium import browser
