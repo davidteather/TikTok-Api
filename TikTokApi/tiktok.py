@@ -193,6 +193,9 @@ class TikTokApi:
                 )
                 logging.error(self.get_cookies(**kwargs))
                 raise TikTokCaptchaError()
+            if json.get("statusCode", 200) == 10201:
+                # Invalid Entity
+                raise TikTokNotFoundError("TikTok returned a response indicating the entity is invalid")
             return r.json()
         except ValueError as e:
             text = r.text
