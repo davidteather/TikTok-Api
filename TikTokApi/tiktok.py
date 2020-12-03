@@ -43,6 +43,8 @@ class TikTokApi:
         self.proxy = kwargs.get("proxy", None)
         self.custom_verifyFp = kwargs.get("custom_verifyFp")
 
+        if kwargs.get("use_test_endpoints", False):
+            BASE_URL = "https://t.tiktok.com/"
         if kwargs.get("use_selenium", False):
             from .browser_selenium import browser
         else:
