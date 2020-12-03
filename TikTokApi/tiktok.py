@@ -68,7 +68,7 @@ class TikTokApi:
             self.width = self.browser.width
             self.height = self.browser.height
         except Exception as e:
-            logging.warning("An error occured but it was ignored.")
+            logging.warning("An error ocurred while opening your browser but it was ignored.")
 
             self.timezone_name = ""
             self.browser_language = ""
@@ -142,7 +142,17 @@ class TikTokApi:
         if self.proxy is not None:
             proxy = self.proxy
 
+        if kwargs.get("custom_verifyFp") == None:
+            if self.custom_verifyFp != None:
+                verifyFp = self.custom_verifyFp
+            else:
+                verifyFp = "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"
+        else:
+            verifyFp = kwargs.get('custom_verifyFp')
+
+
         if self.signer_url is None:
+            kwargs['custom_verifyFp'] = verifyFp
             verify_fp, did, signature = self.browser.sign_url(**kwargs)
             userAgent = self.browser.userAgent
             referrer = self.browser.referrer
@@ -150,8 +160,10 @@ class TikTokApi:
             verify_fp, did, signature, userAgent, referrer = self.external_signer(
                 kwargs["url"],
                 custom_did=kwargs.get("custom_did"),
-                verifyFp=kwargs.get("custom_verifyFp"),
+                verifyFp=kwargs.get("custom_verifyFp", verifyFp),
             )
+
+
         query = {"verifyFp": verify_fp, "did": did, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
         r = requests.get(
@@ -181,6 +193,9 @@ class TikTokApi:
                 )
                 logging.error(self.get_cookies(**kwargs))
                 raise TikTokCaptchaError()
+            if json.get("statusCode", 200) == 10201:
+                # Invalid Entity
+                raise TikTokNotFoundError("TikTok returned a response indicating the entity is invalid")
             return r.json()
         except ValueError as e:
             text = r.text
@@ -203,15 +218,26 @@ class TikTokApi:
                 verifyFp = "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"
         else:
             verifyFp = kwargs.get('custom_verifyFp')
-        return {
-            "tt_webid": did,
-            "tt_webid_v2": did,
-            "tt_csrf_token": "".join(
-                random.choice(string.ascii_uppercase + string.ascii_lowercase)
-                for i in range(16)
-            ),
-            "s_v_web_id": verifyFp
-        }
+
+        if kwargs.get("force_verify_fp_on_cookie_header", False):
+            return {
+                "tt_webid": did,
+                "tt_webid_v2": did,
+                "tt_csrf_token": "".join(
+                    random.choice(string.ascii_uppercase + string.ascii_lowercase)
+                    for i in range(16)
+                ),
+                "s_v_web_id": verifyFp
+            }
+        else:
+            return {
+                "tt_webid": did,
+                "tt_webid_v2": did,
+                "tt_csrf_token": "".join(
+                    random.choice(string.ascii_uppercase + string.ascii_lowercase)
+                    for i in range(16)
+                )
+            }
 
     def getBytes(self, **kwargs) -> bytes:
         """Returns bytes of a response from TikTok.
@@ -295,10 +321,7 @@ class TikTokApi:
                 "region": region,
                 "priority_region": region,
                 "language": language,
-                "verifyFp": kwargs.get(
-                    "custom_verifyFp",
-                    "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq",
-                ),
+                
             }
             api_url = "{}api/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
@@ -443,10 +466,6 @@ class TikTokApi:
                 "region": region,
                 "priority_region": region,
                 "language": language,
-                "verifyFp": kwargs.get(
-                    "custom_verifyFp",
-                    "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq",
-                ),
             }
             api_url = "{}api/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
@@ -457,6 +476,13 @@ class TikTokApi:
             if "items" in res.keys():
                 for t in res["items"]:
                     response.append(t)
+
+            elif 'hasMore' in res.keys():
+                # https://github.com/davidteather/TikTok-Api/pull/398
+                # a response in json without any items but nothing more than
+                # {"statusCode":0,"hasMore":true,"maxCursor":"1605327825000","minCursor":"1605714414000"}
+                # it seems to appear on when a user does not exist anymore
+                raise TikTokNotFoundError("TiktokUser with id {} does not exist".format(userID))
 
             if not res["hasMore"] and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
@@ -522,7 +548,7 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
 
-        api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}" "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}&verifyFp={}".format(
+        api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}" "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}".format(
             self.__add_new_params__(),
             page_size,
             str(userID),
@@ -531,10 +557,6 @@ class TikTokApi:
             maxCursor,
             region,
             language,
-            kwargs.get(
-                "custom_verifyFp",
-                "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq",
-            ),
         )
 
         return self.getData(url=api_url, **kwargs)
@@ -820,8 +842,7 @@ class TikTokApi:
                 "type": 3,
                 "secUid": "",
                 "cursor": offset,
-                "sourceType": "8",
-                "language": language,
+                "priority_region": "",
             }
             api_url = "{}api/challenge/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
@@ -1106,9 +1127,14 @@ class TikTokApi:
                 logging.error("Tiktok response is empty")
             else:
                 logging.error("Tiktok response: \n " + t)
-            raise TikTokCaptchaError() from None
+            raise TikTokCaptchaError()
 
-        return json.loads(j_raw)["props"]["pageProps"]
+        user = json.loads(j_raw)["props"]["pageProps"]
+
+        if user['serverCode'] == 404:
+            raise TikTokNotFoundError("TikTok user with username {} does not exist".format(username))
+
+        return user
 
     def getSuggestedUsersbyID(
         self, userId="6745191554350760966", count=30, **kwargs
@@ -1449,7 +1475,12 @@ class TikTokApi:
         j_raw = t.split(
             '<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">'
         )[1].split("</script>")[0]
-        return json.loads(j_raw)["props"]["pageProps"]["musicInfo"]["title"]
+
+        music_object = json.loads(j_raw)["props"]["pageProps"]["musicInfo"]
+        if not music_object.get("title", None):
+            raise TikTokNotFoundError("Song of {} id does not exist".format(str(id)))
+        
+        return music_object["title"]
 
     def get_secUid(self, username, **kwargs):
         r = requests.get(
@@ -1505,7 +1536,8 @@ class TikTokApi:
             "aid": 1988,
             "app_name": "tiktok_web",
             "device_platform": "web",
-            "referer": "https://www.tiktok.com/",
+            "referer": "",
+            "root_referer": "",
             "user_agent": self.__format_new_params__(self.userAgent),
             "cookie_enabled": "true",
             "screen_width": self.width,
@@ -1523,7 +1555,6 @@ class TikTokApi:
             "isMobile": False,
             "isIOS": False,
             "OS": "windows",
-            "page_referer": "https://www.tiktok.com/",
         }
         return urlencode(query)
 
