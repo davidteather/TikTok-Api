@@ -96,9 +96,13 @@ api = TikTokApi.get_instance()
 
 results = 10
 
-# Since TikTok changed their API you need to use the custom_verifyFp option. 
-# In your web browser you will need to go to TikTok, Log in and get the s_v_web_id value.
-trending = api.trending(count=results, custom_verifyFp="")
+# Since TikTok changed their API you need to use the custom_verifyFp and custom_did options 
+# Log into Tiktok.com using your desktop web browser
+# Open developer tools in your web browser and look for cookies from tiktok.com
+# The s_v_web_id cookie value will be your custom_verifyFp parameter
+# It looks like this: "verify_kiXXXXXX_XXXXXXXX_XXXX_XXXX_XXXX_XXXXXXXXXXXX"
+# The tt_webid_v2 cookie value will be your did/custom_did parameter
+trending = api.trending(count=results, custom_verifyFp="", did="")
 
 for tiktok in trending:
     # Prints the id of the tiktok
@@ -124,7 +128,9 @@ python -m examples.getTrending
 
 * username - the username of a user you want to find
 * secUid - the secUid of the user (you can find in the responses)
-* userId / id - The id of the user
+* userId / id - The id of the user 
+* did/custom_did - The id of the user account used to authenticate with tiktok. Found by logging into tiktok in your desktop browser
+* custom_verifyFp - The security key used to authenticate with tiktok. Found by logging into tiktok in your desktop browser
 * proxy - the proxy address of your proxy
 * language - the 2 letter code for your language (this is included in the requests by default to TikTok, but it doesn't seem to do much for me at least)
 * language - Ex: en (doesn't seem to change data)
