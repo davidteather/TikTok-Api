@@ -22,3 +22,4 @@ test.txt
 tests/__pycache__/*
 *.pyc
 acrawl.js
+test2.py
