@@ -1,7 +1,7 @@
 from TikTokApi import TikTokApi
 import os
 
-api = TikTokApi.get_instance(custom_verifyFp=os.environ.get("verifyFp", None))
+api = TikTokApi.get_instance(custom_verifyFp=os.environ.get("verifyFp", None), use_test_endpoints=True)
 
 
 def unique_count(tiktoks):
@@ -16,7 +16,7 @@ def test_hashtag():
     assert len(api.byHashtag("funny", 5)) == 5
     assert len(api.byHashtag("funny", 10)) == 10
     assert len(api.byHashtag("funny", 20)) == 20
-    assert len(unique_count(api.byHashtag("funny", 500))) == 500
+    assert abs(len(unique_count(api.byHashtag("funny", 500)))-500) <= 5
 
 
 def test_non_latin1():

@@ -43,6 +43,9 @@ class TikTokApi:
         self.proxy = kwargs.get("proxy", None)
         self.custom_verifyFp = kwargs.get("custom_verifyFp")
 
+        if kwargs.get("use_test_endpoints", False):
+            global BASE_URL
+            BASE_URL = "https://t.tiktok.com/"
         if kwargs.get("use_selenium", False):
             from .browser_selenium import browser
         else:
@@ -210,7 +213,7 @@ class TikTokApi:
                 raise JSONDecodeFailure() from e
 
     def get_cookies(self, **kwargs):
-        did = kwargs.get("did", str(random.randint(10000, 999999999)))
+        did = kwargs.get("custom_did", ''.join(random.choice(string.digits) for num in range(19)))
         if kwargs.get("custom_verifyFp") == None:
             if self.custom_verifyFp != None:
                 verifyFp = self.custom_verifyFp
@@ -1564,7 +1567,6 @@ class TikTokApi:
         language = kwargs.get("language", "en")
         proxy = kwargs.get("proxy", None)
         maxCount = kwargs.get("maxCount", 35)
-        did = kwargs.get("did", str(random.randint(10000, 999999999)))
-        kwargs["did"] = did
+        did = kwargs.get("custom_did", ''.join(random.choice(string.digits) for num in range(19)))
 
         return region, language, proxy, maxCount, did
