@@ -168,7 +168,6 @@ class browser:
             )
             for i in range(16)
         )
-
         if kwargs.get("gen_new_verifyFp", False):
             verifyFp = self.gen_verifyFp()
         else:
