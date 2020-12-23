@@ -36,9 +36,9 @@ class TikTokApi:
         self.executablePath = kwargs.get("executablePath", None)
 
         self.userAgent = (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/86.0.4240.111 Safari/537.36"
+            "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) "
+            "AppleWebKit/604.1.38 (KHTML, like Gecko) "
+            "Version/11.0 Mobile/15A356 Safari/604.1"
         )
         self.proxy = kwargs.get("proxy", None)
         self.custom_verifyFp = kwargs.get("custom_verifyFp")
@@ -328,7 +328,7 @@ class TikTokApi:
                 "region": region,
                 "priority_region": region,
                 "language": language,
-                
+
             }
             api_url = "{}api/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
@@ -346,7 +346,7 @@ class TikTokApi:
             maxCursor = res["maxCursor"]
 
             first = False
-        
+
         return response[:count]
 
     def search_for_users(self, search_term, count=28, **kwargs) -> list:
@@ -1479,7 +1479,7 @@ class TikTokApi:
         music_object = json.loads(j_raw)["props"]["pageProps"]["musicInfo"]
         if not music_object.get("title", None):
             raise TikTokNotFoundError("Song of {} id does not exist".format(str(id)))
-        
+
         return music_object["title"]
 
     def get_secUid(self, username, **kwargs):
@@ -1548,6 +1548,8 @@ class TikTokApi:
             "browser_version": self.browser_version,
             "browser_online": "true",
             "ac": "4g",
+            "page_referer": "https://www.tiktok.com/he-IL/",
+            "priority_region": "",
             "timezone_name": self.timezone_name,
             "appId": 1233,
             "appType": "m",
@@ -1567,3 +1569,26 @@ class TikTokApi:
         did = kwargs.get("custom_did", ''.join(random.choice(string.digits) for num in range(19)))
 
         return region, language, proxy, maxCount, did
+
+    def getUserDetails(self, username, secuid, **kwargs) -> dict:
+        """Returns a hashtag object.
+
+        :param hashtag: The hashtag to search by.
+        :param language: The 2 letter code of the language to return.
+                         Note: Doesn't seem to have an affect.
+        :param proxy: The IP address of a proxy to make requests from.
+        """
+        (
+            region,
+            language,
+            proxy,
+            maxCount,
+            did,
+        ) = self.__process_kwargs__(kwargs)
+        kwargs["custom_did"] = did
+        query = {"uniqueId": username, "secUid": secuid, "validUniqueId": username, "isUniqueId": True}
+        api_url = "{}node/share/user/@{}?{}&{}".format(
+            BASE_URL, username, self.__add_new_params__(), urlencode(query)
+        )
+        data = self.getData(url=api_url, **kwargs)
+        return data
