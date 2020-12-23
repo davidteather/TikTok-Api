@@ -89,16 +89,16 @@ class browser:
     def get_params(self, page) -> None:
         # self.browser_language = await self.page.evaluate("""() => { return
         # navigator.language || navigator.userLanguage; }""")
-        self.browser_language = ""
+        self.browser_language = page.evaluate("""() => { return window.navigator.language || navigator.userLanguage; }""")
         # self.timezone_name = await self.page.evaluate("""() => { return
         # Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
-        self.timezone_name = ""
+        self.timezone_name =page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
         # self.browser_platform = await self.page.evaluate("""() => { return window.navigator.platform; }""")
-        self.browser_platform = ""
+        self.browser_platform = page.evaluate("""() => { return window.navigator.platform; }""")
         # self.browser_name = await self.page.evaluate("""() => { return window.navigator.appCodeName; }""")
-        self.browser_name = ""
+        self.browser_name = page.evaluate("""() => { return window.navigator.appCodeName; }""")
         # self.browser_version = await self.page.evaluate("""() => { return window.navigator.appVersion; }""")
-        self.browser_version = ""
+        self.browser_version = page.evaluate("""() => { return window.navigator.appVersion; }""")
 
         self.width = page.evaluate("""() => { return screen.width; }""")
         self.height = page.evaluate("""() => { return screen.height; }""")
