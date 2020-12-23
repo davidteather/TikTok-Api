@@ -548,7 +548,7 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
 
-        api_url = "https://m.tiktok.com/api/item_list/?{}&count={}&id={}&type=1&secUid={}" "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}".format(
+        api_url = BASE_URL + "api/item_list/?{}&count={}&id={}&type=1&secUid={}" "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}".format(
             self.__add_new_params__(),
             page_size,
             str(userID),
@@ -1102,11 +1102,11 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         r = requests.get(
-            "https://tiktok.com/@{}?lang=en".format(username),
+            "https://tiktok.com/@{}?lang=en".format(quote(username)),
             headers={
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                 "authority": "www.tiktok.com",
-                "path": "/{}".format(username),
+                "path": "/@{}".format(quote(username)),
                 "Accept-Encoding": "gzip, deflate",
                 "Connection": "keep-alive",
                 "Host": "www.tiktok.com",
@@ -1484,11 +1484,11 @@ class TikTokApi:
 
     def get_secUid(self, username, **kwargs):
         r = requests.get(
-            "https://tiktok.com/@{}?lang=en".format(username),
+            "https://tiktok.com/@{}?lang=en".format(quote(username)),
             headers={
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                 "authority": "www.tiktok.com",
-                "path": "/{}".format(username),
+                "path": "/@{}".format(quote(username)),
                 "Accept-Encoding": "gzip, deflate",
                 "Connection": "keep-alive",
                 "Host": "www.tiktok.com",
