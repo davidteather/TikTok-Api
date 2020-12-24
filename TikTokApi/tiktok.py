@@ -752,8 +752,13 @@ class TikTokApi:
 
             res = self.getData(url=api_url, **kwargs)
 
-            for t in res.get("itemList", []):
-                response.append(t)
+
+            try:
+                for t in res["items"]:
+                    response.append(t)
+            except KeyError:
+                for t in res['itemList']:
+                    response.append(t)
 
             if not res["hasMore"]:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
@@ -849,8 +854,12 @@ class TikTokApi:
             )
             res = self.getData(url=api_url, **kwargs)
 
-            for t in res["itemList"]:
-                response.append(t)
+            try:
+                for t in res["items"]:
+                    response.append(t)
+            except KeyError:
+                for t in res["itemList"]:
+                    response.append(t)
 
             if not res["hasMore"]:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
