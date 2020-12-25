@@ -1424,36 +1424,9 @@ class TikTokApi:
 
         data = r.text
 
-        check = data.split('video":{"urls":["')
+        check = data.split('video":{"id":"')
         if len(check) > 1:
-            contentURL = check[1].split('"')[0]
-            r = requests.get(
-                contentURL,
-                headers={
-                    "method": "GET",
-                    "accept-encoding": "gzip, deflate, br",
-                    "accept-Language": "en-US,en;q=0.9",
-                    "Range": "bytes=0-200000",
-                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;"
-                    "q=0.8,application/signed-exchange;v=b3;q=0.9",
-                    "user-agent": self.userAgent,
-                },
-                proxies=self.__format_proxy(proxy),
-                cookies=self.get_cookies(**kwargs),
-            )
-
-            tmp = r.text.split("vid:")
-            if len(tmp) > 1:
-                key = tmp[1].split("%")[0]
-                if key[-1:] == " ":
-                    key = key[1:]
-
-                if key[:1] == " ":
-                    key = key[:-1]
-
-            else:
-                key = ""
-
+            key = check[1].split('"')[0]
             cleanVideo = (
                 "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id={}&line=0&ratio=default"
                 "&media_type=4&vr_type=0"
