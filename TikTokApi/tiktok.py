@@ -1037,6 +1037,50 @@ class TikTokApi:
             **kwargs,
         )
 
+    def get_tiktok_by_html(self, url, **kwargs) -> dict:
+        (
+            region,
+            language,
+            proxy,
+            maxCount,
+            did,
+        ) = self.__process_kwargs__(kwargs)
+
+        r = requests.get(
+            url,
+            headers={
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                "authority": "www.tiktok.com",
+                "path": url.split("tiktok.com")[1],
+                "Accept-Encoding": "gzip, deflate",
+                "Connection": "keep-alive",
+                "Host": "www.tiktok.com",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+            },
+            proxies=self.__format_proxy(kwargs.get("proxy", None)),
+            cookies=self.get_cookies(**kwargs),
+        )        
+
+        t = r.text
+        try:
+            j_raw = t.split(
+                '<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">'
+            )[1].split("</script>")[0]
+        except IndexError:
+            if not t:
+                logging.error("TikTok response is empty")
+            else:
+                logging.error("TikTok response: \n " + t)
+            raise TikTokCaptchaError()
+
+        data = json.loads(j_raw)["props"]["pageProps"]
+
+        if data['serverCode'] == 404:
+            raise TikTokNotFoundError("TikTok with that url doesn't exist".format(username))
+
+        return data
+        
+
     def discoverHashtags(self, **kwargs) -> dict:
         """Discover page, consists challenges (hashtags)
 
@@ -1396,7 +1440,7 @@ class TikTokApi:
 
         return self.getBytes(url=download_url, **kwargs)
 
-    def get_Video_No_Watermark(self, video_url, return_bytes=0, **kwargs) -> bytes:
+    def get_video_no_watermark(self, video_url, return_bytes=1, **kwargs) -> bytes:
         """Gets the video with no watermark
 
         :param video_url: The url of the video you want to download
@@ -1411,60 +1455,32 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
+
+        tiktok_html = self.get_tiktok_by_html(video_url)
+
+        # Thanks to @HasibulKabir for pointing this out on #448
+        cleanVideo = (
+                "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id={}&line=0&ratio=default"
+                "&media_type=4&vr_type=0"
+        ).format(tiktok_html['itemInfo']['itemStruct']['video']['id'])
+
+        if return_bytes == 0:
+            return cleanVideo
+
         r = requests.get(
-            video_url,
+            cleanVideo,
             headers={
                 "method": "GET",
                 "accept-encoding": "utf-8",
-                "user-agent": self.userAgent,
+                "user-agent": "okhttp",
             },
             proxies=self.__format_proxy(proxy),
-            cookies=self.get_cookies(**kwargs),
         )
 
-        data = r.text
+        if r.text[0] == '{':
+            raise TikTokCaptchaError()
 
-        check = data.split('video":{"urls":["')
-        if len(check) > 1:
-            contentURL = check[1].split('"')[0]
-            r = requests.get(
-                contentURL,
-                headers={
-                    "method": "GET",
-                    "accept-encoding": "gzip, deflate, br",
-                    "accept-Language": "en-US,en;q=0.9",
-                    "Range": "bytes=0-200000",
-                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;"
-                    "q=0.8,application/signed-exchange;v=b3;q=0.9",
-                    "user-agent": self.userAgent,
-                },
-                proxies=self.__format_proxy(proxy),
-                cookies=self.get_cookies(**kwargs),
-            )
-
-            tmp = r.text.split("vid:")
-            if len(tmp) > 1:
-                key = tmp[1].split("%")[0]
-                if key[-1:] == " ":
-                    key = key[1:]
-
-                if key[:1] == " ":
-                    key = key[:-1]
-
-            else:
-                key = ""
-
-            cleanVideo = (
-                "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id={}&line=0&ratio=default"
-                "&media_type=4&vr_type=0"
-            ).format(key)
-
-            b = browser(cleanVideo, **kwargs)
-            if return_bytes == 0:
-                return b.redirect_url
-            else:
-                r = requests.get(b.redirect_url, proxies=self.__format_proxy(proxy))
-                return r.content
+        return r.content
 
     def get_music_title(self, id, **kwargs):
         r = requests.get(
