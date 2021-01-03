@@ -51,6 +51,8 @@ class TikTokApi:
         else:
             from .browser import browser
 
+        self.sessionid_ss = kwargs.get('sessionid_ss', None)
+
         self.signer_url = kwargs.get("external_signer", None)
         if self.signer_url is None:
             self.browser = browser(**kwargs)
@@ -230,6 +232,7 @@ class TikTokApi:
             return {
                 "tt_webid": did,
                 "tt_webid_v2": did,
+                "sessionid_ss": self.sessionid_ss,
                 "tt_csrf_token": "".join(
                     random.choice(string.ascii_uppercase + string.ascii_lowercase)
                     for i in range(16)
@@ -240,6 +243,7 @@ class TikTokApi:
             return {
                 "tt_webid": did,
                 "tt_webid_v2": did,
+                "sessionid_ss": self.sessionid_ss,
                 "tt_csrf_token": "".join(
                     random.choice(string.ascii_uppercase + string.ascii_lowercase)
                     for i in range(16)
@@ -294,6 +298,73 @@ class TikTokApi:
             cookies=self.get_cookies(**kwargs),
         )
         return r.content
+
+    def getFollowing(self, count=10, minCursor=0, maxCursor=0, **kwargs) -> list:
+        """
+        Gets accounts that you are following
+        """
+        (
+            region,
+            language,
+            proxy,
+            maxCount,
+            did,
+        ) = self.__process_kwargs__(kwargs)
+        kwargs["custom_did"] = did
+
+        if self.sessionid_ss is None:
+            logging.error('You need to provide your sessionid_ss cookie value to access this endpoint')
+            raise ValueError
+
+        response = []
+        has_first = False
+        has_more = True
+
+        # Count has to be between 0 and 199.
+        if count >= 200:
+            count = 199
+
+        while has_more:
+            if not has_first:
+                scene = 20
+            else:
+                scene = 21
+
+            query = {
+                "count": count,
+                "id": 1,
+                "secUid": "",
+                "maxCursor": maxCursor,
+                "minCursor": minCursor,
+                "sourceType": 12,
+                "appId": 1233,
+                "region": region,
+                "priority_region": region,
+                "language": language,
+                "scene": scene,
+            }
+            api_url = "{}api/user/list/?{}&{}".format(
+                BASE_URL, self.__add_new_params__(), urlencode(query)
+            )
+            res = self.getData(url=api_url, **kwargs)
+
+            following = res.get('userList', [])
+
+            for f in following:
+                response.append(f)
+
+            if following is not None:
+                if has_first:
+                    res_max_cursor, res_min_cursor = res.get('maxCursor'), res.get('minCursor')
+                    if res_max_cursor < 0 or res_min_cursor < 0:
+                        has_more = False
+                    else:
+                        maxCursor = res_max_cursor
+                        minCursor = res_min_cursor
+                else:
+                    has_first = True
+
+        return response
 
     def trending(self, count=30, minCursor=0, maxCursor=0, **kwargs) -> dict:
         """
