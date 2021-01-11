@@ -59,6 +59,9 @@ If you run into an issue please check the closed issues on the github. You're mo
 pip install TikTokApi
 python -m playwright install
 ```
+If you would prefer a video walk through of setting up this package I created a [YouTube video](https://www.youtube.com/watch?v=zwLmLfVI-VQ) just for that.
+
+
 
 If you're on MacOS you may need to install [XCode Developer Tools](https://webkit.org/build-tools/)
 
