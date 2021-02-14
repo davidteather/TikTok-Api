@@ -24,3 +24,5 @@ tests/__pycache__/*
 acrawl.js
 test2.py
 build
+MANIFEST
+src
