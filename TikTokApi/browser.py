@@ -52,9 +52,9 @@ class browser:
 
         self.options = {
             "headless": True,
-            "handleSIGINT": True,
-            "handleSIGTERM": True,
-            "handleSIGHUP": True,
+            "handle_sigint": True,
+            "handle_sigterm": True,
+            "handle_sighup": True,
         }
 
         if self.proxy is not None:
