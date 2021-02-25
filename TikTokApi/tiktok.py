@@ -4,7 +4,6 @@ import time
 import logging
 import json
 from urllib.parse import urlencode, quote
-# from playwright import sync_playwright
 from playwright.sync_api import sync_playwright
 import string
 import logging
