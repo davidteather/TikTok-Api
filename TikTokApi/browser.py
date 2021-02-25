@@ -12,7 +12,7 @@ import random
 # Import Detection From Stealth
 from .stealth import stealth
 from .get_acrawler import get_acrawler
-from playwright import sync_playwright
+from playwright.sync_api import sync_playwright
 
 playwright = None
 
