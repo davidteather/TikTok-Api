@@ -83,7 +83,7 @@ class browser:
             logging.critical(e)
 
         context = self.create_context(set_useragent=True)
-        page = context.newPage()
+        page = context.new_page()
         self.get_params(page)
         context.close()
 
@@ -110,13 +110,13 @@ class browser:
             "width": random.randint(320, 1920),
             "height": random.randint(320, 1920),
         }
-        iphone["deviceScaleFactor"] = random.randint(1, 3)
-        iphone["isMobile"] = random.randint(1, 2) == 1
-        iphone["hasTouch"] = random.randint(1, 2) == 1
+        iphone["device_scale_factor"] = random.randint(1, 3)
+        iphone["is_mobile"] = random.randint(1, 2) == 1
+        iphone["has_touch"] = random.randint(1, 2) == 1
 
-        context = self.browser.newContext(**iphone)
+        context = self.browser.new_context(**iphone)
         if set_useragent:
-            self.userAgent = iphone["userAgent"]
+            self.userAgent = iphone["user_agent"]
 
         return context
 
@@ -162,7 +162,7 @@ class browser:
         if url is None:
             raise Exception("sign_url required a url parameter")
         context = self.create_context()
-        page = context.newPage()
+        page = context.new_page()
         verifyFp = "".join(
             random.choice(
                 string.ascii_lowercase + string.ascii_uppercase + string.digits
@@ -184,7 +184,7 @@ class browser:
         else:
             did = self.did
 
-        page.setContent("<script> " + get_acrawler() + " </script>")
+        page.set_content("<script> " + get_acrawler() + " </script>")
         evaluatedPage = page.evaluate(
             '''() => {
             var url = "'''
