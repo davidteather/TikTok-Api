@@ -52,9 +52,9 @@ class browser:
 
         self.options = {
             "headless": True,
-            "handleSIGINT": True,
-            "handleSIGTERM": True,
-            "handleSIGHUP": True,
+            "handle_sigint": True,
+            "handle_sigterm": True,
+            "handle_sighup": True,
         }
 
         if self.proxy is not None:
@@ -64,7 +64,9 @@ class browser:
                 self.options["proxy"] = {
                     "server": server_prefix + "://" + address,
                     "username": self.proxy.split("://")[1].split(":")[0],
-                    "password": self.proxy.split("://")[1].split("@")[0].split(":")[1],
+                    "password": self.proxy.split("://")[1]
+                    .split("@")[0]
+                    .split(":")[1],
                 }
             else:
                 self.options["proxy"] = {"server": self.proxy}
@@ -120,7 +122,9 @@ class browser:
 
         return context
 
-    def base36encode(self, number, alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
+    def base36encode(
+        self, number, alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    ):
         """Converts an integer to a base36 string."""
         base36 = ""
         sign = ""
@@ -139,7 +143,9 @@ class browser:
         return sign + base36
 
     def gen_verifyFp(self):
-        chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"[:]
+        chars = (
+            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"[:]
+        )
         chars_len = len(chars)
         scenario_title = self.base36encode(int(time.time() * 1000))
         uuid = [0] * 36
