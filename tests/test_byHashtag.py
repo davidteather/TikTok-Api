@@ -17,7 +17,7 @@ def test_hashtag():
     assert len(api.byHashtag("funny", 10)) == 10
     assert len(api.byHashtag("funny", 20)) == 20
     # Grant A Little Lenience of at most a 5 difference
-    assert abs(len(unique_count(api.byHashtag("funny", 500)))-500) <= 5
+    assert abs(len(unique_count(api.byHashtag("funny", 500)))-500) <= 10
 
 
 def test_non_latin1():
