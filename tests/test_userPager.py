@@ -22,7 +22,7 @@ class TestUserPager:
         """Should always request therock's first 19 tiktoks across 2 pages"""
         APR_24 = 1587757436000  # 2020-04-24 15:43:56 to be precise. Must be ms-precision timestamp
 
-        pager = api.getUserPager("therock", page_size=10, maxCursor=APR_24)
+        pager = api.getUserPager("therock", page_size=10, cursor=APR_24)
 
         total_tts = 0
         pages = 0
@@ -33,13 +33,14 @@ class TestUserPager:
         assert pages == 2
         assert total_tts == 19
 
-    def test_user_pager_before_after(self):
+    # TikTokApi No Longer Supports
+    '''def test_user_pager_before_after(self):
         """Should always request the 7 tiktoks between those times"""
         APR_24 = 1587757437000  # 2020-04-24 15:43:57
         AUG_10 = 1597076218000  # 2020-08-10 12:16:58
 
         pager = api.getUserPager(
-            "therock", page_size=3, minCursor=APR_24, maxCursor=AUG_10
+            "therock", page_size=3, cursor=APR_24, maxCursor=AUG_10
         )
 
         total_tts = 0
@@ -49,4 +50,4 @@ class TestUserPager:
             total_tts += len(page)
 
         assert pages == 3
-        assert total_tts == 7
+        assert total_tts == 7'''
