@@ -321,21 +321,20 @@ class TikTokApi:
                 "count": realCount,
                 "id": 1,
                 "secUid": "",
-                "maxCursor": maxCursor,
-                "minCursor": minCursor,
                 "sourceType": 12,
                 "appId": 1233,
+                "itemID": 1,
+                "insertedItemID": "",
                 "region": region,
                 "priority_region": region,
                 "language": language,
                 
             }
-            api_url = "{}api/item_list/?{}&{}".format(
+            api_url = "{}api/recommend/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
             res = self.getData(url=api_url, **kwargs)
-
-            for t in res.get("items", []):
+            for t in res.get("itemList", []):
                 response.append(t)
 
             if not res["hasMore"] and not first:
@@ -343,7 +342,6 @@ class TikTokApi:
                 return response[:count]
 
             realCount = count - len(response)
-            maxCursor = res["maxCursor"]
 
             first = False
         
@@ -429,7 +427,7 @@ class TikTokApi:
         return response[:count]
 
     def userPosts(
-        self, userID, secUID, count=30, minCursor=0, maxCursor=0, **kwargs
+        self, userID, secUID, count=30, cursor=0,  **kwargs
     ) -> dict:
         """Returns a dictionary listing TikToks given a user's ID and secUID
 
@@ -464,24 +462,23 @@ class TikTokApi:
             query = {
                 "count": realCount,
                 "id": userID,
+                "cursor": cursor,
                 "type": 1,
                 "secUid": secUID,
-                "maxCursor": maxCursor,
-                "minCursor": minCursor,
                 "sourceType": 8,
                 "appId": 1233,
                 "region": region,
                 "priority_region": region,
                 "language": language,
             }
-            api_url = "{}api/item_list/?{}&{}".format(
+            api_url = "{}api/post/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
             res = self.getData(url=api_url, **kwargs)
 
-            if "items" in res.keys():
-                for t in res["items"]:
+            if "itemList" in res.keys():
+                for t in res["itemList"]:
                     response.append(t)
 
             if not res["hasMore"] and not first:
@@ -489,7 +486,7 @@ class TikTokApi:
                 return response
 
             realCount = count - len(response)
-            maxCursor = res["maxCursor"]
+            cursor = res['cursor']
 
             first = False
 
@@ -524,7 +521,7 @@ class TikTokApi:
         )
 
     def userPage(
-        self, userID, secUID, page_size=30, minCursor=0, maxCursor=0, **kwargs
+        self, userID, secUID, page_size=30, cursor=0, **kwargs
     ) -> dict:
         """Returns a dictionary listing of one page of TikToks given a user's ID and secUID
 
@@ -548,20 +545,19 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
 
-        api_url = BASE_URL + "api/item_list/?{}&count={}&id={}&type=1&secUid={}" "&minCursor={}&maxCursor={}&sourceType=8&appId=1233&region={}&language={}".format(
+        api_url = BASE_URL + "api/post/item_list/?{}&count={}&id={}&type=1&secUid={}" "&cursor={}&sourceType=8&appId=1233&region={}&language={}".format(
             self.__add_new_params__(),
             page_size,
             str(userID),
             str(secUID),
-            minCursor,
-            maxCursor,
+            cursor,
             region,
             language,
         )
 
         return self.getData(url=api_url, **kwargs)
 
-    def getUserPager(self, username, page_size=30, minCursor=0, maxCursor=0, **kwargs):
+    def getUserPager(self, username, page_size=30, cursor=0, **kwargs):
         """Returns a generator to page through a user's feed
 
         :param username: The username of the user.
@@ -589,18 +585,17 @@ class TikTokApi:
                 data["id"],
                 data["secUid"],
                 page_size=page_size,
-                maxCursor=maxCursor,
-                minCursor=minCursor,
+                cursor=cursor,
                 **kwargs,
             )
 
             try:
-                page = resp["items"]
+                page = resp["itemList"]
             except KeyError:
                 # No mo results
                 return
 
-            maxCursor = resp["maxCursor"]
+            cursor = resp["cursor"]
 
             yield page
 
@@ -608,7 +603,7 @@ class TikTokApi:
                 return  # all done
 
     def userLiked(
-        self, userID, secUID, count=30, minCursor=0, maxCursor=0, **kwargs
+        self, userID, secUID, count=30, cursor=0, **kwargs
     ) -> dict:
         """Returns a dictionary listing TikToks that a given a user has liked.
            Note: The user's likes must be public
@@ -645,36 +640,34 @@ class TikTokApi:
                 "id": userID,
                 "type": 2,
                 "secUid": secUID,
-                "maxCursor": maxCursor,
-                "minCursor": minCursor,
+                "cursor": cursor,
                 "sourceType": 9,
                 "appId": 1233,
                 "region": region,
                 "priority_region": region,
                 "language": language,
             }
-            api_url = "{}api/item_list/?{}&{}".format(
+            api_url = "{}api/favorite/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
             res = self.getData(url=api_url, **kwargs)
 
             try:
-                res["items"]
+                res["itemList"]
             except Exception:
                 logging.error("User's likes are most likely private")
                 return []
 
-            if "items" in res.keys():
-                for t in res["items"]:
-                    response.append(t)
+            for t in res["itemList"]:
+                response.append(t)
 
             if not res["hasMore"] and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count - len(response)
-            maxCursor = res["maxCursor"]
+            cursor = res["cursor"]
 
             first = False
 
@@ -742,7 +735,7 @@ class TikTokApi:
                 "secUid": "",
                 "musicID": str(id),
                 "count": str(realCount),
-                "cursor": str(offset),
+                "cursor": offset,
                 "shareUid": "",
                 "language": language,
             }
@@ -854,12 +847,8 @@ class TikTokApi:
             )
             res = self.getData(url=api_url, **kwargs)
 
-            try:
-                for t in res["items"]:
-                    response.append(t)
-            except KeyError:
-                for t in res["itemList"]:
-                    response.append(t)
+            for t in res["itemList"]:
+                response.append(t)
 
             if not res["hasMore"]:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
