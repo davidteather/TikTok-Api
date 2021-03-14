@@ -1,3 +1,5 @@
+
+
 import random
 import requests
 import time
@@ -11,6 +13,8 @@ import os
 from .utilities import update_messager
 from .exceptions import *
 
+
+
 os.environ["no_proxy"] = "127.0.0.1,localhost"
 
 BASE_URL = "https://m.tiktok.com/"
@@ -18,13 +22,10 @@ BASE_URL = "https://m.tiktok.com/"
 
 class TikTokApi:
     __instance = None
+    
 
     def __init__(self, **kwargs):
-        """The TikTokApi class. Used to interact with TikTok.
-
-        :param logging_level: The logging level you want the program to run at
-        :param request_delay: The amount of time to wait before making a request.
-        :param executablePath: The location of the chromedriver.exe
+        """The TikTokApi class. Used to interact with TikTok, use get_instance NOT this.
         """
         # Forces Singleton
         if TikTokApi.__instance is None:
@@ -87,14 +88,66 @@ class TikTokApi:
 
     @staticmethod
     def get_instance(**kwargs):
+        """The TikTokApi class. Used to interact with TikTok. This is a singleton 
+            class to prevent issues from arising with playwright
+
+        Parameters
+        ----------
+        logging_level: The logging level you want the program to run at, optional
+            These are the standard python logging module's levels.
+        request_delay: The amount of time to wait before making a request, optional
+            This is used to throttle your own requests as you may end up making too
+            many requests to TikTok for your IP.
+        custom_did: A TikTok parameter needed to download videos, optional
+            The code generates these and handles these pretty well itself, however
+            for some things such as video download you will need to set a consistent
+            one of these.
+
+            All the methods take this as a optional parameter, however it's cleaner code
+            to store this at the instance level. You can override this at the specific
+            methods.
+        custom_verifyFp: A TikTok parameter needed to work most of the time, optional
+            To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
+            I recommend watching the entire thing, as it will help setup this package.
+
+            All the methods take this as a optional parameter, however it's cleaner code
+            to store this at the instance level. You can override this at the specific
+            methods.
+        use_test_endpoints: Send requests to TikTok's test endpoints, optional
+            This parameter when set to true will make requests to TikTok's testing
+            endpoints instead of the live site. I can't guarantee this will work
+            in the future, however currently basically any custom_verifyFp will
+            work here which is helpful.
+        proxy: A string containing your proxy address, optional
+            If you want to do a lot of scraping of TikTok endpoints you'll likely
+            need a proxy. 
+            
+            Ex: "https://0.0.0.0:8080"
+
+            All the methods take this as a optional parameter, however it's cleaner code
+            to store this at the instance level. You can override this at the specific
+            methods.
+        use_selenium: Option to use selenium over playwright, optional
+            Playwright is selected by default and is the one that I'm designing the 
+            package to be compatable for, however if playwright doesn't work on 
+            your machine feel free to set this to True.
+        executablePath: The location of the driver, optional
+            This shouldn't be needed if you're using playwright
+        **kwargs
+            Parameters that are passed on to basically every module and methods
+            that interact with this main class. These may or may not be documented
+            in other places.
+        """
         if not TikTokApi.__instance:
             TikTokApi(**kwargs)
         return TikTokApi.__instance
 
     def clean_up(self):
+        """A basic cleanup method, called automatically from the code"""
         self.__del__()
 
     def __del__(self):
+        """A basic cleanup method, called automatically from the code"""
         try:
             self.browser.clean_up()
         except Exception:
@@ -106,6 +159,21 @@ class TikTokApi:
         TikTokApi.__instance = None
 
     def external_signer(self, url, custom_did=None, verifyFp=None):
+        """Makes requests to an external signer instead of using a browser.
+
+        Parameters
+        ----------
+        url: The server to make requests to
+            This server is designed to sign requests. You can find an example
+            of this signature server in the examples folder.
+        custom_did: A TikTok parameter needed to download videos
+            The code generates these and handles these pretty well itself, however
+            for some things such as video download you will need to set a consistent
+            one of these.
+        custom_verifyFp: A TikTok parameter needed to work most of the time,
+            To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
+            I recommend watching the entire thing, as it will help setup this package.
+        """
         if custom_did is not None:
             query = {"url": url, "custom_did": custom_did, "verifyFp": verifyFp}
         else:
@@ -122,16 +190,10 @@ class TikTokApi:
         )
 
     def get_data(self, **kwargs) -> dict:
-        """Returns a dictionary of a response from TikTok.
+        """Makes requests to TikTok and returns their JSON.
 
-        :param api_url: the base string without a signature
-
-        :param b: The browser object that contains the signature
-
-        :param language: The two digit language code to make requests to TikTok with.
-                         Note: This doesn't seem to actually change things from the API.
-
-        :param proxy: The IP address of a proxy server to request from.
+        This is all handled by the package so it's unlikely
+        you will need to use this.
         """
         (
             region,
@@ -219,6 +281,7 @@ class TikTokApi:
                 raise JSONDecodeFailure() from e
 
     def get_cookies(self, **kwargs):
+        """Extracts cookies from the kwargs passed to the function for get_data"""
         did = kwargs.get(
             "custom_did", "".join(random.choice(string.digits) for num in range(19))
         )
@@ -251,17 +314,7 @@ class TikTokApi:
             }
 
     def get_bytes(self, **kwargs) -> bytes:
-        """Returns bytes of a response from TikTok.
-
-        :param api_url: the base string without a signature
-
-        :param b: The browser object that contains the signature
-
-        :param language: The two digit language code to make requests to TikTok with.
-                         Note: This doesn't seem to actually change things from the API.
-
-        :param proxy: The IP address of a proxy server to request from.
-        """
+        """Returns TikTok's response as bytes, similar to get_data"""
         (
             region,
             language,
@@ -299,9 +352,15 @@ class TikTokApi:
         )
         return r.content
 
-    def trending(self, count=30, minCursor=0, maxCursor=0, **kwargs) -> dict:
+    def by_trending(self, count=30, **kwargs) -> dict:
         """
         Gets trending TikToks
+
+        Parameters
+        ----------
+        count: The amount of TikToks you want returned, optional
+            Note: TikTok seems to only support at MOST ~2000 TikToks
+            from a single endpoint. 
         """
         (
             region,
@@ -353,27 +412,36 @@ class TikTokApi:
     def search_for_users(self, search_term, count=28, **kwargs) -> list:
         """Returns a list of users that match the search_term
 
-        :param search_term: The string to search by.
-        :param count: The number of posts to return.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        search_term: The string to search for users by
+            This string is the term you want to search for users by.
+        count: The number of users to return.
+            Note: maximum is around 28 for this type of endpoint.
         """
         return self.discover_type(search_term, prefix="user", count=count, **kwargs)
 
     def search_for_music(self, search_term, count=28, **kwargs) -> list:
         """Returns a list of music that match the search_term
 
-        :param search_term: The string to search by.
-        :param count: The number of posts to return.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        search_term: The string to search for music by
+            This string is the term you want to search for music by.
+        count: The number of music to return.
+            Note: maximum is around 28 for this type of endpoint.
         """
         return self.discover_type(search_term, prefix="music", count=count, **kwargs)
 
     def search_for_hashtags(self, search_term, count=28, **kwargs) -> list:
         """Returns a list of hashtags that match the search_term
 
-        :param search_term: The string to search by.
-        :param count: The number of posts to return.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        search_term: The string to search for music by
+            This string is the term you want to search for music by.
+        count: The number of music to return.
+            Note: maximum is around 28 for this type of endpoint.
         """
         return self.discover_type(
             search_term, prefix="challenge", count=count, **kwargs
@@ -382,10 +450,14 @@ class TikTokApi:
     def discover_type(self, search_term, prefix, count=28, offset=0, **kwargs) -> list:
         """Returns a list of whatever the prefix type you pass in
 
-        :param search_term: The string to search by.
-        :param prefix: The type of post to search by user/music/challenge.
-        :param count: The number of posts to return.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        search_term: The string to search by
+            This string is the term you want to search by.
+        prefix: The prefix of what to search for
+            Valid options are user/music/challenge
+        count: The number search results to return.
+            Note: maximum is around 28 for this type of endpoint.
         """
         (
             region,
@@ -808,6 +880,27 @@ class TikTokApi:
     def by_hashtag(self, hashtag, count=30, offset=0, **kwargs) -> dict:
         """Returns a dictionary listing TikToks with a specific hashtag.
 
+        Parameters
+        ----------
+        x1, x2 : array_like
+            Input arrays,
+            description of `x1`, `x2`.
+
+            .. versionadded:: 1.5.0
+        x : { NoneType, 'B', 'C' }, optional
+        n : int or list of int
+            Description of num
+        *args, **kwargs
+            Passed on.
+        complex : Union[Set[pdoc.Doc, Function], pdoc]
+            The `List[Doc]`s of the new signal.
+
+        Returns
+        -------
+        output : pdoc.Doc
+            The output array
+        List[pdoc.Doc]
+            The output array
         :param hashtag: The hashtag to search by.
         :param count: The number of posts to return.
                       Note: seems to only support up to ~2,000
@@ -1593,3 +1686,39 @@ class TikTokApi:
     get_Video_By_DownloadURL = get_video_by_download_url
     get_Video_By_Url = get_video_by_url
     get_secUid = get_secuid
+    trending = by_trending
+
+# pdoc ignore old naming scheme
+__pdoc__ = {
+    'TikTokApi.getData': False,
+    'TikTokApi.getBytes': False,
+    'TikTokApi.userPosts': False,
+    'TikTokApi.byUsername': False,
+    'TikTokApi.userPage': False,
+    'TikTokApi.getUserPager': False,
+    'TikTokApi.userLiked': False,
+    'TikTokApi.userLikedbyUsername': False,
+    'TikTokApi.bySound': False,
+    'TikTokApi.getMusicObject': False,
+    'TikTokApi.getMusicObjectFull': False,
+    'TikTokApi.byHashtag': False,
+    'TikTokApi.getHashtagObject': False,
+    'TikTokApi.getRecommendedTikToksByVideoID': False,
+    'TikTokApi.getTikTokById': False,
+    'TikTokApi.getTikTokByUrl': False,
+    'TikTokApi.discoverHashtags': False,
+    'TikTokApi.discoverMusic': False,
+    'TikTokApi.getUserObject': False,
+    'TikTokApi.getUser': False,
+    'TikTokApi.getSuggestedUsersbyID': False,
+    'TikTokApi.getSuggestedUsersbyIDCrawler': False,
+    'TikTokApi.getSuggestedHashtagsbyID': False,
+    'TikTokApi.getSuggestedHashtagsbyIDCrawler': False,
+    'TikTokApi.getSuggestedMusicbyID': False,
+    'TikTokApi.getSuggestedMusicIDCrawler': False,
+    'TikTokApi.get_Video_By_TikTok': False,
+    'TikTokApi.get_Video_By_DownloadURL': False,
+    'TikTokApi.get_Video_By_Url': False,
+    'TikTokApi.get_secUid': False,
+    'TikTokApi.trending': False,
+}
