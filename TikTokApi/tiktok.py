@@ -71,7 +71,9 @@ class TikTokApi:
             self.width = self.browser.width
             self.height = self.browser.height
         except Exception as e:
-            logging.warning("An error ocurred while opening your browser but it was ignored.")
+            logging.warning(
+                "An error ocurred while opening your browser but it was ignored."
+            )
 
             self.timezone_name = ""
             self.browser_language = ""
@@ -119,7 +121,7 @@ class TikTokApi:
             parsed_data["referrer"],
         )
 
-    def getData(self, **kwargs) -> dict:
+    def get_data(self, **kwargs) -> dict:
         """Returns a dictionary of a response from TikTok.
 
         :param api_url: the base string without a signature
@@ -151,11 +153,10 @@ class TikTokApi:
             else:
                 verifyFp = "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"
         else:
-            verifyFp = kwargs.get('custom_verifyFp')
-
+            verifyFp = kwargs.get("custom_verifyFp")
 
         if self.signer_url is None:
-            kwargs['custom_verifyFp'] = verifyFp
+            kwargs["custom_verifyFp"] = verifyFp
             verify_fp, did, signature = self.browser.sign_url(**kwargs)
             userAgent = self.browser.userAgent
             referrer = self.browser.referrer
@@ -165,7 +166,6 @@ class TikTokApi:
                 custom_did=kwargs.get("custom_did"),
                 verifyFp=kwargs.get("custom_verifyFp", verifyFp),
             )
-
 
         query = {"verifyFp": verify_fp, "did": did, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
@@ -182,7 +182,7 @@ class TikTokApi:
                 "cache-control": "no-cache",
                 "dnt": "1",
                 "origin": referrer,
-                "pragma": 'no-cache',
+                "pragma": "no-cache",
                 "referer": referrer,
                 "sec-fetch-dest": "empty",
                 "sec-fetch-mode": "cors",
@@ -202,7 +202,9 @@ class TikTokApi:
                 raise TikTokCaptchaError()
             if json.get("statusCode", 200) == 10201:
                 # Invalid Entity
-                raise TikTokNotFoundError("TikTok returned a response indicating the entity is invalid")
+                raise TikTokNotFoundError(
+                    "TikTok returned a response indicating the entity is invalid"
+                )
             return r.json()
         except ValueError as e:
             text = r.text
@@ -217,14 +219,16 @@ class TikTokApi:
                 raise JSONDecodeFailure() from e
 
     def get_cookies(self, **kwargs):
-        did = kwargs.get("custom_did", ''.join(random.choice(string.digits) for num in range(19)))
+        did = kwargs.get(
+            "custom_did", "".join(random.choice(string.digits) for num in range(19))
+        )
         if kwargs.get("custom_verifyFp") == None:
             if self.custom_verifyFp != None:
                 verifyFp = self.custom_verifyFp
             else:
                 verifyFp = "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"
         else:
-            verifyFp = kwargs.get('custom_verifyFp')
+            verifyFp = kwargs.get("custom_verifyFp")
 
         if kwargs.get("force_verify_fp_on_cookie_header", False):
             return {
@@ -234,7 +238,7 @@ class TikTokApi:
                     random.choice(string.ascii_uppercase + string.ascii_lowercase)
                     for i in range(16)
                 ),
-                "s_v_web_id": verifyFp
+                "s_v_web_id": verifyFp,
             }
         else:
             return {
@@ -243,10 +247,10 @@ class TikTokApi:
                 "tt_csrf_token": "".join(
                     random.choice(string.ascii_uppercase + string.ascii_lowercase)
                     for i in range(16)
-                )
+                ),
             }
 
-    def getBytes(self, **kwargs) -> bytes:
+    def get_bytes(self, **kwargs) -> bytes:
         """Returns bytes of a response from TikTok.
 
         :param api_url: the base string without a signature
@@ -328,7 +332,6 @@ class TikTokApi:
                 "region": region,
                 "priority_region": region,
                 "language": language,
-                
             }
             api_url = "{}api/recommend/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
@@ -344,7 +347,7 @@ class TikTokApi:
             realCount = count - len(response)
 
             first = False
-        
+
         return response[:count]
 
     def search_for_users(self, search_term, count=28, **kwargs) -> list:
@@ -426,9 +429,7 @@ class TikTokApi:
 
         return response[:count]
 
-    def userPosts(
-        self, userID, secUID, count=30, cursor=0,  **kwargs
-    ) -> dict:
+    def user_posts(self, userID, secUID, count=30, cursor=0, **kwargs) -> dict:
         """Returns a dictionary listing TikToks given a user's ID and secUID
 
         :param userID: The userID of the user, which TikTok assigns.
@@ -486,13 +487,13 @@ class TikTokApi:
                 return response
 
             realCount = count - len(response)
-            cursor = res['cursor']
+            cursor = res["cursor"]
 
             first = False
 
         return response[:count]
 
-    def byUsername(self, username, count=30, **kwargs) -> dict:
+    def by_username(self, username, count=30, **kwargs) -> dict:
         """Returns a dictionary listing TikToks given a user's username.
 
         :param username: The username of the user.
@@ -520,9 +521,7 @@ class TikTokApi:
             **kwargs,
         )
 
-    def userPage(
-        self, userID, secUID, page_size=30, cursor=0, **kwargs
-    ) -> dict:
+    def user_page(self, userID, secUID, page_size=30, cursor=0, **kwargs) -> dict:
         """Returns a dictionary listing of one page of TikToks given a user's ID and secUID
 
         :param userID: The userID of the user, which TikTok assigns.
@@ -545,19 +544,22 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
 
-        api_url = BASE_URL + "api/post/item_list/?{}&count={}&id={}&type=1&secUid={}" "&cursor={}&sourceType=8&appId=1233&region={}&language={}".format(
-            self.__add_new_params__(),
-            page_size,
-            str(userID),
-            str(secUID),
-            cursor,
-            region,
-            language,
+        api_url = (
+            BASE_URL + "api/post/item_list/?{}&count={}&id={}&type=1&secUid={}"
+            "&cursor={}&sourceType=8&appId=1233&region={}&language={}".format(
+                self.__add_new_params__(),
+                page_size,
+                str(userID),
+                str(secUID),
+                cursor,
+                region,
+                language,
+            )
         )
 
         return self.getData(url=api_url, **kwargs)
 
-    def getUserPager(self, username, page_size=30, cursor=0, **kwargs):
+    def get_user_pager(self, username, page_size=30, cursor=0, **kwargs):
         """Returns a generator to page through a user's feed
 
         :param username: The username of the user.
@@ -602,9 +604,7 @@ class TikTokApi:
             if not resp["hasMore"]:
                 return  # all done
 
-    def userLiked(
-        self, userID, secUID, count=30, cursor=0, **kwargs
-    ) -> dict:
+    def user_liked(self, userID, secUID, count=30, cursor=0, **kwargs) -> dict:
         """Returns a dictionary listing TikToks that a given a user has liked.
            Note: The user's likes must be public
 
@@ -673,7 +673,7 @@ class TikTokApi:
 
         return response[:count]
 
-    def userLikedbyUsername(self, username, count=30, **kwargs) -> dict:
+    def user_liked_by_username(self, username, count=30, **kwargs) -> dict:
         """Returns a dictionary listing TikToks a user has liked by username.
            Note: The user's likes must be public
 
@@ -702,7 +702,7 @@ class TikTokApi:
             **kwargs,
         )
 
-    def bySound(self, id, count=30, offset=0, **kwargs) -> dict:
+    def by_sound(self, id, count=30, offset=0, **kwargs) -> dict:
         """Returns a dictionary listing TikToks with a specific sound.
 
         :param id: The sound id to search by.
@@ -745,12 +745,11 @@ class TikTokApi:
 
             res = self.getData(url=api_url, **kwargs)
 
-
             try:
                 for t in res["items"]:
                     response.append(t)
             except KeyError:
-                for t in res['itemList']:
+                for t in res["itemList"]:
                     response.append(t)
 
             if not res["hasMore"]:
@@ -762,7 +761,7 @@ class TikTokApi:
 
         return response[:count]
 
-    def getMusicObject(self, id, **kwargs) -> dict:
+    def get_music_object(self, id, **kwargs) -> dict:
         """Returns a music object for a specific sound id.
 
         :param id: The sound id to search by.
@@ -772,7 +771,7 @@ class TikTokApi:
         """
         return self.getMusicObjectFull(id, **kwargs)["music"]
 
-    def getMusicObjectFull(self, id, **kwargs):
+    def get_music_object_full(self, id, **kwargs):
         """Returns a music object for a specific sound id.
 
         :param id: The sound id to search by.
@@ -806,7 +805,7 @@ class TikTokApi:
         )[1].split("</script>")[0]
         return json.loads(j_raw)["props"]["pageProps"]["musicInfo"]
 
-    def byHashtag(self, hashtag, count=30, offset=0, **kwargs) -> dict:
+    def by_hashtag(self, hashtag, count=30, offset=0, **kwargs) -> dict:
         """Returns a dictionary listing TikToks with a specific hashtag.
 
         :param hashtag: The hashtag to search by.
@@ -858,7 +857,7 @@ class TikTokApi:
 
         return response[:required_count]
 
-    def getHashtagObject(self, hashtag, **kwargs) -> dict:
+    def get_hashtag_object(self, hashtag, **kwargs) -> dict:
         """Returns a hashtag object.
 
         :param hashtag: The hashtag to search by.
@@ -883,33 +882,7 @@ class TikTokApi:
             raise TikTokNotFoundError("Challenge {} does not exist".format(hashtag))
         return data
 
-    def getHashtagDetails(self, hashtag, **kwargs) -> dict:
-        """Returns a hashtag object.
-
-        :param hashtag: The hashtag to search by.
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
-        """
-        logging.warning(
-            "The getHashtagDetails will be deprecated in a future version. Replace it with getHashtagObject"
-        )
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            did,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_did"] = did
-        query = {"lang": language}
-        api_url = "{}node/share/tag/{}?{}&{}".format(
-            BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
-        )
-
-        return self.getData(url=api_url, **kwargs)
-
-    def getRecommendedTikToksByVideoID(
+    def get_recommended_tiktoks_by_video_id(
         self, id, count=30, minCursor=0, maxCursor=0, **kwargs
     ) -> dict:
         """Returns a dictionary listing reccomended TikToks for a specific TikTok video.
@@ -969,7 +942,7 @@ class TikTokApi:
 
         return response[:count]
 
-    def getTikTokById(self, id, **kwargs) -> dict:
+    def get_tiktok_by_id(self, id, **kwargs) -> dict:
         """Returns a dictionary of a specific TikTok.
 
         :param id: The id of the TikTok you want to get the object for.
@@ -996,7 +969,7 @@ class TikTokApi:
 
         return self.getData(url=api_url, **kwargs)
 
-    def getTikTokByUrl(self, url, **kwargs) -> dict:
+    def get_tiktok_by_url(self, url, **kwargs) -> dict:
         """Returns a dictionary of a TikTok object by url.
 
         :param url: The TikTok url you want to retrieve.
@@ -1048,7 +1021,7 @@ class TikTokApi:
             },
             proxies=self.__format_proxy(kwargs.get("proxy", None)),
             cookies=self.get_cookies(**kwargs),
-        )        
+        )
 
         t = r.text
         try:
@@ -1064,13 +1037,14 @@ class TikTokApi:
 
         data = json.loads(j_raw)["props"]["pageProps"]
 
-        if data['serverCode'] == 404:
-            raise TikTokNotFoundError("TikTok with that url doesn't exist".format(username))
+        if data["serverCode"] == 404:
+            raise TikTokNotFoundError(
+                "TikTok with that url doesn't exist".format(username)
+            )
 
         return data
-        
 
-    def discoverHashtags(self, **kwargs) -> dict:
+    def discover_hashtags(self, **kwargs) -> dict:
         """Discover page, consists challenges (hashtags)
 
         :param proxy: The IP address of a proxy server.
@@ -1090,7 +1064,7 @@ class TikTokApi:
 
         return self.getData(url=api_url, **kwargs)["body"][1]["exploreList"]
 
-    def discoverMusic(self, **kwargs) -> dict:
+    def discover_music(self, **kwargs) -> dict:
         """Discover page, consists of music
 
         :param proxy: The IP address of a proxy server.
@@ -1110,7 +1084,7 @@ class TikTokApi:
 
         return self.getData(url=api_url, **kwargs)["body"][2]["exploreList"]
 
-    def getUserObject(self, username, **kwargs) -> dict:
+    def get_user_object(self, username, **kwargs) -> dict:
         """Gets a user object (dictionary)
 
         :param username: The username of the user.
@@ -1128,7 +1102,7 @@ class TikTokApi:
         kwargs["custom_did"] = did
         return self.getUser(username, **kwargs)["userInfo"]["user"]
 
-    def getUser(self, username, **kwargs) -> dict:
+    def get_user(self, username, **kwargs) -> dict:
         """Gets the full exposed user object
 
         :param username: The username of the user.
@@ -1173,12 +1147,14 @@ class TikTokApi:
 
         user = json.loads(j_raw)["props"]["pageProps"]
 
-        if user['serverCode'] == 404:
-            raise TikTokNotFoundError("TikTok user with username {} does not exist".format(username))
+        if user["serverCode"] == 404:
+            raise TikTokNotFoundError(
+                "TikTok user with username {} does not exist".format(username)
+            )
 
         return user
 
-    def getSuggestedUsersbyID(
+    def get_suggested_users_by_id(
         self, userId="6745191554350760966", count=30, **kwargs
     ) -> list:
         """Returns suggested users given a different TikTok user.
@@ -1211,7 +1187,7 @@ class TikTokApi:
             res.append(x["cardItem"])
         return res[:count]
 
-    def getSuggestedUsersbyIDCrawler(
+    def get_suggested_users_by_id_crawler(
         self, count=30, startingId="6745191554350760966", **kwargs
     ) -> list:
         """Crawls for listing of all user objects it can find.
@@ -1243,7 +1219,7 @@ class TikTokApi:
 
         return users[:count]
 
-    def getSuggestedHashtagsbyID(
+    def get_suggested_hashtags_by_id(
         self, count=30, userId="6745191554350760966", **kwargs
     ) -> list:
         """Returns suggested hashtags given a TikTok user.
@@ -1276,7 +1252,7 @@ class TikTokApi:
             res.append(x["cardItem"])
         return res[:count]
 
-    def getSuggestedHashtagsbyIDCrawler(
+    def get_suggested_hashtags_by_id_crawler(
         self, count=30, startingId="6745191554350760966", **kwargs
     ) -> list:
         """Crawls for as many hashtags as it can find.
@@ -1309,7 +1285,7 @@ class TikTokApi:
 
         return hashtags[:count]
 
-    def getSuggestedMusicbyID(
+    def get_suggested_music_by_id(
         self, count=30, userId="6745191554350760966", **kwargs
     ) -> list:
         """Returns suggested music given a TikTok user.
@@ -1342,7 +1318,7 @@ class TikTokApi:
             res.append(x["cardItem"])
         return res[:count]
 
-    def getSuggestedMusicIDCrawler(
+    def get_suggested_music_id_crawler(
         self, count=30, startingId="6745191554350760966", **kwargs
     ) -> list:
         """Crawls for hashtags.
@@ -1375,7 +1351,7 @@ class TikTokApi:
 
         return musics[:count]
 
-    def get_Video_By_TikTok(self, data, **kwargs) -> bytes:
+    def get_video_by_tiktok(self, data, **kwargs) -> bytes:
         """Downloads video from TikTok using a TikTok object
 
         :param data: A TikTok object
@@ -1398,7 +1374,7 @@ class TikTokApi:
                 api_url = data["itemInfo"]["itemStruct"]["video"]["playAddr"]
         return self.get_Video_By_DownloadURL(api_url, **kwargs)
 
-    def get_Video_By_DownloadURL(self, download_url, **kwargs) -> bytes:
+    def get_video_by_download_url(self, download_url, **kwargs) -> bytes:
         """Downloads video from TikTok using download url in a TikTok object
 
         :param download_url: The download url key value in a TikTok object.
@@ -1414,7 +1390,7 @@ class TikTokApi:
         kwargs["custom_did"] = did
         return self.getBytes(url=download_url, **kwargs)
 
-    def get_Video_By_Url(self, video_url, **kwargs) -> bytes:
+    def get_video_by_url(self, video_url, **kwargs) -> bytes:
         (
             region,
             language,
@@ -1449,9 +1425,9 @@ class TikTokApi:
 
         # Thanks to @HasibulKabir for pointing this out on #448
         cleanVideo = (
-                "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id={}&line=0&ratio=default"
-                "&media_type=4&vr_type=0"
-        ).format(tiktok_html['itemInfo']['itemStruct']['video']['id'])
+            "https://api2-16-h2.musical.ly/aweme/v1/play/?video_id={}&line=0&ratio=default"
+            "&media_type=4&vr_type=0"
+        ).format(tiktok_html["itemInfo"]["itemStruct"]["video"]["id"])
 
         if return_bytes == 0:
             return cleanVideo
@@ -1466,7 +1442,7 @@ class TikTokApi:
             proxies=self.__format_proxy(proxy),
         )
 
-        if r.text[0] == '{':
+        if r.text[0] == "{":
             raise TikTokCaptchaError()
 
         return r.content
@@ -1493,10 +1469,10 @@ class TikTokApi:
         music_object = json.loads(j_raw)["props"]["pageProps"]["musicInfo"]
         if not music_object.get("title", None):
             raise TikTokNotFoundError("Song of {} id does not exist".format(str(id)))
-        
+
         return music_object["title"]
 
-    def get_secUid(self, username, **kwargs):
+    def get_secuid(self, username, **kwargs):
         r = requests.get(
             "https://tiktok.com/@{}?lang=en".format(quote(username)),
             headers={
@@ -1578,6 +1554,42 @@ class TikTokApi:
         language = kwargs.get("language", "en")
         proxy = kwargs.get("proxy", None)
         maxCount = kwargs.get("maxCount", 35)
-        did = kwargs.get("custom_did", ''.join(random.choice(string.digits) for num in range(19)))
+        did = kwargs.get(
+            "custom_did", "".join(random.choice(string.digits) for num in range(19))
+        )
 
         return region, language, proxy, maxCount, did
+
+    #
+    # Backwards compatibility of the naming scheme
+    #
+    getData = get_data
+    getBytes = get_bytes
+    userPosts = user_posts
+    byUsername = by_username
+    userPage = user_page
+    getUserPager = get_user_pager
+    userLiked = user_liked
+    userLikedbyUsername = user_liked_by_username
+    bySound = by_sound
+    getMusicObject = get_music_object
+    getMusicObjectFull = get_music_object_full
+    byHashtag = by_hashtag
+    getHashtagObject = get_hashtag_object
+    getRecommendedTikToksByVideoID = get_recommended_tiktoks_by_video_id
+    getTikTokById = get_tiktok_by_id
+    getTikTokByUrl = get_tiktok_by_url
+    discoverHashtags = discover_hashtags
+    discoverMusic = discover_music
+    getUserObject = get_user_object
+    getUser = get_user
+    getSuggestedUsersbyID = get_suggested_users_by_id
+    getSuggestedUsersbyIDCrawler = get_suggested_users_by_id_crawler
+    getSuggestedHashtagsbyID = get_suggested_hashtags_by_id
+    getSuggestedHashtagsbyIDCrawler = get_suggested_hashtags_by_id_crawler
+    getSuggestedMusicbyID = get_suggested_music_by_id
+    getSuggestedMusicIDCrawler = get_suggested_music_id_crawler
+    get_Video_By_TikTok = get_video_by_tiktok
+    get_Video_By_DownloadURL = get_video_by_download_url
+    get_Video_By_Url = get_video_by_url
+    get_secUid = get_secuid
