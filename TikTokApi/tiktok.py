@@ -1,5 +1,3 @@
-
-
 import random
 import requests
 import time
@@ -14,7 +12,6 @@ from .utilities import update_messager
 from .exceptions import *
 
 
-
 os.environ["no_proxy"] = "127.0.0.1,localhost"
 
 BASE_URL = "https://m.tiktok.com/"
@@ -22,11 +19,9 @@ BASE_URL = "https://m.tiktok.com/"
 
 class TikTokApi:
     __instance = None
-    
 
     def __init__(self, **kwargs):
-        """The TikTokApi class. Used to interact with TikTok, use get_instance NOT this.
-        """
+        """The TikTokApi class. Used to interact with TikTok, use get_instance NOT this."""
         # Forces Singleton
         if TikTokApi.__instance is None:
             TikTokApi.__instance = self
@@ -88,7 +83,7 @@ class TikTokApi:
 
     @staticmethod
     def get_instance(**kwargs):
-        """The TikTokApi class. Used to interact with TikTok. This is a singleton 
+        """The TikTokApi class. Used to interact with TikTok. This is a singleton
             class to prevent issues from arising with playwright
 
         Parameters
@@ -120,16 +115,16 @@ class TikTokApi:
             work here which is helpful.
         proxy: A string containing your proxy address, optional
             If you want to do a lot of scraping of TikTok endpoints you'll likely
-            need a proxy. 
-            
+            need a proxy.
+
             Ex: "https://0.0.0.0:8080"
 
             All the methods take this as a optional parameter, however it's cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
         use_selenium: Option to use selenium over playwright, optional
-            Playwright is selected by default and is the one that I'm designing the 
-            package to be compatable for, however if playwright doesn't work on 
+            Playwright is selected by default and is the one that I'm designing the
+            package to be compatable for, however if playwright doesn't work on
             your machine feel free to set this to True.
         executablePath: The location of the driver, optional
             This shouldn't be needed if you're using playwright
@@ -360,7 +355,7 @@ class TikTokApi:
         ----------
         count: The amount of TikToks you want returned, optional
             Note: TikTok seems to only support at MOST ~2000 TikToks
-            from a single endpoint. 
+            from a single endpoint.
         """
         (
             region,
@@ -507,10 +502,10 @@ class TikTokApi:
         Parameters
         ----------
         userID: The userID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         secUID: The secUID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         count: The number of posts to return
             Note: seems to only support up to ~2,000
@@ -599,10 +594,10 @@ class TikTokApi:
         Parameters
         ----------
         userID: The userID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         secUID: The secUID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         page_size: The number of posts to return per page
             Gets a specific page of a user, doesn't iterate.
@@ -831,7 +826,7 @@ class TikTokApi:
         Parameters
         ----------
         id: The sound id to get the object for
-            This can be found by using other methods. 
+            This can be found by using other methods.
         """
         return self.getMusicObjectFull(id, **kwargs)["music"]
 
@@ -1041,7 +1036,7 @@ class TikTokApi:
         ----------
         url: The TikTok url you want to retrieve
             This currently doesn't support the shortened TikTok
-            url links. 
+            url links.
         """
         (
             region,
@@ -1118,8 +1113,7 @@ class TikTokApi:
         return data
 
     def discover_hashtags(self, **kwargs) -> dict:
-        """Discover page, consists challenges (hashtags)
-        """
+        """Discover page, consists challenges (hashtags)"""
         (
             region,
             language,
@@ -1136,8 +1130,7 @@ class TikTokApi:
         return self.getData(url=api_url, **kwargs)["body"][1]["exploreList"]
 
     def discover_music(self, **kwargs) -> dict:
-        """Discover page, consists of music
-        """
+        """Discover page, consists of music"""
         (
             region,
             language,
@@ -1693,37 +1686,38 @@ class TikTokApi:
     get_secUid = get_secuid
     trending = by_trending
 
+
 # pdoc ignore old naming scheme
 __pdoc__ = {
-    'TikTokApi.getData': False,
-    'TikTokApi.getBytes': False,
-    'TikTokApi.userPosts': False,
-    'TikTokApi.byUsername': False,
-    'TikTokApi.userPage': False,
-    'TikTokApi.getUserPager': False,
-    'TikTokApi.userLiked': False,
-    'TikTokApi.userLikedbyUsername': False,
-    'TikTokApi.bySound': False,
-    'TikTokApi.getMusicObject': False,
-    'TikTokApi.getMusicObjectFull': False,
-    'TikTokApi.byHashtag': False,
-    'TikTokApi.getHashtagObject': False,
-    'TikTokApi.getRecommendedTikToksByVideoID': False,
-    'TikTokApi.getTikTokById': False,
-    'TikTokApi.getTikTokByUrl': False,
-    'TikTokApi.discoverHashtags': False,
-    'TikTokApi.discoverMusic': False,
-    'TikTokApi.getUserObject': False,
-    'TikTokApi.getUser': False,
-    'TikTokApi.getSuggestedUsersbyID': False,
-    'TikTokApi.getSuggestedUsersbyIDCrawler': False,
-    'TikTokApi.getSuggestedHashtagsbyID': False,
-    'TikTokApi.getSuggestedHashtagsbyIDCrawler': False,
-    'TikTokApi.getSuggestedMusicbyID': False,
-    'TikTokApi.getSuggestedMusicIDCrawler': False,
-    'TikTokApi.get_Video_By_TikTok': False,
-    'TikTokApi.get_Video_By_DownloadURL': False,
-    'TikTokApi.get_Video_By_Url': False,
-    'TikTokApi.get_secUid': False,
-    'TikTokApi.trending': False,
+    "TikTokApi.getData": False,
+    "TikTokApi.getBytes": False,
+    "TikTokApi.userPosts": False,
+    "TikTokApi.byUsername": False,
+    "TikTokApi.userPage": False,
+    "TikTokApi.getUserPager": False,
+    "TikTokApi.userLiked": False,
+    "TikTokApi.userLikedbyUsername": False,
+    "TikTokApi.bySound": False,
+    "TikTokApi.getMusicObject": False,
+    "TikTokApi.getMusicObjectFull": False,
+    "TikTokApi.byHashtag": False,
+    "TikTokApi.getHashtagObject": False,
+    "TikTokApi.getRecommendedTikToksByVideoID": False,
+    "TikTokApi.getTikTokById": False,
+    "TikTokApi.getTikTokByUrl": False,
+    "TikTokApi.discoverHashtags": False,
+    "TikTokApi.discoverMusic": False,
+    "TikTokApi.getUserObject": False,
+    "TikTokApi.getUser": False,
+    "TikTokApi.getSuggestedUsersbyID": False,
+    "TikTokApi.getSuggestedUsersbyIDCrawler": False,
+    "TikTokApi.getSuggestedHashtagsbyID": False,
+    "TikTokApi.getSuggestedHashtagsbyIDCrawler": False,
+    "TikTokApi.getSuggestedMusicbyID": False,
+    "TikTokApi.getSuggestedMusicIDCrawler": False,
+    "TikTokApi.get_Video_By_TikTok": False,
+    "TikTokApi.get_Video_By_DownloadURL": False,
+    "TikTokApi.get_Video_By_Url": False,
+    "TikTokApi.get_secUid": False,
+    "TikTokApi.trending": False,
 }
