@@ -87,7 +87,7 @@ python -m examples.getTrending
 
 ## Documentation
 
-You can find the documentation [here](https://davidteather.github.io/TikTok-Api/docs/tiktok.html), I will be making this documentation more complete overtime as it's not super great right now, but better than just having it in the readme!
+You can find the documentation [here](https://davidteather.github.io/TikTok-Api/docs/tiktok), I will be making this documentation more complete overtime as it's not super great right now, but better than just having it in the readme!
 
 ## Built With
 
