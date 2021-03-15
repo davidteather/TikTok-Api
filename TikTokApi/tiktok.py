@@ -416,7 +416,7 @@ class TikTokApi:
         ----------
         search_term: The string to search for users by
             This string is the term you want to search for users by.
-        count: The number of users to return.
+        count: The number of users to return
             Note: maximum is around 28 for this type of endpoint.
         """
         return self.discover_type(search_term, prefix="user", count=count, **kwargs)
@@ -428,7 +428,7 @@ class TikTokApi:
         ----------
         search_term: The string to search for music by
             This string is the term you want to search for music by.
-        count: The number of music to return.
+        count: The number of music to return
             Note: maximum is around 28 for this type of endpoint.
         """
         return self.discover_type(search_term, prefix="music", count=count, **kwargs)
@@ -440,7 +440,7 @@ class TikTokApi:
         ----------
         search_term: The string to search for music by
             This string is the term you want to search for music by.
-        count: The number of music to return.
+        count: The number of music to return
             Note: maximum is around 28 for this type of endpoint.
         """
         return self.discover_type(
@@ -456,7 +456,7 @@ class TikTokApi:
             This string is the term you want to search by.
         prefix: The prefix of what to search for
             Valid options are user/music/challenge
-        count: The number search results to return.
+        count: The number search results to return
             Note: maximum is around 28 for this type of endpoint.
         """
         (
@@ -502,17 +502,18 @@ class TikTokApi:
         return response[:count]
 
     def user_posts(self, userID, secUID, count=30, cursor=0, **kwargs) -> dict:
-        """Returns a dictionary listing TikToks given a user's ID and secUID
+        """Returns an array of dictionaries representing TikToks for a user.
 
-        :param userID: The userID of the user, which TikTok assigns.
-        :param secUID: The secUID of the user, which TikTok assigns.
-        :param count: The number of posts to return.
-                      Note: seems to only support up to ~2,000
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param region: The 2 letter region code.
-                       Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        userID: The userID of the user, which TikTok assigns
+            You can find this from utilizing other methods or 
+            just use by_username to find it.
+        secUID: The secUID of the user, which TikTok assigns
+            You can find this from utilizing other methods or 
+            just use by_username to find it.
+        count: The number of posts to return
+            Note: seems to only support up to ~2,000
         """
         (
             region,
@@ -568,14 +569,13 @@ class TikTokApi:
     def by_username(self, username, count=30, **kwargs) -> dict:
         """Returns a dictionary listing TikToks given a user's username.
 
-        :param username: The username of the user.
-        :param count: The number of posts to return.
-                      Note: seems to only support up to ~2,000
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param region: The 2 letter region code.
-                       Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        username: The username of the TikTok user
+            This is just the username of the user you want to
+            get videos from.
+        count: The number of posts to return
+            Note: seems to only support up to ~2,000
         """
         (
             region,
@@ -596,16 +596,18 @@ class TikTokApi:
     def user_page(self, userID, secUID, page_size=30, cursor=0, **kwargs) -> dict:
         """Returns a dictionary listing of one page of TikToks given a user's ID and secUID
 
-        :param userID: The userID of the user, which TikTok assigns.
-        :param secUID: The secUID of the user, which TikTok assigns.
-        :param page_size: The number of posts to return per page.
-        :param minCursor: time stamp for the earliest TikTok to retrieve
-        :param maxCursor: time stamp for the latest TikTok to retrieve
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param region: The 2 letter region code.
-                       Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        userID: The userID of the user, which TikTok assigns
+            You can find this from utilizing other methods or 
+            just use by_username to find it.
+        secUID: The secUID of the user, which TikTok assigns
+            You can find this from utilizing other methods or 
+            just use by_username to find it.
+        page_size: The number of posts to return per page
+            Gets a specific page of a user, doesn't iterate.
+        cursor: The offset of a page
+            The offset to return new videos from
         """
         (
             region,
@@ -634,15 +636,12 @@ class TikTokApi:
     def get_user_pager(self, username, page_size=30, cursor=0, **kwargs):
         """Returns a generator to page through a user's feed
 
-        :param username: The username of the user.
-        :param page_size: The number of posts to return in a page.
-        :param minCursor: time stamp for the earliest TikTok to retrieve
-        :param maxCursor: time stamp for the latest TikTok to retrieve
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param region: The 2 letter region code.
-                       Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        username: The username of the user
+        page_size: The number of posts to return in a page
+        cursor: The offset of a page
+            The offset to return new videos from
         """
         (
             region,
@@ -680,15 +679,14 @@ class TikTokApi:
         """Returns a dictionary listing TikToks that a given a user has liked.
            Note: The user's likes must be public
 
-        :param userID: The userID of the user, which TikTok assigns.
-        :param secUID: The secUID of the user, which TikTok assigns.
-        :param count: The number of posts to return.
+        Parameters
+        ----------
+        userID: The userID of the user, which TikTok assigns
+        secUID: The secUID of the user, which TikTok assigns
+        count: The number of posts to return
                       Note: seems to only support up to ~2,000
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param region: The 2 letter region code.
-                       Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+        cursor: The offset of a page
+            The offset to return new videos from
         """
         (
             region,
@@ -749,14 +747,11 @@ class TikTokApi:
         """Returns a dictionary listing TikToks a user has liked by username.
            Note: The user's likes must be public
 
-        :param username: The username of the user.
-        :param count: The number of posts to return.
-                      Note: seems to only support up to ~2,000
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param region: The 2 letter region code.
-                       Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        username: The username of the user
+        count: The number of posts to return
+            Note: seems to only support up to ~2,000
         """
         (
             region,
@@ -777,15 +772,12 @@ class TikTokApi:
     def by_sound(self, id, count=30, offset=0, **kwargs) -> dict:
         """Returns a dictionary listing TikToks with a specific sound.
 
-        :param id: The sound id to search by.
-                   Note: Can be found in the URL of the sound specific page or with other methods.
-        :param count: The number of posts to return.
-                      Note: seems to only support up to ~2,000
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param region: The 2 letter region code.
-                       Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        id: The sound id to search by
+            Note: Can be found in the URL of the sound specific page or with other methods.
+        count: The number of posts to return
+            Note: seems to only support up to ~2,000
         """
         (
             region,
@@ -836,20 +828,20 @@ class TikTokApi:
     def get_music_object(self, id, **kwargs) -> dict:
         """Returns a music object for a specific sound id.
 
-        :param id: The sound id to search by.
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        id: The sound id to get the object for
+            This can be found by using other methods. 
         """
         return self.getMusicObjectFull(id, **kwargs)["music"]
 
     def get_music_object_full(self, id, **kwargs):
         """Returns a music object for a specific sound id.
 
-        :param id: The sound id to search by.
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        id: The sound id to get the object for
+            This can be found by using other methods.
         """
         (
             region,
@@ -882,33 +874,12 @@ class TikTokApi:
 
         Parameters
         ----------
-        x1, x2 : array_like
-            Input arrays,
-            description of `x1`, `x2`.
+        hashtag: The hashtag to search by
+            Without the # symbol
 
-            .. versionadded:: 1.5.0
-        x : { NoneType, 'B', 'C' }, optional
-        n : int or list of int
-            Description of num
-        *args, **kwargs
-            Passed on.
-        complex : Union[Set[pdoc.Doc, Function], pdoc]
-            The `List[Doc]`s of the new signal.
-
-        Returns
-        -------
-        output : pdoc.Doc
-            The output array
-        List[pdoc.Doc]
-            The output array
-        :param hashtag: The hashtag to search by.
-        :param count: The number of posts to return.
-                      Note: seems to only support up to ~2,000
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param region: The 2 letter region code.
-                       Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+            A valid string is "funny"
+        count: The number of posts to return
+            Note: seems to only support up to ~2,000
         """
         (
             region,
@@ -953,10 +924,10 @@ class TikTokApi:
     def get_hashtag_object(self, hashtag, **kwargs) -> dict:
         """Returns a hashtag object.
 
-        :param hashtag: The hashtag to search by.
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        hashtag: The hashtag to search by
+            Without the # symbol
         """
         (
             region,
@@ -980,10 +951,11 @@ class TikTokApi:
     ) -> dict:
         """Returns a dictionary listing reccomended TikToks for a specific TikTok video.
 
-        :param id: The id of the video to get suggestions for.
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+
+        Parameters
+        ----------
+        id: The id of the video to get suggestions for
+            Can be found using other methods
         """
         (
             region,
@@ -1038,10 +1010,9 @@ class TikTokApi:
     def get_tiktok_by_id(self, id, **kwargs) -> dict:
         """Returns a dictionary of a specific TikTok.
 
-        :param id: The id of the TikTok you want to get the object for.
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        id: The id of the TikTok you want to get the object for
         """
         (
             region,
@@ -1065,10 +1036,12 @@ class TikTokApi:
     def get_tiktok_by_url(self, url, **kwargs) -> dict:
         """Returns a dictionary of a TikTok object by url.
 
-        :param url: The TikTok url you want to retrieve.
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+
+        Parameters
+        ----------
+        url: The TikTok url you want to retrieve
+            This currently doesn't support the shortened TikTok
+            url links. 
         """
         (
             region,
@@ -1093,6 +1066,13 @@ class TikTokApi:
         )
 
     def get_tiktok_by_html(self, url, **kwargs) -> dict:
+        """This method retrieves a TikTok using the html
+        endpoints rather than the API based ones.
+
+        Parameters
+        ----------
+        url: The url of the TikTok to get
+        """
         (
             region,
             language,
@@ -1139,8 +1119,6 @@ class TikTokApi:
 
     def discover_hashtags(self, **kwargs) -> dict:
         """Discover page, consists challenges (hashtags)
-
-        :param proxy: The IP address of a proxy server.
         """
         (
             region,
@@ -1159,8 +1137,6 @@ class TikTokApi:
 
     def discover_music(self, **kwargs) -> dict:
         """Discover page, consists of music
-
-        :param proxy: The IP address of a proxy server.
         """
         (
             region,
@@ -1180,10 +1156,9 @@ class TikTokApi:
     def get_user_object(self, username, **kwargs) -> dict:
         """Gets a user object (dictionary)
 
-        :param username: The username of the user.
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        username: The username of the user
         """
         (
             region,
@@ -1198,10 +1173,9 @@ class TikTokApi:
     def get_user(self, username, **kwargs) -> dict:
         """Gets the full exposed user object
 
-        :param username: The username of the user.
-        :param language: The 2 letter code of the language to return.
-                         Note: Doesn't seem to have an affect.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        username: The username of the user
         """
         (
             region,
@@ -1252,9 +1226,10 @@ class TikTokApi:
     ) -> list:
         """Returns suggested users given a different TikTok user.
 
-        :param userId: The id of the user to get suggestions for.
-        :param count: The amount of users to return.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        userId: The id of the user to get suggestions for
+        count: The amount of users to return, optional
         """
         (
             region,
@@ -1285,10 +1260,12 @@ class TikTokApi:
     ) -> list:
         """Crawls for listing of all user objects it can find.
 
-        :param count: The amount of users to crawl for.
-        :param startingId: The ID of a TikTok user to start at.
-        :param language: The language parameter.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        count: The amount of users to crawl for
+        startingId: The ID of a TikTok user to start at, optional
+            Optional but uses a static one to start, so you may get more
+            unique results with setting your own.
         """
         (
             region,
@@ -1317,9 +1294,9 @@ class TikTokApi:
     ) -> list:
         """Returns suggested hashtags given a TikTok user.
 
-        :param userId: The id of the user to get suggestions for.
-        :param count: The amount of users to return.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        userId: The id of the user to get suggestions for
         """
         (
             region,
@@ -1350,10 +1327,10 @@ class TikTokApi:
     ) -> list:
         """Crawls for as many hashtags as it can find.
 
-        :param count: The amount of users to crawl for.
-        :param startingId: The ID of a TikTok user to start at.
-        :param language: The language parameter.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        count: The amount of users to crawl for
+        startingId: The ID of a TikTok user to start at
         """
         (
             region,
@@ -1383,9 +1360,11 @@ class TikTokApi:
     ) -> list:
         """Returns suggested music given a TikTok user.
 
-        :param userId: The id of the user to get suggestions for.
-        :param count: The amount of users to return.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        userId: The id of the user to get suggestions for
+        count: The amount of users to return
+        proxy: The IP address of a proxy to make requests from
         """
         (
             region,
@@ -1416,10 +1395,10 @@ class TikTokApi:
     ) -> list:
         """Crawls for hashtags.
 
-        :param count: The amount of users to crawl for.
-        :param startingId: The ID of a TikTok user to start at.
-        :param language: The language parameter.
-        :param proxy: The IP address of a proxy to make requests from.
+        Parameters
+        ----------
+        count: The amount of users to crawl for
+        startingId: The ID of a TikTok user to start at
         """
         (
             region,
@@ -1447,8 +1426,10 @@ class TikTokApi:
     def get_video_by_tiktok(self, data, **kwargs) -> bytes:
         """Downloads video from TikTok using a TikTok object
 
-        :param data: A TikTok object
-        :param proxy: The IP address of your proxy.
+        Parameters
+        ----------
+        data: A TikTok object
+            A TikTok JSON object from any other method.
         """
         (
             region,
@@ -1470,8 +1451,9 @@ class TikTokApi:
     def get_video_by_download_url(self, download_url, **kwargs) -> bytes:
         """Downloads video from TikTok using download url in a TikTok object
 
-        :param download_url: The download url key value in a TikTok object.
-        :param proxy: The IP for your proxy.
+        Parameters
+        ----------
+        download_url: The download url key value in a TikTok object
         """
         (
             region,
@@ -1484,6 +1466,12 @@ class TikTokApi:
         return self.getBytes(url=download_url, **kwargs)
 
     def get_video_by_url(self, video_url, **kwargs) -> bytes:
+        """Downloads a TikTok video by a URL
+
+        Parameters
+        ----------
+        video_url: The TikTok url to download the video from
+        """
         (
             region,
             language,
@@ -1500,10 +1488,14 @@ class TikTokApi:
 
     def get_video_no_watermark(self, video_url, return_bytes=1, **kwargs) -> bytes:
         """Gets the video with no watermark
+        .. deprecated::
 
-        :param video_url: The url of the video you want to download
-        :param return_bytes: Set this to 0 if you want url, 1 if you want bytes.
-        :param proxy: The IP address of your proxy.
+        Deprecated due to TikTok fixing this
+
+        Parameters
+        ----------
+        video_url: The url of the video you want to download
+        return_bytes: Set this to 0 if you want url, 1 if you want bytes
         """
         (
             region,
@@ -1512,6 +1504,7 @@ class TikTokApi:
             maxCount,
             did,
         ) = self.__process_kwargs__(kwargs)
+        raise Exception("Deprecated method, TikTok fixed this.")
         kwargs["custom_did"] = did
 
         tiktok_html = self.get_tiktok_by_html(video_url)
@@ -1541,6 +1534,12 @@ class TikTokApi:
         return r.content
 
     def get_music_title(self, id, **kwargs):
+        """Retrieves a music title given an ID
+
+        Parameters
+        ----------
+        id: The music id to get the title for
+        """
         r = requests.get(
             "https://www.tiktok.com/music/-{}".format(id),
             headers={
@@ -1566,6 +1565,12 @@ class TikTokApi:
         return music_object["title"]
 
     def get_secuid(self, username, **kwargs):
+        """Gets the secUid for a specific username
+
+        Parameters
+        ----------
+        username: The username to get the secUid for
+        """
         r = requests.get(
             "https://tiktok.com/@{}?lang=en".format(quote(username)),
             headers={
