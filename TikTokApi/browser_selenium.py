@@ -11,6 +11,7 @@ from selenium_stealth import stealth
 from selenium import webdriver
 from .get_acrawler import get_acrawler
 
+
 class browser:
     def __init__(
         self,
@@ -33,8 +34,8 @@ class browser:
             self.args = args
 
         options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        options.add_argument('log-level=2')
+        options.add_argument("--headless")
+        options.add_argument("log-level=2")
         self.options = {
             "headless": True,
             "handleSIGINT": True,
@@ -54,22 +55,25 @@ class browser:
             else:
                 self.options["proxy"] = {"server": self.proxy}
 
-        #self.options.update(options)
+        # self.options.update(options)
 
         if self.executablePath is not None:
             self.options["executablePath"] = self.executablePath
 
         try:
-            self.browser = webdriver.Chrome(executable_path=self.executablePath, chrome_options=options)
+            self.browser = webdriver.Chrome(
+                executable_path=self.executablePath, chrome_options=options
+            )
         except Exception as e:
             raise e
 
         # Page avoidance
         self.setup_browser()
-        #page.close()
+        # page.close()
 
     def setup_browser(self):
-        stealth(self.browser,
+        stealth(
+            self.browser,
             languages=["en-US", "en"],
             vendor="Google Inc.",
             platform="Win32",
@@ -155,7 +159,6 @@ class browser:
         else:
             did = self.did
 
-        
         return (
             verifyFp,
             did,

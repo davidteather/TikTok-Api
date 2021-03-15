@@ -1,0 +1,1188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>TikTokApi.stealth API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>TikTokApi.stealth</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import re
+
+
+def chrome_runtime(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    window.chrome = {
+        runtime: {}
+    }
+}
+&#34;&#34;&#34;
+    )
+
+
+def console_debug(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    window.console.debug = () =&gt; {
+        return null
+    }
+}
+&#34;&#34;&#34;
+    )
+
+
+def iframe_content_window(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+  try {
+    // Adds a contentWindow proxy to the provided iframe element
+    const addContentWindowProxy = iframe =&gt; {
+      const contentWindowProxy = {
+        get(target, key) {
+          // Now to the interesting part:
+          // We actually make this thing behave like a regular iframe window,
+          // by intercepting calls to e.g. `.self` and redirect it to the correct thing. :)
+          // That makes it possible for these assertions to be correct:
+          // iframe.contentWindow.self === window.top // must be false
+          if (key === &#39;self&#39;) {
+            return this
+          }
+          // iframe.contentWindow.frameElement === iframe // must be true
+          if (key === &#39;frameElement&#39;) {
+            return iframe
+          }
+          return Reflect.get(target, key)
+        }
+      }
+      if (!iframe.contentWindow) {
+        const proxy = new Proxy(window, contentWindowProxy)
+        Object.defineProperty(iframe, &#39;contentWindow&#39;, {
+          get() {
+            return proxy
+          },
+          set(newValue) {
+            return newValue // contentWindow is immutable
+          },
+          enumerable: true,
+          configurable: false
+        })
+      }
+    }
+    // Handles iframe element creation, augments `srcdoc` property so we can intercept further
+    const handleIframeCreation = (target, thisArg, args) =&gt; {
+      const iframe = target.apply(thisArg, args)
+      // We need to keep the originals around
+      const _iframe = iframe
+      const _srcdoc = _iframe.srcdoc
+      // Add hook for the srcdoc property
+      // We need to be very surgical here to not break other iframes by accident
+      Object.defineProperty(iframe, &#39;srcdoc&#39;, {
+        configurable: true, // Important, so we can reset this later
+        get: function() {
+          return _iframe.srcdoc
+        },
+        set: function(newValue) {
+          addContentWindowProxy(this)
+          // Reset property, the hook is only needed once
+          Object.defineProperty(iframe, &#39;srcdoc&#39;, {
+            configurable: false,
+            writable: false,
+            value: _srcdoc
+          })
+          _iframe.srcdoc = newValue
+        }
+      })
+      return iframe
+    }
+    // Adds a hook to intercept iframe creation events
+    const addIframeCreationSniffer = () =&gt; {
+      /* global document */
+      const createElement = {
+        // Make toString() native
+        get(target, key) {
+          return Reflect.get(target, key)
+        },
+        apply: function(target, thisArg, args) {
+          const isIframe =
+            args &amp;&amp; args.length &amp;&amp; `${args[0]}`.toLowerCase() === &#39;iframe&#39;
+          if (!isIframe) {
+            // Everything as usual
+            return target.apply(thisArg, args)
+          } else {
+            return handleIframeCreation(target, thisArg, args)
+          }
+        }
+      }
+      // All this just due to iframes with srcdoc bug
+      document.createElement = new Proxy(
+        document.createElement,
+        createElement
+      )
+    }
+    // Let&#39;s go
+    addIframeCreationSniffer()
+  } catch (err) {
+    // console.warn(err)
+  }
+}
+&#34;&#34;&#34;
+    )
+
+
+def media_codecs(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+    () =&gt; {
+  try {
+    /**
+     * Input might look funky, we need to normalize it so e.g. whitespace isn&#39;t an issue for our spoofing.
+     *
+     * @example
+     * video/webm; codecs=&#34;vp8, vorbis&#34;
+     * video/mp4; codecs=&#34;avc1.42E01E&#34;
+     * audio/x-m4a;
+     * audio/ogg; codecs=&#34;vorbis&#34;
+     * @param {String} arg
+     */
+    const parseInput = arg =&gt; {
+      const [mime, codecStr] = arg.trim().split(&#39;;&#39;)
+      let codecs = []
+      if (codecStr &amp;&amp; codecStr.includes(&#39;codecs=&#34;&#39;)) {
+        codecs = codecStr
+          .trim()
+          .replace(`codecs=&#34;`, &#39;&#39;)
+          .replace(`&#34;`, &#39;&#39;)
+          .trim()
+          .split(&#39;,&#39;)
+          .filter(x =&gt; !!x)
+          .map(x =&gt; x.trim())
+      }
+      return { mime, codecStr, codecs }
+    }
+    /* global HTMLMediaElement */
+    const canPlayType = {
+      // Make toString() native
+      get(target, key) {
+        // Mitigate Chromium bug (#130)
+        if (typeof target[key] === &#39;function&#39;) {
+          return target[key].bind(target)
+        }
+        return Reflect.get(target, key)
+      },
+      // Intercept certain requests
+      apply: function(target, ctx, args) {
+        if (!args || !args.length) {
+          return target.apply(ctx, args)
+        }
+        const { mime, codecs } = parseInput(args[0])
+        // This specific mp4 codec is missing in Chromium
+        if (mime === &#39;video/mp4&#39;) {
+          if (codecs.includes(&#39;avc1.42E01E&#39;)) {
+            return &#39;probably&#39;
+          }
+        }
+        // This mimetype is only supported if no codecs are specified
+        if (mime === &#39;audio/x-m4a&#39; &amp;&amp; !codecs.length) {
+          return &#39;maybe&#39;
+        }
+        // This mimetype is only supported if no codecs are specified
+        if (mime === &#39;audio/aac&#39; &amp;&amp; !codecs.length) {
+          return &#39;probably&#39;
+        }
+        // Everything else as usual
+        return target.apply(ctx, args)
+      }
+    }
+    HTMLMediaElement.prototype.canPlayType = new Proxy(
+      HTMLMediaElement.prototype.canPlayType,
+      canPlayType
+    )
+  } catch (err) {}
+}
+&#34;&#34;&#34;
+    )
+
+
+def navigator_languages(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    Object.defineProperty(navigator, &#39;languages&#39;, {
+        get: () =&gt; [&#39;en-US&#39;, &#39;en&#39;]
+    })
+}
+    &#34;&#34;&#34;
+    )
+
+
+def navigator_permissions(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    const originalQuery = window.navigator.permissions.query
+    window.navigator.permissions.__proto__.query = parameters =&gt;
+        parameters.name === &#39;notifications&#39;
+            ? Promise.resolve({ state: Notification.permission })
+            : originalQuery(parameters)
+    const oldCall = Function.prototype.call
+    function call () {
+        return oldCall.apply(this, arguments)
+    }
+    Function.prototype.call = call
+    const nativeToStringFunctionString = Error.toString().replace(
+        /Error/g,
+        &#39;toString&#39;
+    )
+    const oldToString = Function.prototype.toString
+    function functionToString () {
+        if (this === window.navigator.permissions.query) {
+            return &#39;function query() { [native code] }&#39;
+        }
+        if (this === functionToString) {
+            return nativeToStringFunctionString
+        }
+        return oldCall.call(oldToString, this)
+    }
+    Function.prototype.toString = functionToString
+}
+    &#34;&#34;&#34;
+    )
+
+
+def navigator_plugins(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    function mockPluginsAndMimeTypes() {
+        const makeFnsNative = (fns = []) =&gt; {
+            const oldCall = Function.prototype.call
+            function call() {
+                return oldCall.apply(this, arguments)
+            }
+            Function.prototype.call = call
+            const nativeToStringFunctionString = Error.toString().replace(
+                /Error/g,
+                &#39;toString&#39;
+            )
+            const oldToString = Function.prototype.toString
+            function functionToString() {
+                for (const fn of fns) {
+                    if (this === fn.ref) {
+                        return `function ${fn.name}() { [native code] }`
+                    }
+                }
+                if (this === functionToString) {
+                    return nativeToStringFunctionString
+                }
+                return oldCall.call(oldToString, this)
+            }
+            Function.prototype.toString = functionToString
+        }
+        const mockedFns = []
+        const fakeData = {
+            mimeTypes: [
+                {
+                    type: &#39;application/pdf&#39;,
+                    suffixes: &#39;pdf&#39;,
+                    description: &#39;&#39;,
+                    __pluginName: &#39;Chrome PDF Viewer&#39;
+                },
+                {
+                    type: &#39;application/x-google-chrome-pdf&#39;,
+                    suffixes: &#39;pdf&#39;,
+                    description: &#39;Portable Document Format&#39;,
+                    __pluginName: &#39;Chrome PDF Plugin&#39;
+                },
+                {
+                    type: &#39;application/x-nacl&#39;,
+                    suffixes: &#39;&#39;,
+                    description: &#39;Native Client Executable&#39;,
+                    enabledPlugin: Plugin,
+                    __pluginName: &#39;Native Client&#39;
+                },
+                {
+                    type: &#39;application/x-pnacl&#39;,
+                    suffixes: &#39;&#39;,
+                    description: &#39;Portable Native Client Executable&#39;,
+                    __pluginName: &#39;Native Client&#39;
+                }
+            ],
+            plugins: [
+                {
+                    name: &#39;Chrome PDF Plugin&#39;,
+                    filename: &#39;internal-pdf-viewer&#39;,
+                    description: &#39;Portable Document Format&#39;
+                },
+                {
+                    name: &#39;Chrome PDF Viewer&#39;,
+                    filename: &#39;mhjfbmdgcfjbbpaeojofohoefgiehjai&#39;,
+                    description: &#39;&#39;
+                },
+                {
+                    name: &#39;Native Client&#39;,
+                    filename: &#39;internal-nacl-plugin&#39;,
+                    description: &#39;&#39;
+                }
+            ],
+            fns: {
+                namedItem: instanceName =&gt; {
+                    const fn = function (name) {
+                        if (!arguments.length) {
+                            throw new TypeError(
+                                `Failed to execute &#39;namedItem&#39; on &#39;${instanceName}&#39;: 1 argument required, but only 0 present.`
+                            )
+                        }
+                        return this[name] || null
+                    }
+                    mockedFns.push({ ref: fn, name: &#39;namedItem&#39; })
+                    return fn
+                },
+                item: instanceName =&gt; {
+                    const fn = function (index) {
+                        if (!arguments.length) {
+                            throw new TypeError(
+                                `Failed to execute &#39;namedItem&#39; on &#39;${instanceName}&#39;: 1 argument required, but only 0 present.`
+                            )
+                        }
+                        return this[index] || null
+                    }
+                    mockedFns.push({ ref: fn, name: &#39;item&#39; })
+                    return fn
+                },
+                refresh: instanceName =&gt; {
+                    const fn = function () {
+                        return undefined
+                    }
+                    mockedFns.push({ ref: fn, name: &#39;refresh&#39; })
+                    return fn
+                }
+            }
+        }
+        const getSubset = (keys, obj) =&gt;
+            keys.reduce((a, c) =&gt; ({ ...a, [c]: obj[c] }), {})
+        function generateMimeTypeArray() {
+            const arr = fakeData.mimeTypes
+                .map(obj =&gt; getSubset([&#39;type&#39;, &#39;suffixes&#39;, &#39;description&#39;], obj))
+                .map(obj =&gt; Object.setPrototypeOf(obj, MimeType.prototype))
+            arr.forEach(obj =&gt; {
+                arr[obj.type] = obj
+            })
+            arr.namedItem = fakeData.fns.namedItem(&#39;MimeTypeArray&#39;)
+            arr.item = fakeData.fns.item(&#39;MimeTypeArray&#39;)
+            return Object.setPrototypeOf(arr, MimeTypeArray.prototype)
+        }
+        const mimeTypeArray = generateMimeTypeArray()
+        Object.defineProperty(navigator, &#39;mimeTypes&#39;, {
+            get: () =&gt; mimeTypeArray
+        })
+        function generatePluginArray() {
+            const arr = fakeData.plugins
+                .map(obj =&gt; getSubset([&#39;name&#39;, &#39;filename&#39;, &#39;description&#39;], obj))
+                .map(obj =&gt; {
+                    const mimes = fakeData.mimeTypes.filter(
+                        m =&gt; m.__pluginName === obj.name
+                    )
+                    mimes.forEach((mime, index) =&gt; {
+                        navigator.mimeTypes[mime.type].enabledPlugin = obj
+                        obj[mime.type] = navigator.mimeTypes[mime.type]
+                        obj[index] = navigator.mimeTypes[mime.type]
+                    })
+                    obj.length = mimes.length
+                    return obj
+                })
+                .map(obj =&gt; {
+                    obj.namedItem = fakeData.fns.namedItem(&#39;Plugin&#39;)
+                    obj.item = fakeData.fns.item(&#39;Plugin&#39;)
+                    return obj
+                })
+                .map(obj =&gt; Object.setPrototypeOf(obj, Plugin.prototype))
+            arr.forEach(obj =&gt; {
+                arr[obj.name] = obj
+            })
+            arr.namedItem = fakeData.fns.namedItem(&#39;PluginArray&#39;)
+            arr.item = fakeData.fns.item(&#39;PluginArray&#39;)
+            arr.refresh = fakeData.fns.refresh(&#39;PluginArray&#39;)
+            return Object.setPrototypeOf(arr, PluginArray.prototype)
+        }
+        const pluginArray = generatePluginArray()
+        Object.defineProperty(navigator, &#39;plugins&#39;, {
+            get: () =&gt; pluginArray
+        })
+        makeFnsNative(mockedFns)
+    }
+    try {
+        const isPluginArray = navigator.plugins instanceof PluginArray
+        const hasPlugins = isPluginArray &amp;&amp; navigator.plugins.length &gt; 0
+        if (isPluginArray &amp;&amp; hasPlugins) {
+            return
+        }
+        mockPluginsAndMimeTypes()
+    } catch (err) { }
+}
+&#34;&#34;&#34;
+    )
+
+
+def navigator_webdriver(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    Object.defineProperty(window, &#39;navigator&#39;, {
+    value: new Proxy(navigator, {
+      has: (target, key) =&gt; (key === &#39;webdriver&#39; ? false : key in target),
+      get: (target, key) =&gt;
+        key === &#39;webdriver&#39;
+          ? undefined
+          : typeof target[key] === &#39;function&#39;
+          ? target[key].bind(target)
+          : target[key]
+    })
+  })
+}
+    &#34;&#34;&#34;
+    )
+
+
+def user_agent(page) -&gt; None:
+    return
+    ua = page.browser.userAgent()
+    ua = ua.replace(&#34;HeadlessChrome&#34;, &#34;Chrome&#34;)  # hide headless nature
+    ua = re.sub(
+        r&#34;\(([^)]+)\)&#34;, &#34;(Windows NT 10.0; Win64; x64)&#34;, ua, 1
+    )  # ensure windows
+
+    page.setUserAgent(ua)
+
+
+def webgl_vendor(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    try {
+        const getParameter = WebGLRenderingContext.prototype.getParameter
+        WebGLRenderingContext.prototype.getParameter = function (parameter) {
+          if (parameter === 37445) {
+            return &#39;Intel Inc.&#39;
+          }
+          if (parameter === 37446) {
+            return &#39;Intel Iris OpenGL Engine&#39;
+          }
+          return getParameter.apply(this, [parameter])
+        }
+      } catch (err) {}
+}
+&#34;&#34;&#34;
+    )
+
+
+def window_outerdimensions(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    try {
+        if (window.outerWidth &amp;&amp; window.outerHeight) {
+            return
+        }
+        const windowFrame = 85
+        window.outerWidth = window.innerWidth
+        window.outerHeight = window.innerHeight + windowFrame
+    } catch (err) { }
+}
+&#34;&#34;&#34;
+    )
+
+
+def stealth(page) -&gt; None:
+    # chrome_runtime(page)
+    console_debug(page)
+    iframe_content_window(page)
+    # navigator_languages(page)
+    navigator_permissions(page)
+    navigator_plugins(page)
+    navigator_webdriver(page)
+    # navigator_vendor(page)
+    user_agent(page)
+    webgl_vendor(page)
+    window_outerdimensions(page)
+    media_codecs(page)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="TikTokApi.stealth.chrome_runtime"><code class="name flex">
+<span>def <span class="ident">chrome_runtime</span></span>(<span>page) ‑> NoneType</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def chrome_runtime(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    window.chrome = {
+        runtime: {}
+    }
+}
+&#34;&#34;&#34;
+    )</code></pre>
+</details>
+</dd>
+<dt id="TikTokApi.stealth.console_debug"><code class="name flex">
+<span>def <span class="ident">console_debug</span></span>(<span>page) ‑> NoneType</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def console_debug(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    window.console.debug = () =&gt; {
+        return null
+    }
+}
+&#34;&#34;&#34;
+    )</code></pre>
+</details>
+</dd>
+<dt id="TikTokApi.stealth.iframe_content_window"><code class="name flex">
+<span>def <span class="ident">iframe_content_window</span></span>(<span>page) ‑> NoneType</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def iframe_content_window(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+  try {
+    // Adds a contentWindow proxy to the provided iframe element
+    const addContentWindowProxy = iframe =&gt; {
+      const contentWindowProxy = {
+        get(target, key) {
+          // Now to the interesting part:
+          // We actually make this thing behave like a regular iframe window,
+          // by intercepting calls to e.g. `.self` and redirect it to the correct thing. :)
+          // That makes it possible for these assertions to be correct:
+          // iframe.contentWindow.self === window.top // must be false
+          if (key === &#39;self&#39;) {
+            return this
+          }
+          // iframe.contentWindow.frameElement === iframe // must be true
+          if (key === &#39;frameElement&#39;) {
+            return iframe
+          }
+          return Reflect.get(target, key)
+        }
+      }
+      if (!iframe.contentWindow) {
+        const proxy = new Proxy(window, contentWindowProxy)
+        Object.defineProperty(iframe, &#39;contentWindow&#39;, {
+          get() {
+            return proxy
+          },
+          set(newValue) {
+            return newValue // contentWindow is immutable
+          },
+          enumerable: true,
+          configurable: false
+        })
+      }
+    }
+    // Handles iframe element creation, augments `srcdoc` property so we can intercept further
+    const handleIframeCreation = (target, thisArg, args) =&gt; {
+      const iframe = target.apply(thisArg, args)
+      // We need to keep the originals around
+      const _iframe = iframe
+      const _srcdoc = _iframe.srcdoc
+      // Add hook for the srcdoc property
+      // We need to be very surgical here to not break other iframes by accident
+      Object.defineProperty(iframe, &#39;srcdoc&#39;, {
+        configurable: true, // Important, so we can reset this later
+        get: function() {
+          return _iframe.srcdoc
+        },
+        set: function(newValue) {
+          addContentWindowProxy(this)
+          // Reset property, the hook is only needed once
+          Object.defineProperty(iframe, &#39;srcdoc&#39;, {
+            configurable: false,
+            writable: false,
+            value: _srcdoc
+          })
+          _iframe.srcdoc = newValue
+        }
+      })
+      return iframe
+    }
+    // Adds a hook to intercept iframe creation events
+    const addIframeCreationSniffer = () =&gt; {
+      /* global document */
+      const createElement = {
+        // Make toString() native
+        get(target, key) {
+          return Reflect.get(target, key)
+        },
+        apply: function(target, thisArg, args) {
+          const isIframe =
+            args &amp;&amp; args.length &amp;&amp; `${args[0]}`.toLowerCase() === &#39;iframe&#39;
+          if (!isIframe) {
+            // Everything as usual
+            return target.apply(thisArg, args)
+          } else {
+            return handleIframeCreation(target, thisArg, args)
+          }
+        }
+      }
+      // All this just due to iframes with srcdoc bug
+      document.createElement = new Proxy(
+        document.createElement,
+        createElement
+      )
+    }
+    // Let&#39;s go
+    addIframeCreationSniffer()
+  } catch (err) {
+    // console.warn(err)
+  }
+}
+&#34;&#34;&#34;
+    )</code></pre>
+</details>
+</dd>
+<dt id="TikTokApi.stealth.media_codecs"><code class="name flex">
+<span>def <span class="ident">media_codecs</span></span>(<span>page) ‑> NoneType</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def media_codecs(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+    () =&gt; {
+  try {
+    /**
+     * Input might look funky, we need to normalize it so e.g. whitespace isn&#39;t an issue for our spoofing.
+     *
+     * @example
+     * video/webm; codecs=&#34;vp8, vorbis&#34;
+     * video/mp4; codecs=&#34;avc1.42E01E&#34;
+     * audio/x-m4a;
+     * audio/ogg; codecs=&#34;vorbis&#34;
+     * @param {String} arg
+     */
+    const parseInput = arg =&gt; {
+      const [mime, codecStr] = arg.trim().split(&#39;;&#39;)
+      let codecs = []
+      if (codecStr &amp;&amp; codecStr.includes(&#39;codecs=&#34;&#39;)) {
+        codecs = codecStr
+          .trim()
+          .replace(`codecs=&#34;`, &#39;&#39;)
+          .replace(`&#34;`, &#39;&#39;)
+          .trim()
+          .split(&#39;,&#39;)
+          .filter(x =&gt; !!x)
+          .map(x =&gt; x.trim())
+      }
+      return { mime, codecStr, codecs }
+    }
+    /* global HTMLMediaElement */
+    const canPlayType = {
+      // Make toString() native
+      get(target, key) {
+        // Mitigate Chromium bug (#130)
+        if (typeof target[key] === &#39;function&#39;) {
+          return target[key].bind(target)
+        }
+        return Reflect.get(target, key)
+      },
+      // Intercept certain requests
+      apply: function(target, ctx, args) {
+        if (!args || !args.length) {
+          return target.apply(ctx, args)
+        }
+        const { mime, codecs } = parseInput(args[0])
+        // This specific mp4 codec is missing in Chromium
+        if (mime === &#39;video/mp4&#39;) {
+          if (codecs.includes(&#39;avc1.42E01E&#39;)) {
+            return &#39;probably&#39;
+          }
+        }
+        // This mimetype is only supported if no codecs are specified
+        if (mime === &#39;audio/x-m4a&#39; &amp;&amp; !codecs.length) {
+          return &#39;maybe&#39;
+        }
+        // This mimetype is only supported if no codecs are specified
+        if (mime === &#39;audio/aac&#39; &amp;&amp; !codecs.length) {
+          return &#39;probably&#39;
+        }
+        // Everything else as usual
+        return target.apply(ctx, args)
+      }
+    }
+    HTMLMediaElement.prototype.canPlayType = new Proxy(
+      HTMLMediaElement.prototype.canPlayType,
+      canPlayType
+    )
+  } catch (err) {}
+}
+&#34;&#34;&#34;
+    )</code></pre>
+</details>
+</dd>
+<dt id="TikTokApi.stealth.navigator_languages"><code class="name flex">
+<span>def <span class="ident">navigator_languages</span></span>(<span>page) ‑> NoneType</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def navigator_languages(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    Object.defineProperty(navigator, &#39;languages&#39;, {
+        get: () =&gt; [&#39;en-US&#39;, &#39;en&#39;]
+    })
+}
+    &#34;&#34;&#34;
+    )</code></pre>
+</details>
+</dd>
+<dt id="TikTokApi.stealth.navigator_permissions"><code class="name flex">
+<span>def <span class="ident">navigator_permissions</span></span>(<span>page) ‑> NoneType</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def navigator_permissions(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    const originalQuery = window.navigator.permissions.query
+    window.navigator.permissions.__proto__.query = parameters =&gt;
+        parameters.name === &#39;notifications&#39;
+            ? Promise.resolve({ state: Notification.permission })
+            : originalQuery(parameters)
+    const oldCall = Function.prototype.call
+    function call () {
+        return oldCall.apply(this, arguments)
+    }
+    Function.prototype.call = call
+    const nativeToStringFunctionString = Error.toString().replace(
+        /Error/g,
+        &#39;toString&#39;
+    )
+    const oldToString = Function.prototype.toString
+    function functionToString () {
+        if (this === window.navigator.permissions.query) {
+            return &#39;function query() { [native code] }&#39;
+        }
+        if (this === functionToString) {
+            return nativeToStringFunctionString
+        }
+        return oldCall.call(oldToString, this)
+    }
+    Function.prototype.toString = functionToString
+}
+    &#34;&#34;&#34;
+    )</code></pre>
+</details>
+</dd>
+<dt id="TikTokApi.stealth.navigator_plugins"><code class="name flex">
+<span>def <span class="ident">navigator_plugins</span></span>(<span>page) ‑> NoneType</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def navigator_plugins(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    function mockPluginsAndMimeTypes() {
+        const makeFnsNative = (fns = []) =&gt; {
+            const oldCall = Function.prototype.call
+            function call() {
+                return oldCall.apply(this, arguments)
+            }
+            Function.prototype.call = call
+            const nativeToStringFunctionString = Error.toString().replace(
+                /Error/g,
+                &#39;toString&#39;
+            )
+            const oldToString = Function.prototype.toString
+            function functionToString() {
+                for (const fn of fns) {
+                    if (this === fn.ref) {
+                        return `function ${fn.name}() { [native code] }`
+                    }
+                }
+                if (this === functionToString) {
+                    return nativeToStringFunctionString
+                }
+                return oldCall.call(oldToString, this)
+            }
+            Function.prototype.toString = functionToString
+        }
+        const mockedFns = []
+        const fakeData = {
+            mimeTypes: [
+                {
+                    type: &#39;application/pdf&#39;,
+                    suffixes: &#39;pdf&#39;,
+                    description: &#39;&#39;,
+                    __pluginName: &#39;Chrome PDF Viewer&#39;
+                },
+                {
+                    type: &#39;application/x-google-chrome-pdf&#39;,
+                    suffixes: &#39;pdf&#39;,
+                    description: &#39;Portable Document Format&#39;,
+                    __pluginName: &#39;Chrome PDF Plugin&#39;
+                },
+                {
+                    type: &#39;application/x-nacl&#39;,
+                    suffixes: &#39;&#39;,
+                    description: &#39;Native Client Executable&#39;,
+                    enabledPlugin: Plugin,
+                    __pluginName: &#39;Native Client&#39;
+                },
+                {
+                    type: &#39;application/x-pnacl&#39;,
+                    suffixes: &#39;&#39;,
+                    description: &#39;Portable Native Client Executable&#39;,
+                    __pluginName: &#39;Native Client&#39;
+                }
+            ],
+            plugins: [
+                {
+                    name: &#39;Chrome PDF Plugin&#39;,
+                    filename: &#39;internal-pdf-viewer&#39;,
+                    description: &#39;Portable Document Format&#39;
+                },
+                {
+                    name: &#39;Chrome PDF Viewer&#39;,
+                    filename: &#39;mhjfbmdgcfjbbpaeojofohoefgiehjai&#39;,
+                    description: &#39;&#39;
+                },
+                {
+                    name: &#39;Native Client&#39;,
+                    filename: &#39;internal-nacl-plugin&#39;,
+                    description: &#39;&#39;
+                }
+            ],
+            fns: {
+                namedItem: instanceName =&gt; {
+                    const fn = function (name) {
+                        if (!arguments.length) {
+                            throw new TypeError(
+                                `Failed to execute &#39;namedItem&#39; on &#39;${instanceName}&#39;: 1 argument required, but only 0 present.`
+                            )
+                        }
+                        return this[name] || null
+                    }
+                    mockedFns.push({ ref: fn, name: &#39;namedItem&#39; })
+                    return fn
+                },
+                item: instanceName =&gt; {
+                    const fn = function (index) {
+                        if (!arguments.length) {
+                            throw new TypeError(
+                                `Failed to execute &#39;namedItem&#39; on &#39;${instanceName}&#39;: 1 argument required, but only 0 present.`
+                            )
+                        }
+                        return this[index] || null
+                    }
+                    mockedFns.push({ ref: fn, name: &#39;item&#39; })
+                    return fn
+                },
+                refresh: instanceName =&gt; {
+                    const fn = function () {
+                        return undefined
+                    }
+                    mockedFns.push({ ref: fn, name: &#39;refresh&#39; })
+                    return fn
+                }
+            }
+        }
+        const getSubset = (keys, obj) =&gt;
+            keys.reduce((a, c) =&gt; ({ ...a, [c]: obj[c] }), {})
+        function generateMimeTypeArray() {
+            const arr = fakeData.mimeTypes
+                .map(obj =&gt; getSubset([&#39;type&#39;, &#39;suffixes&#39;, &#39;description&#39;], obj))
+                .map(obj =&gt; Object.setPrototypeOf(obj, MimeType.prototype))
+            arr.forEach(obj =&gt; {
+                arr[obj.type] = obj
+            })
+            arr.namedItem = fakeData.fns.namedItem(&#39;MimeTypeArray&#39;)
+            arr.item = fakeData.fns.item(&#39;MimeTypeArray&#39;)
+            return Object.setPrototypeOf(arr, MimeTypeArray.prototype)
+        }
+        const mimeTypeArray = generateMimeTypeArray()
+        Object.defineProperty(navigator, &#39;mimeTypes&#39;, {
+            get: () =&gt; mimeTypeArray
+        })
+        function generatePluginArray() {
+            const arr = fakeData.plugins
+                .map(obj =&gt; getSubset([&#39;name&#39;, &#39;filename&#39;, &#39;description&#39;], obj))
+                .map(obj =&gt; {
+                    const mimes = fakeData.mimeTypes.filter(
+                        m =&gt; m.__pluginName === obj.name
+                    )
+                    mimes.forEach((mime, index) =&gt; {
+                        navigator.mimeTypes[mime.type].enabledPlugin = obj
+                        obj[mime.type] = navigator.mimeTypes[mime.type]
+                        obj[index] = navigator.mimeTypes[mime.type]
+                    })
+                    obj.length = mimes.length
+                    return obj
+                })
+                .map(obj =&gt; {
+                    obj.namedItem = fakeData.fns.namedItem(&#39;Plugin&#39;)
+                    obj.item = fakeData.fns.item(&#39;Plugin&#39;)
+                    return obj
+                })
+                .map(obj =&gt; Object.setPrototypeOf(obj, Plugin.prototype))
+            arr.forEach(obj =&gt; {
+                arr[obj.name] = obj
+            })
+            arr.namedItem = fakeData.fns.namedItem(&#39;PluginArray&#39;)
+            arr.item = fakeData.fns.item(&#39;PluginArray&#39;)
+            arr.refresh = fakeData.fns.refresh(&#39;PluginArray&#39;)
+            return Object.setPrototypeOf(arr, PluginArray.prototype)
+        }
+        const pluginArray = generatePluginArray()
+        Object.defineProperty(navigator, &#39;plugins&#39;, {
+            get: () =&gt; pluginArray
+        })
+        makeFnsNative(mockedFns)
+    }
+    try {
+        const isPluginArray = navigator.plugins instanceof PluginArray
+        const hasPlugins = isPluginArray &amp;&amp; navigator.plugins.length &gt; 0
+        if (isPluginArray &amp;&amp; hasPlugins) {
+            return
+        }
+        mockPluginsAndMimeTypes()
+    } catch (err) { }
+}
+&#34;&#34;&#34;
+    )</code></pre>
+</details>
+</dd>
+<dt id="TikTokApi.stealth.navigator_webdriver"><code class="name flex">
+<span>def <span class="ident">navigator_webdriver</span></span>(<span>page) ‑> NoneType</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def navigator_webdriver(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    Object.defineProperty(window, &#39;navigator&#39;, {
+    value: new Proxy(navigator, {
+      has: (target, key) =&gt; (key === &#39;webdriver&#39; ? false : key in target),
+      get: (target, key) =&gt;
+        key === &#39;webdriver&#39;
+          ? undefined
+          : typeof target[key] === &#39;function&#39;
+          ? target[key].bind(target)
+          : target[key]
+    })
+  })
+}
+    &#34;&#34;&#34;
+    )</code></pre>
+</details>
+</dd>
+<dt id="TikTokApi.stealth.stealth"><code class="name flex">
+<span>def <span class="ident">stealth</span></span>(<span>page) ‑> NoneType</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def stealth(page) -&gt; None:
+    # chrome_runtime(page)
+    console_debug(page)
+    iframe_content_window(page)
+    # navigator_languages(page)
+    navigator_permissions(page)
+    navigator_plugins(page)
+    navigator_webdriver(page)
+    # navigator_vendor(page)
+    user_agent(page)
+    webgl_vendor(page)
+    window_outerdimensions(page)
+    media_codecs(page)</code></pre>
+</details>
+</dd>
+<dt id="TikTokApi.stealth.user_agent"><code class="name flex">
+<span>def <span class="ident">user_agent</span></span>(<span>page) ‑> NoneType</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def user_agent(page) -&gt; None:
+    return
+    ua = page.browser.userAgent()
+    ua = ua.replace(&#34;HeadlessChrome&#34;, &#34;Chrome&#34;)  # hide headless nature
+    ua = re.sub(
+        r&#34;\(([^)]+)\)&#34;, &#34;(Windows NT 10.0; Win64; x64)&#34;, ua, 1
+    )  # ensure windows
+
+    page.setUserAgent(ua)</code></pre>
+</details>
+</dd>
+<dt id="TikTokApi.stealth.webgl_vendor"><code class="name flex">
+<span>def <span class="ident">webgl_vendor</span></span>(<span>page) ‑> NoneType</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def webgl_vendor(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    try {
+        const getParameter = WebGLRenderingContext.prototype.getParameter
+        WebGLRenderingContext.prototype.getParameter = function (parameter) {
+          if (parameter === 37445) {
+            return &#39;Intel Inc.&#39;
+          }
+          if (parameter === 37446) {
+            return &#39;Intel Iris OpenGL Engine&#39;
+          }
+          return getParameter.apply(this, [parameter])
+        }
+      } catch (err) {}
+}
+&#34;&#34;&#34;
+    )</code></pre>
+</details>
+</dd>
+<dt id="TikTokApi.stealth.window_outerdimensions"><code class="name flex">
+<span>def <span class="ident">window_outerdimensions</span></span>(<span>page) ‑> NoneType</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def window_outerdimensions(page) -&gt; None:
+    page.evaluateOnNewDocument(
+        &#34;&#34;&#34;
+() =&gt; {
+    try {
+        if (window.outerWidth &amp;&amp; window.outerHeight) {
+            return
+        }
+        const windowFrame = 85
+        window.outerWidth = window.innerWidth
+        window.outerHeight = window.innerHeight + windowFrame
+    } catch (err) { }
+}
+&#34;&#34;&#34;
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="TikTokApi" href="index.html">TikTokApi</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="TikTokApi.stealth.chrome_runtime" href="#TikTokApi.stealth.chrome_runtime">chrome_runtime</a></code></li>
+<li><code><a title="TikTokApi.stealth.console_debug" href="#TikTokApi.stealth.console_debug">console_debug</a></code></li>
+<li><code><a title="TikTokApi.stealth.iframe_content_window" href="#TikTokApi.stealth.iframe_content_window">iframe_content_window</a></code></li>
+<li><code><a title="TikTokApi.stealth.media_codecs" href="#TikTokApi.stealth.media_codecs">media_codecs</a></code></li>
+<li><code><a title="TikTokApi.stealth.navigator_languages" href="#TikTokApi.stealth.navigator_languages">navigator_languages</a></code></li>
+<li><code><a title="TikTokApi.stealth.navigator_permissions" href="#TikTokApi.stealth.navigator_permissions">navigator_permissions</a></code></li>
+<li><code><a title="TikTokApi.stealth.navigator_plugins" href="#TikTokApi.stealth.navigator_plugins">navigator_plugins</a></code></li>
+<li><code><a title="TikTokApi.stealth.navigator_webdriver" href="#TikTokApi.stealth.navigator_webdriver">navigator_webdriver</a></code></li>
+<li><code><a title="TikTokApi.stealth.stealth" href="#TikTokApi.stealth.stealth">stealth</a></code></li>
+<li><code><a title="TikTokApi.stealth.user_agent" href="#TikTokApi.stealth.user_agent">user_agent</a></code></li>
+<li><code><a title="TikTokApi.stealth.webgl_vendor" href="#TikTokApi.stealth.webgl_vendor">webgl_vendor</a></code></li>
+<li><code><a title="TikTokApi.stealth.window_outerdimensions" href="#TikTokApi.stealth.window_outerdimensions">window_outerdimensions</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>
