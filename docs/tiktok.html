@@ -40,7 +40,6 @@ from .utilities import update_messager
 from .exceptions import *
 
 
-
 os.environ[&#34;no_proxy&#34;] = &#34;127.0.0.1,localhost&#34;
 
 BASE_URL = &#34;https://m.tiktok.com/&#34;
@@ -48,11 +47,9 @@ BASE_URL = &#34;https://m.tiktok.com/&#34;
 
 class TikTokApi:
     __instance = None
-    
 
     def __init__(self, **kwargs):
-        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok, use get_instance NOT this.
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok, use get_instance NOT this.&#34;&#34;&#34;
         # Forces Singleton
         if TikTokApi.__instance is None:
             TikTokApi.__instance = self
@@ -60,8 +57,10 @@ class TikTokApi:
             raise Exception(&#34;Only one TikTokApi object is allowed&#34;)
         logging.basicConfig(level=kwargs.get(&#34;logging_level&#34;, logging.WARNING))
         logging.info(&#34;Class initalized&#34;)
-        self.executablePath = kwargs.get(&#34;executablePath&#34;, None)
 
+        # Some Instance Vars
+        self.executablePath = kwargs.get(&#34;executablePath&#34;, None)
+        self.custom_did = kwargs.get(&#34;custom_did&#34;, None)
         self.userAgent = (
             &#34;Mozilla/5.0 (Windows NT 10.0; Win64; x64) &#34;
             &#34;AppleWebKit/537.36 (KHTML, like Gecko) &#34;
@@ -69,6 +68,8 @@ class TikTokApi:
         )
         self.proxy = kwargs.get(&#34;proxy&#34;, None)
         self.custom_verifyFp = kwargs.get(&#34;custom_verifyFp&#34;)
+        self.signer_url = kwargs.get(&#34;external_signer&#34;, None)
+        self.request_delay = kwargs.get(&#34;request_delay&#34;, None)
 
         if kwargs.get(&#34;use_test_endpoints&#34;, False):
             global BASE_URL
@@ -78,7 +79,9 @@ class TikTokApi:
         else:
             from .browser import browser
 
-        self.signer_url = kwargs.get(&#34;external_signer&#34;, None)
+        if kwargs.get(&#34;generate_static_did&#34;, False):
+            self.custom_did = &#34;&#34;.join(random.choice(string.digits) for num in range(19))
+
         if self.signer_url is None:
             self.browser = browser(**kwargs)
             self.userAgent = self.browser.userAgent
@@ -98,6 +101,7 @@ class TikTokApi:
             self.width = self.browser.width
             self.height = self.browser.height
         except Exception as e:
+            logging.error(e)
             logging.warning(
                 &#34;An error ocurred while opening your browser but it was ignored.&#34;
             )
@@ -110,11 +114,9 @@ class TikTokApi:
             self.width = &#34;1920&#34;
             self.height = &#34;1080&#34;
 
-        self.request_delay = kwargs.get(&#34;request_delay&#34;, None)
-
     @staticmethod
     def get_instance(**kwargs):
-        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok. This is a singleton 
+        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok. This is a singleton
             class to prevent issues from arising with playwright
 
         Parameters
@@ -132,6 +134,9 @@ class TikTokApi:
             All the methods take this as a optional parameter, however it&#39;s cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
+        generate_static_did: A parameter that generates a custom_did at the instance level
+            Use this if you want to download videos from a script but don&#39;t want to generate
+            your own custom_did parameter.
         custom_verifyFp: A TikTok parameter needed to work most of the time, optional
             To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
             I recommend watching the entire thing, as it will help setup this package.
@@ -139,6 +144,9 @@ class TikTokApi:
             All the methods take this as a optional parameter, however it&#39;s cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
+
+            You can use the following to generate `&#34;&#34;.join(random.choice(string.digits)
+            for num in range(19))`
         use_test_endpoints: Send requests to TikTok&#39;s test endpoints, optional
             This parameter when set to true will make requests to TikTok&#39;s testing
             endpoints instead of the live site. I can&#39;t guarantee this will work
@@ -146,16 +154,16 @@ class TikTokApi:
             work here which is helpful.
         proxy: A string containing your proxy address, optional
             If you want to do a lot of scraping of TikTok endpoints you&#39;ll likely
-            need a proxy. 
-            
+            need a proxy.
+
             Ex: &#34;https://0.0.0.0:8080&#34;
 
             All the methods take this as a optional parameter, however it&#39;s cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
         use_selenium: Option to use selenium over playwright, optional
-            Playwright is selected by default and is the one that I&#39;m designing the 
-            package to be compatable for, however if playwright doesn&#39;t work on 
+            Playwright is selected by default and is the one that I&#39;m designing the
+            package to be compatable for, however if playwright doesn&#39;t work on
             your machine feel free to set this to True.
         executablePath: The location of the driver, optional
             This shouldn&#39;t be needed if you&#39;re using playwright
@@ -386,7 +394,7 @@ class TikTokApi:
         ----------
         count: The amount of TikToks you want returned, optional
             Note: TikTok seems to only support at MOST ~2000 TikToks
-            from a single endpoint. 
+            from a single endpoint.
         &#34;&#34;&#34;
         (
             region,
@@ -533,10 +541,10 @@ class TikTokApi:
         Parameters
         ----------
         userID: The userID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         secUID: The secUID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         count: The number of posts to return
             Note: seems to only support up to ~2,000
@@ -625,10 +633,10 @@ class TikTokApi:
         Parameters
         ----------
         userID: The userID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         secUID: The secUID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         page_size: The number of posts to return per page
             Gets a specific page of a user, doesn&#39;t iterate.
@@ -857,7 +865,7 @@ class TikTokApi:
         Parameters
         ----------
         id: The sound id to get the object for
-            This can be found by using other methods. 
+            This can be found by using other methods.
         &#34;&#34;&#34;
         return self.getMusicObjectFull(id, **kwargs)[&#34;music&#34;]
 
@@ -1067,7 +1075,7 @@ class TikTokApi:
         ----------
         url: The TikTok url you want to retrieve
             This currently doesn&#39;t support the shortened TikTok
-            url links. 
+            url links.
         &#34;&#34;&#34;
         (
             region,
@@ -1144,8 +1152,7 @@ class TikTokApi:
         return data
 
     def discover_hashtags(self, **kwargs) -&gt; dict:
-        &#34;&#34;&#34;Discover page, consists challenges (hashtags)
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;Discover page, consists challenges (hashtags)&#34;&#34;&#34;
         (
             region,
             language,
@@ -1162,8 +1169,7 @@ class TikTokApi:
         return self.getData(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]
 
     def discover_music(self, **kwargs) -&gt; dict:
-        &#34;&#34;&#34;Discover page, consists of music
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;Discover page, consists of music&#34;&#34;&#34;
         (
             region,
             language,
@@ -1450,7 +1456,12 @@ class TikTokApi:
         return musics[:count]
 
     def get_video_by_tiktok(self, data, **kwargs) -&gt; bytes:
-        &#34;&#34;&#34;Downloads video from TikTok using a TikTok object
+        &#34;&#34;&#34;Downloads video from TikTok using a TikTok object.
+
+            You will need to set a custom_did to do this for anything but trending.
+            To do this, this is pretty simple you can either generate one yourself or,
+            you can pass the generate_static_did=True into the constructor of the
+            TikTokApi class.
 
         Parameters
         ----------
@@ -1621,6 +1632,10 @@ class TikTokApi:
                 &#34;Retrieving the user secUid failed. Likely due to TikTok wanting captcha validation. Try to use a proxy.&#34;
             )
 
+    def generate_did(self):
+        &#34;&#34;&#34;Generates a valid did for other methods. Pass this as the custom_did field to download videos&#34;&#34;&#34;
+        return &#34;&#34;.join(random.choice(string.digits) for num in range(19))
+
     #
     # PRIVATE METHODS
     #
@@ -1678,10 +1693,14 @@ class TikTokApi:
         language = kwargs.get(&#34;language&#34;, &#34;en&#34;)
         proxy = kwargs.get(&#34;proxy&#34;, None)
         maxCount = kwargs.get(&#34;maxCount&#34;, 35)
-        did = kwargs.get(
-            &#34;custom_did&#34;, &#34;&#34;.join(random.choice(string.digits) for num in range(19))
-        )
 
+        if kwargs.get(&#34;custom_did&#34;, None) != None:
+            did = kwargs.get(&#34;custom_did&#34;)
+        else:
+            if self.custom_did != None:
+                did = self.custom_did
+            else:
+                did = &#34;&#34;.join(random.choice(string.digits) for num in range(19))
         return region, language, proxy, maxCount, did
 
     #
@@ -1719,39 +1738,40 @@ class TikTokApi:
     get_secUid = get_secuid
     trending = by_trending
 
+
 # pdoc ignore old naming scheme
 __pdoc__ = {
-    &#39;TikTokApi.getData&#39;: False,
-    &#39;TikTokApi.getBytes&#39;: False,
-    &#39;TikTokApi.userPosts&#39;: False,
-    &#39;TikTokApi.byUsername&#39;: False,
-    &#39;TikTokApi.userPage&#39;: False,
-    &#39;TikTokApi.getUserPager&#39;: False,
-    &#39;TikTokApi.userLiked&#39;: False,
-    &#39;TikTokApi.userLikedbyUsername&#39;: False,
-    &#39;TikTokApi.bySound&#39;: False,
-    &#39;TikTokApi.getMusicObject&#39;: False,
-    &#39;TikTokApi.getMusicObjectFull&#39;: False,
-    &#39;TikTokApi.byHashtag&#39;: False,
-    &#39;TikTokApi.getHashtagObject&#39;: False,
-    &#39;TikTokApi.getRecommendedTikToksByVideoID&#39;: False,
-    &#39;TikTokApi.getTikTokById&#39;: False,
-    &#39;TikTokApi.getTikTokByUrl&#39;: False,
-    &#39;TikTokApi.discoverHashtags&#39;: False,
-    &#39;TikTokApi.discoverMusic&#39;: False,
-    &#39;TikTokApi.getUserObject&#39;: False,
-    &#39;TikTokApi.getUser&#39;: False,
-    &#39;TikTokApi.getSuggestedUsersbyID&#39;: False,
-    &#39;TikTokApi.getSuggestedUsersbyIDCrawler&#39;: False,
-    &#39;TikTokApi.getSuggestedHashtagsbyID&#39;: False,
-    &#39;TikTokApi.getSuggestedHashtagsbyIDCrawler&#39;: False,
-    &#39;TikTokApi.getSuggestedMusicbyID&#39;: False,
-    &#39;TikTokApi.getSuggestedMusicIDCrawler&#39;: False,
-    &#39;TikTokApi.get_Video_By_TikTok&#39;: False,
-    &#39;TikTokApi.get_Video_By_DownloadURL&#39;: False,
-    &#39;TikTokApi.get_Video_By_Url&#39;: False,
-    &#39;TikTokApi.get_secUid&#39;: False,
-    &#39;TikTokApi.trending&#39;: False,
+    &#34;TikTokApi.getData&#34;: False,
+    &#34;TikTokApi.getBytes&#34;: False,
+    &#34;TikTokApi.userPosts&#34;: False,
+    &#34;TikTokApi.byUsername&#34;: False,
+    &#34;TikTokApi.userPage&#34;: False,
+    &#34;TikTokApi.getUserPager&#34;: False,
+    &#34;TikTokApi.userLiked&#34;: False,
+    &#34;TikTokApi.userLikedbyUsername&#34;: False,
+    &#34;TikTokApi.bySound&#34;: False,
+    &#34;TikTokApi.getMusicObject&#34;: False,
+    &#34;TikTokApi.getMusicObjectFull&#34;: False,
+    &#34;TikTokApi.byHashtag&#34;: False,
+    &#34;TikTokApi.getHashtagObject&#34;: False,
+    &#34;TikTokApi.getRecommendedTikToksByVideoID&#34;: False,
+    &#34;TikTokApi.getTikTokById&#34;: False,
+    &#34;TikTokApi.getTikTokByUrl&#34;: False,
+    &#34;TikTokApi.discoverHashtags&#34;: False,
+    &#34;TikTokApi.discoverMusic&#34;: False,
+    &#34;TikTokApi.getUserObject&#34;: False,
+    &#34;TikTokApi.getUser&#34;: False,
+    &#34;TikTokApi.getSuggestedUsersbyID&#34;: False,
+    &#34;TikTokApi.getSuggestedUsersbyIDCrawler&#34;: False,
+    &#34;TikTokApi.getSuggestedHashtagsbyID&#34;: False,
+    &#34;TikTokApi.getSuggestedHashtagsbyIDCrawler&#34;: False,
+    &#34;TikTokApi.getSuggestedMusicbyID&#34;: False,
+    &#34;TikTokApi.getSuggestedMusicIDCrawler&#34;: False,
+    &#34;TikTokApi.get_Video_By_TikTok&#34;: False,
+    &#34;TikTokApi.get_Video_By_DownloadURL&#34;: False,
+    &#34;TikTokApi.get_Video_By_Url&#34;: False,
+    &#34;TikTokApi.get_secUid&#34;: False,
+    &#34;TikTokApi.trending&#34;: False,
 }</code></pre>
 </details>
 </section>
@@ -1776,11 +1796,9 @@ __pdoc__ = {
 </summary>
 <pre><code class="python">class TikTokApi:
     __instance = None
-    
 
     def __init__(self, **kwargs):
-        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok, use get_instance NOT this.
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok, use get_instance NOT this.&#34;&#34;&#34;
         # Forces Singleton
         if TikTokApi.__instance is None:
             TikTokApi.__instance = self
@@ -1788,8 +1806,10 @@ __pdoc__ = {
             raise Exception(&#34;Only one TikTokApi object is allowed&#34;)
         logging.basicConfig(level=kwargs.get(&#34;logging_level&#34;, logging.WARNING))
         logging.info(&#34;Class initalized&#34;)
-        self.executablePath = kwargs.get(&#34;executablePath&#34;, None)
 
+        # Some Instance Vars
+        self.executablePath = kwargs.get(&#34;executablePath&#34;, None)
+        self.custom_did = kwargs.get(&#34;custom_did&#34;, None)
         self.userAgent = (
             &#34;Mozilla/5.0 (Windows NT 10.0; Win64; x64) &#34;
             &#34;AppleWebKit/537.36 (KHTML, like Gecko) &#34;
@@ -1797,6 +1817,8 @@ __pdoc__ = {
         )
         self.proxy = kwargs.get(&#34;proxy&#34;, None)
         self.custom_verifyFp = kwargs.get(&#34;custom_verifyFp&#34;)
+        self.signer_url = kwargs.get(&#34;external_signer&#34;, None)
+        self.request_delay = kwargs.get(&#34;request_delay&#34;, None)
 
         if kwargs.get(&#34;use_test_endpoints&#34;, False):
             global BASE_URL
@@ -1806,7 +1828,9 @@ __pdoc__ = {
         else:
             from .browser import browser
 
-        self.signer_url = kwargs.get(&#34;external_signer&#34;, None)
+        if kwargs.get(&#34;generate_static_did&#34;, False):
+            self.custom_did = &#34;&#34;.join(random.choice(string.digits) for num in range(19))
+
         if self.signer_url is None:
             self.browser = browser(**kwargs)
             self.userAgent = self.browser.userAgent
@@ -1826,6 +1850,7 @@ __pdoc__ = {
             self.width = self.browser.width
             self.height = self.browser.height
         except Exception as e:
+            logging.error(e)
             logging.warning(
                 &#34;An error ocurred while opening your browser but it was ignored.&#34;
             )
@@ -1838,11 +1863,9 @@ __pdoc__ = {
             self.width = &#34;1920&#34;
             self.height = &#34;1080&#34;
 
-        self.request_delay = kwargs.get(&#34;request_delay&#34;, None)
-
     @staticmethod
     def get_instance(**kwargs):
-        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok. This is a singleton 
+        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok. This is a singleton
             class to prevent issues from arising with playwright
 
         Parameters
@@ -1860,6 +1883,9 @@ __pdoc__ = {
             All the methods take this as a optional parameter, however it&#39;s cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
+        generate_static_did: A parameter that generates a custom_did at the instance level
+            Use this if you want to download videos from a script but don&#39;t want to generate
+            your own custom_did parameter.
         custom_verifyFp: A TikTok parameter needed to work most of the time, optional
             To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
             I recommend watching the entire thing, as it will help setup this package.
@@ -1867,6 +1893,9 @@ __pdoc__ = {
             All the methods take this as a optional parameter, however it&#39;s cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
+
+            You can use the following to generate `&#34;&#34;.join(random.choice(string.digits)
+            for num in range(19))`
         use_test_endpoints: Send requests to TikTok&#39;s test endpoints, optional
             This parameter when set to true will make requests to TikTok&#39;s testing
             endpoints instead of the live site. I can&#39;t guarantee this will work
@@ -1874,16 +1903,16 @@ __pdoc__ = {
             work here which is helpful.
         proxy: A string containing your proxy address, optional
             If you want to do a lot of scraping of TikTok endpoints you&#39;ll likely
-            need a proxy. 
-            
+            need a proxy.
+
             Ex: &#34;https://0.0.0.0:8080&#34;
 
             All the methods take this as a optional parameter, however it&#39;s cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
         use_selenium: Option to use selenium over playwright, optional
-            Playwright is selected by default and is the one that I&#39;m designing the 
-            package to be compatable for, however if playwright doesn&#39;t work on 
+            Playwright is selected by default and is the one that I&#39;m designing the
+            package to be compatable for, however if playwright doesn&#39;t work on
             your machine feel free to set this to True.
         executablePath: The location of the driver, optional
             This shouldn&#39;t be needed if you&#39;re using playwright
@@ -2114,7 +2143,7 @@ __pdoc__ = {
         ----------
         count: The amount of TikToks you want returned, optional
             Note: TikTok seems to only support at MOST ~2000 TikToks
-            from a single endpoint. 
+            from a single endpoint.
         &#34;&#34;&#34;
         (
             region,
@@ -2261,10 +2290,10 @@ __pdoc__ = {
         Parameters
         ----------
         userID: The userID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         secUID: The secUID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         count: The number of posts to return
             Note: seems to only support up to ~2,000
@@ -2353,10 +2382,10 @@ __pdoc__ = {
         Parameters
         ----------
         userID: The userID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         secUID: The secUID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         page_size: The number of posts to return per page
             Gets a specific page of a user, doesn&#39;t iterate.
@@ -2585,7 +2614,7 @@ __pdoc__ = {
         Parameters
         ----------
         id: The sound id to get the object for
-            This can be found by using other methods. 
+            This can be found by using other methods.
         &#34;&#34;&#34;
         return self.getMusicObjectFull(id, **kwargs)[&#34;music&#34;]
 
@@ -2795,7 +2824,7 @@ __pdoc__ = {
         ----------
         url: The TikTok url you want to retrieve
             This currently doesn&#39;t support the shortened TikTok
-            url links. 
+            url links.
         &#34;&#34;&#34;
         (
             region,
@@ -2872,8 +2901,7 @@ __pdoc__ = {
         return data
 
     def discover_hashtags(self, **kwargs) -&gt; dict:
-        &#34;&#34;&#34;Discover page, consists challenges (hashtags)
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;Discover page, consists challenges (hashtags)&#34;&#34;&#34;
         (
             region,
             language,
@@ -2890,8 +2918,7 @@ __pdoc__ = {
         return self.getData(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]
 
     def discover_music(self, **kwargs) -&gt; dict:
-        &#34;&#34;&#34;Discover page, consists of music
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;Discover page, consists of music&#34;&#34;&#34;
         (
             region,
             language,
@@ -3178,7 +3205,12 @@ __pdoc__ = {
         return musics[:count]
 
     def get_video_by_tiktok(self, data, **kwargs) -&gt; bytes:
-        &#34;&#34;&#34;Downloads video from TikTok using a TikTok object
+        &#34;&#34;&#34;Downloads video from TikTok using a TikTok object.
+
+            You will need to set a custom_did to do this for anything but trending.
+            To do this, this is pretty simple you can either generate one yourself or,
+            you can pass the generate_static_did=True into the constructor of the
+            TikTokApi class.
 
         Parameters
         ----------
@@ -3349,6 +3381,10 @@ __pdoc__ = {
                 &#34;Retrieving the user secUid failed. Likely due to TikTok wanting captcha validation. Try to use a proxy.&#34;
             )
 
+    def generate_did(self):
+        &#34;&#34;&#34;Generates a valid did for other methods. Pass this as the custom_did field to download videos&#34;&#34;&#34;
+        return &#34;&#34;.join(random.choice(string.digits) for num in range(19))
+
     #
     # PRIVATE METHODS
     #
@@ -3406,10 +3442,14 @@ __pdoc__ = {
         language = kwargs.get(&#34;language&#34;, &#34;en&#34;)
         proxy = kwargs.get(&#34;proxy&#34;, None)
         maxCount = kwargs.get(&#34;maxCount&#34;, 35)
-        did = kwargs.get(
-            &#34;custom_did&#34;, &#34;&#34;.join(random.choice(string.digits) for num in range(19))
-        )
 
+        if kwargs.get(&#34;custom_did&#34;, None) != None:
+            did = kwargs.get(&#34;custom_did&#34;)
+        else:
+            if self.custom_did != None:
+                did = self.custom_did
+            else:
+                did = &#34;&#34;.join(random.choice(string.digits) for num in range(19))
         return region, language, proxy, maxCount, did
 
     #
@@ -3471,6 +3511,9 @@ one of these.</p>
 to store this at the instance level. You can override this at the specific
 methods.</p>
 </dd>
+<dt><strong><code>generate_static_did</code></strong> :&ensp;<code>A parameter that generates a custom_did at the instance level</code></dt>
+<dd>Use this if you want to download videos from a script but don't want to generate
+your own custom_did parameter.</dd>
 <dt><strong><code>custom_verifyFp</code></strong> :&ensp;<code>A TikTok parameter needed to work most</code> of <code>the time</code>, optional</dt>
 <dd>
 <p>To get this parameter look at <a href="https://youtu.be/zwLmLfVI-VQ?t=117">this video</a>
@@ -3478,6 +3521,8 @@ I recommend watching the entire thing, as it will help setup this package.</p>
 <p>All the methods take this as a optional parameter, however it's cleaner code
 to store this at the instance level. You can override this at the specific
 methods.</p>
+<p>You can use the following to generate <code>"".join(random.choice(string.digits)
+for num in range(19))</code></p>
 </dd>
 <dt><strong><code>use_test_endpoints</code></strong> :&ensp;<code>Send requests to TikTok's test endpoints</code>, optional</dt>
 <dd>This parameter when set to true will make requests to TikTok's testing
@@ -3487,7 +3532,7 @@ work here which is helpful.</dd>
 <dt><strong><code>proxy</code></strong> :&ensp;<code>A string containing your proxy address</code>, optional</dt>
 <dd>
 <p>If you want to do a lot of scraping of TikTok endpoints you'll likely
-need a proxy. </p>
+need a proxy.</p>
 <p>Ex: "https://0.0.0.0:8080"</p>
 <p>All the methods take this as a optional parameter, however it's cleaner code
 to store this at the instance level. You can override this at the specific
@@ -3510,7 +3555,7 @@ in other places.</dd>
 </summary>
 <pre><code class="python">@staticmethod
 def get_instance(**kwargs):
-    &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok. This is a singleton 
+    &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok. This is a singleton
         class to prevent issues from arising with playwright
 
     Parameters
@@ -3528,6 +3573,9 @@ def get_instance(**kwargs):
         All the methods take this as a optional parameter, however it&#39;s cleaner code
         to store this at the instance level. You can override this at the specific
         methods.
+    generate_static_did: A parameter that generates a custom_did at the instance level
+        Use this if you want to download videos from a script but don&#39;t want to generate
+        your own custom_did parameter.
     custom_verifyFp: A TikTok parameter needed to work most of the time, optional
         To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
         I recommend watching the entire thing, as it will help setup this package.
@@ -3535,6 +3583,9 @@ def get_instance(**kwargs):
         All the methods take this as a optional parameter, however it&#39;s cleaner code
         to store this at the instance level. You can override this at the specific
         methods.
+
+        You can use the following to generate `&#34;&#34;.join(random.choice(string.digits)
+        for num in range(19))`
     use_test_endpoints: Send requests to TikTok&#39;s test endpoints, optional
         This parameter when set to true will make requests to TikTok&#39;s testing
         endpoints instead of the live site. I can&#39;t guarantee this will work
@@ -3542,16 +3593,16 @@ def get_instance(**kwargs):
         work here which is helpful.
     proxy: A string containing your proxy address, optional
         If you want to do a lot of scraping of TikTok endpoints you&#39;ll likely
-        need a proxy. 
-        
+        need a proxy.
+
         Ex: &#34;https://0.0.0.0:8080&#34;
 
         All the methods take this as a optional parameter, however it&#39;s cleaner code
         to store this at the instance level. You can override this at the specific
         methods.
     use_selenium: Option to use selenium over playwright, optional
-        Playwright is selected by default and is the one that I&#39;m designing the 
-        package to be compatable for, however if playwright doesn&#39;t work on 
+        Playwright is selected by default and is the one that I&#39;m designing the
+        package to be compatable for, however if playwright doesn&#39;t work on
         your machine feel free to set this to True.
     executablePath: The location of the driver, optional
         This shouldn&#39;t be needed if you&#39;re using playwright
@@ -3736,7 +3787,7 @@ from a single endpoint.</dd>
     ----------
     count: The amount of TikToks you want returned, optional
         Note: TikTok seems to only support at MOST ~2000 TikToks
-        from a single endpoint. 
+        from a single endpoint.
     &#34;&#34;&#34;
     (
         region,
@@ -3855,8 +3906,7 @@ get videos from.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def discover_hashtags(self, **kwargs) -&gt; dict:
-    &#34;&#34;&#34;Discover page, consists challenges (hashtags)
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Discover page, consists challenges (hashtags)&#34;&#34;&#34;
     (
         region,
         language,
@@ -3883,8 +3933,7 @@ get videos from.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def discover_music(self, **kwargs) -&gt; dict:
-    &#34;&#34;&#34;Discover page, consists of music
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Discover page, consists of music&#34;&#34;&#34;
     (
         region,
         language,
@@ -4026,6 +4075,20 @@ I recommend watching the entire thing, as it will help setup this package.</dd>
         parsed_data[&#34;userAgent&#34;],
         parsed_data[&#34;referrer&#34;],
     )</code></pre>
+</details>
+</dd>
+<dt id="TikTokApi.tiktok.TikTokApi.generate_did"><code class="name flex">
+<span>def <span class="ident">generate_did</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generates a valid did for other methods. Pass this as the custom_did field to download videos</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_did(self):
+    &#34;&#34;&#34;Generates a valid did for other methods. Pass this as the custom_did field to download videos&#34;&#34;&#34;
+    return &#34;&#34;.join(random.choice(string.digits) for num in range(19))</code></pre>
 </details>
 </dd>
 <dt id="TikTokApi.tiktok.TikTokApi.get_bytes"><code class="name flex">
@@ -4283,7 +4346,7 @@ you will need to use this.</p></div>
     Parameters
     ----------
     id: The sound id to get the object for
-        This can be found by using other methods. 
+        This can be found by using other methods.
     &#34;&#34;&#34;
     return self.getMusicObjectFull(id, **kwargs)[&#34;music&#34;]</code></pre>
 </details>
@@ -4942,7 +5005,7 @@ url links.</dd>
     ----------
     url: The TikTok url you want to retrieve
         This currently doesn&#39;t support the shortened TikTok
-        url links. 
+        url links.
     &#34;&#34;&#34;
     (
         region,
@@ -5162,7 +5225,12 @@ url links.</dd>
 <span>def <span class="ident">get_video_by_tiktok</span></span>(<span>self, data, **kwargs) ‑> bytes</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Downloads video from TikTok using a TikTok object</p>
+<div class="desc"><p>Downloads video from TikTok using a TikTok object.</p>
+<pre><code>You will need to set a custom_did to do this for anything but trending.
+To do this, this is pretty simple you can either generate one yourself or,
+you can pass the generate_static_did=True into the constructor of the
+TikTokApi class.
+</code></pre>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>data</code></strong> :&ensp;<code>A TikTok object</code></dt>
@@ -5173,7 +5241,12 @@ url links.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_video_by_tiktok(self, data, **kwargs) -&gt; bytes:
-    &#34;&#34;&#34;Downloads video from TikTok using a TikTok object
+    &#34;&#34;&#34;Downloads video from TikTok using a TikTok object.
+
+        You will need to set a custom_did to do this for anything but trending.
+        To do this, this is pretty simple you can either generate one yourself or,
+        you can pass the generate_static_did=True into the constructor of the
+        TikTokApi class.
 
     Parameters
     ----------
@@ -5553,10 +5626,10 @@ just use by_username to find it.</dd>
     Parameters
     ----------
     userID: The userID of the user, which TikTok assigns
-        You can find this from utilizing other methods or 
+        You can find this from utilizing other methods or
         just use by_username to find it.
     secUID: The secUID of the user, which TikTok assigns
-        You can find this from utilizing other methods or 
+        You can find this from utilizing other methods or
         just use by_username to find it.
     page_size: The number of posts to return per page
         Gets a specific page of a user, doesn&#39;t iterate.
@@ -5614,10 +5687,10 @@ just use by_username to find it.</dd>
     Parameters
     ----------
     userID: The userID of the user, which TikTok assigns
-        You can find this from utilizing other methods or 
+        You can find this from utilizing other methods or
         just use by_username to find it.
     secUID: The secUID of the user, which TikTok assigns
-        You can find this from utilizing other methods or 
+        You can find this from utilizing other methods or
         just use by_username to find it.
     count: The number of posts to return
         Note: seems to only support up to ~2,000
@@ -5704,6 +5777,7 @@ just use by_username to find it.</dd>
 <li><code><a title="TikTokApi.tiktok.TikTokApi.discover_music" href="#TikTokApi.tiktok.TikTokApi.discover_music">discover_music</a></code></li>
 <li><code><a title="TikTokApi.tiktok.TikTokApi.discover_type" href="#TikTokApi.tiktok.TikTokApi.discover_type">discover_type</a></code></li>
 <li><code><a title="TikTokApi.tiktok.TikTokApi.external_signer" href="#TikTokApi.tiktok.TikTokApi.external_signer">external_signer</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.generate_did" href="#TikTokApi.tiktok.TikTokApi.generate_did">generate_did</a></code></li>
 <li><code><a title="TikTokApi.tiktok.TikTokApi.get_bytes" href="#TikTokApi.tiktok.TikTokApi.get_bytes">get_bytes</a></code></li>
 <li><code><a title="TikTokApi.tiktok.TikTokApi.get_cookies" href="#TikTokApi.tiktok.TikTokApi.get_cookies">get_cookies</a></code></li>
 <li><code><a title="TikTokApi.tiktok.TikTokApi.get_data" href="#TikTokApi.tiktok.TikTokApi.get_data">get_data</a></code></li>
