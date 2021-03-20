@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
-<title>TikTokApi.tiktokapi API documentation</title>
+<title>TikTokApi.tiktok API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,7 +19,7 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>TikTokApi.tiktokapi</code></h1>
+<h1 class="title">Module <code>TikTokApi.tiktok</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
@@ -1784,7 +1784,7 @@ __pdoc__ = {
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="TikTokApi.tiktokapi.TikTokApi"><code class="flex name class">
+<dt id="TikTokApi.tiktok.TikTokApi"><code class="flex name class">
 <span>class <span class="ident">TikTokApi</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
@@ -3489,7 +3489,7 @@ __pdoc__ = {
 </details>
 <h3>Static methods</h3>
 <dl>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_instance"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_instance"><code class="name flex">
 <span>def <span class="ident">get_instance</span></span>(<span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -3619,7 +3619,7 @@ def get_instance(**kwargs):
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="TikTokApi.tiktokapi.TikTokApi.by_hashtag"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.by_hashtag"><code class="name flex">
 <span>def <span class="ident">by_hashtag</span></span>(<span>self, hashtag, count=30, offset=0, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -3691,7 +3691,7 @@ def get_instance(**kwargs):
     return response[:required_count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.by_sound"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.by_sound"><code class="name flex">
 <span>def <span class="ident">by_sound</span></span>(<span>self, id, count=30, offset=0, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -3764,7 +3764,7 @@ def get_instance(**kwargs):
     return response[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.by_trending"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.by_trending"><code class="name flex">
 <span>def <span class="ident">by_trending</span></span>(<span>self, count=30, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -3837,7 +3837,7 @@ from a single endpoint.</dd>
     return response[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.by_username"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.by_username"><code class="name flex">
 <span>def <span class="ident">by_username</span></span>(<span>self, username, count=30, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -3882,7 +3882,7 @@ get videos from.</dd>
     )</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.clean_up"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.clean_up"><code class="name flex">
 <span>def <span class="ident">clean_up</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -3896,7 +3896,7 @@ get videos from.</dd>
     self.__del__()</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.discover_hashtags"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.discover_hashtags"><code class="name flex">
 <span>def <span class="ident">discover_hashtags</span></span>(<span>self, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -3923,7 +3923,7 @@ get videos from.</dd>
     return self.getData(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.discover_music"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.discover_music"><code class="name flex">
 <span>def <span class="ident">discover_music</span></span>(<span>self, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -3950,7 +3950,7 @@ get videos from.</dd>
     return self.getData(url=api_url, **kwargs)[&#34;body&#34;][2][&#34;exploreList&#34;]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.discover_type"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.discover_type"><code class="name flex">
 <span>def <span class="ident">discover_type</span></span>(<span>self, search_term, prefix, count=28, offset=0, **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -4023,7 +4023,7 @@ get videos from.</dd>
     return response[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.external_signer"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.external_signer"><code class="name flex">
 <span>def <span class="ident">external_signer</span></span>(<span>self, url, custom_did=None, verifyFp=None)</span>
 </code></dt>
 <dd>
@@ -4077,7 +4077,7 @@ I recommend watching the entire thing, as it will help setup this package.</dd>
     )</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.generate_did"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.generate_did"><code class="name flex">
 <span>def <span class="ident">generate_did</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -4091,7 +4091,7 @@ I recommend watching the entire thing, as it will help setup this package.</dd>
     return &#34;&#34;.join(random.choice(string.digits) for num in range(19))</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_bytes"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_bytes"><code class="name flex">
 <span>def <span class="ident">get_bytes</span></span>(<span>self, **kwargs) ‑> bytes</span>
 </code></dt>
 <dd>
@@ -4140,7 +4140,7 @@ I recommend watching the entire thing, as it will help setup this package.</dd>
     return r.content</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_cookies"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_cookies"><code class="name flex">
 <span>def <span class="ident">get_cookies</span></span>(<span>self, **kwargs)</span>
 </code></dt>
 <dd>
@@ -4183,7 +4183,7 @@ I recommend watching the entire thing, as it will help setup this package.</dd>
         }</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_data"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_data"><code class="name flex">
 <span>def <span class="ident">get_data</span></span>(<span>self, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -4286,7 +4286,7 @@ you will need to use this.</p></div>
             raise JSONDecodeFailure() from e</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_hashtag_object"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_hashtag_object"><code class="name flex">
 <span>def <span class="ident">get_hashtag_object</span></span>(<span>self, hashtag, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -4326,7 +4326,7 @@ you will need to use this.</p></div>
     return data</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_music_object"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_music_object"><code class="name flex">
 <span>def <span class="ident">get_music_object</span></span>(<span>self, id, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -4351,7 +4351,7 @@ you will need to use this.</p></div>
     return self.getMusicObjectFull(id, **kwargs)[&#34;music&#34;]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_music_object_full"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_music_object_full"><code class="name flex">
 <span>def <span class="ident">get_music_object_full</span></span>(<span>self, id, **kwargs)</span>
 </code></dt>
 <dd>
@@ -4400,7 +4400,7 @@ you will need to use this.</p></div>
     return json.loads(j_raw)[&#34;props&#34;][&#34;pageProps&#34;][&#34;musicInfo&#34;]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_music_title"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_music_title"><code class="name flex">
 <span>def <span class="ident">get_music_title</span></span>(<span>self, id, **kwargs)</span>
 </code></dt>
 <dd>
@@ -4446,7 +4446,7 @@ you will need to use this.</p></div>
     return music_object[&#34;title&#34;]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_recommended_tiktoks_by_video_id"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_recommended_tiktoks_by_video_id"><code class="name flex">
 <span>def <span class="ident">get_recommended_tiktoks_by_video_id</span></span>(<span>self, id, count=30, minCursor=0, maxCursor=0, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -4522,7 +4522,7 @@ you will need to use this.</p></div>
     return response[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_secuid"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_secuid"><code class="name flex">
 <span>def <span class="ident">get_secuid</span></span>(<span>self, username, **kwargs)</span>
 </code></dt>
 <dd>
@@ -4568,7 +4568,7 @@ you will need to use this.</p></div>
         )</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_suggested_hashtags_by_id"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_suggested_hashtags_by_id"><code class="name flex">
 <span>def <span class="ident">get_suggested_hashtags_by_id</span></span>(<span>self, count=30, userId='6745191554350760966', **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -4616,7 +4616,7 @@ you will need to use this.</p></div>
     return res[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_suggested_hashtags_by_id_crawler"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_suggested_hashtags_by_id_crawler"><code class="name flex">
 <span>def <span class="ident">get_suggested_hashtags_by_id_crawler</span></span>(<span>self, count=30, startingId='6745191554350760966', **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -4666,7 +4666,7 @@ you will need to use this.</p></div>
     return hashtags[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_suggested_music_by_id"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_suggested_music_by_id"><code class="name flex">
 <span>def <span class="ident">get_suggested_music_by_id</span></span>(<span>self, count=30, userId='6745191554350760966', **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -4720,7 +4720,7 @@ you will need to use this.</p></div>
     return res[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_suggested_music_id_crawler"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_suggested_music_id_crawler"><code class="name flex">
 <span>def <span class="ident">get_suggested_music_id_crawler</span></span>(<span>self, count=30, startingId='6745191554350760966', **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -4770,7 +4770,7 @@ you will need to use this.</p></div>
     return musics[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_suggested_users_by_id"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_suggested_users_by_id"><code class="name flex">
 <span>def <span class="ident">get_suggested_users_by_id</span></span>(<span>self, userId='6745191554350760966', count=30, **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -4821,7 +4821,7 @@ you will need to use this.</p></div>
     return res[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_suggested_users_by_id_crawler"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_suggested_users_by_id_crawler"><code class="name flex">
 <span>def <span class="ident">get_suggested_users_by_id_crawler</span></span>(<span>self, count=30, startingId='6745191554350760966', **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -4873,7 +4873,7 @@ unique results with setting your own.</dd>
     return users[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_tiktok_by_html"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_tiktok_by_html"><code class="name flex">
 <span>def <span class="ident">get_tiktok_by_html</span></span>(<span>self, url, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -4941,7 +4941,7 @@ endpoints rather than the API based ones.</p>
     return data</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_tiktok_by_id"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_tiktok_by_id"><code class="name flex">
 <span>def <span class="ident">get_tiktok_by_id</span></span>(<span>self, id, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -4982,7 +4982,7 @@ endpoints rather than the API based ones.</p>
     return self.getData(url=api_url, **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_tiktok_by_url"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_tiktok_by_url"><code class="name flex">
 <span>def <span class="ident">get_tiktok_by_url</span></span>(<span>self, url, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -5030,7 +5030,7 @@ url links.</dd>
     )</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_user"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_user"><code class="name flex">
 <span>def <span class="ident">get_user</span></span>(<span>self, username, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -5096,7 +5096,7 @@ url links.</dd>
     return user</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_user_object"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_user_object"><code class="name flex">
 <span>def <span class="ident">get_user_object</span></span>(<span>self, username, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -5128,7 +5128,7 @@ url links.</dd>
     return self.getUser(username, **kwargs)[&#34;userInfo&#34;][&#34;user&#34;]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_user_pager"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_user_pager"><code class="name flex">
 <span>def <span class="ident">get_user_pager</span></span>(<span>self, username, page_size=30, cursor=0, **kwargs)</span>
 </code></dt>
 <dd>
@@ -5189,7 +5189,7 @@ url links.</dd>
             return  # all done</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_video_by_download_url"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_video_by_download_url"><code class="name flex">
 <span>def <span class="ident">get_video_by_download_url</span></span>(<span>self, download_url, **kwargs) ‑> bytes</span>
 </code></dt>
 <dd>
@@ -5221,7 +5221,7 @@ url links.</dd>
     return self.getBytes(url=download_url, **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_video_by_tiktok"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_video_by_tiktok"><code class="name flex">
 <span>def <span class="ident">get_video_by_tiktok</span></span>(<span>self, data, **kwargs) ‑> bytes</span>
 </code></dt>
 <dd>
@@ -5271,7 +5271,7 @@ TikTokApi class.
     return self.get_Video_By_DownloadURL(api_url, **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_video_by_url"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_video_by_url"><code class="name flex">
 <span>def <span class="ident">get_video_by_url</span></span>(<span>self, video_url, **kwargs) ‑> bytes</span>
 </code></dt>
 <dd>
@@ -5307,7 +5307,7 @@ TikTokApi class.
     return self.getBytes(url=download_url, **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.get_video_no_watermark"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.get_video_no_watermark"><code class="name flex">
 <span>def <span class="ident">get_video_no_watermark</span></span>(<span>self, video_url, return_bytes=1, **kwargs) ‑> bytes</span>
 </code></dt>
 <dd>
@@ -5375,7 +5375,7 @@ TikTokApi class.
     return r.content</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.search_for_hashtags"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.search_for_hashtags"><code class="name flex">
 <span>def <span class="ident">search_for_hashtags</span></span>(<span>self, search_term, count=28, **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -5406,7 +5406,7 @@ TikTokApi class.
     )</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.search_for_music"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.search_for_music"><code class="name flex">
 <span>def <span class="ident">search_for_music</span></span>(<span>self, search_term, count=28, **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -5435,7 +5435,7 @@ TikTokApi class.
     return self.discover_type(search_term, prefix=&#34;music&#34;, count=count, **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.search_for_users"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.search_for_users"><code class="name flex">
 <span>def <span class="ident">search_for_users</span></span>(<span>self, search_term, count=28, **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -5464,7 +5464,7 @@ TikTokApi class.
     return self.discover_type(search_term, prefix=&#34;user&#34;, count=count, **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.user_liked"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.user_liked"><code class="name flex">
 <span>def <span class="ident">user_liked</span></span>(<span>self, userID, secUID, count=30, cursor=0, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -5554,7 +5554,7 @@ Note: The user's likes must be public</p>
     return response[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.user_liked_by_username"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.user_liked_by_username"><code class="name flex">
 <span>def <span class="ident">user_liked_by_username</span></span>(<span>self, username, count=30, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -5598,7 +5598,7 @@ Note: The user's likes must be public</p>
     )</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.user_page"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.user_page"><code class="name flex">
 <span>def <span class="ident">user_page</span></span>(<span>self, userID, secUID, page_size=30, cursor=0, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -5661,7 +5661,7 @@ just use by_username to find it.</dd>
     return self.getData(url=api_url, **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktokapi.TikTokApi.user_posts"><code class="name flex">
+<dt id="TikTokApi.tiktok.TikTokApi.user_posts"><code class="name flex">
 <span>def <span class="ident">user_posts</span></span>(<span>self, userID, secUID, count=30, cursor=0, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -5766,51 +5766,51 @@ just use by_username to find it.</dd>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="TikTokApi.tiktokapi.TikTokApi" href="#TikTokApi.tiktokapi.TikTokApi">TikTokApi</a></code></h4>
+<h4><code><a title="TikTokApi.tiktok.TikTokApi" href="#TikTokApi.tiktok.TikTokApi">TikTokApi</a></code></h4>
 <ul class="">
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.by_hashtag" href="#TikTokApi.tiktokapi.TikTokApi.by_hashtag">by_hashtag</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.by_sound" href="#TikTokApi.tiktokapi.TikTokApi.by_sound">by_sound</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.by_trending" href="#TikTokApi.tiktokapi.TikTokApi.by_trending">by_trending</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.by_username" href="#TikTokApi.tiktokapi.TikTokApi.by_username">by_username</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.clean_up" href="#TikTokApi.tiktokapi.TikTokApi.clean_up">clean_up</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.discover_hashtags" href="#TikTokApi.tiktokapi.TikTokApi.discover_hashtags">discover_hashtags</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.discover_music" href="#TikTokApi.tiktokapi.TikTokApi.discover_music">discover_music</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.discover_type" href="#TikTokApi.tiktokapi.TikTokApi.discover_type">discover_type</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.external_signer" href="#TikTokApi.tiktokapi.TikTokApi.external_signer">external_signer</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.generate_did" href="#TikTokApi.tiktokapi.TikTokApi.generate_did">generate_did</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_bytes" href="#TikTokApi.tiktokapi.TikTokApi.get_bytes">get_bytes</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_cookies" href="#TikTokApi.tiktokapi.TikTokApi.get_cookies">get_cookies</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_data" href="#TikTokApi.tiktokapi.TikTokApi.get_data">get_data</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_hashtag_object" href="#TikTokApi.tiktokapi.TikTokApi.get_hashtag_object">get_hashtag_object</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_instance" href="#TikTokApi.tiktokapi.TikTokApi.get_instance">get_instance</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_music_object" href="#TikTokApi.tiktokapi.TikTokApi.get_music_object">get_music_object</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_music_object_full" href="#TikTokApi.tiktokapi.TikTokApi.get_music_object_full">get_music_object_full</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_music_title" href="#TikTokApi.tiktokapi.TikTokApi.get_music_title">get_music_title</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_recommended_tiktoks_by_video_id" href="#TikTokApi.tiktokapi.TikTokApi.get_recommended_tiktoks_by_video_id">get_recommended_tiktoks_by_video_id</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_secuid" href="#TikTokApi.tiktokapi.TikTokApi.get_secuid">get_secuid</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_suggested_hashtags_by_id" href="#TikTokApi.tiktokapi.TikTokApi.get_suggested_hashtags_by_id">get_suggested_hashtags_by_id</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_suggested_hashtags_by_id_crawler" href="#TikTokApi.tiktokapi.TikTokApi.get_suggested_hashtags_by_id_crawler">get_suggested_hashtags_by_id_crawler</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_suggested_music_by_id" href="#TikTokApi.tiktokapi.TikTokApi.get_suggested_music_by_id">get_suggested_music_by_id</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_suggested_music_id_crawler" href="#TikTokApi.tiktokapi.TikTokApi.get_suggested_music_id_crawler">get_suggested_music_id_crawler</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_suggested_users_by_id" href="#TikTokApi.tiktokapi.TikTokApi.get_suggested_users_by_id">get_suggested_users_by_id</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_suggested_users_by_id_crawler" href="#TikTokApi.tiktokapi.TikTokApi.get_suggested_users_by_id_crawler">get_suggested_users_by_id_crawler</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_tiktok_by_html" href="#TikTokApi.tiktokapi.TikTokApi.get_tiktok_by_html">get_tiktok_by_html</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_tiktok_by_id" href="#TikTokApi.tiktokapi.TikTokApi.get_tiktok_by_id">get_tiktok_by_id</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_tiktok_by_url" href="#TikTokApi.tiktokapi.TikTokApi.get_tiktok_by_url">get_tiktok_by_url</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_user" href="#TikTokApi.tiktokapi.TikTokApi.get_user">get_user</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_user_object" href="#TikTokApi.tiktokapi.TikTokApi.get_user_object">get_user_object</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_user_pager" href="#TikTokApi.tiktokapi.TikTokApi.get_user_pager">get_user_pager</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_video_by_download_url" href="#TikTokApi.tiktokapi.TikTokApi.get_video_by_download_url">get_video_by_download_url</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_video_by_tiktok" href="#TikTokApi.tiktokapi.TikTokApi.get_video_by_tiktok">get_video_by_tiktok</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_video_by_url" href="#TikTokApi.tiktokapi.TikTokApi.get_video_by_url">get_video_by_url</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.get_video_no_watermark" href="#TikTokApi.tiktokapi.TikTokApi.get_video_no_watermark">get_video_no_watermark</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.search_for_hashtags" href="#TikTokApi.tiktokapi.TikTokApi.search_for_hashtags">search_for_hashtags</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.search_for_music" href="#TikTokApi.tiktokapi.TikTokApi.search_for_music">search_for_music</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.search_for_users" href="#TikTokApi.tiktokapi.TikTokApi.search_for_users">search_for_users</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.user_liked" href="#TikTokApi.tiktokapi.TikTokApi.user_liked">user_liked</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.user_liked_by_username" href="#TikTokApi.tiktokapi.TikTokApi.user_liked_by_username">user_liked_by_username</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.user_page" href="#TikTokApi.tiktokapi.TikTokApi.user_page">user_page</a></code></li>
-<li><code><a title="TikTokApi.tiktokapi.TikTokApi.user_posts" href="#TikTokApi.tiktokapi.TikTokApi.user_posts">user_posts</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.by_hashtag" href="#TikTokApi.tiktok.TikTokApi.by_hashtag">by_hashtag</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.by_sound" href="#TikTokApi.tiktok.TikTokApi.by_sound">by_sound</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.by_trending" href="#TikTokApi.tiktok.TikTokApi.by_trending">by_trending</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.by_username" href="#TikTokApi.tiktok.TikTokApi.by_username">by_username</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.clean_up" href="#TikTokApi.tiktok.TikTokApi.clean_up">clean_up</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.discover_hashtags" href="#TikTokApi.tiktok.TikTokApi.discover_hashtags">discover_hashtags</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.discover_music" href="#TikTokApi.tiktok.TikTokApi.discover_music">discover_music</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.discover_type" href="#TikTokApi.tiktok.TikTokApi.discover_type">discover_type</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.external_signer" href="#TikTokApi.tiktok.TikTokApi.external_signer">external_signer</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.generate_did" href="#TikTokApi.tiktok.TikTokApi.generate_did">generate_did</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_bytes" href="#TikTokApi.tiktok.TikTokApi.get_bytes">get_bytes</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_cookies" href="#TikTokApi.tiktok.TikTokApi.get_cookies">get_cookies</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_data" href="#TikTokApi.tiktok.TikTokApi.get_data">get_data</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_hashtag_object" href="#TikTokApi.tiktok.TikTokApi.get_hashtag_object">get_hashtag_object</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_instance" href="#TikTokApi.tiktok.TikTokApi.get_instance">get_instance</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_music_object" href="#TikTokApi.tiktok.TikTokApi.get_music_object">get_music_object</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_music_object_full" href="#TikTokApi.tiktok.TikTokApi.get_music_object_full">get_music_object_full</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_music_title" href="#TikTokApi.tiktok.TikTokApi.get_music_title">get_music_title</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_recommended_tiktoks_by_video_id" href="#TikTokApi.tiktok.TikTokApi.get_recommended_tiktoks_by_video_id">get_recommended_tiktoks_by_video_id</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_secuid" href="#TikTokApi.tiktok.TikTokApi.get_secuid">get_secuid</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_suggested_hashtags_by_id" href="#TikTokApi.tiktok.TikTokApi.get_suggested_hashtags_by_id">get_suggested_hashtags_by_id</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_suggested_hashtags_by_id_crawler" href="#TikTokApi.tiktok.TikTokApi.get_suggested_hashtags_by_id_crawler">get_suggested_hashtags_by_id_crawler</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_suggested_music_by_id" href="#TikTokApi.tiktok.TikTokApi.get_suggested_music_by_id">get_suggested_music_by_id</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_suggested_music_id_crawler" href="#TikTokApi.tiktok.TikTokApi.get_suggested_music_id_crawler">get_suggested_music_id_crawler</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_suggested_users_by_id" href="#TikTokApi.tiktok.TikTokApi.get_suggested_users_by_id">get_suggested_users_by_id</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_suggested_users_by_id_crawler" href="#TikTokApi.tiktok.TikTokApi.get_suggested_users_by_id_crawler">get_suggested_users_by_id_crawler</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_tiktok_by_html" href="#TikTokApi.tiktok.TikTokApi.get_tiktok_by_html">get_tiktok_by_html</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_tiktok_by_id" href="#TikTokApi.tiktok.TikTokApi.get_tiktok_by_id">get_tiktok_by_id</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_tiktok_by_url" href="#TikTokApi.tiktok.TikTokApi.get_tiktok_by_url">get_tiktok_by_url</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_user" href="#TikTokApi.tiktok.TikTokApi.get_user">get_user</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_user_object" href="#TikTokApi.tiktok.TikTokApi.get_user_object">get_user_object</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_user_pager" href="#TikTokApi.tiktok.TikTokApi.get_user_pager">get_user_pager</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_video_by_download_url" href="#TikTokApi.tiktok.TikTokApi.get_video_by_download_url">get_video_by_download_url</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_video_by_tiktok" href="#TikTokApi.tiktok.TikTokApi.get_video_by_tiktok">get_video_by_tiktok</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_video_by_url" href="#TikTokApi.tiktok.TikTokApi.get_video_by_url">get_video_by_url</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_video_no_watermark" href="#TikTokApi.tiktok.TikTokApi.get_video_no_watermark">get_video_no_watermark</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.search_for_hashtags" href="#TikTokApi.tiktok.TikTokApi.search_for_hashtags">search_for_hashtags</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.search_for_music" href="#TikTokApi.tiktok.TikTokApi.search_for_music">search_for_music</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.search_for_users" href="#TikTokApi.tiktok.TikTokApi.search_for_users">search_for_users</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.user_liked" href="#TikTokApi.tiktok.TikTokApi.user_liked">user_liked</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.user_liked_by_username" href="#TikTokApi.tiktok.TikTokApi.user_liked_by_username">user_liked_by_username</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.user_page" href="#TikTokApi.tiktok.TikTokApi.user_page">user_page</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.user_posts" href="#TikTokApi.tiktok.TikTokApi.user_posts">user_posts</a></code></li>
 </ul>
 </li>
 </ul>
