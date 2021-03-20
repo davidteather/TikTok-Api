@@ -29,8 +29,10 @@ class TikTokApi:
             raise Exception("Only one TikTokApi object is allowed")
         logging.basicConfig(level=kwargs.get("logging_level", logging.WARNING))
         logging.info("Class initalized")
-        self.executablePath = kwargs.get("executablePath", None)
 
+        # Some Instance Vars
+        self.executablePath = kwargs.get("executablePath", None)
+        self.custom_did = kwargs.get("custom_did", None)
         self.userAgent = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -38,6 +40,8 @@ class TikTokApi:
         )
         self.proxy = kwargs.get("proxy", None)
         self.custom_verifyFp = kwargs.get("custom_verifyFp")
+        self.signer_url = kwargs.get("external_signer", None)
+        self.request_delay = kwargs.get("request_delay", None)
 
         if kwargs.get("use_test_endpoints", False):
             global BASE_URL
@@ -47,7 +51,9 @@ class TikTokApi:
         else:
             from .browser import browser
 
-        self.signer_url = kwargs.get("external_signer", None)
+        if kwargs.get("generate_static_did", False):
+            self.custom_did = "".join(random.choice(string.digits) for num in range(19))
+
         if self.signer_url is None:
             self.browser = browser(**kwargs)
             self.userAgent = self.browser.userAgent
@@ -67,6 +73,7 @@ class TikTokApi:
             self.width = self.browser.width
             self.height = self.browser.height
         except Exception as e:
+            logging.error(e)
             logging.warning(
                 "An error ocurred while opening your browser but it was ignored."
             )
@@ -78,8 +85,6 @@ class TikTokApi:
             self.browser_version = ""
             self.width = "1920"
             self.height = "1080"
-
-        self.request_delay = kwargs.get("request_delay", None)
 
     @staticmethod
     def get_instance(**kwargs):
@@ -101,6 +106,9 @@ class TikTokApi:
             All the methods take this as a optional parameter, however it's cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
+        generate_static_did: A parameter that generates a custom_did at the instance level
+            Use this if you want to download videos from a script but don't want to generate
+            your own custom_did parameter.
         custom_verifyFp: A TikTok parameter needed to work most of the time, optional
             To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
             I recommend watching the entire thing, as it will help setup this package.
@@ -108,6 +116,9 @@ class TikTokApi:
             All the methods take this as a optional parameter, however it's cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
+
+            You can use the following to generate `"".join(random.choice(string.digits)
+            for num in range(19))`
         use_test_endpoints: Send requests to TikTok's test endpoints, optional
             This parameter when set to true will make requests to TikTok's testing
             endpoints instead of the live site. I can't guarantee this will work
@@ -1417,7 +1428,12 @@ class TikTokApi:
         return musics[:count]
 
     def get_video_by_tiktok(self, data, **kwargs) -> bytes:
-        """Downloads video from TikTok using a TikTok object
+        """Downloads video from TikTok using a TikTok object.
+
+            You will need to set a custom_did to do this for anything but trending.
+            To do this, this is pretty simple you can either generate one yourself or,
+            you can pass the generate_static_did=True into the constructor of the
+            TikTokApi class.
 
         Parameters
         ----------
@@ -1588,6 +1604,10 @@ class TikTokApi:
                 "Retrieving the user secUid failed. Likely due to TikTok wanting captcha validation. Try to use a proxy."
             )
 
+    def generate_did(self):
+        """Generates a valid did for other methods. Pass this as the custom_did field to download videos"""
+        return "".join(random.choice(string.digits) for num in range(19))
+
     #
     # PRIVATE METHODS
     #
@@ -1645,10 +1665,14 @@ class TikTokApi:
         language = kwargs.get("language", "en")
         proxy = kwargs.get("proxy", None)
         maxCount = kwargs.get("maxCount", 35)
-        did = kwargs.get(
-            "custom_did", "".join(random.choice(string.digits) for num in range(19))
-        )
 
+        if kwargs.get("custom_did", None) != None:
+            did = kwargs.get("custom_did")
+        else:
+            if self.custom_did != None:
+                did = self.custom_did
+            else:
+                did = "".join(random.choice(string.digits) for num in range(19))
         return region, language, proxy, maxCount, did
 
     #

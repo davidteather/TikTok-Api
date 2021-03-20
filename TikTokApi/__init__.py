@@ -1,2 +1,2 @@
-from TikTokApi.tiktok import TikTokApi
-from TikTokApi.tiktokuser import TikTokUser
+from TikTokApi.TikTokApi import TikTokApi
+from TikTokApi.TikTokUser import TikTokUser

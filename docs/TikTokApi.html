@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
-<title>TikTokApi.tiktok API documentation</title>
+<title>TikTokApi.TikTokApi API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,7 +19,7 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>TikTokApi.tiktok</code></h1>
+<h1 class="title">Module <code>TikTokApi.TikTokApi</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
@@ -40,7 +40,6 @@ from .utilities import update_messager
 from .exceptions import *
 
 
-
 os.environ[&#34;no_proxy&#34;] = &#34;127.0.0.1,localhost&#34;
 
 BASE_URL = &#34;https://m.tiktok.com/&#34;
@@ -48,11 +47,9 @@ BASE_URL = &#34;https://m.tiktok.com/&#34;
 
 class TikTokApi:
     __instance = None
-    
 
     def __init__(self, **kwargs):
-        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok, use get_instance NOT this.
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok, use get_instance NOT this.&#34;&#34;&#34;
         # Forces Singleton
         if TikTokApi.__instance is None:
             TikTokApi.__instance = self
@@ -60,8 +57,10 @@ class TikTokApi:
             raise Exception(&#34;Only one TikTokApi object is allowed&#34;)
         logging.basicConfig(level=kwargs.get(&#34;logging_level&#34;, logging.WARNING))
         logging.info(&#34;Class initalized&#34;)
-        self.executablePath = kwargs.get(&#34;executablePath&#34;, None)
 
+        # Some Instance Vars
+        self.executablePath = kwargs.get(&#34;executablePath&#34;, None)
+        self.custom_did = kwargs.get(&#34;custom_did&#34;, None)
         self.userAgent = (
             &#34;Mozilla/5.0 (Windows NT 10.0; Win64; x64) &#34;
             &#34;AppleWebKit/537.36 (KHTML, like Gecko) &#34;
@@ -69,6 +68,8 @@ class TikTokApi:
         )
         self.proxy = kwargs.get(&#34;proxy&#34;, None)
         self.custom_verifyFp = kwargs.get(&#34;custom_verifyFp&#34;)
+        self.signer_url = kwargs.get(&#34;external_signer&#34;, None)
+        self.request_delay = kwargs.get(&#34;request_delay&#34;, None)
 
         if kwargs.get(&#34;use_test_endpoints&#34;, False):
             global BASE_URL
@@ -78,7 +79,9 @@ class TikTokApi:
         else:
             from .browser import browser
 
-        self.signer_url = kwargs.get(&#34;external_signer&#34;, None)
+        if kwargs.get(&#34;generate_static_did&#34;, False):
+            self.custom_did = &#34;&#34;.join(random.choice(string.digits) for num in range(19))
+
         if self.signer_url is None:
             self.browser = browser(**kwargs)
             self.userAgent = self.browser.userAgent
@@ -98,6 +101,7 @@ class TikTokApi:
             self.width = self.browser.width
             self.height = self.browser.height
         except Exception as e:
+            logging.error(e)
             logging.warning(
                 &#34;An error ocurred while opening your browser but it was ignored.&#34;
             )
@@ -110,11 +114,9 @@ class TikTokApi:
             self.width = &#34;1920&#34;
             self.height = &#34;1080&#34;
 
-        self.request_delay = kwargs.get(&#34;request_delay&#34;, None)
-
     @staticmethod
     def get_instance(**kwargs):
-        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok. This is a singleton 
+        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok. This is a singleton
             class to prevent issues from arising with playwright
 
         Parameters
@@ -132,6 +134,9 @@ class TikTokApi:
             All the methods take this as a optional parameter, however it&#39;s cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
+        generate_static_did: A parameter that generates a custom_did at the instance level
+            Use this if you want to download videos from a script but don&#39;t want to generate
+            your own custom_did parameter.
         custom_verifyFp: A TikTok parameter needed to work most of the time, optional
             To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
             I recommend watching the entire thing, as it will help setup this package.
@@ -139,6 +144,9 @@ class TikTokApi:
             All the methods take this as a optional parameter, however it&#39;s cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
+
+            You can use the following to generate `&#34;&#34;.join(random.choice(string.digits)
+            for num in range(19))`
         use_test_endpoints: Send requests to TikTok&#39;s test endpoints, optional
             This parameter when set to true will make requests to TikTok&#39;s testing
             endpoints instead of the live site. I can&#39;t guarantee this will work
@@ -146,16 +154,16 @@ class TikTokApi:
             work here which is helpful.
         proxy: A string containing your proxy address, optional
             If you want to do a lot of scraping of TikTok endpoints you&#39;ll likely
-            need a proxy. 
-            
+            need a proxy.
+
             Ex: &#34;https://0.0.0.0:8080&#34;
 
             All the methods take this as a optional parameter, however it&#39;s cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
         use_selenium: Option to use selenium over playwright, optional
-            Playwright is selected by default and is the one that I&#39;m designing the 
-            package to be compatable for, however if playwright doesn&#39;t work on 
+            Playwright is selected by default and is the one that I&#39;m designing the
+            package to be compatable for, however if playwright doesn&#39;t work on
             your machine feel free to set this to True.
         executablePath: The location of the driver, optional
             This shouldn&#39;t be needed if you&#39;re using playwright
@@ -386,7 +394,7 @@ class TikTokApi:
         ----------
         count: The amount of TikToks you want returned, optional
             Note: TikTok seems to only support at MOST ~2000 TikToks
-            from a single endpoint. 
+            from a single endpoint.
         &#34;&#34;&#34;
         (
             region,
@@ -533,10 +541,10 @@ class TikTokApi:
         Parameters
         ----------
         userID: The userID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         secUID: The secUID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         count: The number of posts to return
             Note: seems to only support up to ~2,000
@@ -625,10 +633,10 @@ class TikTokApi:
         Parameters
         ----------
         userID: The userID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         secUID: The secUID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         page_size: The number of posts to return per page
             Gets a specific page of a user, doesn&#39;t iterate.
@@ -857,7 +865,7 @@ class TikTokApi:
         Parameters
         ----------
         id: The sound id to get the object for
-            This can be found by using other methods. 
+            This can be found by using other methods.
         &#34;&#34;&#34;
         return self.getMusicObjectFull(id, **kwargs)[&#34;music&#34;]
 
@@ -1067,7 +1075,7 @@ class TikTokApi:
         ----------
         url: The TikTok url you want to retrieve
             This currently doesn&#39;t support the shortened TikTok
-            url links. 
+            url links.
         &#34;&#34;&#34;
         (
             region,
@@ -1144,8 +1152,7 @@ class TikTokApi:
         return data
 
     def discover_hashtags(self, **kwargs) -&gt; dict:
-        &#34;&#34;&#34;Discover page, consists challenges (hashtags)
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;Discover page, consists challenges (hashtags)&#34;&#34;&#34;
         (
             region,
             language,
@@ -1162,8 +1169,7 @@ class TikTokApi:
         return self.getData(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]
 
     def discover_music(self, **kwargs) -&gt; dict:
-        &#34;&#34;&#34;Discover page, consists of music
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;Discover page, consists of music&#34;&#34;&#34;
         (
             region,
             language,
@@ -1450,7 +1456,12 @@ class TikTokApi:
         return musics[:count]
 
     def get_video_by_tiktok(self, data, **kwargs) -&gt; bytes:
-        &#34;&#34;&#34;Downloads video from TikTok using a TikTok object
+        &#34;&#34;&#34;Downloads video from TikTok using a TikTok object.
+
+            You will need to set a custom_did to do this for anything but trending.
+            To do this, this is pretty simple you can either generate one yourself or,
+            you can pass the generate_static_did=True into the constructor of the
+            TikTokApi class.
 
         Parameters
         ----------
@@ -1621,6 +1632,10 @@ class TikTokApi:
                 &#34;Retrieving the user secUid failed. Likely due to TikTok wanting captcha validation. Try to use a proxy.&#34;
             )
 
+    def generate_did(self):
+        &#34;&#34;&#34;Generates a valid did for other methods. Pass this as the custom_did field to download videos&#34;&#34;&#34;
+        return &#34;&#34;.join(random.choice(string.digits) for num in range(19))
+
     #
     # PRIVATE METHODS
     #
@@ -1678,10 +1693,14 @@ class TikTokApi:
         language = kwargs.get(&#34;language&#34;, &#34;en&#34;)
         proxy = kwargs.get(&#34;proxy&#34;, None)
         maxCount = kwargs.get(&#34;maxCount&#34;, 35)
-        did = kwargs.get(
-            &#34;custom_did&#34;, &#34;&#34;.join(random.choice(string.digits) for num in range(19))
-        )
 
+        if kwargs.get(&#34;custom_did&#34;, None) != None:
+            did = kwargs.get(&#34;custom_did&#34;)
+        else:
+            if self.custom_did != None:
+                did = self.custom_did
+            else:
+                did = &#34;&#34;.join(random.choice(string.digits) for num in range(19))
         return region, language, proxy, maxCount, did
 
     #
@@ -1719,39 +1738,40 @@ class TikTokApi:
     get_secUid = get_secuid
     trending = by_trending
 
+
 # pdoc ignore old naming scheme
 __pdoc__ = {
-    &#39;TikTokApi.getData&#39;: False,
-    &#39;TikTokApi.getBytes&#39;: False,
-    &#39;TikTokApi.userPosts&#39;: False,
-    &#39;TikTokApi.byUsername&#39;: False,
-    &#39;TikTokApi.userPage&#39;: False,
-    &#39;TikTokApi.getUserPager&#39;: False,
-    &#39;TikTokApi.userLiked&#39;: False,
-    &#39;TikTokApi.userLikedbyUsername&#39;: False,
-    &#39;TikTokApi.bySound&#39;: False,
-    &#39;TikTokApi.getMusicObject&#39;: False,
-    &#39;TikTokApi.getMusicObjectFull&#39;: False,
-    &#39;TikTokApi.byHashtag&#39;: False,
-    &#39;TikTokApi.getHashtagObject&#39;: False,
-    &#39;TikTokApi.getRecommendedTikToksByVideoID&#39;: False,
-    &#39;TikTokApi.getTikTokById&#39;: False,
-    &#39;TikTokApi.getTikTokByUrl&#39;: False,
-    &#39;TikTokApi.discoverHashtags&#39;: False,
-    &#39;TikTokApi.discoverMusic&#39;: False,
-    &#39;TikTokApi.getUserObject&#39;: False,
-    &#39;TikTokApi.getUser&#39;: False,
-    &#39;TikTokApi.getSuggestedUsersbyID&#39;: False,
-    &#39;TikTokApi.getSuggestedUsersbyIDCrawler&#39;: False,
-    &#39;TikTokApi.getSuggestedHashtagsbyID&#39;: False,
-    &#39;TikTokApi.getSuggestedHashtagsbyIDCrawler&#39;: False,
-    &#39;TikTokApi.getSuggestedMusicbyID&#39;: False,
-    &#39;TikTokApi.getSuggestedMusicIDCrawler&#39;: False,
-    &#39;TikTokApi.get_Video_By_TikTok&#39;: False,
-    &#39;TikTokApi.get_Video_By_DownloadURL&#39;: False,
-    &#39;TikTokApi.get_Video_By_Url&#39;: False,
-    &#39;TikTokApi.get_secUid&#39;: False,
-    &#39;TikTokApi.trending&#39;: False,
+    &#34;TikTokApi.getData&#34;: False,
+    &#34;TikTokApi.getBytes&#34;: False,
+    &#34;TikTokApi.userPosts&#34;: False,
+    &#34;TikTokApi.byUsername&#34;: False,
+    &#34;TikTokApi.userPage&#34;: False,
+    &#34;TikTokApi.getUserPager&#34;: False,
+    &#34;TikTokApi.userLiked&#34;: False,
+    &#34;TikTokApi.userLikedbyUsername&#34;: False,
+    &#34;TikTokApi.bySound&#34;: False,
+    &#34;TikTokApi.getMusicObject&#34;: False,
+    &#34;TikTokApi.getMusicObjectFull&#34;: False,
+    &#34;TikTokApi.byHashtag&#34;: False,
+    &#34;TikTokApi.getHashtagObject&#34;: False,
+    &#34;TikTokApi.getRecommendedTikToksByVideoID&#34;: False,
+    &#34;TikTokApi.getTikTokById&#34;: False,
+    &#34;TikTokApi.getTikTokByUrl&#34;: False,
+    &#34;TikTokApi.discoverHashtags&#34;: False,
+    &#34;TikTokApi.discoverMusic&#34;: False,
+    &#34;TikTokApi.getUserObject&#34;: False,
+    &#34;TikTokApi.getUser&#34;: False,
+    &#34;TikTokApi.getSuggestedUsersbyID&#34;: False,
+    &#34;TikTokApi.getSuggestedUsersbyIDCrawler&#34;: False,
+    &#34;TikTokApi.getSuggestedHashtagsbyID&#34;: False,
+    &#34;TikTokApi.getSuggestedHashtagsbyIDCrawler&#34;: False,
+    &#34;TikTokApi.getSuggestedMusicbyID&#34;: False,
+    &#34;TikTokApi.getSuggestedMusicIDCrawler&#34;: False,
+    &#34;TikTokApi.get_Video_By_TikTok&#34;: False,
+    &#34;TikTokApi.get_Video_By_DownloadURL&#34;: False,
+    &#34;TikTokApi.get_Video_By_Url&#34;: False,
+    &#34;TikTokApi.get_secUid&#34;: False,
+    &#34;TikTokApi.trending&#34;: False,
 }</code></pre>
 </details>
 </section>
@@ -1764,7 +1784,7 @@ __pdoc__ = {
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="TikTokApi.tiktok.TikTokApi"><code class="flex name class">
+<dt id="TikTokApi.TikTokApi.TikTokApi"><code class="flex name class">
 <span>class <span class="ident">TikTokApi</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
@@ -1776,11 +1796,9 @@ __pdoc__ = {
 </summary>
 <pre><code class="python">class TikTokApi:
     __instance = None
-    
 
     def __init__(self, **kwargs):
-        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok, use get_instance NOT this.
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok, use get_instance NOT this.&#34;&#34;&#34;
         # Forces Singleton
         if TikTokApi.__instance is None:
             TikTokApi.__instance = self
@@ -1788,8 +1806,10 @@ __pdoc__ = {
             raise Exception(&#34;Only one TikTokApi object is allowed&#34;)
         logging.basicConfig(level=kwargs.get(&#34;logging_level&#34;, logging.WARNING))
         logging.info(&#34;Class initalized&#34;)
-        self.executablePath = kwargs.get(&#34;executablePath&#34;, None)
 
+        # Some Instance Vars
+        self.executablePath = kwargs.get(&#34;executablePath&#34;, None)
+        self.custom_did = kwargs.get(&#34;custom_did&#34;, None)
         self.userAgent = (
             &#34;Mozilla/5.0 (Windows NT 10.0; Win64; x64) &#34;
             &#34;AppleWebKit/537.36 (KHTML, like Gecko) &#34;
@@ -1797,6 +1817,8 @@ __pdoc__ = {
         )
         self.proxy = kwargs.get(&#34;proxy&#34;, None)
         self.custom_verifyFp = kwargs.get(&#34;custom_verifyFp&#34;)
+        self.signer_url = kwargs.get(&#34;external_signer&#34;, None)
+        self.request_delay = kwargs.get(&#34;request_delay&#34;, None)
 
         if kwargs.get(&#34;use_test_endpoints&#34;, False):
             global BASE_URL
@@ -1806,7 +1828,9 @@ __pdoc__ = {
         else:
             from .browser import browser
 
-        self.signer_url = kwargs.get(&#34;external_signer&#34;, None)
+        if kwargs.get(&#34;generate_static_did&#34;, False):
+            self.custom_did = &#34;&#34;.join(random.choice(string.digits) for num in range(19))
+
         if self.signer_url is None:
             self.browser = browser(**kwargs)
             self.userAgent = self.browser.userAgent
@@ -1826,6 +1850,7 @@ __pdoc__ = {
             self.width = self.browser.width
             self.height = self.browser.height
         except Exception as e:
+            logging.error(e)
             logging.warning(
                 &#34;An error ocurred while opening your browser but it was ignored.&#34;
             )
@@ -1838,11 +1863,9 @@ __pdoc__ = {
             self.width = &#34;1920&#34;
             self.height = &#34;1080&#34;
 
-        self.request_delay = kwargs.get(&#34;request_delay&#34;, None)
-
     @staticmethod
     def get_instance(**kwargs):
-        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok. This is a singleton 
+        &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok. This is a singleton
             class to prevent issues from arising with playwright
 
         Parameters
@@ -1860,6 +1883,9 @@ __pdoc__ = {
             All the methods take this as a optional parameter, however it&#39;s cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
+        generate_static_did: A parameter that generates a custom_did at the instance level
+            Use this if you want to download videos from a script but don&#39;t want to generate
+            your own custom_did parameter.
         custom_verifyFp: A TikTok parameter needed to work most of the time, optional
             To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
             I recommend watching the entire thing, as it will help setup this package.
@@ -1867,6 +1893,9 @@ __pdoc__ = {
             All the methods take this as a optional parameter, however it&#39;s cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
+
+            You can use the following to generate `&#34;&#34;.join(random.choice(string.digits)
+            for num in range(19))`
         use_test_endpoints: Send requests to TikTok&#39;s test endpoints, optional
             This parameter when set to true will make requests to TikTok&#39;s testing
             endpoints instead of the live site. I can&#39;t guarantee this will work
@@ -1874,16 +1903,16 @@ __pdoc__ = {
             work here which is helpful.
         proxy: A string containing your proxy address, optional
             If you want to do a lot of scraping of TikTok endpoints you&#39;ll likely
-            need a proxy. 
-            
+            need a proxy.
+
             Ex: &#34;https://0.0.0.0:8080&#34;
 
             All the methods take this as a optional parameter, however it&#39;s cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
         use_selenium: Option to use selenium over playwright, optional
-            Playwright is selected by default and is the one that I&#39;m designing the 
-            package to be compatable for, however if playwright doesn&#39;t work on 
+            Playwright is selected by default and is the one that I&#39;m designing the
+            package to be compatable for, however if playwright doesn&#39;t work on
             your machine feel free to set this to True.
         executablePath: The location of the driver, optional
             This shouldn&#39;t be needed if you&#39;re using playwright
@@ -2114,7 +2143,7 @@ __pdoc__ = {
         ----------
         count: The amount of TikToks you want returned, optional
             Note: TikTok seems to only support at MOST ~2000 TikToks
-            from a single endpoint. 
+            from a single endpoint.
         &#34;&#34;&#34;
         (
             region,
@@ -2261,10 +2290,10 @@ __pdoc__ = {
         Parameters
         ----------
         userID: The userID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         secUID: The secUID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         count: The number of posts to return
             Note: seems to only support up to ~2,000
@@ -2353,10 +2382,10 @@ __pdoc__ = {
         Parameters
         ----------
         userID: The userID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         secUID: The secUID of the user, which TikTok assigns
-            You can find this from utilizing other methods or 
+            You can find this from utilizing other methods or
             just use by_username to find it.
         page_size: The number of posts to return per page
             Gets a specific page of a user, doesn&#39;t iterate.
@@ -2585,7 +2614,7 @@ __pdoc__ = {
         Parameters
         ----------
         id: The sound id to get the object for
-            This can be found by using other methods. 
+            This can be found by using other methods.
         &#34;&#34;&#34;
         return self.getMusicObjectFull(id, **kwargs)[&#34;music&#34;]
 
@@ -2795,7 +2824,7 @@ __pdoc__ = {
         ----------
         url: The TikTok url you want to retrieve
             This currently doesn&#39;t support the shortened TikTok
-            url links. 
+            url links.
         &#34;&#34;&#34;
         (
             region,
@@ -2872,8 +2901,7 @@ __pdoc__ = {
         return data
 
     def discover_hashtags(self, **kwargs) -&gt; dict:
-        &#34;&#34;&#34;Discover page, consists challenges (hashtags)
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;Discover page, consists challenges (hashtags)&#34;&#34;&#34;
         (
             region,
             language,
@@ -2890,8 +2918,7 @@ __pdoc__ = {
         return self.getData(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]
 
     def discover_music(self, **kwargs) -&gt; dict:
-        &#34;&#34;&#34;Discover page, consists of music
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;Discover page, consists of music&#34;&#34;&#34;
         (
             region,
             language,
@@ -3178,7 +3205,12 @@ __pdoc__ = {
         return musics[:count]
 
     def get_video_by_tiktok(self, data, **kwargs) -&gt; bytes:
-        &#34;&#34;&#34;Downloads video from TikTok using a TikTok object
+        &#34;&#34;&#34;Downloads video from TikTok using a TikTok object.
+
+            You will need to set a custom_did to do this for anything but trending.
+            To do this, this is pretty simple you can either generate one yourself or,
+            you can pass the generate_static_did=True into the constructor of the
+            TikTokApi class.
 
         Parameters
         ----------
@@ -3349,6 +3381,10 @@ __pdoc__ = {
                 &#34;Retrieving the user secUid failed. Likely due to TikTok wanting captcha validation. Try to use a proxy.&#34;
             )
 
+    def generate_did(self):
+        &#34;&#34;&#34;Generates a valid did for other methods. Pass this as the custom_did field to download videos&#34;&#34;&#34;
+        return &#34;&#34;.join(random.choice(string.digits) for num in range(19))
+
     #
     # PRIVATE METHODS
     #
@@ -3406,10 +3442,14 @@ __pdoc__ = {
         language = kwargs.get(&#34;language&#34;, &#34;en&#34;)
         proxy = kwargs.get(&#34;proxy&#34;, None)
         maxCount = kwargs.get(&#34;maxCount&#34;, 35)
-        did = kwargs.get(
-            &#34;custom_did&#34;, &#34;&#34;.join(random.choice(string.digits) for num in range(19))
-        )
 
+        if kwargs.get(&#34;custom_did&#34;, None) != None:
+            did = kwargs.get(&#34;custom_did&#34;)
+        else:
+            if self.custom_did != None:
+                did = self.custom_did
+            else:
+                did = &#34;&#34;.join(random.choice(string.digits) for num in range(19))
         return region, language, proxy, maxCount, did
 
     #
@@ -3449,7 +3489,7 @@ __pdoc__ = {
 </details>
 <h3>Static methods</h3>
 <dl>
-<dt id="TikTokApi.tiktok.TikTokApi.get_instance"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_instance"><code class="name flex">
 <span>def <span class="ident">get_instance</span></span>(<span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -3471,6 +3511,9 @@ one of these.</p>
 to store this at the instance level. You can override this at the specific
 methods.</p>
 </dd>
+<dt><strong><code>generate_static_did</code></strong> :&ensp;<code>A parameter that generates a custom_did at the instance level</code></dt>
+<dd>Use this if you want to download videos from a script but don't want to generate
+your own custom_did parameter.</dd>
 <dt><strong><code>custom_verifyFp</code></strong> :&ensp;<code>A TikTok parameter needed to work most</code> of <code>the time</code>, optional</dt>
 <dd>
 <p>To get this parameter look at <a href="https://youtu.be/zwLmLfVI-VQ?t=117">this video</a>
@@ -3478,6 +3521,8 @@ I recommend watching the entire thing, as it will help setup this package.</p>
 <p>All the methods take this as a optional parameter, however it's cleaner code
 to store this at the instance level. You can override this at the specific
 methods.</p>
+<p>You can use the following to generate <code>"".join(random.choice(string.digits)
+for num in range(19))</code></p>
 </dd>
 <dt><strong><code>use_test_endpoints</code></strong> :&ensp;<code>Send requests to TikTok's test endpoints</code>, optional</dt>
 <dd>This parameter when set to true will make requests to TikTok's testing
@@ -3487,7 +3532,7 @@ work here which is helpful.</dd>
 <dt><strong><code>proxy</code></strong> :&ensp;<code>A string containing your proxy address</code>, optional</dt>
 <dd>
 <p>If you want to do a lot of scraping of TikTok endpoints you'll likely
-need a proxy. </p>
+need a proxy.</p>
 <p>Ex: "https://0.0.0.0:8080"</p>
 <p>All the methods take this as a optional parameter, however it's cleaner code
 to store this at the instance level. You can override this at the specific
@@ -3510,7 +3555,7 @@ in other places.</dd>
 </summary>
 <pre><code class="python">@staticmethod
 def get_instance(**kwargs):
-    &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok. This is a singleton 
+    &#34;&#34;&#34;The TikTokApi class. Used to interact with TikTok. This is a singleton
         class to prevent issues from arising with playwright
 
     Parameters
@@ -3528,6 +3573,9 @@ def get_instance(**kwargs):
         All the methods take this as a optional parameter, however it&#39;s cleaner code
         to store this at the instance level. You can override this at the specific
         methods.
+    generate_static_did: A parameter that generates a custom_did at the instance level
+        Use this if you want to download videos from a script but don&#39;t want to generate
+        your own custom_did parameter.
     custom_verifyFp: A TikTok parameter needed to work most of the time, optional
         To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
         I recommend watching the entire thing, as it will help setup this package.
@@ -3535,6 +3583,9 @@ def get_instance(**kwargs):
         All the methods take this as a optional parameter, however it&#39;s cleaner code
         to store this at the instance level. You can override this at the specific
         methods.
+
+        You can use the following to generate `&#34;&#34;.join(random.choice(string.digits)
+        for num in range(19))`
     use_test_endpoints: Send requests to TikTok&#39;s test endpoints, optional
         This parameter when set to true will make requests to TikTok&#39;s testing
         endpoints instead of the live site. I can&#39;t guarantee this will work
@@ -3542,16 +3593,16 @@ def get_instance(**kwargs):
         work here which is helpful.
     proxy: A string containing your proxy address, optional
         If you want to do a lot of scraping of TikTok endpoints you&#39;ll likely
-        need a proxy. 
-        
+        need a proxy.
+
         Ex: &#34;https://0.0.0.0:8080&#34;
 
         All the methods take this as a optional parameter, however it&#39;s cleaner code
         to store this at the instance level. You can override this at the specific
         methods.
     use_selenium: Option to use selenium over playwright, optional
-        Playwright is selected by default and is the one that I&#39;m designing the 
-        package to be compatable for, however if playwright doesn&#39;t work on 
+        Playwright is selected by default and is the one that I&#39;m designing the
+        package to be compatable for, however if playwright doesn&#39;t work on
         your machine feel free to set this to True.
     executablePath: The location of the driver, optional
         This shouldn&#39;t be needed if you&#39;re using playwright
@@ -3568,7 +3619,7 @@ def get_instance(**kwargs):
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="TikTokApi.tiktok.TikTokApi.by_hashtag"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.by_hashtag"><code class="name flex">
 <span>def <span class="ident">by_hashtag</span></span>(<span>self, hashtag, count=30, offset=0, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -3640,7 +3691,7 @@ def get_instance(**kwargs):
     return response[:required_count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.by_sound"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.by_sound"><code class="name flex">
 <span>def <span class="ident">by_sound</span></span>(<span>self, id, count=30, offset=0, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -3713,7 +3764,7 @@ def get_instance(**kwargs):
     return response[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.by_trending"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.by_trending"><code class="name flex">
 <span>def <span class="ident">by_trending</span></span>(<span>self, count=30, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -3736,7 +3787,7 @@ from a single endpoint.</dd>
     ----------
     count: The amount of TikToks you want returned, optional
         Note: TikTok seems to only support at MOST ~2000 TikToks
-        from a single endpoint. 
+        from a single endpoint.
     &#34;&#34;&#34;
     (
         region,
@@ -3786,7 +3837,7 @@ from a single endpoint.</dd>
     return response[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.by_username"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.by_username"><code class="name flex">
 <span>def <span class="ident">by_username</span></span>(<span>self, username, count=30, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -3831,7 +3882,7 @@ get videos from.</dd>
     )</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.clean_up"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.clean_up"><code class="name flex">
 <span>def <span class="ident">clean_up</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -3845,7 +3896,7 @@ get videos from.</dd>
     self.__del__()</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.discover_hashtags"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.discover_hashtags"><code class="name flex">
 <span>def <span class="ident">discover_hashtags</span></span>(<span>self, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -3855,8 +3906,7 @@ get videos from.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def discover_hashtags(self, **kwargs) -&gt; dict:
-    &#34;&#34;&#34;Discover page, consists challenges (hashtags)
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Discover page, consists challenges (hashtags)&#34;&#34;&#34;
     (
         region,
         language,
@@ -3873,7 +3923,7 @@ get videos from.</dd>
     return self.getData(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.discover_music"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.discover_music"><code class="name flex">
 <span>def <span class="ident">discover_music</span></span>(<span>self, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -3883,8 +3933,7 @@ get videos from.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def discover_music(self, **kwargs) -&gt; dict:
-    &#34;&#34;&#34;Discover page, consists of music
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Discover page, consists of music&#34;&#34;&#34;
     (
         region,
         language,
@@ -3901,7 +3950,7 @@ get videos from.</dd>
     return self.getData(url=api_url, **kwargs)[&#34;body&#34;][2][&#34;exploreList&#34;]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.discover_type"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.discover_type"><code class="name flex">
 <span>def <span class="ident">discover_type</span></span>(<span>self, search_term, prefix, count=28, offset=0, **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -3974,7 +4023,7 @@ get videos from.</dd>
     return response[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.external_signer"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.external_signer"><code class="name flex">
 <span>def <span class="ident">external_signer</span></span>(<span>self, url, custom_did=None, verifyFp=None)</span>
 </code></dt>
 <dd>
@@ -4028,7 +4077,21 @@ I recommend watching the entire thing, as it will help setup this package.</dd>
     )</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_bytes"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.generate_did"><code class="name flex">
+<span>def <span class="ident">generate_did</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generates a valid did for other methods. Pass this as the custom_did field to download videos</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_did(self):
+    &#34;&#34;&#34;Generates a valid did for other methods. Pass this as the custom_did field to download videos&#34;&#34;&#34;
+    return &#34;&#34;.join(random.choice(string.digits) for num in range(19))</code></pre>
+</details>
+</dd>
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_bytes"><code class="name flex">
 <span>def <span class="ident">get_bytes</span></span>(<span>self, **kwargs) ‑> bytes</span>
 </code></dt>
 <dd>
@@ -4077,7 +4140,7 @@ I recommend watching the entire thing, as it will help setup this package.</dd>
     return r.content</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_cookies"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_cookies"><code class="name flex">
 <span>def <span class="ident">get_cookies</span></span>(<span>self, **kwargs)</span>
 </code></dt>
 <dd>
@@ -4120,7 +4183,7 @@ I recommend watching the entire thing, as it will help setup this package.</dd>
         }</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_data"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_data"><code class="name flex">
 <span>def <span class="ident">get_data</span></span>(<span>self, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -4223,7 +4286,7 @@ you will need to use this.</p></div>
             raise JSONDecodeFailure() from e</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_hashtag_object"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_hashtag_object"><code class="name flex">
 <span>def <span class="ident">get_hashtag_object</span></span>(<span>self, hashtag, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -4263,7 +4326,7 @@ you will need to use this.</p></div>
     return data</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_music_object"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_music_object"><code class="name flex">
 <span>def <span class="ident">get_music_object</span></span>(<span>self, id, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -4283,12 +4346,12 @@ you will need to use this.</p></div>
     Parameters
     ----------
     id: The sound id to get the object for
-        This can be found by using other methods. 
+        This can be found by using other methods.
     &#34;&#34;&#34;
     return self.getMusicObjectFull(id, **kwargs)[&#34;music&#34;]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_music_object_full"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_music_object_full"><code class="name flex">
 <span>def <span class="ident">get_music_object_full</span></span>(<span>self, id, **kwargs)</span>
 </code></dt>
 <dd>
@@ -4337,7 +4400,7 @@ you will need to use this.</p></div>
     return json.loads(j_raw)[&#34;props&#34;][&#34;pageProps&#34;][&#34;musicInfo&#34;]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_music_title"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_music_title"><code class="name flex">
 <span>def <span class="ident">get_music_title</span></span>(<span>self, id, **kwargs)</span>
 </code></dt>
 <dd>
@@ -4383,7 +4446,7 @@ you will need to use this.</p></div>
     return music_object[&#34;title&#34;]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_recommended_tiktoks_by_video_id"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_recommended_tiktoks_by_video_id"><code class="name flex">
 <span>def <span class="ident">get_recommended_tiktoks_by_video_id</span></span>(<span>self, id, count=30, minCursor=0, maxCursor=0, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -4459,7 +4522,7 @@ you will need to use this.</p></div>
     return response[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_secuid"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_secuid"><code class="name flex">
 <span>def <span class="ident">get_secuid</span></span>(<span>self, username, **kwargs)</span>
 </code></dt>
 <dd>
@@ -4505,7 +4568,7 @@ you will need to use this.</p></div>
         )</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_suggested_hashtags_by_id"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_suggested_hashtags_by_id"><code class="name flex">
 <span>def <span class="ident">get_suggested_hashtags_by_id</span></span>(<span>self, count=30, userId='6745191554350760966', **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -4553,7 +4616,7 @@ you will need to use this.</p></div>
     return res[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_suggested_hashtags_by_id_crawler"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_suggested_hashtags_by_id_crawler"><code class="name flex">
 <span>def <span class="ident">get_suggested_hashtags_by_id_crawler</span></span>(<span>self, count=30, startingId='6745191554350760966', **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -4603,7 +4666,7 @@ you will need to use this.</p></div>
     return hashtags[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_suggested_music_by_id"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_suggested_music_by_id"><code class="name flex">
 <span>def <span class="ident">get_suggested_music_by_id</span></span>(<span>self, count=30, userId='6745191554350760966', **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -4657,7 +4720,7 @@ you will need to use this.</p></div>
     return res[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_suggested_music_id_crawler"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_suggested_music_id_crawler"><code class="name flex">
 <span>def <span class="ident">get_suggested_music_id_crawler</span></span>(<span>self, count=30, startingId='6745191554350760966', **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -4707,7 +4770,7 @@ you will need to use this.</p></div>
     return musics[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_suggested_users_by_id"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_suggested_users_by_id"><code class="name flex">
 <span>def <span class="ident">get_suggested_users_by_id</span></span>(<span>self, userId='6745191554350760966', count=30, **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -4758,7 +4821,7 @@ you will need to use this.</p></div>
     return res[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_suggested_users_by_id_crawler"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_suggested_users_by_id_crawler"><code class="name flex">
 <span>def <span class="ident">get_suggested_users_by_id_crawler</span></span>(<span>self, count=30, startingId='6745191554350760966', **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -4810,7 +4873,7 @@ unique results with setting your own.</dd>
     return users[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_tiktok_by_html"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_tiktok_by_html"><code class="name flex">
 <span>def <span class="ident">get_tiktok_by_html</span></span>(<span>self, url, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -4878,7 +4941,7 @@ endpoints rather than the API based ones.</p>
     return data</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_tiktok_by_id"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_tiktok_by_id"><code class="name flex">
 <span>def <span class="ident">get_tiktok_by_id</span></span>(<span>self, id, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -4919,7 +4982,7 @@ endpoints rather than the API based ones.</p>
     return self.getData(url=api_url, **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_tiktok_by_url"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_tiktok_by_url"><code class="name flex">
 <span>def <span class="ident">get_tiktok_by_url</span></span>(<span>self, url, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -4942,7 +5005,7 @@ url links.</dd>
     ----------
     url: The TikTok url you want to retrieve
         This currently doesn&#39;t support the shortened TikTok
-        url links. 
+        url links.
     &#34;&#34;&#34;
     (
         region,
@@ -4967,7 +5030,7 @@ url links.</dd>
     )</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_user"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_user"><code class="name flex">
 <span>def <span class="ident">get_user</span></span>(<span>self, username, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -5033,7 +5096,7 @@ url links.</dd>
     return user</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_user_object"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_user_object"><code class="name flex">
 <span>def <span class="ident">get_user_object</span></span>(<span>self, username, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -5065,7 +5128,7 @@ url links.</dd>
     return self.getUser(username, **kwargs)[&#34;userInfo&#34;][&#34;user&#34;]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_user_pager"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_user_pager"><code class="name flex">
 <span>def <span class="ident">get_user_pager</span></span>(<span>self, username, page_size=30, cursor=0, **kwargs)</span>
 </code></dt>
 <dd>
@@ -5126,7 +5189,7 @@ url links.</dd>
             return  # all done</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_video_by_download_url"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_video_by_download_url"><code class="name flex">
 <span>def <span class="ident">get_video_by_download_url</span></span>(<span>self, download_url, **kwargs) ‑> bytes</span>
 </code></dt>
 <dd>
@@ -5158,11 +5221,16 @@ url links.</dd>
     return self.getBytes(url=download_url, **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_video_by_tiktok"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_video_by_tiktok"><code class="name flex">
 <span>def <span class="ident">get_video_by_tiktok</span></span>(<span>self, data, **kwargs) ‑> bytes</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Downloads video from TikTok using a TikTok object</p>
+<div class="desc"><p>Downloads video from TikTok using a TikTok object.</p>
+<pre><code>You will need to set a custom_did to do this for anything but trending.
+To do this, this is pretty simple you can either generate one yourself or,
+you can pass the generate_static_did=True into the constructor of the
+TikTokApi class.
+</code></pre>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>data</code></strong> :&ensp;<code>A TikTok object</code></dt>
@@ -5173,7 +5241,12 @@ url links.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_video_by_tiktok(self, data, **kwargs) -&gt; bytes:
-    &#34;&#34;&#34;Downloads video from TikTok using a TikTok object
+    &#34;&#34;&#34;Downloads video from TikTok using a TikTok object.
+
+        You will need to set a custom_did to do this for anything but trending.
+        To do this, this is pretty simple you can either generate one yourself or,
+        you can pass the generate_static_did=True into the constructor of the
+        TikTokApi class.
 
     Parameters
     ----------
@@ -5198,7 +5271,7 @@ url links.</dd>
     return self.get_Video_By_DownloadURL(api_url, **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_video_by_url"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_video_by_url"><code class="name flex">
 <span>def <span class="ident">get_video_by_url</span></span>(<span>self, video_url, **kwargs) ‑> bytes</span>
 </code></dt>
 <dd>
@@ -5234,7 +5307,7 @@ url links.</dd>
     return self.getBytes(url=download_url, **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.get_video_no_watermark"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.get_video_no_watermark"><code class="name flex">
 <span>def <span class="ident">get_video_no_watermark</span></span>(<span>self, video_url, return_bytes=1, **kwargs) ‑> bytes</span>
 </code></dt>
 <dd>
@@ -5302,7 +5375,7 @@ url links.</dd>
     return r.content</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.search_for_hashtags"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.search_for_hashtags"><code class="name flex">
 <span>def <span class="ident">search_for_hashtags</span></span>(<span>self, search_term, count=28, **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -5333,7 +5406,7 @@ url links.</dd>
     )</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.search_for_music"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.search_for_music"><code class="name flex">
 <span>def <span class="ident">search_for_music</span></span>(<span>self, search_term, count=28, **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -5362,7 +5435,7 @@ url links.</dd>
     return self.discover_type(search_term, prefix=&#34;music&#34;, count=count, **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.search_for_users"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.search_for_users"><code class="name flex">
 <span>def <span class="ident">search_for_users</span></span>(<span>self, search_term, count=28, **kwargs) ‑> list</span>
 </code></dt>
 <dd>
@@ -5391,7 +5464,7 @@ url links.</dd>
     return self.discover_type(search_term, prefix=&#34;user&#34;, count=count, **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.user_liked"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.user_liked"><code class="name flex">
 <span>def <span class="ident">user_liked</span></span>(<span>self, userID, secUID, count=30, cursor=0, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -5481,7 +5554,7 @@ Note: The user's likes must be public</p>
     return response[:count]</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.user_liked_by_username"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.user_liked_by_username"><code class="name flex">
 <span>def <span class="ident">user_liked_by_username</span></span>(<span>self, username, count=30, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -5525,7 +5598,7 @@ Note: The user's likes must be public</p>
     )</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.user_page"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.user_page"><code class="name flex">
 <span>def <span class="ident">user_page</span></span>(<span>self, userID, secUID, page_size=30, cursor=0, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -5553,10 +5626,10 @@ just use by_username to find it.</dd>
     Parameters
     ----------
     userID: The userID of the user, which TikTok assigns
-        You can find this from utilizing other methods or 
+        You can find this from utilizing other methods or
         just use by_username to find it.
     secUID: The secUID of the user, which TikTok assigns
-        You can find this from utilizing other methods or 
+        You can find this from utilizing other methods or
         just use by_username to find it.
     page_size: The number of posts to return per page
         Gets a specific page of a user, doesn&#39;t iterate.
@@ -5588,7 +5661,7 @@ just use by_username to find it.</dd>
     return self.getData(url=api_url, **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="TikTokApi.tiktok.TikTokApi.user_posts"><code class="name flex">
+<dt id="TikTokApi.TikTokApi.TikTokApi.user_posts"><code class="name flex">
 <span>def <span class="ident">user_posts</span></span>(<span>self, userID, secUID, count=30, cursor=0, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
@@ -5614,10 +5687,10 @@ just use by_username to find it.</dd>
     Parameters
     ----------
     userID: The userID of the user, which TikTok assigns
-        You can find this from utilizing other methods or 
+        You can find this from utilizing other methods or
         just use by_username to find it.
     secUID: The secUID of the user, which TikTok assigns
-        You can find this from utilizing other methods or 
+        You can find this from utilizing other methods or
         just use by_username to find it.
     count: The number of posts to return
         Note: seems to only support up to ~2,000
@@ -5693,50 +5766,51 @@ just use by_username to find it.</dd>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="TikTokApi.tiktok.TikTokApi" href="#TikTokApi.tiktok.TikTokApi">TikTokApi</a></code></h4>
+<h4><code><a title="TikTokApi.TikTokApi.TikTokApi" href="#TikTokApi.TikTokApi.TikTokApi">TikTokApi</a></code></h4>
 <ul class="">
-<li><code><a title="TikTokApi.tiktok.TikTokApi.by_hashtag" href="#TikTokApi.tiktok.TikTokApi.by_hashtag">by_hashtag</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.by_sound" href="#TikTokApi.tiktok.TikTokApi.by_sound">by_sound</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.by_trending" href="#TikTokApi.tiktok.TikTokApi.by_trending">by_trending</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.by_username" href="#TikTokApi.tiktok.TikTokApi.by_username">by_username</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.clean_up" href="#TikTokApi.tiktok.TikTokApi.clean_up">clean_up</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.discover_hashtags" href="#TikTokApi.tiktok.TikTokApi.discover_hashtags">discover_hashtags</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.discover_music" href="#TikTokApi.tiktok.TikTokApi.discover_music">discover_music</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.discover_type" href="#TikTokApi.tiktok.TikTokApi.discover_type">discover_type</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.external_signer" href="#TikTokApi.tiktok.TikTokApi.external_signer">external_signer</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_bytes" href="#TikTokApi.tiktok.TikTokApi.get_bytes">get_bytes</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_cookies" href="#TikTokApi.tiktok.TikTokApi.get_cookies">get_cookies</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_data" href="#TikTokApi.tiktok.TikTokApi.get_data">get_data</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_hashtag_object" href="#TikTokApi.tiktok.TikTokApi.get_hashtag_object">get_hashtag_object</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_instance" href="#TikTokApi.tiktok.TikTokApi.get_instance">get_instance</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_music_object" href="#TikTokApi.tiktok.TikTokApi.get_music_object">get_music_object</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_music_object_full" href="#TikTokApi.tiktok.TikTokApi.get_music_object_full">get_music_object_full</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_music_title" href="#TikTokApi.tiktok.TikTokApi.get_music_title">get_music_title</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_recommended_tiktoks_by_video_id" href="#TikTokApi.tiktok.TikTokApi.get_recommended_tiktoks_by_video_id">get_recommended_tiktoks_by_video_id</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_secuid" href="#TikTokApi.tiktok.TikTokApi.get_secuid">get_secuid</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_suggested_hashtags_by_id" href="#TikTokApi.tiktok.TikTokApi.get_suggested_hashtags_by_id">get_suggested_hashtags_by_id</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_suggested_hashtags_by_id_crawler" href="#TikTokApi.tiktok.TikTokApi.get_suggested_hashtags_by_id_crawler">get_suggested_hashtags_by_id_crawler</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_suggested_music_by_id" href="#TikTokApi.tiktok.TikTokApi.get_suggested_music_by_id">get_suggested_music_by_id</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_suggested_music_id_crawler" href="#TikTokApi.tiktok.TikTokApi.get_suggested_music_id_crawler">get_suggested_music_id_crawler</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_suggested_users_by_id" href="#TikTokApi.tiktok.TikTokApi.get_suggested_users_by_id">get_suggested_users_by_id</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_suggested_users_by_id_crawler" href="#TikTokApi.tiktok.TikTokApi.get_suggested_users_by_id_crawler">get_suggested_users_by_id_crawler</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_tiktok_by_html" href="#TikTokApi.tiktok.TikTokApi.get_tiktok_by_html">get_tiktok_by_html</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_tiktok_by_id" href="#TikTokApi.tiktok.TikTokApi.get_tiktok_by_id">get_tiktok_by_id</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_tiktok_by_url" href="#TikTokApi.tiktok.TikTokApi.get_tiktok_by_url">get_tiktok_by_url</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_user" href="#TikTokApi.tiktok.TikTokApi.get_user">get_user</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_user_object" href="#TikTokApi.tiktok.TikTokApi.get_user_object">get_user_object</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_user_pager" href="#TikTokApi.tiktok.TikTokApi.get_user_pager">get_user_pager</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_video_by_download_url" href="#TikTokApi.tiktok.TikTokApi.get_video_by_download_url">get_video_by_download_url</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_video_by_tiktok" href="#TikTokApi.tiktok.TikTokApi.get_video_by_tiktok">get_video_by_tiktok</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_video_by_url" href="#TikTokApi.tiktok.TikTokApi.get_video_by_url">get_video_by_url</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.get_video_no_watermark" href="#TikTokApi.tiktok.TikTokApi.get_video_no_watermark">get_video_no_watermark</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.search_for_hashtags" href="#TikTokApi.tiktok.TikTokApi.search_for_hashtags">search_for_hashtags</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.search_for_music" href="#TikTokApi.tiktok.TikTokApi.search_for_music">search_for_music</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.search_for_users" href="#TikTokApi.tiktok.TikTokApi.search_for_users">search_for_users</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.user_liked" href="#TikTokApi.tiktok.TikTokApi.user_liked">user_liked</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.user_liked_by_username" href="#TikTokApi.tiktok.TikTokApi.user_liked_by_username">user_liked_by_username</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.user_page" href="#TikTokApi.tiktok.TikTokApi.user_page">user_page</a></code></li>
-<li><code><a title="TikTokApi.tiktok.TikTokApi.user_posts" href="#TikTokApi.tiktok.TikTokApi.user_posts">user_posts</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.by_hashtag" href="#TikTokApi.TikTokApi.TikTokApi.by_hashtag">by_hashtag</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.by_sound" href="#TikTokApi.TikTokApi.TikTokApi.by_sound">by_sound</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.by_trending" href="#TikTokApi.TikTokApi.TikTokApi.by_trending">by_trending</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.by_username" href="#TikTokApi.TikTokApi.TikTokApi.by_username">by_username</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.clean_up" href="#TikTokApi.TikTokApi.TikTokApi.clean_up">clean_up</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.discover_hashtags" href="#TikTokApi.TikTokApi.TikTokApi.discover_hashtags">discover_hashtags</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.discover_music" href="#TikTokApi.TikTokApi.TikTokApi.discover_music">discover_music</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.discover_type" href="#TikTokApi.TikTokApi.TikTokApi.discover_type">discover_type</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.external_signer" href="#TikTokApi.TikTokApi.TikTokApi.external_signer">external_signer</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.generate_did" href="#TikTokApi.TikTokApi.TikTokApi.generate_did">generate_did</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_bytes" href="#TikTokApi.TikTokApi.TikTokApi.get_bytes">get_bytes</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_cookies" href="#TikTokApi.TikTokApi.TikTokApi.get_cookies">get_cookies</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_data" href="#TikTokApi.TikTokApi.TikTokApi.get_data">get_data</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_hashtag_object" href="#TikTokApi.TikTokApi.TikTokApi.get_hashtag_object">get_hashtag_object</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_instance" href="#TikTokApi.TikTokApi.TikTokApi.get_instance">get_instance</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_music_object" href="#TikTokApi.TikTokApi.TikTokApi.get_music_object">get_music_object</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_music_object_full" href="#TikTokApi.TikTokApi.TikTokApi.get_music_object_full">get_music_object_full</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_music_title" href="#TikTokApi.TikTokApi.TikTokApi.get_music_title">get_music_title</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_recommended_tiktoks_by_video_id" href="#TikTokApi.TikTokApi.TikTokApi.get_recommended_tiktoks_by_video_id">get_recommended_tiktoks_by_video_id</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_secuid" href="#TikTokApi.TikTokApi.TikTokApi.get_secuid">get_secuid</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_suggested_hashtags_by_id" href="#TikTokApi.TikTokApi.TikTokApi.get_suggested_hashtags_by_id">get_suggested_hashtags_by_id</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_suggested_hashtags_by_id_crawler" href="#TikTokApi.TikTokApi.TikTokApi.get_suggested_hashtags_by_id_crawler">get_suggested_hashtags_by_id_crawler</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_suggested_music_by_id" href="#TikTokApi.TikTokApi.TikTokApi.get_suggested_music_by_id">get_suggested_music_by_id</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_suggested_music_id_crawler" href="#TikTokApi.TikTokApi.TikTokApi.get_suggested_music_id_crawler">get_suggested_music_id_crawler</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_suggested_users_by_id" href="#TikTokApi.TikTokApi.TikTokApi.get_suggested_users_by_id">get_suggested_users_by_id</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_suggested_users_by_id_crawler" href="#TikTokApi.TikTokApi.TikTokApi.get_suggested_users_by_id_crawler">get_suggested_users_by_id_crawler</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_tiktok_by_html" href="#TikTokApi.TikTokApi.TikTokApi.get_tiktok_by_html">get_tiktok_by_html</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_tiktok_by_id" href="#TikTokApi.TikTokApi.TikTokApi.get_tiktok_by_id">get_tiktok_by_id</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_tiktok_by_url" href="#TikTokApi.TikTokApi.TikTokApi.get_tiktok_by_url">get_tiktok_by_url</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_user" href="#TikTokApi.TikTokApi.TikTokApi.get_user">get_user</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_user_object" href="#TikTokApi.TikTokApi.TikTokApi.get_user_object">get_user_object</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_user_pager" href="#TikTokApi.TikTokApi.TikTokApi.get_user_pager">get_user_pager</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_video_by_download_url" href="#TikTokApi.TikTokApi.TikTokApi.get_video_by_download_url">get_video_by_download_url</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_video_by_tiktok" href="#TikTokApi.TikTokApi.TikTokApi.get_video_by_tiktok">get_video_by_tiktok</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_video_by_url" href="#TikTokApi.TikTokApi.TikTokApi.get_video_by_url">get_video_by_url</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.get_video_no_watermark" href="#TikTokApi.TikTokApi.TikTokApi.get_video_no_watermark">get_video_no_watermark</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.search_for_hashtags" href="#TikTokApi.TikTokApi.TikTokApi.search_for_hashtags">search_for_hashtags</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.search_for_music" href="#TikTokApi.TikTokApi.TikTokApi.search_for_music">search_for_music</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.search_for_users" href="#TikTokApi.TikTokApi.TikTokApi.search_for_users">search_for_users</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.user_liked" href="#TikTokApi.TikTokApi.TikTokApi.user_liked">user_liked</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.user_liked_by_username" href="#TikTokApi.TikTokApi.TikTokApi.user_liked_by_username">user_liked_by_username</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.user_page" href="#TikTokApi.TikTokApi.TikTokApi.user_page">user_page</a></code></li>
+<li><code><a title="TikTokApi.TikTokApi.TikTokApi.user_posts" href="#TikTokApi.TikTokApi.TikTokApi.user_posts">user_posts</a></code></li>
 </ul>
 </li>
 </ul>
