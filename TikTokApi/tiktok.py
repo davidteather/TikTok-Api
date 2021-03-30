@@ -3,6 +3,7 @@ import requests
 import time
 import logging
 import json
+import re
 from urllib.parse import urlencode, quote
 from playwright.sync_api import sync_playwright
 import string
@@ -1592,11 +1593,12 @@ class TikTokApi:
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
             },
             proxies=self.__format_proxy(
-                kwargs.get("proxy", None), cookies=self.get_cookies(**kwargs)
+                kwargs.get("proxy", None),
             ),
+            cookies=self.get_cookies(**kwargs)
         )
         try:
-            return r.text.split('"secUid":"')[1].split('","secret":')[0]
+            return re.search(r'(?<=\"secUid\":\").*?(?=\",\")', r.text)[0]
         except IndexError as e:
             logging.info(r.text)
             logging.error(e)
