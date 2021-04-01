@@ -869,10 +869,8 @@ class TikTokApi:
             proxies=self.__format_proxy(kwargs.get("proxy", None)),
             cookies=self.get_cookies(**kwargs),
         )
-        t = r.text
-        j_raw = t.split(
-            '<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">'
-        )[1].split("</script>")[0]
+
+        j_raw = self.__extract_tag_contents(r.text)
         return json.loads(j_raw)["props"]["pageProps"]["musicInfo"]
 
     def by_hashtag(self, hashtag, count=30, offset=0, **kwargs) -> dict:
@@ -1104,9 +1102,7 @@ class TikTokApi:
 
         t = r.text
         try:
-            j_raw = t.split(
-                '<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">'
-            )[1].split("</script>")[0]
+            j_raw = self.__extract_tag_contents(r.text)
         except IndexError:
             if not t:
                 logging.error("TikTok response is empty")
@@ -1118,7 +1114,7 @@ class TikTokApi:
 
         if data["serverCode"] == 404:
             raise TikTokNotFoundError(
-                "TikTok with that url doesn't exist".format(username)
+                "TikTok with that url doesn't exist"
             )
 
         return data
@@ -1206,9 +1202,7 @@ class TikTokApi:
         t = r.text
 
         try:
-            j_raw = t.split(
-                '<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">'
-            )[1].split("</script>")[0]
+            j_raw = self.__extract_tag_contents(r.text)
         except IndexError:
             if not t:
                 logging.error("Tiktok response is empty")
@@ -1563,9 +1557,7 @@ class TikTokApi:
             cookies=self.get_cookies(**kwargs),
         )
         t = r.text
-        j_raw = t.split(
-            '<script id="__NEXT_DATA__" type="application/json" crossorigin="anonymous">'
-        )[1].split("</script>")[0]
+        j_raw = self.__extract_tag_contents(r.text)
 
         music_object = json.loads(j_raw)["props"]["pageProps"]["musicInfo"]
         if not music_object.get("title", None):
@@ -1658,6 +1650,15 @@ class TikTokApi:
             "OS": "windows",
         }
         return urlencode(query)
+
+    def __extract_tag_contents(self, html):
+        nonce_start = '<head nonce="'
+        nonce_end = '">'
+        nonce = html.split(nonce_start)[1].split(nonce_end)[0]
+        j_raw = html.split(
+            '<script id="__NEXT_DATA__" type="application/json" nonce="%s" crossorigin="anonymous">' % nonce
+        )[1].split("</script>")[0]
+        return j_raw
 
     # Process the kwargs
     def __process_kwargs__(self, kwargs):
