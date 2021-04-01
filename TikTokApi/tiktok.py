@@ -477,11 +477,11 @@ class TikTokApi:
         response = []
         while len(response) < count:
             query = {
-                "discoverType": count,
+                "discoverType": 1,
                 "needItemList": False,
                 "keyWord": search_term,
                 "offset": offset,
-                "count": 99,
+                "count": 20,
                 "useRecommend": False,
                 "language": "en",
             }
