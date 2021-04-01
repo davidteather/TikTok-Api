@@ -481,7 +481,7 @@ class TikTokApi:
                 "needItemList": False,
                 "keyWord": search_term,
                 "offset": offset,
-                "count": 20,
+                "count": count,
                 "useRecommend": False,
                 "language": "en",
             }
