@@ -7,7 +7,7 @@ This is an unofficial api wrapper for TikTok.com in python. With this api you ar
 
 ## Thank you to our sponsors & advertisers
 
-[![TikAPI](https://tikapi.io/logo128.png)](https://tikapi.io/?ref=davidteather)   |  **[TikAPI](https://tikapi.io/?ref=davidteather)** is a paid TikTok API service providing an full out-of-the-box solution for developers, trusted by 100+ companies. [Learn more](https://tikapi.io/?ref=davidteather)
+[![TikAPI](imgs/logo128.png)](https://tikapi.io/?ref=davidteather)   |  **[TikAPI](https://tikapi.io/?ref=davidteather)** is a paid TikTok API service providing an full out-of-the-box solution for developers, trusted by 100+ companies. [Learn more](https://tikapi.io/?ref=davidteather)
 :-------------------------:|:-------------------------:
 
 ## Table of Contents
