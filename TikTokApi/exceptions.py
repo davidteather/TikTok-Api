@@ -13,6 +13,12 @@ class TikTokNotFoundError(Exception):
         super().__init__(self.message)
 
 
+class LiveNotFoundError(Exception):
+    def __init__(self, message="There was no livestream for the selected user"):
+        self.message = message
+        super().__init__(self.message)
+
+
 class EmptyResponseError(Exception):
     def __init__(self, message="TikTok sent no data back"):
         self.message = message

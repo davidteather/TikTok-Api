@@ -358,6 +358,46 @@ class TikTokApi:
         )
         return r.content
 
+    def get_roomid(self, username, **kwargs) -> int:
+        (
+            region,
+            language,
+            proxy,
+            maxCount,
+            did,
+        ) = self.__process_kwargs__(kwargs)
+        r = requests.get(
+            "https://www.tiktok.com/@{}/live?lang=en".format(quote(username)),
+            headers={
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                "authority": "www.tiktok.com",
+                "Accept-Encoding": "gzip, deflate",
+                "path": "/@{}".format(quote(username)),
+                "Connection": "keep-alive",
+                "Host": "www.tiktok.com",
+
+                # Mobile UA causes redirect to get RoomID
+                "User-Agent": "User-Agent: Mozilla/5.0 (iPhone; CPU OS 10_15_4 Supplemental Update like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 Mobile/14E304 Safari/605.1.15",
+            },
+        )
+
+        u = r.url
+
+        if u == "https://m.tiktok.com/share/live/?lang=en":
+            raise LiveNotFoundError()
+
+        t = re.findall("\/live\/([^\.]+)\?lang=en", r.url)
+
+        try:
+            return (int(t[0]))
+        except:
+            raise TikTokCaptchaError()
+
+    def get_room(self, room_id, **kwargs) -> dict:
+        url = "https://m.tiktok.com/node/share/live?id={}".format(room_id)
+
+        return self.get_data(url=url)
+
     def by_trending(self, count=30, **kwargs) -> dict:
         """
         Gets trending TikToks
