@@ -14,7 +14,7 @@ class TikTokNotFoundError(Exception):
 
 
 class LiveNotFoundError(Exception):
-    def __init__(self, message="There was no livestream for the selected user"):
+    def __init__(self, message="There requested user livestream does not exist"):
         self.message = message
         super().__init__(self.message)
 

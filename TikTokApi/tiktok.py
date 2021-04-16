@@ -358,14 +358,22 @@ class TikTokApi:
         )
         return r.content
 
-    def get_roomid(self, username, **kwargs) -> int:
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            did,
-        ) = self.__process_kwargs__(kwargs)
+    def get_room_id(self, username, **kwargs) -> int:
+        """
+        Gets the ID of a user's most recent livestream room if one exists
+
+        Throws LiveNotFoundError if not found
+
+        """
+        proxy = kwargs.get("proxy", None)
+        kwargs["custom_did"] = did
+
+        if proxy is not None:
+            proxy = {
+                "https": proxy,
+                "http": proxy
+            }
+
         r = requests.get(
             "https://www.tiktok.com/@{}/live?lang=en".format(quote(username)),
             headers={
@@ -379,24 +387,43 @@ class TikTokApi:
                 # Mobile UA causes redirect to get RoomID
                 "User-Agent": "User-Agent: Mozilla/5.0 (iPhone; CPU OS 10_15_4 Supplemental Update like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 Mobile/14E304 Safari/605.1.15",
             },
+            proxies=proxy
         )
 
+        # The redirect URL gives us the room ID
         u = r.url
 
+        # Occurs when there are no lives for that user and therefore no room IDs
         if u == "https://m.tiktok.com/share/live/?lang=en":
             raise LiveNotFoundError()
 
+        # Find the Room ID
         t = re.findall("\/live\/([^\.]+)\?lang=en", r.url)
 
+        # Return the 1st value of 1 values, the ID
         try:
             return (int(t[0]))
         except:
+
+            # Occurs when a captcha is received
             raise TikTokCaptchaError()
 
     def get_room(self, room_id, **kwargs) -> dict:
-        url = "https://m.tiktok.com/node/share/live?id={}".format(room_id)
+        """
+        Gets data of a room by its room ID.
 
-        return self.get_data(url=url)
+        """
+        BASE_URL = "https://m.tiktok.com/node/share/live?id={}".format(room_id)
+        (
+            region,
+            language,
+            proxy,
+            maxCount,
+            did,
+        ) = self.__process_kwargs__(kwargs)
+
+        return self.getData(url=BASE_URL, **kwargs)
+
 
     def by_trending(self, count=30, **kwargs) -> dict:
         """
@@ -1719,6 +1746,8 @@ class TikTokApi:
     #
     # Backwards compatibility of the naming scheme
     #
+    getRoom = get_room
+    getRoomId = get_room_id
     getData = get_data
     getBytes = get_bytes
     userPosts = user_posts
