@@ -10,7 +10,7 @@ import logging
 import os
 from .utilities import update_messager
 from .exceptions import *
-
+import re
 
 os.environ["no_proxy"] = "127.0.0.1,localhost"
 
@@ -366,7 +366,6 @@ class TikTokApi:
 
         """
         proxy = kwargs.get("proxy", None)
-        kwargs["custom_did"] = did
 
         if proxy is not None:
             proxy = {
