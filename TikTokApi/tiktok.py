@@ -42,6 +42,7 @@ class TikTokApi:
         self.custom_verifyFp = kwargs.get("custom_verifyFp")
         self.signer_url = kwargs.get("external_signer", None)
         self.request_delay = kwargs.get("request_delay", None)
+        self.requests_extra_kwargs = kwargs.get("requests_extra_kwargs", {})
 
         if kwargs.get("use_test_endpoints", False):
             global BASE_URL
@@ -184,7 +185,7 @@ class TikTokApi:
             query = {"url": url, "custom_did": custom_did, "verifyFp": verifyFp}
         else:
             query = {"url": url, "verifyFp": verifyFp}
-        data = requests.get(self.signer_url + "?{}".format(urlencode(query)))
+        data = requests.get(self.signer_url + "?{}".format(urlencode(query)), **self.requests_extra_kwargs)
         parsed_data = data.json()
 
         return (
@@ -259,6 +260,7 @@ class TikTokApi:
             },
             cookies=self.get_cookies(**kwargs),
             proxies=self.__format_proxy(proxy),
+            **self.requests_extra_kwargs,
         )
         try:
             json = r.json()
@@ -868,6 +870,7 @@ class TikTokApi:
             },
             proxies=self.__format_proxy(kwargs.get("proxy", None)),
             cookies=self.get_cookies(**kwargs),
+            **self.requests_extra_kwargs,
         )
 
         j_raw = self.__extract_tag_contents(r.text)
@@ -1098,6 +1101,7 @@ class TikTokApi:
             },
             proxies=self.__format_proxy(kwargs.get("proxy", None)),
             cookies=self.get_cookies(**kwargs),
+            **self.requests_extra_kwargs,
         )
 
         t = r.text
@@ -1197,6 +1201,7 @@ class TikTokApi:
             },
             proxies=self.__format_proxy(kwargs.get("proxy", None)),
             cookies=self.get_cookies(**kwargs),
+            **self.requests_extra_kwargs,
         )
 
         t = r.text
@@ -1529,6 +1534,7 @@ class TikTokApi:
                 "user-agent": "okhttp",
             },
             proxies=self.__format_proxy(proxy),
+            **self.requests_extra_kwargs,
         )
 
         if r.text[0] == "{":
@@ -1555,6 +1561,7 @@ class TikTokApi:
             },
             proxies=self.__format_proxy(kwargs.get("proxy", None)),
             cookies=self.get_cookies(**kwargs),
+            **self.requests_extra_kwargs,
         )
         t = r.text
         j_raw = self.__extract_tag_contents(r.text)
@@ -1586,6 +1593,7 @@ class TikTokApi:
             proxies=self.__format_proxy(
                 kwargs.get("proxy", None), cookies=self.get_cookies(**kwargs)
             ),
+            **self.requests_extra_kwargs,
         )
         try:
             return r.text.split('"secUid":"')[1].split('","secret":')[0]
@@ -1619,6 +1627,7 @@ class TikTokApi:
         return requests.get(
             "https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js",
             proxies=self.__format_proxy(proxy),
+            **self.requests_extra_kwargs,
         ).text
 
     def __format_new_params__(self, parm) -> str:
