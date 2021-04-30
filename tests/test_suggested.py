@@ -7,7 +7,7 @@ api = TikTokApi.get_instance(
 
 
 def test_suggested():
-    assert len(api.getSuggestedHashtagsbyID()) > 0
+    assert len(api.get_suggested_hashtags_by_id()) > 0
     assert len(api.getSuggestedMusicbyID()) > 0
     assert len(api.getSuggestedUsersbyID()) > 0
 

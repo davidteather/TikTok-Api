@@ -262,7 +262,10 @@ class TikTokApi:
         )
         try:
             json = r.json()
-            if json.get("type") == "verify":
+            if (
+                json.get("type") == "verify"
+                or json.get("verifyConfig", {}).get("type", "") == "verify"
+            ):
                 logging.error(
                     "Tiktok wants to display a catcha. Response is:\n" + r.text
                 )
@@ -401,7 +404,7 @@ class TikTokApi:
             api_url = "{}api/recommend/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
             for t in res.get("itemList", []):
                 response.append(t)
 
@@ -488,7 +491,7 @@ class TikTokApi:
             api_url = "{}api/discover/{}/?{}&{}".format(
                 BASE_URL, prefix, self.__add_new_params__(), urlencode(query)
             )
-            data = self.getData(url=api_url, **kwargs)
+            data = self.get_data(url=api_url, **kwargs)
 
             if "userInfoList" in data.keys():
                 for x in data["userInfoList"]:
@@ -555,7 +558,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
             if "itemList" in res.keys():
                 for t in res["itemList"]:
@@ -591,7 +594,7 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
-        data = self.getUserObject(username, **kwargs)
+        data = self.get_user_object(username, **kwargs)
         return self.userPosts(
             data["id"],
             data["secUid"],
@@ -637,7 +640,7 @@ class TikTokApi:
             )
         )
 
-        return self.getData(url=api_url, **kwargs)
+        return self.get_data(url=api_url, **kwargs)
 
     def get_user_pager(self, username, page_size=30, cursor=0, **kwargs):
         """Returns a generator to page through a user's feed
@@ -727,7 +730,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
             try:
                 res["itemList"]
@@ -813,7 +816,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
             try:
                 for t in res["items"]:
@@ -912,7 +915,7 @@ class TikTokApi:
             api_url = "{}api/challenge/item_list/?{}&{}".format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
             for t in res["itemList"]:
                 response.append(t)
@@ -945,14 +948,12 @@ class TikTokApi:
         api_url = "{}node/share/tag/{}?{}&{}".format(
             BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
         )
-        data = self.getData(url=api_url, **kwargs)
+        data = self.get_data(url=api_url, **kwargs)
         if data["challengeInfo"].get("challenge") is None:
             raise TikTokNotFoundError("Challenge {} does not exist".format(hashtag))
         return data
 
-    def get_recommended_tiktoks_by_video_id(
-        self, id, count=30, minCursor=0, maxCursor=0, **kwargs
-    ) -> dict:
+    def get_recommended_tiktoks_by_video_id(self, id, count=30, **kwargs) -> dict:
         """Returns a dictionary listing reccomended TikToks for a specific TikTok video.
 
 
@@ -960,6 +961,7 @@ class TikTokApi:
         ----------
         id: The id of the video to get suggestions for
             Can be found using other methods
+        count: The count of results you want to return
         """
         (
             region,
@@ -983,8 +985,6 @@ class TikTokApi:
                 "count": realCount,
                 "id": 1,
                 "secUid": "",
-                "maxCursor": maxCursor,
-                "minCursor": minCursor,
                 "sourceType": 12,
                 "appId": 1233,
                 "region": region,
@@ -995,9 +995,9 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
-            for t in res.get("items", []):
+            for t in res.get("itemList", []):
                 response.append(t)
 
             if not res["hasMore"] and not first:
@@ -1005,7 +1005,6 @@ class TikTokApi:
                 return response[:count]
 
             realCount = count - len(response)
-            maxCursor = res["maxCursor"]
 
             first = False
 
@@ -1035,7 +1034,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        return self.getData(url=api_url, **kwargs)
+        return self.get_data(url=api_url, **kwargs)
 
     def get_tiktok_by_url(self, url, **kwargs) -> dict:
         """Returns a dictionary of a TikTok object by url.
@@ -1113,9 +1112,7 @@ class TikTokApi:
         data = json.loads(j_raw)["props"]["pageProps"]
 
         if data["serverCode"] == 404:
-            raise TikTokNotFoundError(
-                "TikTok with that url doesn't exist"
-            )
+            raise TikTokNotFoundError("TikTok with that url doesn't exist")
 
         return data
 
@@ -1133,8 +1130,8 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-
-        return self.getData(url=api_url, **kwargs)["body"][1]["exploreList"]
+        print(self.get_data(url=api_url, **kwargs))
+        return self.get_data(url=api_url, **kwargs)["body"][1]["exploreList"]
 
     def discover_music(self, **kwargs) -> dict:
         """Discover page, consists of music"""
@@ -1151,7 +1148,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        return self.getData(url=api_url, **kwargs)["body"][2]["exploreList"]
+        return self.get_data(url=api_url, **kwargs)["body"][2]["exploreList"]
 
     def get_user_object(self, username, **kwargs) -> dict:
         """Gets a user object (dictionary)
@@ -1249,7 +1246,7 @@ class TikTokApi:
         )
 
         res = []
-        for x in self.getData(url=api_url, **kwargs)["body"][0]["exploreList"]:
+        for x in self.get_data(url=api_url, **kwargs)["body"][0]["exploreList"]:
             res.append(x["cardItem"])
         return res[:count]
 
@@ -1314,9 +1311,8 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-
         res = []
-        for x in self.getData(url=api_url, **kwargs)["body"][1]["exploreList"]:
+        for x in self.get_data(url=api_url, **kwargs)["body"][1]["exploreList"]:
             res.append(x["cardItem"])
         return res[:count]
 
@@ -1384,7 +1380,7 @@ class TikTokApi:
         )
 
         res = []
-        for x in self.getData(url=api_url, **kwargs)["body"][2]["exploreList"]:
+        for x in self.get_data(url=api_url, **kwargs)["body"][2]["exploreList"]:
             res.append(x["cardItem"])
         return res[:count]
 
@@ -1656,7 +1652,8 @@ class TikTokApi:
         nonce_end = '">'
         nonce = html.split(nonce_start)[1].split(nonce_end)[0]
         j_raw = html.split(
-            '<script id="__NEXT_DATA__" type="application/json" nonce="%s" crossorigin="anonymous">' % nonce
+            '<script id="__NEXT_DATA__" type="application/json" nonce="%s" crossorigin="anonymous">'
+            % nonce
         )[1].split("</script>")[0]
         return j_raw
 
