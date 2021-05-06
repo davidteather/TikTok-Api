@@ -880,7 +880,6 @@ class TikTokApi:
         return json.loads(j_raw)["props"]["pageProps"]["musicInfo"]
 
     def get_music_object_full_by_api(self, id, **kwargs):
-        """Discover page, consists of music"""
         (
             region,
             language,
