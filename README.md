@@ -25,6 +25,11 @@ This is an unofficial api wrapper for TikTok.com in python. With this api you ar
 
 To get started using this api follow the instructions below.
 
+#### How to support the project
+* Feel free to sponsor me on GitHub
+* Feel free to tip the project using the brave browser
+* Submit PRs for issues :)
+
 ### Installing
 
 If you run into an issue please check the closed issues on the github. You're most likely not the first person to experience this issue. If nothing works feel free to open an issue.
