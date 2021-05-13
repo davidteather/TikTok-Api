@@ -1,0 +1,33 @@
+name: Generate Docs
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+      - nightly
+      - 'releases/*'
+
+jobs:
+  doc-create:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python setup.py install
+          pip install pdoc3
+      - name: Generate Docs
+        run: |
+          pdoc --html -o ./docs TikTokApi
+          mv docs/TikTokApi/* docs/
+          rm docs/TikTokApi
+      - name: Push
+        run: |
+          git config --global user.name 'David Teather'
+          git config --global user.email 'davidteather@users.noreply.github.com'
+          git commit -am "Automated Doc Generation"
+          git push

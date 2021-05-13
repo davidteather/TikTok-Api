@@ -70,6 +70,7 @@ class TikTokApi:
         self.custom_verifyFp = kwargs.get(&#34;custom_verifyFp&#34;)
         self.signer_url = kwargs.get(&#34;external_signer&#34;, None)
         self.request_delay = kwargs.get(&#34;request_delay&#34;, None)
+        self.requests_extra_kwargs = kwargs.get(&#34;requests_extra_kwargs&#34;, {})
 
         if kwargs.get(&#34;use_test_endpoints&#34;, False):
             global BASE_URL
@@ -212,7 +213,7 @@ class TikTokApi:
             query = {&#34;url&#34;: url, &#34;custom_did&#34;: custom_did, &#34;verifyFp&#34;: verifyFp}
         else:
             query = {&#34;url&#34;: url, &#34;verifyFp&#34;: verifyFp}
-        data = requests.get(self.signer_url + &#34;?{}&#34;.format(urlencode(query)))
+        data = requests.get(self.signer_url + &#34;?{}&#34;.format(urlencode(query)), **self.requests_extra_kwargs)
         parsed_data = data.json()
 
         return (
@@ -287,10 +288,14 @@ class TikTokApi:
             },
             cookies=self.get_cookies(**kwargs),
             proxies=self.__format_proxy(proxy),
+            **self.requests_extra_kwargs,
         )
         try:
             json = r.json()
-            if json.get(&#34;type&#34;) == &#34;verify&#34;:
+            if (
+                json.get(&#34;type&#34;) == &#34;verify&#34;
+                or json.get(&#34;verifyConfig&#34;, {}).get(&#34;type&#34;, &#34;&#34;) == &#34;verify&#34;
+            ):
                 logging.error(
                     &#34;Tiktok wants to display a catcha. Response is:\n&#34; + r.text
                 )
@@ -429,7 +434,7 @@ class TikTokApi:
             api_url = &#34;{}api/recommend/item_list/?{}&amp;{}&#34;.format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
             for t in res.get(&#34;itemList&#34;, []):
                 response.append(t)
 
@@ -505,18 +510,18 @@ class TikTokApi:
         response = []
         while len(response) &lt; count:
             query = {
-                &#34;discoverType&#34;: count,
+                &#34;discoverType&#34;: 1,
                 &#34;needItemList&#34;: False,
                 &#34;keyWord&#34;: search_term,
                 &#34;offset&#34;: offset,
-                &#34;count&#34;: 99,
+                &#34;count&#34;: count,
                 &#34;useRecommend&#34;: False,
                 &#34;language&#34;: &#34;en&#34;,
             }
             api_url = &#34;{}api/discover/{}/?{}&amp;{}&#34;.format(
                 BASE_URL, prefix, self.__add_new_params__(), urlencode(query)
             )
-            data = self.getData(url=api_url, **kwargs)
+            data = self.get_data(url=api_url, **kwargs)
 
             if &#34;userInfoList&#34; in data.keys():
                 for x in data[&#34;userInfoList&#34;]:
@@ -583,7 +588,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
             if &#34;itemList&#34; in res.keys():
                 for t in res[&#34;itemList&#34;]:
@@ -619,7 +624,7 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs[&#34;custom_did&#34;] = did
-        data = self.getUserObject(username, **kwargs)
+        data = self.get_user_object(username, **kwargs)
         return self.userPosts(
             data[&#34;id&#34;],
             data[&#34;secUid&#34;],
@@ -665,7 +670,7 @@ class TikTokApi:
             )
         )
 
-        return self.getData(url=api_url, **kwargs)
+        return self.get_data(url=api_url, **kwargs)
 
     def get_user_pager(self, username, page_size=30, cursor=0, **kwargs):
         &#34;&#34;&#34;Returns a generator to page through a user&#39;s feed
@@ -755,7 +760,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
             try:
                 res[&#34;itemList&#34;]
@@ -841,7 +846,7 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
             try:
                 for t in res[&#34;items&#34;]:
@@ -896,12 +901,34 @@ class TikTokApi:
             },
             proxies=self.__format_proxy(kwargs.get(&#34;proxy&#34;, None)),
             cookies=self.get_cookies(**kwargs),
+            **self.requests_extra_kwargs,
         )
-        t = r.text
-        j_raw = t.split(
-            &#39;&lt;script id=&#34;__NEXT_DATA__&#34; type=&#34;application/json&#34; crossorigin=&#34;anonymous&#34;&gt;&#39;
-        )[1].split(&#34;&lt;/script&gt;&#34;)[0]
+
+        j_raw = self.__extract_tag_contents(r.text)
         return json.loads(j_raw)[&#34;props&#34;][&#34;pageProps&#34;][&#34;musicInfo&#34;]
+
+    def get_music_object_full_by_api(self, id, **kwargs):
+        &#34;&#34;&#34;Returns a music object for a specific sound id, but using the API rather than HTML requests.
+
+        Parameters
+        ----------
+        id: The sound id to get the object for
+            This can be found by using other methods.
+        &#34;&#34;&#34;
+        (
+            region,
+            language,
+            proxy,
+            maxCount,
+            did,
+        ) = self.__process_kwargs__(kwargs)
+        kwargs[&#34;custom_did&#34;] = did
+
+        api_url = &#34;{}node/share/music/-{}?{}&#34;.format(
+            BASE_URL, id, self.__add_new_params__()
+        )
+        res = self.get_data(url=api_url, **kwargs)
+        return res[&#39;musicInfo&#39;]
 
     def by_hashtag(self, hashtag, count=30, offset=0, **kwargs) -&gt; dict:
         &#34;&#34;&#34;Returns a dictionary listing TikToks with a specific hashtag.
@@ -942,7 +969,7 @@ class TikTokApi:
             api_url = &#34;{}api/challenge/item_list/?{}&amp;{}&#34;.format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
             for t in res[&#34;itemList&#34;]:
                 response.append(t)
@@ -975,14 +1002,12 @@ class TikTokApi:
         api_url = &#34;{}node/share/tag/{}?{}&amp;{}&#34;.format(
             BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
         )
-        data = self.getData(url=api_url, **kwargs)
+        data = self.get_data(url=api_url, **kwargs)
         if data[&#34;challengeInfo&#34;].get(&#34;challenge&#34;) is None:
             raise TikTokNotFoundError(&#34;Challenge {} does not exist&#34;.format(hashtag))
         return data
 
-    def get_recommended_tiktoks_by_video_id(
-        self, id, count=30, minCursor=0, maxCursor=0, **kwargs
-    ) -&gt; dict:
+    def get_recommended_tiktoks_by_video_id(self, id, count=30, **kwargs) -&gt; dict:
         &#34;&#34;&#34;Returns a dictionary listing reccomended TikToks for a specific TikTok video.
 
 
@@ -990,6 +1015,7 @@ class TikTokApi:
         ----------
         id: The id of the video to get suggestions for
             Can be found using other methods
+        count: The count of results you want to return
         &#34;&#34;&#34;
         (
             region,
@@ -1013,8 +1039,6 @@ class TikTokApi:
                 &#34;count&#34;: realCount,
                 &#34;id&#34;: 1,
                 &#34;secUid&#34;: &#34;&#34;,
-                &#34;maxCursor&#34;: maxCursor,
-                &#34;minCursor&#34;: minCursor,
                 &#34;sourceType&#34;: 12,
                 &#34;appId&#34;: 1233,
                 &#34;region&#34;: region,
@@ -1025,9 +1049,9 @@ class TikTokApi:
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
-            for t in res.get(&#34;items&#34;, []):
+            for t in res.get(&#34;itemList&#34;, []):
                 response.append(t)
 
             if not res[&#34;hasMore&#34;] and not first:
@@ -1035,7 +1059,6 @@ class TikTokApi:
                 return response[:count]
 
             realCount = count - len(response)
-            maxCursor = res[&#34;maxCursor&#34;]
 
             first = False
 
@@ -1065,7 +1088,7 @@ class TikTokApi:
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        return self.getData(url=api_url, **kwargs)
+        return self.get_data(url=api_url, **kwargs)
 
     def get_tiktok_by_url(self, url, **kwargs) -&gt; dict:
         &#34;&#34;&#34;Returns a dictionary of a TikTok object by url.
@@ -1128,13 +1151,12 @@ class TikTokApi:
             },
             proxies=self.__format_proxy(kwargs.get(&#34;proxy&#34;, None)),
             cookies=self.get_cookies(**kwargs),
+            **self.requests_extra_kwargs,
         )
 
         t = r.text
         try:
-            j_raw = t.split(
-                &#39;&lt;script id=&#34;__NEXT_DATA__&#34; type=&#34;application/json&#34; crossorigin=&#34;anonymous&#34;&gt;&#39;
-            )[1].split(&#34;&lt;/script&gt;&#34;)[0]
+            j_raw = self.__extract_tag_contents(r.text)
         except IndexError:
             if not t:
                 logging.error(&#34;TikTok response is empty&#34;)
@@ -1145,9 +1167,7 @@ class TikTokApi:
         data = json.loads(j_raw)[&#34;props&#34;][&#34;pageProps&#34;]
 
         if data[&#34;serverCode&#34;] == 404:
-            raise TikTokNotFoundError(
-                &#34;TikTok with that url doesn&#39;t exist&#34;.format(username)
-            )
+            raise TikTokNotFoundError(&#34;TikTok with that url doesn&#39;t exist&#34;)
 
         return data
 
@@ -1165,8 +1185,7 @@ class TikTokApi:
         api_url = &#34;{}node/share/discover?{}&amp;{}&#34;.format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-
-        return self.getData(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]
+        return self.get_data(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]
 
     def discover_music(self, **kwargs) -&gt; dict:
         &#34;&#34;&#34;Discover page, consists of music&#34;&#34;&#34;
@@ -1178,12 +1197,12 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs[&#34;custom_did&#34;] = did
-        query = {&#34;noUser&#34;: 1, &#34;userCount&#34;: 30, &#34;scene&#34;: 0}
+        query = {&#34;noUser&#34;: 0, &#34;userCount&#34;: 28, &#34;scene&#34;: 17}
         api_url = &#34;{}node/share/discover?{}&amp;{}&#34;.format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        return self.getData(url=api_url, **kwargs)[&#34;body&#34;][2][&#34;exploreList&#34;]
+        return self.get_data(url=api_url, **kwargs)[&#34;body&#34;][2][&#34;exploreList&#34;]
 
     def get_user_object(self, username, **kwargs) -&gt; dict:
         &#34;&#34;&#34;Gets a user object (dictionary)
@@ -1229,14 +1248,13 @@ class TikTokApi:
             },
             proxies=self.__format_proxy(kwargs.get(&#34;proxy&#34;, None)),
             cookies=self.get_cookies(**kwargs),
+            **self.requests_extra_kwargs,
         )
 
         t = r.text
 
         try:
-            j_raw = t.split(
-                &#39;&lt;script id=&#34;__NEXT_DATA__&#34; type=&#34;application/json&#34; crossorigin=&#34;anonymous&#34;&gt;&#39;
-            )[1].split(&#34;&lt;/script&gt;&#34;)[0]
+            j_raw = self.__extract_tag_contents(r.text)
         except IndexError:
             if not t:
                 logging.error(&#34;Tiktok response is empty&#34;)
@@ -1281,9 +1299,9 @@ class TikTokApi:
         api_url = &#34;{}node/share/discover?{}&amp;{}&#34;.format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-
+        print(api_url)
         res = []
-        for x in self.getData(url=api_url, **kwargs)[&#34;body&#34;][0][&#34;exploreList&#34;]:
+        for x in self.get_data(url=api_url, **kwargs)[&#34;body&#34;][0][&#34;exploreList&#34;]:
             res.append(x[&#34;cardItem&#34;])
         return res[:count]
 
@@ -1348,9 +1366,8 @@ class TikTokApi:
         api_url = &#34;{}node/share/discover?{}&amp;{}&#34;.format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-
         res = []
-        for x in self.getData(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]:
+        for x in self.get_data(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]:
             res.append(x[&#34;cardItem&#34;])
         return res[:count]
 
@@ -1418,7 +1435,7 @@ class TikTokApi:
         )
 
         res = []
-        for x in self.getData(url=api_url, **kwargs)[&#34;body&#34;][2][&#34;exploreList&#34;]:
+        for x in self.get_data(url=api_url, **kwargs)[&#34;body&#34;][2][&#34;exploreList&#34;]:
             res.append(x[&#34;cardItem&#34;])
         return res[:count]
 
@@ -1563,6 +1580,7 @@ class TikTokApi:
                 &#34;user-agent&#34;: &#34;okhttp&#34;,
             },
             proxies=self.__format_proxy(proxy),
+            **self.requests_extra_kwargs,
         )
 
         if r.text[0] == &#34;{&#34;:
@@ -1589,11 +1607,10 @@ class TikTokApi:
             },
             proxies=self.__format_proxy(kwargs.get(&#34;proxy&#34;, None)),
             cookies=self.get_cookies(**kwargs),
+            **self.requests_extra_kwargs,
         )
         t = r.text
-        j_raw = t.split(
-            &#39;&lt;script id=&#34;__NEXT_DATA__&#34; type=&#34;application/json&#34; crossorigin=&#34;anonymous&#34;&gt;&#39;
-        )[1].split(&#34;&lt;/script&gt;&#34;)[0]
+        j_raw = self.__extract_tag_contents(r.text)
 
         music_object = json.loads(j_raw)[&#34;props&#34;][&#34;pageProps&#34;][&#34;musicInfo&#34;]
         if not music_object.get(&#34;title&#34;, None):
@@ -1622,6 +1639,7 @@ class TikTokApi:
             proxies=self.__format_proxy(
                 kwargs.get(&#34;proxy&#34;, None), cookies=self.get_cookies(**kwargs)
             ),
+            **self.requests_extra_kwargs,
         )
         try:
             return r.text.split(&#39;&#34;secUid&#34;:&#34;&#39;)[1].split(&#39;&#34;,&#34;secret&#34;:&#39;)[0]
@@ -1655,6 +1673,7 @@ class TikTokApi:
         return requests.get(
             &#34;https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js&#34;,
             proxies=self.__format_proxy(proxy),
+            **self.requests_extra_kwargs,
         ).text
 
     def __format_new_params__(self, parm) -&gt; str:
@@ -1686,6 +1705,16 @@ class TikTokApi:
             &#34;OS&#34;: &#34;windows&#34;,
         }
         return urlencode(query)
+
+    def __extract_tag_contents(self, html):
+        nonce_start = &#39;&lt;head nonce=&#34;&#39;
+        nonce_end = &#39;&#34;&gt;&#39;
+        nonce = html.split(nonce_start)[1].split(nonce_end)[0]
+        j_raw = html.split(
+            &#39;&lt;script id=&#34;__NEXT_DATA__&#34; type=&#34;application/json&#34; nonce=&#34;%s&#34; crossorigin=&#34;anonymous&#34;&gt;&#39;
+            % nonce
+        )[1].split(&#34;&lt;/script&gt;&#34;)[0]
+        return j_raw
 
     # Process the kwargs
     def __process_kwargs__(self, kwargs):
@@ -1819,6 +1848,7 @@ __pdoc__ = {
         self.custom_verifyFp = kwargs.get(&#34;custom_verifyFp&#34;)
         self.signer_url = kwargs.get(&#34;external_signer&#34;, None)
         self.request_delay = kwargs.get(&#34;request_delay&#34;, None)
+        self.requests_extra_kwargs = kwargs.get(&#34;requests_extra_kwargs&#34;, {})
 
         if kwargs.get(&#34;use_test_endpoints&#34;, False):
             global BASE_URL
@@ -1961,7 +1991,7 @@ __pdoc__ = {
             query = {&#34;url&#34;: url, &#34;custom_did&#34;: custom_did, &#34;verifyFp&#34;: verifyFp}
         else:
             query = {&#34;url&#34;: url, &#34;verifyFp&#34;: verifyFp}
-        data = requests.get(self.signer_url + &#34;?{}&#34;.format(urlencode(query)))
+        data = requests.get(self.signer_url + &#34;?{}&#34;.format(urlencode(query)), **self.requests_extra_kwargs)
         parsed_data = data.json()
 
         return (
@@ -2036,10 +2066,14 @@ __pdoc__ = {
             },
             cookies=self.get_cookies(**kwargs),
             proxies=self.__format_proxy(proxy),
+            **self.requests_extra_kwargs,
         )
         try:
             json = r.json()
-            if json.get(&#34;type&#34;) == &#34;verify&#34;:
+            if (
+                json.get(&#34;type&#34;) == &#34;verify&#34;
+                or json.get(&#34;verifyConfig&#34;, {}).get(&#34;type&#34;, &#34;&#34;) == &#34;verify&#34;
+            ):
                 logging.error(
                     &#34;Tiktok wants to display a catcha. Response is:\n&#34; + r.text
                 )
@@ -2178,7 +2212,7 @@ __pdoc__ = {
             api_url = &#34;{}api/recommend/item_list/?{}&amp;{}&#34;.format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
             for t in res.get(&#34;itemList&#34;, []):
                 response.append(t)
 
@@ -2254,18 +2288,18 @@ __pdoc__ = {
         response = []
         while len(response) &lt; count:
             query = {
-                &#34;discoverType&#34;: count,
+                &#34;discoverType&#34;: 1,
                 &#34;needItemList&#34;: False,
                 &#34;keyWord&#34;: search_term,
                 &#34;offset&#34;: offset,
-                &#34;count&#34;: 99,
+                &#34;count&#34;: count,
                 &#34;useRecommend&#34;: False,
                 &#34;language&#34;: &#34;en&#34;,
             }
             api_url = &#34;{}api/discover/{}/?{}&amp;{}&#34;.format(
                 BASE_URL, prefix, self.__add_new_params__(), urlencode(query)
             )
-            data = self.getData(url=api_url, **kwargs)
+            data = self.get_data(url=api_url, **kwargs)
 
             if &#34;userInfoList&#34; in data.keys():
                 for x in data[&#34;userInfoList&#34;]:
@@ -2332,7 +2366,7 @@ __pdoc__ = {
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
             if &#34;itemList&#34; in res.keys():
                 for t in res[&#34;itemList&#34;]:
@@ -2368,7 +2402,7 @@ __pdoc__ = {
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs[&#34;custom_did&#34;] = did
-        data = self.getUserObject(username, **kwargs)
+        data = self.get_user_object(username, **kwargs)
         return self.userPosts(
             data[&#34;id&#34;],
             data[&#34;secUid&#34;],
@@ -2414,7 +2448,7 @@ __pdoc__ = {
             )
         )
 
-        return self.getData(url=api_url, **kwargs)
+        return self.get_data(url=api_url, **kwargs)
 
     def get_user_pager(self, username, page_size=30, cursor=0, **kwargs):
         &#34;&#34;&#34;Returns a generator to page through a user&#39;s feed
@@ -2504,7 +2538,7 @@ __pdoc__ = {
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
             try:
                 res[&#34;itemList&#34;]
@@ -2590,7 +2624,7 @@ __pdoc__ = {
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
             try:
                 for t in res[&#34;items&#34;]:
@@ -2645,12 +2679,34 @@ __pdoc__ = {
             },
             proxies=self.__format_proxy(kwargs.get(&#34;proxy&#34;, None)),
             cookies=self.get_cookies(**kwargs),
+            **self.requests_extra_kwargs,
         )
-        t = r.text
-        j_raw = t.split(
-            &#39;&lt;script id=&#34;__NEXT_DATA__&#34; type=&#34;application/json&#34; crossorigin=&#34;anonymous&#34;&gt;&#39;
-        )[1].split(&#34;&lt;/script&gt;&#34;)[0]
+
+        j_raw = self.__extract_tag_contents(r.text)
         return json.loads(j_raw)[&#34;props&#34;][&#34;pageProps&#34;][&#34;musicInfo&#34;]
+
+    def get_music_object_full_by_api(self, id, **kwargs):
+        &#34;&#34;&#34;Returns a music object for a specific sound id, but using the API rather than HTML requests.
+
+        Parameters
+        ----------
+        id: The sound id to get the object for
+            This can be found by using other methods.
+        &#34;&#34;&#34;
+        (
+            region,
+            language,
+            proxy,
+            maxCount,
+            did,
+        ) = self.__process_kwargs__(kwargs)
+        kwargs[&#34;custom_did&#34;] = did
+
+        api_url = &#34;{}node/share/music/-{}?{}&#34;.format(
+            BASE_URL, id, self.__add_new_params__()
+        )
+        res = self.get_data(url=api_url, **kwargs)
+        return res[&#39;musicInfo&#39;]
 
     def by_hashtag(self, hashtag, count=30, offset=0, **kwargs) -&gt; dict:
         &#34;&#34;&#34;Returns a dictionary listing TikToks with a specific hashtag.
@@ -2691,7 +2747,7 @@ __pdoc__ = {
             api_url = &#34;{}api/challenge/item_list/?{}&amp;{}&#34;.format(
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
             for t in res[&#34;itemList&#34;]:
                 response.append(t)
@@ -2724,14 +2780,12 @@ __pdoc__ = {
         api_url = &#34;{}node/share/tag/{}?{}&amp;{}&#34;.format(
             BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
         )
-        data = self.getData(url=api_url, **kwargs)
+        data = self.get_data(url=api_url, **kwargs)
         if data[&#34;challengeInfo&#34;].get(&#34;challenge&#34;) is None:
             raise TikTokNotFoundError(&#34;Challenge {} does not exist&#34;.format(hashtag))
         return data
 
-    def get_recommended_tiktoks_by_video_id(
-        self, id, count=30, minCursor=0, maxCursor=0, **kwargs
-    ) -&gt; dict:
+    def get_recommended_tiktoks_by_video_id(self, id, count=30, **kwargs) -&gt; dict:
         &#34;&#34;&#34;Returns a dictionary listing reccomended TikToks for a specific TikTok video.
 
 
@@ -2739,6 +2793,7 @@ __pdoc__ = {
         ----------
         id: The id of the video to get suggestions for
             Can be found using other methods
+        count: The count of results you want to return
         &#34;&#34;&#34;
         (
             region,
@@ -2762,8 +2817,6 @@ __pdoc__ = {
                 &#34;count&#34;: realCount,
                 &#34;id&#34;: 1,
                 &#34;secUid&#34;: &#34;&#34;,
-                &#34;maxCursor&#34;: maxCursor,
-                &#34;minCursor&#34;: minCursor,
                 &#34;sourceType&#34;: 12,
                 &#34;appId&#34;: 1233,
                 &#34;region&#34;: region,
@@ -2774,9 +2827,9 @@ __pdoc__ = {
                 BASE_URL, self.__add_new_params__(), urlencode(query)
             )
 
-            res = self.getData(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, **kwargs)
 
-            for t in res.get(&#34;items&#34;, []):
+            for t in res.get(&#34;itemList&#34;, []):
                 response.append(t)
 
             if not res[&#34;hasMore&#34;] and not first:
@@ -2784,7 +2837,6 @@ __pdoc__ = {
                 return response[:count]
 
             realCount = count - len(response)
-            maxCursor = res[&#34;maxCursor&#34;]
 
             first = False
 
@@ -2814,7 +2866,7 @@ __pdoc__ = {
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        return self.getData(url=api_url, **kwargs)
+        return self.get_data(url=api_url, **kwargs)
 
     def get_tiktok_by_url(self, url, **kwargs) -&gt; dict:
         &#34;&#34;&#34;Returns a dictionary of a TikTok object by url.
@@ -2877,13 +2929,12 @@ __pdoc__ = {
             },
             proxies=self.__format_proxy(kwargs.get(&#34;proxy&#34;, None)),
             cookies=self.get_cookies(**kwargs),
+            **self.requests_extra_kwargs,
         )
 
         t = r.text
         try:
-            j_raw = t.split(
-                &#39;&lt;script id=&#34;__NEXT_DATA__&#34; type=&#34;application/json&#34; crossorigin=&#34;anonymous&#34;&gt;&#39;
-            )[1].split(&#34;&lt;/script&gt;&#34;)[0]
+            j_raw = self.__extract_tag_contents(r.text)
         except IndexError:
             if not t:
                 logging.error(&#34;TikTok response is empty&#34;)
@@ -2894,9 +2945,7 @@ __pdoc__ = {
         data = json.loads(j_raw)[&#34;props&#34;][&#34;pageProps&#34;]
 
         if data[&#34;serverCode&#34;] == 404:
-            raise TikTokNotFoundError(
-                &#34;TikTok with that url doesn&#39;t exist&#34;.format(username)
-            )
+            raise TikTokNotFoundError(&#34;TikTok with that url doesn&#39;t exist&#34;)
 
         return data
 
@@ -2914,8 +2963,7 @@ __pdoc__ = {
         api_url = &#34;{}node/share/discover?{}&amp;{}&#34;.format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-
-        return self.getData(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]
+        return self.get_data(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]
 
     def discover_music(self, **kwargs) -&gt; dict:
         &#34;&#34;&#34;Discover page, consists of music&#34;&#34;&#34;
@@ -2927,12 +2975,12 @@ __pdoc__ = {
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs[&#34;custom_did&#34;] = did
-        query = {&#34;noUser&#34;: 1, &#34;userCount&#34;: 30, &#34;scene&#34;: 0}
+        query = {&#34;noUser&#34;: 0, &#34;userCount&#34;: 28, &#34;scene&#34;: 17}
         api_url = &#34;{}node/share/discover?{}&amp;{}&#34;.format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        return self.getData(url=api_url, **kwargs)[&#34;body&#34;][2][&#34;exploreList&#34;]
+        return self.get_data(url=api_url, **kwargs)[&#34;body&#34;][2][&#34;exploreList&#34;]
 
     def get_user_object(self, username, **kwargs) -&gt; dict:
         &#34;&#34;&#34;Gets a user object (dictionary)
@@ -2978,14 +3026,13 @@ __pdoc__ = {
             },
             proxies=self.__format_proxy(kwargs.get(&#34;proxy&#34;, None)),
             cookies=self.get_cookies(**kwargs),
+            **self.requests_extra_kwargs,
         )
 
         t = r.text
 
         try:
-            j_raw = t.split(
-                &#39;&lt;script id=&#34;__NEXT_DATA__&#34; type=&#34;application/json&#34; crossorigin=&#34;anonymous&#34;&gt;&#39;
-            )[1].split(&#34;&lt;/script&gt;&#34;)[0]
+            j_raw = self.__extract_tag_contents(r.text)
         except IndexError:
             if not t:
                 logging.error(&#34;Tiktok response is empty&#34;)
@@ -3030,9 +3077,9 @@ __pdoc__ = {
         api_url = &#34;{}node/share/discover?{}&amp;{}&#34;.format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-
+        print(api_url)
         res = []
-        for x in self.getData(url=api_url, **kwargs)[&#34;body&#34;][0][&#34;exploreList&#34;]:
+        for x in self.get_data(url=api_url, **kwargs)[&#34;body&#34;][0][&#34;exploreList&#34;]:
             res.append(x[&#34;cardItem&#34;])
         return res[:count]
 
@@ -3097,9 +3144,8 @@ __pdoc__ = {
         api_url = &#34;{}node/share/discover?{}&amp;{}&#34;.format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-
         res = []
-        for x in self.getData(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]:
+        for x in self.get_data(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]:
             res.append(x[&#34;cardItem&#34;])
         return res[:count]
 
@@ -3167,7 +3213,7 @@ __pdoc__ = {
         )
 
         res = []
-        for x in self.getData(url=api_url, **kwargs)[&#34;body&#34;][2][&#34;exploreList&#34;]:
+        for x in self.get_data(url=api_url, **kwargs)[&#34;body&#34;][2][&#34;exploreList&#34;]:
             res.append(x[&#34;cardItem&#34;])
         return res[:count]
 
@@ -3312,6 +3358,7 @@ __pdoc__ = {
                 &#34;user-agent&#34;: &#34;okhttp&#34;,
             },
             proxies=self.__format_proxy(proxy),
+            **self.requests_extra_kwargs,
         )
 
         if r.text[0] == &#34;{&#34;:
@@ -3338,11 +3385,10 @@ __pdoc__ = {
             },
             proxies=self.__format_proxy(kwargs.get(&#34;proxy&#34;, None)),
             cookies=self.get_cookies(**kwargs),
+            **self.requests_extra_kwargs,
         )
         t = r.text
-        j_raw = t.split(
-            &#39;&lt;script id=&#34;__NEXT_DATA__&#34; type=&#34;application/json&#34; crossorigin=&#34;anonymous&#34;&gt;&#39;
-        )[1].split(&#34;&lt;/script&gt;&#34;)[0]
+        j_raw = self.__extract_tag_contents(r.text)
 
         music_object = json.loads(j_raw)[&#34;props&#34;][&#34;pageProps&#34;][&#34;musicInfo&#34;]
         if not music_object.get(&#34;title&#34;, None):
@@ -3371,6 +3417,7 @@ __pdoc__ = {
             proxies=self.__format_proxy(
                 kwargs.get(&#34;proxy&#34;, None), cookies=self.get_cookies(**kwargs)
             ),
+            **self.requests_extra_kwargs,
         )
         try:
             return r.text.split(&#39;&#34;secUid&#34;:&#34;&#39;)[1].split(&#39;&#34;,&#34;secret&#34;:&#39;)[0]
@@ -3404,6 +3451,7 @@ __pdoc__ = {
         return requests.get(
             &#34;https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js&#34;,
             proxies=self.__format_proxy(proxy),
+            **self.requests_extra_kwargs,
         ).text
 
     def __format_new_params__(self, parm) -&gt; str:
@@ -3435,6 +3483,16 @@ __pdoc__ = {
             &#34;OS&#34;: &#34;windows&#34;,
         }
         return urlencode(query)
+
+    def __extract_tag_contents(self, html):
+        nonce_start = &#39;&lt;head nonce=&#34;&#39;
+        nonce_end = &#39;&#34;&gt;&#39;
+        nonce = html.split(nonce_start)[1].split(nonce_end)[0]
+        j_raw = html.split(
+            &#39;&lt;script id=&#34;__NEXT_DATA__&#34; type=&#34;application/json&#34; nonce=&#34;%s&#34; crossorigin=&#34;anonymous&#34;&gt;&#39;
+            % nonce
+        )[1].split(&#34;&lt;/script&gt;&#34;)[0]
+        return j_raw
 
     # Process the kwargs
     def __process_kwargs__(self, kwargs):
@@ -3677,7 +3735,7 @@ def get_instance(**kwargs):
         api_url = &#34;{}api/challenge/item_list/?{}&amp;{}&#34;.format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        res = self.getData(url=api_url, **kwargs)
+        res = self.get_data(url=api_url, **kwargs)
 
         for t in res[&#34;itemList&#34;]:
             response.append(t)
@@ -3745,7 +3803,7 @@ def get_instance(**kwargs):
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        res = self.getData(url=api_url, **kwargs)
+        res = self.get_data(url=api_url, **kwargs)
 
         try:
             for t in res[&#34;items&#34;]:
@@ -3822,7 +3880,7 @@ from a single endpoint.</dd>
         api_url = &#34;{}api/recommend/item_list/?{}&amp;{}&#34;.format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        res = self.getData(url=api_url, **kwargs)
+        res = self.get_data(url=api_url, **kwargs)
         for t in res.get(&#34;itemList&#34;, []):
             response.append(t)
 
@@ -3873,7 +3931,7 @@ get videos from.</dd>
         did,
     ) = self.__process_kwargs__(kwargs)
     kwargs[&#34;custom_did&#34;] = did
-    data = self.getUserObject(username, **kwargs)
+    data = self.get_user_object(username, **kwargs)
     return self.userPosts(
         data[&#34;id&#34;],
         data[&#34;secUid&#34;],
@@ -3919,8 +3977,7 @@ get videos from.</dd>
     api_url = &#34;{}node/share/discover?{}&amp;{}&#34;.format(
         BASE_URL, self.__add_new_params__(), urlencode(query)
     )
-
-    return self.getData(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]</code></pre>
+    return self.get_data(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]</code></pre>
 </details>
 </dd>
 <dt id="TikTokApi.tiktok.TikTokApi.discover_music"><code class="name flex">
@@ -3942,12 +3999,12 @@ get videos from.</dd>
         did,
     ) = self.__process_kwargs__(kwargs)
     kwargs[&#34;custom_did&#34;] = did
-    query = {&#34;noUser&#34;: 1, &#34;userCount&#34;: 30, &#34;scene&#34;: 0}
+    query = {&#34;noUser&#34;: 0, &#34;userCount&#34;: 28, &#34;scene&#34;: 17}
     api_url = &#34;{}node/share/discover?{}&amp;{}&#34;.format(
         BASE_URL, self.__add_new_params__(), urlencode(query)
     )
 
-    return self.getData(url=api_url, **kwargs)[&#34;body&#34;][2][&#34;exploreList&#34;]</code></pre>
+    return self.get_data(url=api_url, **kwargs)[&#34;body&#34;][2][&#34;exploreList&#34;]</code></pre>
 </details>
 </dd>
 <dt id="TikTokApi.tiktok.TikTokApi.discover_type"><code class="name flex">
@@ -3992,18 +4049,18 @@ get videos from.</dd>
     response = []
     while len(response) &lt; count:
         query = {
-            &#34;discoverType&#34;: count,
+            &#34;discoverType&#34;: 1,
             &#34;needItemList&#34;: False,
             &#34;keyWord&#34;: search_term,
             &#34;offset&#34;: offset,
-            &#34;count&#34;: 99,
+            &#34;count&#34;: count,
             &#34;useRecommend&#34;: False,
             &#34;language&#34;: &#34;en&#34;,
         }
         api_url = &#34;{}api/discover/{}/?{}&amp;{}&#34;.format(
             BASE_URL, prefix, self.__add_new_params__(), urlencode(query)
         )
-        data = self.getData(url=api_url, **kwargs)
+        data = self.get_data(url=api_url, **kwargs)
 
         if &#34;userInfoList&#34; in data.keys():
             for x in data[&#34;userInfoList&#34;]:
@@ -4065,7 +4122,7 @@ I recommend watching the entire thing, as it will help setup this package.</dd>
         query = {&#34;url&#34;: url, &#34;custom_did&#34;: custom_did, &#34;verifyFp&#34;: verifyFp}
     else:
         query = {&#34;url&#34;: url, &#34;verifyFp&#34;: verifyFp}
-    data = requests.get(self.signer_url + &#34;?{}&#34;.format(urlencode(query)))
+    data = requests.get(self.signer_url + &#34;?{}&#34;.format(urlencode(query)), **self.requests_extra_kwargs)
     parsed_data = data.json()
 
     return (
@@ -4258,10 +4315,14 @@ you will need to use this.</p></div>
         },
         cookies=self.get_cookies(**kwargs),
         proxies=self.__format_proxy(proxy),
+        **self.requests_extra_kwargs,
     )
     try:
         json = r.json()
-        if json.get(&#34;type&#34;) == &#34;verify&#34;:
+        if (
+            json.get(&#34;type&#34;) == &#34;verify&#34;
+            or json.get(&#34;verifyConfig&#34;, {}).get(&#34;type&#34;, &#34;&#34;) == &#34;verify&#34;
+        ):
             logging.error(
                 &#34;Tiktok wants to display a catcha. Response is:\n&#34; + r.text
             )
@@ -4320,7 +4381,7 @@ you will need to use this.</p></div>
     api_url = &#34;{}node/share/tag/{}?{}&amp;{}&#34;.format(
         BASE_URL, quote(hashtag), self.__add_new_params__(), urlencode(query)
     )
-    data = self.getData(url=api_url, **kwargs)
+    data = self.get_data(url=api_url, **kwargs)
     if data[&#34;challengeInfo&#34;].get(&#34;challenge&#34;) is None:
         raise TikTokNotFoundError(&#34;Challenge {} does not exist&#34;.format(hashtag))
     return data</code></pre>
@@ -4392,12 +4453,49 @@ you will need to use this.</p></div>
         },
         proxies=self.__format_proxy(kwargs.get(&#34;proxy&#34;, None)),
         cookies=self.get_cookies(**kwargs),
+        **self.requests_extra_kwargs,
     )
-    t = r.text
-    j_raw = t.split(
-        &#39;&lt;script id=&#34;__NEXT_DATA__&#34; type=&#34;application/json&#34; crossorigin=&#34;anonymous&#34;&gt;&#39;
-    )[1].split(&#34;&lt;/script&gt;&#34;)[0]
+
+    j_raw = self.__extract_tag_contents(r.text)
     return json.loads(j_raw)[&#34;props&#34;][&#34;pageProps&#34;][&#34;musicInfo&#34;]</code></pre>
+</details>
+</dd>
+<dt id="TikTokApi.tiktok.TikTokApi.get_music_object_full_by_api"><code class="name flex">
+<span>def <span class="ident">get_music_object_full_by_api</span></span>(<span>self, id, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns a music object for a specific sound id, but using the API rather than HTML requests.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>id</code></strong> :&ensp;<code>The sound id to get the object for</code></dt>
+<dd>This can be found by using other methods.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_music_object_full_by_api(self, id, **kwargs):
+    &#34;&#34;&#34;Returns a music object for a specific sound id, but using the API rather than HTML requests.
+
+    Parameters
+    ----------
+    id: The sound id to get the object for
+        This can be found by using other methods.
+    &#34;&#34;&#34;
+    (
+        region,
+        language,
+        proxy,
+        maxCount,
+        did,
+    ) = self.__process_kwargs__(kwargs)
+    kwargs[&#34;custom_did&#34;] = did
+
+    api_url = &#34;{}node/share/music/-{}?{}&#34;.format(
+        BASE_URL, id, self.__add_new_params__()
+    )
+    res = self.get_data(url=api_url, **kwargs)
+    return res[&#39;musicInfo&#39;]</code></pre>
 </details>
 </dd>
 <dt id="TikTokApi.tiktok.TikTokApi.get_music_title"><code class="name flex">
@@ -4433,11 +4531,10 @@ you will need to use this.</p></div>
         },
         proxies=self.__format_proxy(kwargs.get(&#34;proxy&#34;, None)),
         cookies=self.get_cookies(**kwargs),
+        **self.requests_extra_kwargs,
     )
     t = r.text
-    j_raw = t.split(
-        &#39;&lt;script id=&#34;__NEXT_DATA__&#34; type=&#34;application/json&#34; crossorigin=&#34;anonymous&#34;&gt;&#39;
-    )[1].split(&#34;&lt;/script&gt;&#34;)[0]
+    j_raw = self.__extract_tag_contents(r.text)
 
     music_object = json.loads(j_raw)[&#34;props&#34;][&#34;pageProps&#34;][&#34;musicInfo&#34;]
     if not music_object.get(&#34;title&#34;, None):
@@ -4447,7 +4544,7 @@ you will need to use this.</p></div>
 </details>
 </dd>
 <dt id="TikTokApi.tiktok.TikTokApi.get_recommended_tiktoks_by_video_id"><code class="name flex">
-<span>def <span class="ident">get_recommended_tiktoks_by_video_id</span></span>(<span>self, id, count=30, minCursor=0, maxCursor=0, **kwargs) ‑> dict</span>
+<span>def <span class="ident">get_recommended_tiktoks_by_video_id</span></span>(<span>self, id, count=30, **kwargs) ‑> dict</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns a dictionary listing reccomended TikToks for a specific TikTok video.</p>
@@ -4455,14 +4552,14 @@ you will need to use this.</p></div>
 <dl>
 <dt><strong><code>id</code></strong> :&ensp;<code>The id</code> of <code>the video to get suggestions for</code></dt>
 <dd>Can be found using other methods</dd>
+<dt><strong><code>count</code></strong> :&ensp;<code>The count</code> of <code>results you want to return</code></dt>
+<dd>&nbsp;</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_recommended_tiktoks_by_video_id(
-    self, id, count=30, minCursor=0, maxCursor=0, **kwargs
-) -&gt; dict:
+<pre><code class="python">def get_recommended_tiktoks_by_video_id(self, id, count=30, **kwargs) -&gt; dict:
     &#34;&#34;&#34;Returns a dictionary listing reccomended TikToks for a specific TikTok video.
 
 
@@ -4470,6 +4567,7 @@ you will need to use this.</p></div>
     ----------
     id: The id of the video to get suggestions for
         Can be found using other methods
+    count: The count of results you want to return
     &#34;&#34;&#34;
     (
         region,
@@ -4493,8 +4591,6 @@ you will need to use this.</p></div>
             &#34;count&#34;: realCount,
             &#34;id&#34;: 1,
             &#34;secUid&#34;: &#34;&#34;,
-            &#34;maxCursor&#34;: maxCursor,
-            &#34;minCursor&#34;: minCursor,
             &#34;sourceType&#34;: 12,
             &#34;appId&#34;: 1233,
             &#34;region&#34;: region,
@@ -4505,9 +4601,9 @@ you will need to use this.</p></div>
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        res = self.getData(url=api_url, **kwargs)
+        res = self.get_data(url=api_url, **kwargs)
 
-        for t in res.get(&#34;items&#34;, []):
+        for t in res.get(&#34;itemList&#34;, []):
             response.append(t)
 
         if not res[&#34;hasMore&#34;] and not first:
@@ -4515,7 +4611,6 @@ you will need to use this.</p></div>
             return response[:count]
 
         realCount = count - len(response)
-        maxCursor = res[&#34;maxCursor&#34;]
 
         first = False
 
@@ -4557,6 +4652,7 @@ you will need to use this.</p></div>
         proxies=self.__format_proxy(
             kwargs.get(&#34;proxy&#34;, None), cookies=self.get_cookies(**kwargs)
         ),
+        **self.requests_extra_kwargs,
     )
     try:
         return r.text.split(&#39;&#34;secUid&#34;:&#34;&#39;)[1].split(&#39;&#34;,&#34;secret&#34;:&#39;)[0]
@@ -4609,9 +4705,8 @@ you will need to use this.</p></div>
     api_url = &#34;{}node/share/discover?{}&amp;{}&#34;.format(
         BASE_URL, self.__add_new_params__(), urlencode(query)
     )
-
     res = []
-    for x in self.getData(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]:
+    for x in self.get_data(url=api_url, **kwargs)[&#34;body&#34;][1][&#34;exploreList&#34;]:
         res.append(x[&#34;cardItem&#34;])
     return res[:count]</code></pre>
 </details>
@@ -4715,7 +4810,7 @@ you will need to use this.</p></div>
     )
 
     res = []
-    for x in self.getData(url=api_url, **kwargs)[&#34;body&#34;][2][&#34;exploreList&#34;]:
+    for x in self.get_data(url=api_url, **kwargs)[&#34;body&#34;][2][&#34;exploreList&#34;]:
         res.append(x[&#34;cardItem&#34;])
     return res[:count]</code></pre>
 </details>
@@ -4814,9 +4909,9 @@ you will need to use this.</p></div>
     api_url = &#34;{}node/share/discover?{}&amp;{}&#34;.format(
         BASE_URL, self.__add_new_params__(), urlencode(query)
     )
-
+    print(api_url)
     res = []
-    for x in self.getData(url=api_url, **kwargs)[&#34;body&#34;][0][&#34;exploreList&#34;]:
+    for x in self.get_data(url=api_url, **kwargs)[&#34;body&#34;][0][&#34;exploreList&#34;]:
         res.append(x[&#34;cardItem&#34;])
     return res[:count]</code></pre>
 </details>
@@ -4917,13 +5012,12 @@ endpoints rather than the API based ones.</p>
         },
         proxies=self.__format_proxy(kwargs.get(&#34;proxy&#34;, None)),
         cookies=self.get_cookies(**kwargs),
+        **self.requests_extra_kwargs,
     )
 
     t = r.text
     try:
-        j_raw = t.split(
-            &#39;&lt;script id=&#34;__NEXT_DATA__&#34; type=&#34;application/json&#34; crossorigin=&#34;anonymous&#34;&gt;&#39;
-        )[1].split(&#34;&lt;/script&gt;&#34;)[0]
+        j_raw = self.__extract_tag_contents(r.text)
     except IndexError:
         if not t:
             logging.error(&#34;TikTok response is empty&#34;)
@@ -4934,9 +5028,7 @@ endpoints rather than the API based ones.</p>
     data = json.loads(j_raw)[&#34;props&#34;][&#34;pageProps&#34;]
 
     if data[&#34;serverCode&#34;] == 404:
-        raise TikTokNotFoundError(
-            &#34;TikTok with that url doesn&#39;t exist&#34;.format(username)
-        )
+        raise TikTokNotFoundError(&#34;TikTok with that url doesn&#39;t exist&#34;)
 
     return data</code></pre>
 </details>
@@ -4979,7 +5071,7 @@ endpoints rather than the API based ones.</p>
         BASE_URL, self.__add_new_params__(), urlencode(query)
     )
 
-    return self.getData(url=api_url, **kwargs)</code></pre>
+    return self.get_data(url=api_url, **kwargs)</code></pre>
 </details>
 </dd>
 <dt id="TikTokApi.tiktok.TikTokApi.get_tiktok_by_url"><code class="name flex">
@@ -5071,14 +5163,13 @@ url links.</dd>
         },
         proxies=self.__format_proxy(kwargs.get(&#34;proxy&#34;, None)),
         cookies=self.get_cookies(**kwargs),
+        **self.requests_extra_kwargs,
     )
 
     t = r.text
 
     try:
-        j_raw = t.split(
-            &#39;&lt;script id=&#34;__NEXT_DATA__&#34; type=&#34;application/json&#34; crossorigin=&#34;anonymous&#34;&gt;&#39;
-        )[1].split(&#34;&lt;/script&gt;&#34;)[0]
+        j_raw = self.__extract_tag_contents(r.text)
     except IndexError:
         if not t:
             logging.error(&#34;Tiktok response is empty&#34;)
@@ -5367,6 +5458,7 @@ TikTokApi class.
             &#34;user-agent&#34;: &#34;okhttp&#34;,
         },
         proxies=self.__format_proxy(proxy),
+        **self.requests_extra_kwargs,
     )
 
     if r.text[0] == &#34;{&#34;:
@@ -5531,7 +5623,7 @@ Note: The user's likes must be public</p>
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        res = self.getData(url=api_url, **kwargs)
+        res = self.get_data(url=api_url, **kwargs)
 
         try:
             res[&#34;itemList&#34;]
@@ -5658,7 +5750,7 @@ just use by_username to find it.</dd>
         )
     )
 
-    return self.getData(url=api_url, **kwargs)</code></pre>
+    return self.get_data(url=api_url, **kwargs)</code></pre>
 </details>
 </dd>
 <dt id="TikTokApi.tiktok.TikTokApi.user_posts"><code class="name flex">
@@ -5729,7 +5821,7 @@ just use by_username to find it.</dd>
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
 
-        res = self.getData(url=api_url, **kwargs)
+        res = self.get_data(url=api_url, **kwargs)
 
         if &#34;itemList&#34; in res.keys():
             for t in res[&#34;itemList&#34;]:
@@ -5785,6 +5877,7 @@ just use by_username to find it.</dd>
 <li><code><a title="TikTokApi.tiktok.TikTokApi.get_instance" href="#TikTokApi.tiktok.TikTokApi.get_instance">get_instance</a></code></li>
 <li><code><a title="TikTokApi.tiktok.TikTokApi.get_music_object" href="#TikTokApi.tiktok.TikTokApi.get_music_object">get_music_object</a></code></li>
 <li><code><a title="TikTokApi.tiktok.TikTokApi.get_music_object_full" href="#TikTokApi.tiktok.TikTokApi.get_music_object_full">get_music_object_full</a></code></li>
+<li><code><a title="TikTokApi.tiktok.TikTokApi.get_music_object_full_by_api" href="#TikTokApi.tiktok.TikTokApi.get_music_object_full_by_api">get_music_object_full_by_api</a></code></li>
 <li><code><a title="TikTokApi.tiktok.TikTokApi.get_music_title" href="#TikTokApi.tiktok.TikTokApi.get_music_title">get_music_title</a></code></li>
 <li><code><a title="TikTokApi.tiktok.TikTokApi.get_recommended_tiktoks_by_video_id" href="#TikTokApi.tiktok.TikTokApi.get_recommended_tiktoks_by_video_id">get_recommended_tiktoks_by_video_id</a></code></li>
 <li><code><a title="TikTokApi.tiktok.TikTokApi.get_secuid" href="#TikTokApi.tiktok.TikTokApi.get_secuid">get_secuid</a></code></li>

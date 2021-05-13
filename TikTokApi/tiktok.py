@@ -880,6 +880,13 @@ class TikTokApi:
         return json.loads(j_raw)["props"]["pageProps"]["musicInfo"]
 
     def get_music_object_full_by_api(self, id, **kwargs):
+        """Returns a music object for a specific sound id, but using the API rather than HTML requests.
+
+        Parameters
+        ----------
+        id: The sound id to get the object for
+            This can be found by using other methods.
+        """
         (
             region,
             language,
@@ -1150,7 +1157,6 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        print(self.get_data(url=api_url, **kwargs))
         return self.get_data(url=api_url, **kwargs)["body"][1]["exploreList"]
 
     def discover_music(self, **kwargs) -> dict:
@@ -1163,7 +1169,7 @@ class TikTokApi:
             did,
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
-        query = {"noUser": 1, "userCount": 30, "scene": 0}
+        query = {"noUser": 0, "userCount": 28, "scene": 17}
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
@@ -1265,7 +1271,7 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-
+        print(api_url)
         res = []
         for x in self.get_data(url=api_url, **kwargs)["body"][0]["exploreList"]:
             res.append(x["cardItem"])
