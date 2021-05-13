@@ -21,7 +21,7 @@ jobs:
           pip install pdoc3
       - name: Generate Docs
         run: |
-          pdoc --html -o ./docs TikTokApi
+          pdoc --html --force -o ./docs TikTokApi
           mv docs/TikTokApi/* docs/
           rm docs/TikTokApi
       - name: Push
