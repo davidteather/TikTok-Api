@@ -879,6 +879,22 @@ class TikTokApi:
         j_raw = self.__extract_tag_contents(r.text)
         return json.loads(j_raw)["props"]["pageProps"]["musicInfo"]
 
+    def get_music_object_full_by_api(self, id, **kwargs):
+        (
+            region,
+            language,
+            proxy,
+            maxCount,
+            did,
+        ) = self.__process_kwargs__(kwargs)
+        kwargs["custom_did"] = did
+
+        api_url = "{}node/share/music/-{}?{}".format(
+            BASE_URL, id, self.__add_new_params__()
+        )
+        res = self.get_data(url=api_url, **kwargs)
+        return res['musicInfo']
+
     def by_hashtag(self, hashtag, count=30, offset=0, **kwargs) -> dict:
         """Returns a dictionary listing TikToks with a specific hashtag.
 
