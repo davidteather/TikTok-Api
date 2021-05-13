@@ -23,7 +23,7 @@ jobs:
         run: |
           pdoc --html --force -o ./docs TikTokApi
           mv docs/TikTokApi/* docs/
-          rm docs/TikTokApi
+          rm -r docs/TikTokApi
       - name: Push
         run: |
           git config --global user.name 'David Teather'
