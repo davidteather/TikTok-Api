@@ -25,11 +25,16 @@ This is an unofficial api wrapper for TikTok.com in python. With this api you ar
 
 To get started using this api follow the instructions below.
 
+#### How to support the project
+* Feel free to sponsor me on GitHub
+* Feel free to tip the project using the brave browser
+* Submit PRs for issues :)
+
 ### Installing
 
 If you run into an issue please check the closed issues on the github. You're most likely not the first person to experience this issue. If nothing works feel free to open an issue.
 
-```
+```sh
 pip install TikTokApi
 python -m playwright install
 ```
@@ -43,7 +48,7 @@ If you're on MacOS you may need to install [XCode Developer Tools](https://webki
 
 Clone this repository onto a local machine then run the following commands.
 
-```
+```sh
 docker build . -t tiktokapi:latest
 docker run -v TikTokApi --rm tiktokapi:latest python3 your_script.py
 ```
@@ -62,7 +67,7 @@ Please don't open an issue if you're experiencing one of these just comment if t
 
 Here's a quick bit of code to get the most recent trending on TikTok. There's more examples in the examples directory.
 
-```
+```py
 from TikTokApi import TikTokApi
 api = TikTokApi.get_instance()
 # If playwright doesn't work for you try to use selenium
@@ -84,7 +89,7 @@ print(len(trending))
 To run the example scripts from the repository root, make sure you use the
 module form of python the interpreter
 
-```
+```sh
 python -m examples.getTrending
 ```
 
