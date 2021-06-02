@@ -248,15 +248,16 @@ class TikTokApi:
                 "accept": "application/json, text/plain, */*",
                 "accept-encoding": "gzip, deflate, br",
                 "accept-language": "en-US,en;q=0.9",
-                "cache-control": "no-cache",
-                "dnt": "1",
                 "origin": referrer,
-                "pragma": "no-cache",
                 "referer": referrer,
                 "sec-fetch-dest": "empty",
                 "sec-fetch-mode": "cors",
                 "sec-fetch-site": "same-site",
+                "sec-gpc": "1",
                 "user-agent": userAgent,
+                "x-secsdk-csrf-token": "".join(
+                    random.choice(string.ascii_uppercase + string.ascii_lowercase)
+                    for i in range(53))
             },
             cookies=self.get_cookies(**kwargs),
             proxies=self.__format_proxy(proxy),
@@ -1271,7 +1272,6 @@ class TikTokApi:
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_new_params__(), urlencode(query)
         )
-        print(api_url)
         res = []
         for x in self.get_data(url=api_url, **kwargs)["body"][0]["exploreList"]:
             res.append(x["cardItem"])
