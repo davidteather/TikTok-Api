@@ -257,7 +257,7 @@ class TikTokApi:
                 "user-agent": userAgent,
                 "x-secsdk-csrf-token": "".join(
                     random.choice(string.ascii_uppercase + string.ascii_lowercase)
-                    for i in range(53))
+                    for i in range(92))
             },
             cookies=self.get_cookies(**kwargs),
             proxies=self.__format_proxy(proxy),
@@ -870,7 +870,7 @@ class TikTokApi:
                 "Accept-Encoding": "gzip, deflate",
                 "Connection": "keep-alive",
                 "Host": "www.tiktok.com",
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+                "User-Agent": self.userAgent,
             },
             proxies=self.__format_proxy(kwargs.get("proxy", None)),
             cookies=self.get_cookies(**kwargs),
