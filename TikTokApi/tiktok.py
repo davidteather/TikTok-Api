@@ -311,7 +311,7 @@ class TikTokApi:
                 "tt_webid_v2": did,
                 "tt_csrf_token": "".join(
                     random.choice(string.ascii_uppercase + string.ascii_lowercase)
-                    for i in range(16)
+                    for i in range(32)
                 ),
                 "s_v_web_id": verifyFp,
             }
@@ -321,7 +321,7 @@ class TikTokApi:
                 "tt_webid_v2": did,
                 "tt_csrf_token": "".join(
                     random.choice(string.ascii_uppercase + string.ascii_lowercase)
-                    for i in range(16)
+                    for i in range(32)
                 ),
             }
 
@@ -1621,7 +1621,7 @@ class TikTokApi:
             raise Exception(
                 "Retrieving the user secUid failed. Likely due to TikTok wanting captcha validation. Try to use a proxy."
             )
-    
+
     @staticmethod
     def generate_did():
         """Generates a valid did for other methods. Pass this as the custom_did field to download videos"""
