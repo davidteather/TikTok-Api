@@ -17,7 +17,6 @@ This is an unofficial api wrapper for TikTok.com in python. With this api you ar
 - [Quick Start Guide](#quick-start-guide)
     - [Examples](https://github.com/davidteather/TikTok-Api/tree/master/examples)
 - [Documentation](#documentation)
-- [Built With](#built-with)
 - [Authors](#authors)
 - [License](#license)
 
