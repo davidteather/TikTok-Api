@@ -227,3 +227,17 @@ class browser:
             "https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js",
             proxies=self.__format_proxy(self.proxy),
         ).text
+
+    @staticmethod
+    def parse_redirects(url: str) -> str:
+        """
+        Redirect URLs (Useful for converting vm.tiktok.com Links -> /video/ links)
+        """
+
+        headers = {
+            'Accept-Language': "en-US,en;q=0.8",
+            "Referer": "https://www.google.com/",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
+        }
+
+        return requests.get(url, headers=headers).url
