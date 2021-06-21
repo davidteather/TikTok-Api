@@ -28,7 +28,6 @@ class TikTokApi:
         else:
             raise Exception("Only one TikTokApi object is allowed")
         logging.basicConfig(level=kwargs.get("logging_level", logging.WARNING))
-        logging.info("Class initalized")
 
         # Some Instance Vars
         self.executablePath = kwargs.get("executablePath", None)
@@ -42,7 +41,11 @@ class TikTokApi:
         self.custom_verifyFp = kwargs.get("custom_verifyFp")
         self.signer_url = kwargs.get("external_signer", None)
         self.request_delay = kwargs.get("request_delay", None)
+        self.verbose = kwargs.get("verbose", True)
         self.requests_extra_kwargs = kwargs.get("requests_extra_kwargs", {})
+
+        if self.verbose:
+            logging.info("Class initalized")
 
         if kwargs.get("use_test_endpoints", False):
             global BASE_URL
@@ -74,7 +77,8 @@ class TikTokApi:
             self.width = self.browser.width
             self.height = self.browser.height
         except Exception as e:
-            logging.error(e)
+            if self.verbose:
+                logging.error(e)
             logging.warning(
                 "An error ocurred while opening your browser but it was ignored."
             )
@@ -96,6 +100,8 @@ class TikTokApi:
         ----------
         logging_level: The logging level you want the program to run at, optional
             These are the standard python logging module's levels.
+        verbose: Whether or not to display debugging messages, optional
+            Defaults to True.
         request_delay: The amount of time to wait before making a request, optional
             This is used to throttle your own requests as you may end up making too
             many requests to TikTok for your IP.
@@ -208,6 +214,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         if self.request_delay is not None:
@@ -280,10 +287,11 @@ class TikTokApi:
                 json.get("type") == "verify"
                 or json.get("verifyConfig", {}).get("type", "") == "verify"
             ):
-                logging.error(
-                    "Tiktok wants to display a catcha. Response is:\n" + r.text
-                )
-                logging.error(self.get_cookies(**kwargs))
+                if verbose:
+                    logging.error(
+                        "Tiktok wants to display a catcha. Response is:\n" + r.text
+                    )
+                    logging.error(self.get_cookies(**kwargs))
                 raise TikTokCaptchaError()
             if json.get("statusCode", 200) == 10201:
                 # Invalid Entity
@@ -293,14 +301,16 @@ class TikTokApi:
             return r.json()
         except ValueError as e:
             text = r.text
-            logging.error("TikTok response: " + text)
+            if verbose:
+                logging.error("TikTok response: " + text)
             if len(text) == 0:
                 raise EmptyResponseError(
                     "Empty response from Tiktok to " + url
                 ) from None
             else:
-                logging.error("Converting response to JSON failed")
-                logging.error(e)
+                if verbose:
+                    logging.error("Converting response to JSON failed")
+                    logging.error(e)
                 raise JSONDecodeFailure() from e
 
     def get_cookies(self, **kwargs):
@@ -346,6 +356,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         if self.signer_url is None:
@@ -393,6 +404,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
 
@@ -425,7 +437,8 @@ class TikTokApi:
                 response.append(t)
 
             if not res["hasMore"] and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                if verbose:
+                    logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response[:count]
 
             realCount = count - len(response)
@@ -490,6 +503,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
 
@@ -519,7 +533,8 @@ class TikTokApi:
                 for x in data["challengeInfoList"]:
                     response.append(x)
             else:
-                logging.info("TikTok is not sending videos beyond this point.")
+                if verbose:
+                    logging.info("TikTok is not sending videos beyond this point.")
                 break
 
             offset += maxCount
@@ -546,6 +561,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
 
@@ -581,7 +597,8 @@ class TikTokApi:
                     response.append(t)
 
             if not res["hasMore"] and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                if verbose:
+                    logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count - len(response)
@@ -608,6 +625,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose,
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         data = self.get_user_object(username, **kwargs)
@@ -640,6 +658,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
 
@@ -674,6 +693,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         data = self.getUserObject(username, **kwargs)
@@ -719,6 +739,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         response = []
@@ -751,14 +772,16 @@ class TikTokApi:
             try:
                 res["itemList"]
             except Exception:
-                logging.error("User's likes are most likely private")
+                if verbose:
+                    logging.error("User's likes are most likely private")
                 return []
 
             for t in res["itemList"]:
                 response.append(t)
 
             if not res["hasMore"] and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                if verbose:
+                    logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count - len(response)
@@ -784,6 +807,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         data = self.getUserObject(username, **kwargs)
@@ -810,6 +834,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         response = []
@@ -842,7 +867,8 @@ class TikTokApi:
                     response.append(t)
 
             if not res["hasMore"]:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                if verbose:
+                    logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count - len(response)
@@ -874,6 +900,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         r = requests.get(
             "https://www.tiktok.com/music/-{}".format(id),
@@ -907,6 +934,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
 
@@ -934,6 +962,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         id = self.getHashtagObject(hashtag)["challengeInfo"]["challenge"]["id"]
@@ -961,7 +990,8 @@ class TikTokApi:
                 response.append(t)
 
             if not res["hasMore"]:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                if verbose:
+                    logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             offset += maxCount
@@ -982,6 +1012,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         query = {"name": hashtag, "isName": True, "lang": language}
@@ -994,7 +1025,7 @@ class TikTokApi:
         return data
 
     def get_recommended_tiktoks_by_video_id(self, id, count=30, **kwargs) -> dict:
-        """Returns a dictionary listing reccomended TikToks for a specific TikTok video.
+        """Returns a dictionary listing recommending TikToks for a specific TikTok video.
 
 
         Parameters
@@ -1009,6 +1040,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
 
@@ -1041,7 +1073,8 @@ class TikTokApi:
                 response.append(t)
 
             if not res["hasMore"] and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                if verbose:
+                    logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response[:count]
 
             realCount = count - len(response)
@@ -1063,6 +1096,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         did = kwargs.get("custom_did", None)
@@ -1092,6 +1126,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         custom_did = kwargs.get("custom_did", None)
@@ -1122,6 +1157,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
 
         r = requests.get(
@@ -1144,10 +1180,11 @@ class TikTokApi:
         try:
             j_raw = self.__extract_tag_contents(r.text)
         except IndexError:
-            if not t:
-                logging.error("TikTok response is empty")
-            else:
-                logging.error("TikTok response: \n " + t)
+            if verbose:
+                if not t:
+                    logging.error("TikTok response is empty")
+                else:
+                    logging.error("TikTok response: \n " + t)
             raise TikTokCaptchaError()
 
         data = json.loads(j_raw)["props"]["pageProps"]
@@ -1165,6 +1202,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         query = {"noUser": 1, "userCount": 30, "scene": 0}
@@ -1181,6 +1219,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         query = {"noUser": 0, "userCount": 28, "scene": 17}
@@ -1203,6 +1242,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         return self.getUser(username, **kwargs)["userInfo"]["user"]
@@ -1220,6 +1260,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose,
         ) = self.__process_kwargs__(kwargs)
         r = requests.get(
             "https://tiktok.com/@{}?lang=en".format(quote(username)),
@@ -1242,10 +1283,11 @@ class TikTokApi:
         try:
             j_raw = self.__extract_tag_contents(r.text)
         except IndexError:
-            if not t:
-                logging.error("Tiktok response is empty")
-            else:
-                logging.error("Tiktok response: \n " + t)
+            if verbose:
+                if not t:
+                    logging.error("Tiktok response is empty")
+                else:
+                    logging.error("Tiktok response: \n " + t)
             raise TikTokCaptchaError()
 
         user = json.loads(j_raw)["props"]["pageProps"]
@@ -1273,6 +1315,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         query = {
@@ -1308,6 +1351,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         users = []
@@ -1339,6 +1383,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         query = {
@@ -1372,6 +1417,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         hashtags = []
@@ -1406,6 +1452,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         query = {
@@ -1440,6 +1487,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         musics = []
@@ -1476,6 +1524,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         try:
@@ -1500,6 +1549,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
         return self.getBytes(url=download_url, **kwargs)
@@ -1517,6 +1567,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_did"] = did
 
@@ -1542,6 +1593,7 @@ class TikTokApi:
             proxy,
             maxCount,
             did,
+            verbose
         ) = self.__process_kwargs__(kwargs)
         raise Exception("Deprecated method, TikTok fixed this.")
         kwargs["custom_did"] = did
@@ -1629,8 +1681,9 @@ class TikTokApi:
         try:
             return r.text.split('"secUid":"')[1].split('","secret":')[0]
         except IndexError as e:
-            logging.info(r.text)
-            logging.error(e)
+            if kwargs.get("verbose", self.verbose):
+                logging.info(r.text)
+                logging.error(e)
             raise Exception(
                 "Retrieving the user secUid failed. Likely due to TikTok wanting captcha validation. Try to use a proxy."
             )
@@ -1708,6 +1761,7 @@ class TikTokApi:
         language = kwargs.get("language", "en")
         proxy = kwargs.get("proxy", None)
         maxCount = kwargs.get("maxCount", 35)
+        verbose = kwargs.get("verbose", self.verbose)
 
         if kwargs.get("custom_did", None) != None:
             did = kwargs.get("custom_did")
@@ -1716,7 +1770,7 @@ class TikTokApi:
                 did = self.custom_did
             else:
                 did = "".join(random.choice(string.digits) for num in range(19))
-        return region, language, proxy, maxCount, did
+        return region, language, proxy, maxCount, did, verbose
 
     #
     # Backwards compatibility of the naming scheme
