@@ -577,7 +577,7 @@ class TikTokApi:
             res = self.get_data(url=api_url, **kwargs)
 
             if "itemList" in res.keys():
-                for t in res["itemList"]:
+                for t in res.get("itemList", []):
                     response.append(t)
 
             if not res["hasMore"] and not first:
@@ -754,7 +754,7 @@ class TikTokApi:
                 logging.error("User's likes are most likely private")
                 return []
 
-            for t in res["itemList"]:
+            for t in res.get("itemList", []):
                 response.append(t)
 
             if not res["hasMore"] and not first:
@@ -838,7 +838,7 @@ class TikTokApi:
                 for t in res["items"]:
                     response.append(t)
             except KeyError:
-                for t in res["itemList"]:
+                for t in res.get("itemList", []):
                     response.append(t)
 
             if not res["hasMore"]:
@@ -957,7 +957,7 @@ class TikTokApi:
             )
             res = self.get_data(url=api_url, **kwargs)
 
-            for t in res["itemList"]:
+            for t in res.get("itemList", []):
                 response.append(t)
 
             if not res["hasMore"]:
