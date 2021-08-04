@@ -616,7 +616,7 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
         data = self.get_user_object(username, **kwargs)
-        return self.userPosts(
+        return self.user_posts(
             data["id"],
             data["secUid"],
             count=count,
@@ -686,10 +686,10 @@ class TikTokApi:
             device_id,
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
-        data = self.getUserObject(username, **kwargs)
+        data = self.get_user_object(username, **kwargs)
 
         while True:
-            resp = self.userPage(
+            resp = self.user_page(
                 data["id"],
                 data["secUid"],
                 page_size=page_size,
@@ -800,8 +800,8 @@ class TikTokApi:
             device_id,
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
-        data = self.getUserObject(username, **kwargs)
-        return self.userLiked(
+        data = self.get_user_object(username, **kwargs)
+        return self.user_liked(
             data["id"],
             data["secUid"],
             count=count,
@@ -873,7 +873,7 @@ class TikTokApi:
 
             This can be found by using other methods.
         """
-        return self.getMusicObjectFull(id, **kwargs)["music"]
+        return self.get_music_object_full(id, **kwargs)["music"]
 
     def get_music_object_full(self, id, **kwargs):
         """Returns a music object for a specific sound id.
@@ -951,7 +951,7 @@ class TikTokApi:
             device_id,
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
-        id = self.getHashtagObject(hashtag)["challengeInfo"]["challenge"]["id"]
+        id = self.get_hashtag_object(hashtag)["challengeInfo"]["challenge"]["id"]
         response = []
 
         required_count = count
@@ -1217,7 +1217,7 @@ class TikTokApi:
             device_id,
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
-        return self.getUser(username, **kwargs)["userInfo"]["user"]
+        return self.get_user(username, **kwargs)["userInfo"]["user"]
 
     def get_user(self, username, **kwargs) -> dict:
         """Gets the full exposed user object
@@ -1326,7 +1326,7 @@ class TikTokApi:
         unusedevice_idS = [startingId]
         while len(users) < count:
             userId = random.choice(unusedevice_idS)
-            newUsers = self.getSuggestedUsersbyID(userId=userId, **kwargs)
+            newUsers = self.get_suggested_users_by_id(userId=userId, **kwargs)
             unusedevice_idS.remove(userId)
 
             for user in newUsers:
@@ -1386,12 +1386,12 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
         hashtags = []
-        ids = self.getSuggestedUsersbyIDCrawler(
+        ids = self.get_suggested_users_by_id_crawler(
             count=count, startingId=startingId, **kwargs
         )
         while len(hashtags) < count and len(ids) != 0:
             userId = random.choice(ids)
-            newTags = self.getSuggestedHashtagsbyID(userId=userId["id"], **kwargs)
+            newTags = self.get_suggested_hashtags_by_id(userId=userId["id"], **kwargs)
             ids.remove(userId)
 
             for hashtag in newTags:
@@ -1455,12 +1455,12 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
         musics = []
-        ids = self.getSuggestedUsersbyIDCrawler(
+        ids = self.get_suggested_users_by_id_crawler(
             count=count, startingId=startingId, **kwargs
         )
         while len(musics) < count and len(ids) != 0:
             userId = random.choice(ids)
-            newTags = self.getSuggestedMusicbyID(userId=userId["id"], **kwargs)
+            newTags = self.get_suggested_music_by_id(userId=userId["id"], **kwargs)
             ids.remove(userId)
 
             for music in newTags:
@@ -1497,7 +1497,7 @@ class TikTokApi:
                 api_url = data["itemInfos"]["video"]["urls"][0]
             except Exception:
                 api_url = data["itemInfo"]["itemStruct"]["video"]["playAddr"]
-        return self.get_Video_By_DownloadURL(api_url, **kwargs)
+        return self.get_video_by_download_url(api_url, **kwargs)
 
     def get_video_by_download_url(self, download_url, **kwargs) -> bytes:
         """Downloads video from TikTok using download url in a TikTok object
@@ -1513,7 +1513,7 @@ class TikTokApi:
             device_id,
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
-        return self.getBytes(url=download_url, **kwargs)
+        return self.get_bytes(url=download_url, **kwargs)
 
     def get_video_by_url(self, video_url, **kwargs) -> bytes:
         """Downloads a TikTok video by a URL
@@ -1530,10 +1530,10 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
 
-        tiktok_schema = self.getTikTokByUrl(video_url, **kwargs)
+        tiktok_schema = self.get_tiktok_by_url(video_url, **kwargs)
         download_url = tiktok_schema["itemInfo"]["itemStruct"]["video"]["downloadAddr"]
 
-        return self.getBytes(url=download_url, **kwargs)
+        return self.get_bytes(url=download_url, **kwargs)
 
     def get_video_no_watermark(self, video_url, return_bytes=1, **kwargs) -> bytes:
         """Gets the video with no watermark
