@@ -93,10 +93,10 @@ class browser:
         self.browser_version = page.evaluate("""() => { return window.navigator.appVersion; }""")
 
         if len(self.browser_language.split("-")) == 0:
-            self.region = "US"
-            self.language = "en"
+            self.region = self.kwargs.get("region", "US")
+            self.language = self.kwargs.get("language", "en")
         elif len(self.browser_language.split("-")) == 1:
-            self.region = "US"
+            self.region = self.kwargs.get("region", "US")
             self.language = self.browser_language.split("-")[0]
         else:
             self.region = self.kwargs.get("region", self.browser_language.split("-")[1])
