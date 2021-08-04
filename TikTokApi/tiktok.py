@@ -1117,7 +1117,7 @@ class TikTokApi:
                 "https://www.tiktok.com/@therock/video/6829267836783971589"
             )
 
-        return self.getTikTokById(
+        return self.get_tiktok_by_id(
             post_id,
             **kwargs,
         )
