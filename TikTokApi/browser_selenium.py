@@ -23,7 +23,7 @@ class browser:
         self.referrer = kwargs.get("referer", "https://www.tiktok.com/")
         self.language = kwargs.get("language", "en")
         self.executablePath = kwargs.get("executablePath", "chromedriver")
-        self.did = kwargs.get("custom_did", None)
+        self.device_id = kwargs.get("custom_device_id", None)
 
         args = kwargs.get("browser_args", [])
         options = kwargs.get("browser_options", {})
@@ -152,24 +152,24 @@ class browser:
                 "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX",
             )
 
-        if kwargs.get("custom_did") is not None:
-            did = kwargs.get("custom_did", None)
-        elif self.did is None:
-            did = str(random.randint(10000, 999999999))
+        if kwargs.get("custom_device_id") is not None:
+            device_id = kwargs.get("custom_device_id", None)
+        elif self.device_id is None:
+            device_id = str(random.randint(10000, 999999999))
         else:
-            did = self.did
+            device_id = self.device_id
 
         return (
             verifyFp,
-            did,
+            device_id,
             self.browser.execute_script(
                 '''
         var url = "'''
                 + url
                 + "&verifyFp="
                 + verifyFp
-                + """&did="""
-                + did
+                + """&device_id="""
+                + device_id
                 + """"
         var token = window.byted_acrawler.sign({url: url});
         return token;

@@ -5,6 +5,15 @@ api = TikTokApi.get_instance(
     custom_verifyFp=os.environ.get("verifyFp", None), use_test_endpoints=True
 )
 
+device_id = api.generate_device_id()
+trending = api.trending(custom_device_id=device_id)
+
+# Below is if the method used if you have the full tiktok object
+video_bytes = api.get_Video_By_TikTok(trending[0], custom_device_id=device_id)
+
+with open("video.mp4", "wb") as out:
+    out.write(video_bytes)
+
 
 def unique_count(tiktoks):
     tmp = []

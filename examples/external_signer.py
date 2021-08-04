@@ -17,18 +17,18 @@ app = Flask(__name__)
 @app.route("/sign", methods=["GET"])
 def sign_url():
     url = request.args.get("url")
-    did = request.args.get("custom_did", None)
+    device_id = request.args.get("custom_device_id", None)
     if url is None:
         return jsonify({"success": False, "error": "You must provide a URL"})
 
-    if did is not None:
-        did = str(random.randint(10000, 999999999))
-    verifyFp, did, _signature = signing_browser.sign_url(url=url, custom_did=did)
+    if device_id is not None:
+        device_id = str(random.randint(10000, 999999999))
+    verifyFp, device_id, _signature = signing_browser.sign_url(url=url, custom_device_id=device_id)
 
     return jsonify(
         {
             "verifyFp": verifyFp,
-            "did": did,
+            "device_id": device_id,
             "_signature": _signature,
             "userAgent": signing_browser.userAgent,
             "referrer": signing_browser.referrer,
