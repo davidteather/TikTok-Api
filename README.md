@@ -59,9 +59,7 @@ docker run -v TikTokApi --rm tiktokapi:latest python3 your_script.py
 
 Please don't open an issue if you're experiencing one of these just comment if the provided solution do not work for you.
 
-* [Browser object has no attribute verifyFp](https://github.com/davidteather/TikTok-Api/issues/237) There's so many issues by this error please search (open and closed) issues before posting
-* [Browser closed unexpectedly](https://github.com/davidteather/TikTok-Api/issues/95)
-* [BadStatusLine](https://github.com/davidteather/TikTok-Api/issues/88)
+* **Has no Attribute .width** - make sure you ran `python3 -m playwright install`, if your error persists try the [playwright](https://github.com/microsoft/playwright-python) quickstart guide and diagnose issues from there.
 
 ## Quick Start Guide
 
@@ -90,7 +88,7 @@ To run the example scripts from the repository root, make sure you use the
 module form of python the interpreter
 
 ```sh
-python -m examples.getTrending
+python -m examples.get_trending
 ```
 
 [Here's](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d) an example of what a tiktok dictionary looks like.

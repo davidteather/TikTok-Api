@@ -4,7 +4,7 @@ api = TikTokApi.get_instance()
 
 count = 30
 
-tiktoks = api.byUsername("americanredcross", count=count)
+tiktoks = api.by_hashtag("funny", count=count)
 
 for tiktok in tiktoks:
     print(tiktok)

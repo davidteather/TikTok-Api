@@ -12,7 +12,7 @@ class TestUserPager:
     def test_page_size(self):
         """Pages should be pretty close to the specified size"""
 
-        pager = api.getUserPager("therock", page_size=5)
+        pager = api.get_user_pager("therock", page_size=5)
 
         page = pager.__next__()
         assert abs(len(page) - 5) <= 2
@@ -24,7 +24,7 @@ class TestUserPager:
         """Should always request therock's first 19 tiktoks across 2 pages"""
         APR_24 = 1587757436000  # 2020-04-24 15:43:56 to be precise. Must be ms-precision timestamp
 
-        pager = api.getUserPager("therock", page_size=10, cursor=APR_24)
+        pager = api.get_user_pager("therock", page_size=10, cursor=APR_24)
 
         total_tts = 0
         pages = 0

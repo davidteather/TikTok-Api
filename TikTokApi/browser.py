@@ -33,13 +33,14 @@ class browser:
         self,
         **kwargs,
     ):
+        self.kwargs = kwargs
         self.debug = kwargs.get("debug", False)
         self.proxy = kwargs.get("proxy", None)
         self.api_url = kwargs.get("api_url", None)
         self.referrer = kwargs.get("referer", "https://www.tiktok.com/")
         self.language = kwargs.get("language", "en")
         self.executablePath = kwargs.get("executablePath", None)
-        self.did = kwargs.get("custom_did", None)
+        self.device_id = kwargs.get("custom_device_id", None)
         find_redirect = kwargs.get("find_redirect", False)
 
         args = kwargs.get("browser_args", [])
@@ -88,19 +89,20 @@ class browser:
         context.close()
 
     def get_params(self, page) -> None:
-        # self.browser_language = await self.page.evaluate("""() => { return
-        # navigator.language || navigator.userLanguage; }""")
-        self.browser_language = ""
-        # self.timezone_name = await self.page.evaluate("""() => { return
-        # Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
-        self.timezone_name = ""
-        # self.browser_platform = await self.page.evaluate("""() => { return window.navigator.platform; }""")
-        self.browser_platform = ""
-        # self.browser_name = await self.page.evaluate("""() => { return window.navigator.appCodeName; }""")
-        self.browser_name = ""
-        # self.browser_version = await self.page.evaluate("""() => { return window.navigator.appVersion; }""")
-        self.browser_version = ""
+        self.browser_language = self.kwargs.get("browser_language", page.evaluate("""() => { return navigator.language; }"""))
+        self.browser_version = page.evaluate("""() => { return window.navigator.appVersion; }""")
 
+        if len(self.browser_language.split("-")) == 0:
+            self.region = self.kwargs.get("region", "US")
+            self.language = self.kwargs.get("language", "en")
+        elif len(self.browser_language.split("-")) == 1:
+            self.region = self.kwargs.get("region", "US")
+            self.language = self.browser_language.split("-")[0]
+        else:
+            self.region = self.kwargs.get("region", self.browser_language.split("-")[1])
+            self.language = self.kwargs.get("language", self.browser_language.split("-")[0])
+
+        self.timezone_name = self.kwargs.get("timezone_name", page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }"""))
         self.width = page.evaluate("""() => { return screen.width; }""")
         self.height = page.evaluate("""() => { return screen.height; }""")
 
@@ -177,12 +179,12 @@ class browser:
                 "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX",
             )
 
-        if kwargs.get("custom_did") is not None:
-            did = kwargs.get("custom_did", None)
-        elif self.did is None:
-            did = str(random.randint(10000, 999999999))
+        if kwargs.get("custom_device_id") is not None:
+            device_id = kwargs.get("custom_device_id", None)
+        elif self.device_id is None:
+            device_id = str(random.randint(10000, 999999999))
         else:
-            did = self.did
+            device_id = self.device_id
 
         page.set_content("<script> " + get_acrawler() + " </script>")
         evaluatedPage = page.evaluate(
@@ -191,8 +193,8 @@ class browser:
             + url
             + "&verifyFp="
             + verifyFp
-            + """&did="""
-            + did
+            + """&device_id="""
+            + device_id
             + """"
             var token = window.byted_acrawler.sign({url: url});
             return token;
@@ -201,7 +203,7 @@ class browser:
         context.close()
         return (
             verifyFp,
-            did,
+            device_id,
             evaluatedPage,
         )
 

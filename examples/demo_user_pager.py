@@ -16,7 +16,7 @@ username = "therock"
 # count and list all of the posts for a given user with the pager
 total = 0
 
-pager = api.getUserPager(username, page_size=count)
+pager = api.get_user_pager(username, page_size=count)
 
 for page in pager:
     printPage(page)
@@ -28,8 +28,8 @@ all_posts = total
 # List all of the posts for a given user after a certain date
 
 APR_24 = 1587757438000  # 2020-04-24 15:43:58 to be precise. Must be ms-precision UNIX timestamp
-user = api.getUserObject(username)
-page = api.userPage(user["id"], user["secUid"], page_size=30, after=APR_24)
+user = api.get_user_object(username)
+page = api.user_page(user["id"], user["secUid"], page_size=30, after=APR_24)
 
 printPage(page["items"])
 new_posts = len(page["items"])
@@ -39,7 +39,7 @@ print("{} has {} posts after {}".format(username, new_posts, APR_24))
 # Count and list all of the posts before a certain date for a given user with the pager
 
 total = 0
-pager = api.getUserPager(username, page_size=count, before=APR_24)
+pager = api.get_user_pager(username, page_size=count, before=APR_24)
 
 for page in pager:
     printPage(page)

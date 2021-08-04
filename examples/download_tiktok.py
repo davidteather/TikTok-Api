@@ -8,12 +8,12 @@ api = TikTokApi.get_instance()
 
 # This is generating the tt_webid_v2 cookie
 # need to pass it to methods you want to download
-did = str(random.randint(10000, 999999999))
+device_id = api.generate_device_id()
 
-trending = api.trending(custom_did=did)
+trending = api.trending(custom_device_id=device_id)
 
 # Below is if the method used if you have the full tiktok object
-tiktokData = api.get_Video_By_TikTok(trending[0], custom_did=did)
+video_bytes = api.get_video_by_tiktok(trending[0], custom_device_id=device_id)
 
 with open("video.mp4", "wb") as out:
-    out.write(tiktokData)
+    out.write(video_bytes)

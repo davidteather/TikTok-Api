@@ -8,13 +8,13 @@ api = TikTokApi.get_instance(
 
 def test_user():
     assert (
-        api.getUser("charlidamelio")["userInfo"]["user"]["uniqueId"] == "charlidamelio"
+        api.get_user("charlidamelio")["userInfo"]["user"]["uniqueId"] == "charlidamelio"
     )
-    assert api.getUserObject("charlidamelio")["uniqueId"] == "charlidamelio"
+    assert api.get_user_object("charlidamelio")["uniqueId"] == "charlidamelio"
     assert (
         abs(
             len(
-                api.userPosts(
+                api.user_posts(
                     userID="5058536",
                     secUID="MS4wLjABAAAAoRsCq3Yj6BtSKBCQ4rf3WQYxIaxe5VetwJfYzW_U5K8",
                     count=5,
@@ -27,7 +27,7 @@ def test_user():
     assert (
         abs(
             len(
-                api.userPosts(
+                api.user_posts(
                     userID="5058536",
                     secUID="MS4wLjABAAAAoRsCq3Yj6BtSKBCQ4rf3WQYxIaxe5VetwJfYzW_U5K8",
                     count=10,
@@ -40,7 +40,7 @@ def test_user():
     assert (
         abs(
             len(
-                api.userPosts(
+                api.user_posts(
                     userID="5058536",
                     secUID="MS4wLjABAAAAoRsCq3Yj6BtSKBCQ4rf3WQYxIaxe5VetwJfYzW_U5K8",
                     count=30,
