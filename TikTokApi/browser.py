@@ -95,7 +95,7 @@ class browser:
         if len(self.browser_language.split("-")) == 0:
             self.region = "US"
             self.language = "en"
-        elif len(self.browser_language.split("-") == 1):
+        elif len(self.browser_language.split("-")) == 1:
             self.region = "US"
             self.language = self.browser_language.split("-")[0]
         else:
