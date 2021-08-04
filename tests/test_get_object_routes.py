@@ -10,7 +10,7 @@ def test_tiktok_object():
     assert len(api.get_tiktok_by_id("6829267836783971589")) > 0
     assert (
         len(
-            api.getTikTokByUrl(
+            api.get_tiktok_by_url(
                 "https://www.tiktok.com/@therock/video/6829267836783971589"
             )
         )
