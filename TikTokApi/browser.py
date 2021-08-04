@@ -91,8 +91,17 @@ class browser:
     def get_params(self, page) -> None:
         self.browser_language = self.kwargs.get("browser_language", page.evaluate("""() => { return navigator.language; }"""))
         self.browser_version = page.evaluate("""() => { return window.navigator.appVersion; }""")
-        self.region = self.kwargs.get("region", self.browser_language.split("-")[1])
-        self.language = self.kwargs.get("language", self.browser_language.split("-")[0])
+
+        if len(self.browser_language.split("-")) == 0:
+            self.region = "US"
+            self.language = "en"
+        elif len(self.browser_language.split("-") == 1):
+            self.region = "US"
+            self.language = self.browser_language.split("-")[0]
+        else:
+            self.region = self.kwargs.get("region", self.browser_language.split("-")[1])
+            self.language = self.kwargs.get("language", self.browser_language.split("-")[0])
+
         self.timezone_name = self.kwargs.get("timezone_name", page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }"""))
         self.width = page.evaluate("""() => { return screen.width; }""")
         self.height = page.evaluate("""() => { return screen.height; }""")
