@@ -1,15 +1,16 @@
-import random
-import requests
-import time
-import logging
 import json
-from urllib.parse import urlencode, quote
-from playwright.sync_api import sync_playwright
-import string
 import logging
 import os
-from .utilities import update_messager
+import random
+import string
+import time
+from urllib.parse import quote, urlencode
+
+import requests
+from playwright.sync_api import sync_playwright
+
 from .exceptions import *
+from .utilities import update_messager
 
 
 os.environ["no_proxy"] = "127.0.0.1,localhost"
