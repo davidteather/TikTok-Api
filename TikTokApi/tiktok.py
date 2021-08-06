@@ -73,18 +73,16 @@ class TikTokApi:
             self.region = self.browser.region
             self.language = self.browser.language
         except Exception as e:
-            logging.error(e)
-            logging.warning(
-                "An error ocurred while opening your browser but it was ignored."
-            )
+            logging.exception(e)
+            logging.warning("An error ocurred while opening your browser but it was ignored.")
+            logging.warning("Are you sure you ran python -m playwright install")
 
             self.timezone_name = ""
             self.browser_language = ""
-            self.browser_platform = ""
-            self.browser_name = ""
-            self.browser_version = ""
             self.width = "1920"
             self.height = "1080"
+            self.region = "US"
+            self.language = "en"
 
     @staticmethod
     def get_instance(**kwargs):
@@ -1652,7 +1650,6 @@ class TikTokApi:
             "aid": 1988,
             "app_name": "tiktok_web",
             "device_platform": "web_mobile",
-            # "device_id": random.randint(),
             "region": self.region or "US",
             "priority_region": "",
             "os": "ios",
@@ -1664,7 +1661,7 @@ class TikTokApi:
             "browser_language": self.browser_language.lower() or "en-us",
             "browser_platform": "iPhone",
             "browser_name": "Mozilla",
-            "browser_version": self.__format_new_params__(self.userAgent), # Ex: 5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Mobile/15E148 Safari/604.1
+            "browser_version": self.__format_new_params__(self.userAgent),
             "browser_online": "true",
             "timezone_name": self.timezone_name or "America/Chicago",
             "is_page_visible": "true",
