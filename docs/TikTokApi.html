@@ -28,6 +28,28 @@
                                pattern=".+" required>
 
 
+                    <h2>Contents</h2>
+                    <ul>
+  <li><a href="#unofficial-tiktok-api-in-python">Unofficial TikTok API in Python</a>
+  <ul>
+    <li><a href="#thank-you-to-our-sponsors-advertisers">Thank you to our sponsors &amp; advertisers</a></li>
+    <li><a href="#table-of-contents">Table of Contents</a></li>
+    <li><a href="#getting-started">Getting Started</a>
+    <ul>
+      <li><a href="#how-to-support-the-project">How to support the project</a></li>
+    </ul></li>
+    <li><a href="#installing">Installing</a>
+    <ul>
+      <li><a href="#docker-installation">Docker Installation</a></li>
+    </ul></li>
+    <li><a href="#common-issues">Common Issues</a></li>
+    <li><a href="#quick-start-guide">Quick Start Guide</a></li>
+    <li><a href="#documentation">Documentation</a></li>
+    <li><a href="#authors">Authors</a></li>
+    <li><a href="#license">License</a></li>
+  </ul></li>
+</ul>
+
 
                     <h2>Submodules</h2>
                     <ul>
@@ -54,10 +76,129 @@
                     <h1 class="modulename">
 TikTokApi    </h1>
 
-                
+                        <div class="docstring"><h1 id="unofficial-tiktok-api-in-python">Unofficial TikTok API in Python</h1>
+
+<p>This is an unofficial api wrapper for TikTok.com in python. With this api you are able to call most trending and fetch specific user information as well as much more.</p>
+
+<p><a href="https://www.linkedin.com/in/davidteather/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&amp;logo=linkedin&amp;logoColor=white&amp;style=flat-square" alt="LinkedIn" /></a> <a href="https://github.com/sponsors/davidteather"><img src="https://img.shields.io/static/v1?label=Sponsor&amp;message=%E2%9D%A4&amp;logo=GitHub" alt="Sponsor Me" /></a>  <a href="https://github.com/davidteather/TikTok-Api/releases"><img src="https://img.shields.io/github/v/release/davidteather/TikTok-Api" alt="GitHub release (latest by date)" /></a> <a href="https://github.com/davidteather/TikTok-Api/actions/workflows/package-test.yml"><img src="https://img.shields.io/github/workflow/status/davidteather/tiktok-api/TikTokApi%20CI/master" alt="Build Status" /></a> <a href="https://github.com/davidteather/TikTok-Api/blob/master/LICENSE"><img src="https://img.shields.io/github/license/davidteather/TikTok-Api" alt="GitHub" /></a> <a href="https://pypi.org/project/TikTokApi/"><img src="https://pepy.tech/badge/tiktokapi" alt="Downloads" /></a> <img src="https://visitor-badge.laobi.icu/badge?page_id=davidteather.TikTok-Api" alt="" /> <a href="https://discord.gg/yyPhbfma6f"><img src="https://img.shields.io/discord/783108952111579166.svg?color=7289da&amp;logo=discord&amp;style=flat-square" alt="Support Server" /></a></p>
+
+<h2 id="thank-you-to-our-sponsors-advertisers">Thank you to our sponsors &amp; advertisers</h2>
+
+<p><a href="https://tikapi.io/?ref=davidteather"><img src="imgs/logo128.png" alt="TikAPI" /></a>   |  <strong><a href="https://tikapi.io/?ref=davidteather">TikAPI</a></strong> is a paid TikTok API service providing an full out-of-the-box solution for developers, trusted by 100+ companies. <a href="https://tikapi.io/?ref=davidteather">Learn more</a>
+:-------------------------:|:-------------------------:</p>
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+<li><a href="#getting-started">Getting Started</a>
+<ul>
+<li><a href="#installing">Installing</a></li>
+<li><a href="#common-issues">Common Issues</a></li>
+</ul></li>
+<li><a href="#quick-start-guide">Quick Start Guide</a>
+<ul>
+<li><a href="https://github.com/davidteather/TikTok-Api/tree/master/examples">Examples</a></li>
+</ul></li>
+<li><a href="#documentation">Documentation</a></li>
+<li><a href="#built-with">Built With</a></li>
+<li><a href="#authors">Authors</a></li>
+<li><a href="#license">License</a></li>
+</ul>
+
+<h2 id="getting-started">Getting Started</h2>
+
+<p>To get started using this api follow the instructions below.</p>
+
+<h4 id="how-to-support-the-project">How to support the project</h4>
+
+<ul>
+<li>Feel free to sponsor me on GitHub</li>
+<li>Feel free to tip the project using the brave browser</li>
+<li>Submit PRs for issues :)</li>
+</ul>
+
+<h3 id="installing">Installing</h3>
+
+<p>If you run into an issue please check the closed issues on the github. You're most likely not the first person to experience this issue. If nothing works feel free to open an issue.</p>
+
+<div class="codehilite"><pre><span></span><code>pip install TikTokApi
+python -m playwright install
+</code></pre></div>
+
+<p>If you would prefer a video walk through of setting up this package I created a <a href="https://www.youtube.com/watch?v=zwLmLfVI-VQ">YouTube video</a> just for that.</p>
+
+<p>If you're on MacOS you may need to install <a href="https://webkit.org/build-tools/">XCode Developer Tools</a></p>
+
+<h4 id="docker-installation">Docker Installation</h4>
+
+<p>Clone this repository onto a local machine then run the following commands.</p>
+
+<div class="codehilite"><pre><span></span><code>docker build . -t tiktokapi:latest
+docker run -v TikTokApi --rm tiktokapi:latest python3 your_script.py
+</code></pre></div>
+
+<p><strong>Note</strong> this assumes your script is named your_script.py and lives in the root of this directory.</p>
+
+<h3 id="common-issues">Common Issues</h3>
+
+<p>Please don't open an issue if you're experiencing one of these just comment if the provided solution do not work for you.</p>
+
+<ul>
+<li><strong>Browser Has no Attribute</strong> - make sure you ran <code>python3 -m playwright install</code>, if your error persists try the <a href="https://github.com/microsoft/playwright-python">playwright</a> quickstart guide and diagnose issues from there.</li>
+</ul>
+
+<h2 id="quick-start-guide">Quick Start Guide</h2>
+
+<p>Here's a quick bit of code to get the most recent trending on TikTok. There's more examples in the examples directory.</p>
+
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">TikTokApi</span> <span class="kn">import</span> <span class="n">TikTokApi</span>
+<span class="n">api</span> <span class="o">=</span> <span class="n">TikTokApi</span><span class="o">.</span><span class="n">get_instance</span><span class="p">()</span>
+<span class="n">results</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># Since TikTok changed their API you need to use the custom_verifyFp option. </span>
+<span class="c1"># In your web browser you will need to go to TikTok, Log in and get the s_v_web_id value.</span>
+<span class="n">trending</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">by_trending</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="n">results</span><span class="p">,</span> <span class="n">custom_verifyFp</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">tiktok</span> <span class="ow">in</span> <span class="n">trending</span><span class="p">:</span>
+    <span class="c1"># Prints the id of the tiktok</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">tiktok</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trending</span><span class="p">))</span>
+</code></pre></div>
+
+<p>To run the example scripts from the repository root, make sure you use the
+module form of python the interpreter</p>
+
+<div class="codehilite"><pre><span></span><code>python -m examples.get_trending
+</code></pre></div>
+
+<p><a href="https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d">Here's</a> an example of what a TikTok dictionary looks like.</p>
+
+<h2 id="documentation">Documentation</h2>
+
+<p>You can find the documentation <a href="https://davidteather.github.io/TikTok-Api/docs/TikTokApi.html">here</a> (you'll likely just need the TikTokApi section of the docs), I will be making this documentation more complete overtime as it's not super great right now, but better than just having it in the readme!</p>
+
+<h2 id="authors">Authors</h2>
+
+<ul>
+<li><strong>David Teather</strong> - <em>Initial work</em> - <a href="https://github.com/davidteather">davidteather</a></li>
+</ul>
+
+<p>See also the list of <a href="https://github.com/davidteather/TikTok-Api/contributors">contributors</a> who participated in this project.</p>
+
+<h2 id="license">License</h2>
+
+<p>This project is licensed under the MIT License</p>
+</div>
+
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">TikTokApi.tiktok</span> <span class="kn">import</span> <span class="n">TikTokApi</span>
+            <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. include:: ../README.md</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__docformat__</span> <span class="o">=</span> <span class="s2">&quot;restructuredtext&quot;</span>
+
+<span class="kn">from</span> <span class="nn">TikTokApi.tiktok</span> <span class="kn">import</span> <span class="n">TikTokApi</span>
 <span class="kn">from</span> <span class="nn">TikTokApi.tiktokuser</span> <span class="kn">import</span> <span class="n">TikTokUser</span>
 </pre></div>
 
