@@ -513,14 +513,11 @@ class TikTokApi:
 
         return response[:count]
 
-    def user_posts(self, userID, secUID, count=30, cursor=0, **kwargs) -> dict:
+    def user_posts(self, secUID, count=30, cursor=0, **kwargs) -> dict:
         """Returns an array of dictionaries representing TikToks for a user.
 
         Parameters
         ----------
-        userID: The userID of the user, which TikTok assigns
-            You can find this from utilizing other methods or
-            just use by_username to find it.
         secUID: The secUID of the user, which TikTok assigns
             You can find this from utilizing other methods or
             just use by_username to find it.
@@ -547,7 +544,6 @@ class TikTokApi:
 
             query = {
                 "count": realCount,
-                "id": userID,
                 "cursor": cursor,
                 "type": 1,
                 "secUid": secUID,
