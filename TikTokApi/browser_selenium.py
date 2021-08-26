@@ -34,8 +34,14 @@ class browser:
             self.args = args
 
         options = webdriver.ChromeOptions()
+        options.add_argument('--ignore-certificate-errors')
+        options.add_argument('--window-size=1420,1080')
+        options.add_argument("--test-type")
         options.add_argument("--headless")
-        options.add_argument("log-level=2")
+        options.add_argument("--test-type")
+        options.add_argument('--disable-gpu')
+        options.add_argument("--no-sandbox")
+        
         self.options = {
             "headless": True,
             "handleSIGINT": True,
@@ -62,7 +68,7 @@ class browser:
 
         try:
             self.browser = webdriver.Chrome(
-                executable_path=self.executablePath, chrome_options=options
+                executable_path=self.executablePath, options=options
             )
         except Exception as e:
             raise e
