@@ -1096,9 +1096,10 @@ class TikTokApi:
         ##### Parameters
         * url: The TikTok url you want to retrieve
 
-            This currently doesn't support the shortened TikTok
-            url links.
         """
+
+        url = requests.head(url=url, allow_redirects=True).url
+
         (
             region,
             language,
