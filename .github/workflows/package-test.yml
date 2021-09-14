@@ -20,7 +20,7 @@ jobs:
         python-version: [3.7, 3.9]
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
       - uses: microsoft/playwright-github-action@v1
       - name: Install Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
