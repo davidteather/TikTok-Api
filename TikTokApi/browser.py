@@ -7,11 +7,13 @@ from threading import Thread
 import time
 import datetime
 import random
+import json
+from urllib.parse import splitquery, parse_qs, parse_qsl
 
 
 # Import Detection From Stealth
 from .stealth import stealth
-from .get_acrawler import get_acrawler
+from .get_acrawler import get_acrawler, get_tt_params_script
 from playwright.sync_api import sync_playwright
 
 playwright = None
@@ -186,25 +188,36 @@ class browser:
         else:
             device_id = self.device_id
 
-        page.set_content("<script> " + get_acrawler() + " </script>")
+        url = '{}&verifyFp={}&device_id={}'.format(url, verifyFp, device_id)
+
+        page.add_script_tag(content=get_acrawler())
         evaluatedPage = page.evaluate(
             '''() => {
             var url = "'''
             + url
-            + "&verifyFp="
-            + verifyFp
-            + """&device_id="""
-            + device_id
             + """"
             var token = window.byted_acrawler.sign({url: url});
+            
             return token;
             }"""
         )
+
+        url = '{}&_signature={}'.format(url, evaluatedPage)
+        page.add_script_tag(content=get_tt_params_script())
+
+        tt_params = page.evaluate(
+            '''() => {
+                return window.genXTTParams(''' + json.dumps(dict(parse_qsl(splitquery(url)[1]))) + ''');
+        
+            }'''
+        ) 
+        
         context.close()
         return (
             verifyFp,
             device_id,
             evaluatedPage,
+            tt_params
         )
 
     def clean_up(self):
