@@ -118,6 +118,8 @@ class browser:
         iphone["is_mobile"] = random.randint(1, 2) == 1
         iphone["has_touch"] = random.randint(1, 2) == 1
 
+        iphone['bypass_csp'] = True
+
         context = self.browser.new_context(**iphone)
         if set_useragent:
             self.userAgent = iphone["user_agent"]
@@ -166,7 +168,7 @@ class browser:
         if url is None:
             raise Exception("sign_url required a url parameter")
         context = self.create_context()
-        page = context.new_page(bypass_csp=True)
+        page = context.new_page()
 
         page.goto(kwargs.get('default_url', 'https://www.tiktok.com/@redbull'), wait_until='load')
 
