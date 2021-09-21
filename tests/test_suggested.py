@@ -9,7 +9,7 @@ api = TikTokApi.get_instance(
 def test_suggested():
     assert len(api.get_suggested_users_by_id()) > 0
     assert len(api.get_suggested_hashtags_by_id()) > 0
-    assert len(api.get_suggested_users_by_id()) > 0
+    assert len(api.get_suggested_music_by_id()) > 0
 
 
 def test_suggested_crawlers():
