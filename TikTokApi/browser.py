@@ -167,6 +167,9 @@ class browser:
             raise Exception("sign_url required a url parameter")
         context = self.create_context()
         page = context.new_page()
+
+        page.goto(kwargs.get('default_url', 'https://www.tiktok.com/@redbull'), wait_until='load')
+
         verifyFp = "".join(
             random.choice(
                 string.ascii_lowercase + string.ascii_uppercase + string.digits
