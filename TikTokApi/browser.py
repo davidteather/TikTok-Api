@@ -166,7 +166,7 @@ class browser:
         if url is None:
             raise Exception("sign_url required a url parameter")
         context = self.create_context()
-        page = context.new_page()
+        page = context.new_page(bypass_csp=True)
 
         page.goto(kwargs.get('default_url', 'https://www.tiktok.com/@redbull'), wait_until='load')
 
