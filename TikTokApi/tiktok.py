@@ -434,7 +434,6 @@ class TikTokApi:
             for t in res.get("itemList", []):
                 response.append(t)
 
-            print(res)
             if not res.get("hasMore", False) and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response[:count]
