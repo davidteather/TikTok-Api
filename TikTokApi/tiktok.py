@@ -34,7 +34,7 @@ class TikTokApi:
         # Some Instance Vars
         self.executablePath = kwargs.get("executablePath", None)
 
-        if kwargs.get("custom_device_id") != None:
+        if kwargs.get("custom_did") != None:
             raise Exception("Please use custom_device_id instead of custom_device_id")
         self.custom_device_id = kwargs.get("custom_device_id", None)
         self.userAgent = (
@@ -434,7 +434,8 @@ class TikTokApi:
             for t in res.get("itemList", []):
                 response.append(t)
 
-            if not res["hasMore"] and not first:
+            print(res)
+            if not res.get("hasMore", False) and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response[:count]
 
@@ -585,13 +586,13 @@ class TikTokApi:
                 BASE_URL, self.__add_url_params__(), urlencode(query)
             )
 
-            res = self.get_data(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, send_tt_params=True, **kwargs)
 
             if "itemList" in res.keys():
                 for t in res.get("itemList", []):
                     response.append(t)
 
-            if not res["hasMore"] and not first:
+            if not res.get("hasMore", False) and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
@@ -775,7 +776,7 @@ class TikTokApi:
             for t in res.get("itemList", []):
                 response.append(t)
 
-            if not res["hasMore"] and not first:
+            if not res.get("hasMore", False) and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
@@ -861,7 +862,7 @@ class TikTokApi:
                 for t in res.get("itemList", []):
                     response.append(t)
 
-            if not res["hasMore"]:
+            if not res.get("hasMore", False):
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
@@ -980,7 +981,7 @@ class TikTokApi:
             for t in res.get("itemList", []):
                 response.append(t)
 
-            if not res["hasMore"]:
+            if not res.get("hasMore", False):
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
@@ -1060,7 +1061,7 @@ class TikTokApi:
             for t in res.get("itemList", []):
                 response.append(t)
 
-            if not res["hasMore"] and not first:
+            if not res.get("hasMore", False) and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response[:count]
 
