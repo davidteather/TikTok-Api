@@ -8,6 +8,7 @@ import time
 import datetime
 import random
 import json
+import re
 from urllib.parse import splitquery, parse_qs, parse_qsl
 
 
@@ -163,14 +164,21 @@ class browser:
 
         return f'verify_{scenario_title.lower()}_{"".join(uuid)}'
 
-    def sign_url(self, **kwargs):
+    def sign_url(self, calc_tt_params=False, **kwargs):
+        def process(route):
+            route.abort()
+
         url = kwargs.get("url", None)
         if url is None:
             raise Exception("sign_url required a url parameter")
+
+        tt_params = None
         context = self.create_context()
         page = context.new_page()
 
-        page.goto(kwargs.get('default_url', 'https://www.tiktok.com/@redbull'), wait_until='load')
+        if calc_tt_params:
+            page.route(re.compile(r"(\.png)|(\.jpeg)|(\.mp4)|(x-expire)"), process)
+            page.goto(kwargs.get('default_url', 'https://www.tiktok.com/@redbull'), wait_until='load')
 
         verifyFp = "".join(
             random.choice(
@@ -208,15 +216,17 @@ class browser:
         )
 
         url = '{}&_signature={}'.format(url, evaluatedPage)
-        page.add_script_tag(content=get_tt_params_script())
 
-        tt_params = page.evaluate(
-            '''() => {
-                return window.genXTTParams(''' + json.dumps(dict(parse_qsl(splitquery(url)[1]))) + ''');
-        
-            }'''
-        ) 
-        
+        if calc_tt_params:
+            page.add_script_tag(content=get_tt_params_script())
+
+            tt_params = page.evaluate(
+                '''() => {
+                    return window.genXTTParams(''' + json.dumps(dict(parse_qsl(splitquery(url)[1]))) + ''');
+            
+                }'''
+            )
+
         context.close()
         return (
             verifyFp,
