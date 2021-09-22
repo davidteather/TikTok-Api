@@ -52,9 +52,9 @@ class TikTokApi:
             global BASE_URL
             BASE_URL = "https://t.tiktok.com/"
         if kwargs.get("use_selenium", False):
-            from .browser_selenium import browser
+            from .browser_utilities.browser_selenium import browser
         else:
-            from .browser import browser
+            from .browser_utilities.browser import browser
 
         if kwargs.get("generate_static_device_id", False):
             self.custom_device_id = "".join(random.choice(string.digits) for num in range(19))
@@ -100,8 +100,8 @@ class TikTokApi:
         * custom_device_id: A TikTok parameter needed to download videos, optional
             The code generates these and handles these pretty well itself, however
             for some things such as video download you will need to set a consistent
-            one of these. All the methods take this as a optional parameter, however 
-            it's cleaner code to store this at the instance level. You can override 
+            one of these. All the methods take this as a optional parameter, however
+            it's cleaner code to store this at the instance level. You can override
             this at the specific methods.
 
         * generate_static_device_id: A parameter that generates a custom_device_id at the instance level
@@ -110,7 +110,7 @@ class TikTokApi:
 
         * custom_verifyFp: A TikTok parameter needed to work most of the time, optional
             To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
-            I recommend watching the entire thing, as it will help setup this package. All 
+            I recommend watching the entire thing, as it will help setup this package. All
             the methods take this as a optional parameter, however it's cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
@@ -231,9 +231,11 @@ class TikTokApi:
             verifyFp = kwargs.get("custom_verifyFp")
 
         tt_params = None
+        send_tt_params = kwargs.get("send_tt_params", False)
+
         if self.signer_url is None:
             kwargs["custom_verifyFp"] = verifyFp
-            verify_fp, device_id, signature, tt_params = self.browser.sign_url(**kwargs)
+            verify_fp, device_id, signature, tt_params = self.browser.sign_url(calc_tt_params=send_tt_params, **kwargs)
             userAgent = self.browser.userAgent
             referrer = self.browser.referrer
         else:
@@ -245,7 +247,6 @@ class TikTokApi:
 
         if not kwargs.get("send_tt_params", False):
             tt_params = None
-            
 
         query = {"verifyFp": verify_fp, "device_id": device_id, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
@@ -300,6 +301,12 @@ class TikTokApi:
                 raise TikTokNotFoundError(
                     "TikTok returned a response indicating the entity is invalid"
                 )
+            if json.get("statusCode", 200) == 10219:
+                # not available in this region
+                raise TikTokNotAvailableError(
+                    "Content not available for this region"
+                )
+
             return r.json()
         except ValueError as e:
             text = r.text
@@ -359,7 +366,7 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
         if self.signer_url is None:
-            verify_fp, device_id, signature = self.browser.sign_url(**kwargs)
+            verify_fp, device_id, signature, _ = self.browser.sign_url(calc_tt_params=False, **kwargs)
             userAgent = self.browser.userAgent
             referrer = self.browser.referrer
         else:
@@ -870,6 +877,39 @@ class TikTokApi:
 
         return response[:count]
 
+
+    def by_sound_page(self, id, page_size=30, cursor=0, **kwargs) -> dict:
+        """Returns a page of tiktoks with a specific sound.
+
+        Parameters
+        ----------
+        id: The sound id to search by
+            Note: Can be found in the URL of the sound specific page or with other methods.
+        cursor: offset for pagination
+        page_size: The number of posts to return
+        """
+        (
+            region,
+            language,
+            proxy,
+            maxCount,
+            device_id,
+        ) = self.__process_kwargs__(kwargs)
+        kwargs["custom_device_id"] = device_id
+
+        query = {
+            "musicID": str(id),
+            "count": str(page_size),
+            "cursor": cursor,
+            "language": language,
+        }
+        api_url = "{}api/music/item_list/?{}&{}".format(
+            BASE_URL, self.__add_url_params__(), urlencode(query)
+        )
+
+        return self.get_data(url=api_url, send_tt_params=True, **kwargs)
+
+
     def get_music_object(self, id, **kwargs) -> dict:
         """Returns a music object for a specific sound id.
 
@@ -934,6 +974,10 @@ class TikTokApi:
             BASE_URL, id, self.__add_url_params__()
         )
         res = self.get_data(url=api_url, **kwargs)
+
+        if res.get("statusCode", 200) == 10203:
+            raise TikTokNotFoundError()
+
         return res["musicInfo"]
 
     def by_hashtag(self, hashtag, count=30, offset=0, **kwargs) -> dict:
