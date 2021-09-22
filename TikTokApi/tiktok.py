@@ -886,10 +886,9 @@ class TikTokApi:
             language,
             proxy,
             maxCount,
-            did,
+            device_id,
         ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_did"] = did
-        response = []
+        kwargs["custom_device_id"] = device_id
 
         query = {
             "musicID": str(id),
@@ -898,7 +897,7 @@ class TikTokApi:
             "language": language,
         }
         api_url = "{}api/music/item_list/?{}&{}".format(
-            BASE_URL, self.__add_new_params__(), urlencode(query)
+            BASE_URL, self.__add_url_params__(), urlencode(query)
         )
 
         return self.get_data(url=api_url, send_tt_params=True, **kwargs)
