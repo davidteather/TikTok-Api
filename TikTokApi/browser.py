@@ -164,12 +164,16 @@ class browser:
         return f'verify_{scenario_title.lower()}_{"".join(uuid)}'
 
     def sign_url(self, **kwargs):
+        def process(route):
+            route.abort()
+
         url = kwargs.get("url", None)
         if url is None:
             raise Exception("sign_url required a url parameter")
         context = self.create_context()
         page = context.new_page()
 
+        page.route(re.compile(r"(\.png)|(\.jpeg)|(\.mp4)|(x-expire)"), process)
         page.goto(kwargs.get('default_url', 'https://www.tiktok.com/@redbull'), wait_until='load')
 
         verifyFp = "".join(
