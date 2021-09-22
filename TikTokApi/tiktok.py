@@ -870,6 +870,40 @@ class TikTokApi:
 
         return response[:count]
 
+
+    def by_sound_page(self, id, page_size=30, cursor=0, **kwargs) -> dict:
+        """Returns a page of tiktoks with a specific sound.
+
+        Parameters
+        ----------
+        id: The sound id to search by
+            Note: Can be found in the URL of the sound specific page or with other methods.
+        cursor: offset for pagination
+        page_size: The number of posts to return
+        """
+        (
+            region,
+            language,
+            proxy,
+            maxCount,
+            did,
+        ) = self.__process_kwargs__(kwargs)
+        kwargs["custom_did"] = did
+        response = []
+
+        query = {
+            "musicID": str(id),
+            "count": str(page_size),
+            "cursor": cursor,
+            "language": language,
+        }
+        api_url = "{}api/music/item_list/?{}&{}".format(
+            BASE_URL, self.__add_new_params__(), urlencode(query)
+        )
+
+        return self.get_data(url=api_url, send_tt_params=True, **kwargs)
+
+
     def get_music_object(self, id, **kwargs) -> dict:
         """Returns a music object for a specific sound id.
 
