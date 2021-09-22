@@ -245,6 +245,9 @@ class TikTokApi:
                 verifyFp=kwargs.get("custom_verifyFp", verifyFp),
             )
 
+        if not kwargs.get("send_tt_params", False):
+            tt_params = None
+
         query = {"verifyFp": verify_fp, "device_id": device_id, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
 
@@ -298,6 +301,12 @@ class TikTokApi:
                 raise TikTokNotFoundError(
                     "TikTok returned a response indicating the entity is invalid"
                 )
+            if json.get("statusCode", 200) == 10219:
+                # not available in this region
+                raise TikTokNotAvailableError(
+                    "Content not available for this region"
+                )
+
             return r.json()
         except ValueError as e:
             text = r.text
@@ -965,6 +974,10 @@ class TikTokApi:
             BASE_URL, id, self.__add_url_params__()
         )
         res = self.get_data(url=api_url, **kwargs)
+
+        if res.get("statusCode", 200) == 10203:
+            raise TikTokNotFoundError()
+
         return res["musicInfo"]
 
     def by_hashtag(self, hashtag, count=30, offset=0, **kwargs) -> dict:
