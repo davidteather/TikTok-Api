@@ -52,9 +52,9 @@ class TikTokApi:
             global BASE_URL
             BASE_URL = "https://t.tiktok.com/"
         if kwargs.get("use_selenium", False):
-            from .browser_selenium import browser
+            from .browser_utilities.browser_selenium import browser
         else:
-            from .browser import browser
+            from .browser_utilities.browser import browser
 
         if kwargs.get("generate_static_device_id", False):
             self.custom_device_id = "".join(random.choice(string.digits) for num in range(19))

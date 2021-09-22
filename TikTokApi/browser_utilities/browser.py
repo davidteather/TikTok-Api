@@ -3,17 +3,15 @@ import time
 import string
 import requests
 import logging
-from threading import Thread
 import time
-import datetime
 import random
 import json
 import re
+from .browser_interface import BrowserInterface
 from urllib.parse import splitquery, parse_qs, parse_qsl
 
 
 # Import Detection From Stealth
-from .stealth import stealth
 from .get_acrawler import get_acrawler, get_tt_params_script
 from playwright.sync_api import sync_playwright
 
@@ -31,7 +29,7 @@ def get_playwright():
     return playwright
 
 
-class browser:
+class browser(BrowserInterface):
     def __init__(
         self,
         **kwargs,
@@ -44,7 +42,6 @@ class browser:
         self.language = kwargs.get("language", "en")
         self.executablePath = kwargs.get("executablePath", None)
         self.device_id = kwargs.get("custom_device_id", None)
-        find_redirect = kwargs.get("find_redirect", False)
 
         args = kwargs.get("browser_args", [])
         options = kwargs.get("browser_options", {})
@@ -83,8 +80,8 @@ class browser:
                 args=self.args, **self.options
             )
         except Exception as e:
-            raise e
             logging.critical(e)
+            raise e
 
         context = self.create_context(set_useragent=True)
         page = context.new_page()

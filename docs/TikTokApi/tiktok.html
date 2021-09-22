@@ -91,6 +91,9 @@
                                 <a class="function" href="#TikTokApi.by_sound">by_sound</a>
                         </li>
                         <li>
+                                <a class="function" href="#TikTokApi.by_sound_page">by_sound_page</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#TikTokApi.get_music_object">get_music_object</a>
                         </li>
                         <li>
@@ -225,7 +228,7 @@
         <span class="c1"># Some Instance Vars</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">executablePath</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;executablePath&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_did&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Please use custom_device_id instead of custom_device_id&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">custom_device_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">userAgent</span> <span class="o">=</span> <span class="p">(</span>
@@ -243,9 +246,9 @@
             <span class="k">global</span> <span class="n">BASE_URL</span>
             <span class="n">BASE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://t.tiktok.com/&quot;</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_selenium&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">.browser_selenium</span> <span class="kn">import</span> <span class="n">browser</span>
+            <span class="kn">from</span> <span class="nn">.browser_utilities.browser_selenium</span> <span class="kn">import</span> <span class="n">browser</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">.browser</span> <span class="kn">import</span> <span class="n">browser</span>
+            <span class="kn">from</span> <span class="nn">.browser_utilities.browser</span> <span class="kn">import</span> <span class="n">browser</span>
 
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;generate_static_device_id&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">custom_device_id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">digits</span><span class="p">)</span> <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">19</span><span class="p">))</span>
@@ -291,8 +294,8 @@
 <span class="sd">        * custom_device_id: A TikTok parameter needed to download videos, optional</span>
 <span class="sd">            The code generates these and handles these pretty well itself, however</span>
 <span class="sd">            for some things such as video download you will need to set a consistent</span>
-<span class="sd">            one of these. All the methods take this as a optional parameter, however </span>
-<span class="sd">            it&#39;s cleaner code to store this at the instance level. You can override </span>
+<span class="sd">            one of these. All the methods take this as a optional parameter, however</span>
+<span class="sd">            it&#39;s cleaner code to store this at the instance level. You can override</span>
 <span class="sd">            this at the specific methods.</span>
 
 <span class="sd">        * generate_static_device_id: A parameter that generates a custom_device_id at the instance level</span>
@@ -301,7 +304,7 @@
 
 <span class="sd">        * custom_verifyFp: A TikTok parameter needed to work most of the time, optional</span>
 <span class="sd">            To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)</span>
-<span class="sd">            I recommend watching the entire thing, as it will help setup this package. All </span>
+<span class="sd">            I recommend watching the entire thing, as it will help setup this package. All</span>
 <span class="sd">            the methods take this as a optional parameter, however it&#39;s cleaner code</span>
 <span class="sd">            to store this at the instance level. You can override this at the specific</span>
 <span class="sd">            methods.</span>
@@ -421,9 +424,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">verifyFp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_verifyFp&quot;</span><span class="p">)</span>
 
+        <span class="n">tt_params</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">send_tt_params</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;send_tt_params&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signer_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_verifyFp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">verifyFp</span>
-            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">tt_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="n">calc_tt_params</span><span class="o">=</span><span class="n">send_tt_params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">userAgent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">userAgent</span>
             <span class="n">referrer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">referrer</span>
         <span class="k">else</span><span class="p">:</span>
@@ -432,6 +438,9 @@
                 <span class="n">custom_device_id</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">),</span>
                 <span class="n">verifyFp</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_verifyFp&quot;</span><span class="p">,</span> <span class="n">verifyFp</span><span class="p">),</span>
             <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;send_tt_params&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">tt_params</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="n">query</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;verifyFp&quot;</span><span class="p">:</span> <span class="n">verify_fp</span><span class="p">,</span> <span class="s2">&quot;device_id&quot;</span><span class="p">:</span> <span class="n">device_id</span><span class="p">,</span> <span class="s2">&quot;_signature&quot;</span><span class="p">:</span> <span class="n">signature</span><span class="p">}</span>
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">))</span>
@@ -464,6 +473,7 @@
                 <span class="s2">&quot;sec-gpc&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;user-agent&quot;</span><span class="p">:</span> <span class="n">userAgent</span><span class="p">,</span>
                 <span class="s2">&quot;x-secsdk-csrf-token&quot;</span><span class="p">:</span> <span class="n">csrf_token</span><span class="p">,</span>
+                <span class="s2">&quot;x-tt-params&quot;</span><span class="p">:</span> <span class="n">tt_params</span>
             <span class="p">},</span>
             <span class="n">cookies</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cookies</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
             <span class="n">proxies</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__format_proxy</span><span class="p">(</span><span class="n">proxy</span><span class="p">),</span>
@@ -485,6 +495,12 @@
                 <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">(</span>
                     <span class="s2">&quot;TikTok returned a response indicating the entity is invalid&quot;</span>
                 <span class="p">)</span>
+            <span class="k">if</span> <span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;statusCode&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10219</span><span class="p">:</span>
+                <span class="c1"># not available in this region</span>
+                <span class="k">raise</span> <span class="n">TikTokNotAvailableError</span><span class="p">(</span>
+                    <span class="s2">&quot;Content not available for this region&quot;</span>
+                <span class="p">)</span>
+
             <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
@@ -544,7 +560,7 @@
         <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__process_kwargs__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_id</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signer_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">userAgent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">userAgent</span>
             <span class="n">referrer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">referrer</span>
         <span class="k">else</span><span class="p">:</span>
@@ -619,7 +635,7 @@
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span>
 
@@ -770,13 +786,13 @@
                 <span class="n">BASE_URL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_url_params__</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
             <span class="p">)</span>
 
-            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="s2">&quot;itemList&quot;</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                     <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span>
 
@@ -854,7 +870,7 @@
             <span class="p">)</span>
         <span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_user_pager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a generator to page through a user&#39;s feed</span>
@@ -960,7 +976,7 @@
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span>
 
@@ -1037,7 +1053,7 @@
                 <span class="n">BASE_URL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_url_params__</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
             <span class="p">)</span>
 
-            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">]:</span>
@@ -1046,7 +1062,7 @@
                 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                     <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span>
 
@@ -1054,6 +1070,39 @@
             <span class="n">offset</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;cursor&quot;</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">response</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span>
+
+
+    <span class="k">def</span> <span class="nf">by_sound_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a page of tiktoks with a specific sound.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        id: The sound id to search by</span>
+<span class="sd">            Note: Can be found in the URL of the sound specific page or with other methods.</span>
+<span class="sd">        cursor: offset for pagination</span>
+<span class="sd">        page_size: The number of posts to return</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span>
+            <span class="n">region</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">,</span>
+            <span class="n">proxy</span><span class="p">,</span>
+            <span class="n">maxCount</span><span class="p">,</span>
+            <span class="n">device_id</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__process_kwargs__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_id</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;musicID&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">),</span>
+            <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">page_size</span><span class="p">),</span>
+            <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
+            <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="n">language</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">api_url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">api/music/item_list/?</span><span class="si">{}</span><span class="s2">&amp;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">BASE_URL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_url_params__</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
 
     <span class="k">def</span> <span class="nf">get_music_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns a music object for a specific sound id.</span>
@@ -1119,6 +1168,10 @@
             <span class="n">BASE_URL</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_url_params__</span><span class="p">()</span>
         <span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;statusCode&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10203</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">()</span>
+
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">by_hashtag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hashtag</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
@@ -1165,7 +1218,7 @@
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span>
 
@@ -1245,7 +1298,7 @@
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span>
 
@@ -1920,7 +1973,7 @@
         <span class="c1"># Some Instance Vars</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">executablePath</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;executablePath&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_did&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Please use custom_device_id instead of custom_device_id&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">custom_device_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">userAgent</span> <span class="o">=</span> <span class="p">(</span>
@@ -1938,9 +1991,9 @@
             <span class="k">global</span> <span class="n">BASE_URL</span>
             <span class="n">BASE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://t.tiktok.com/&quot;</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_selenium&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">.browser_selenium</span> <span class="kn">import</span> <span class="n">browser</span>
+            <span class="kn">from</span> <span class="nn">.browser_utilities.browser_selenium</span> <span class="kn">import</span> <span class="n">browser</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">.browser</span> <span class="kn">import</span> <span class="n">browser</span>
+            <span class="kn">from</span> <span class="nn">.browser_utilities.browser</span> <span class="kn">import</span> <span class="n">browser</span>
 
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;generate_static_device_id&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">custom_device_id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">digits</span><span class="p">)</span> <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">19</span><span class="p">))</span>
@@ -1986,8 +2039,8 @@
 <span class="sd">        * custom_device_id: A TikTok parameter needed to download videos, optional</span>
 <span class="sd">            The code generates these and handles these pretty well itself, however</span>
 <span class="sd">            for some things such as video download you will need to set a consistent</span>
-<span class="sd">            one of these. All the methods take this as a optional parameter, however </span>
-<span class="sd">            it&#39;s cleaner code to store this at the instance level. You can override </span>
+<span class="sd">            one of these. All the methods take this as a optional parameter, however</span>
+<span class="sd">            it&#39;s cleaner code to store this at the instance level. You can override</span>
 <span class="sd">            this at the specific methods.</span>
 
 <span class="sd">        * generate_static_device_id: A parameter that generates a custom_device_id at the instance level</span>
@@ -1996,7 +2049,7 @@
 
 <span class="sd">        * custom_verifyFp: A TikTok parameter needed to work most of the time, optional</span>
 <span class="sd">            To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)</span>
-<span class="sd">            I recommend watching the entire thing, as it will help setup this package. All </span>
+<span class="sd">            I recommend watching the entire thing, as it will help setup this package. All</span>
 <span class="sd">            the methods take this as a optional parameter, however it&#39;s cleaner code</span>
 <span class="sd">            to store this at the instance level. You can override this at the specific</span>
 <span class="sd">            methods.</span>
@@ -2116,9 +2169,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">verifyFp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_verifyFp&quot;</span><span class="p">)</span>
 
+        <span class="n">tt_params</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">send_tt_params</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;send_tt_params&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signer_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_verifyFp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">verifyFp</span>
-            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">tt_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="n">calc_tt_params</span><span class="o">=</span><span class="n">send_tt_params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">userAgent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">userAgent</span>
             <span class="n">referrer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">referrer</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2127,6 +2183,9 @@
                 <span class="n">custom_device_id</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">),</span>
                 <span class="n">verifyFp</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_verifyFp&quot;</span><span class="p">,</span> <span class="n">verifyFp</span><span class="p">),</span>
             <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;send_tt_params&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">tt_params</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="n">query</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;verifyFp&quot;</span><span class="p">:</span> <span class="n">verify_fp</span><span class="p">,</span> <span class="s2">&quot;device_id&quot;</span><span class="p">:</span> <span class="n">device_id</span><span class="p">,</span> <span class="s2">&quot;_signature&quot;</span><span class="p">:</span> <span class="n">signature</span><span class="p">}</span>
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">))</span>
@@ -2159,6 +2218,7 @@
                 <span class="s2">&quot;sec-gpc&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;user-agent&quot;</span><span class="p">:</span> <span class="n">userAgent</span><span class="p">,</span>
                 <span class="s2">&quot;x-secsdk-csrf-token&quot;</span><span class="p">:</span> <span class="n">csrf_token</span><span class="p">,</span>
+                <span class="s2">&quot;x-tt-params&quot;</span><span class="p">:</span> <span class="n">tt_params</span>
             <span class="p">},</span>
             <span class="n">cookies</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cookies</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
             <span class="n">proxies</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__format_proxy</span><span class="p">(</span><span class="n">proxy</span><span class="p">),</span>
@@ -2180,6 +2240,12 @@
                 <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">(</span>
                     <span class="s2">&quot;TikTok returned a response indicating the entity is invalid&quot;</span>
                 <span class="p">)</span>
+            <span class="k">if</span> <span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;statusCode&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10219</span><span class="p">:</span>
+                <span class="c1"># not available in this region</span>
+                <span class="k">raise</span> <span class="n">TikTokNotAvailableError</span><span class="p">(</span>
+                    <span class="s2">&quot;Content not available for this region&quot;</span>
+                <span class="p">)</span>
+
             <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
@@ -2239,7 +2305,7 @@
         <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__process_kwargs__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_id</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signer_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">userAgent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">userAgent</span>
             <span class="n">referrer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">referrer</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2314,7 +2380,7 @@
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span>
 
@@ -2465,13 +2531,13 @@
                 <span class="n">BASE_URL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_url_params__</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
             <span class="p">)</span>
 
-            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="s2">&quot;itemList&quot;</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                     <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span>
 
@@ -2549,7 +2615,7 @@
             <span class="p">)</span>
         <span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_user_pager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a generator to page through a user&#39;s feed</span>
@@ -2655,7 +2721,7 @@
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span>
 
@@ -2732,7 +2798,7 @@
                 <span class="n">BASE_URL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_url_params__</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
             <span class="p">)</span>
 
-            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">]:</span>
@@ -2741,7 +2807,7 @@
                 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                     <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span>
 
@@ -2749,6 +2815,39 @@
             <span class="n">offset</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;cursor&quot;</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">response</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span>
+
+
+    <span class="k">def</span> <span class="nf">by_sound_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a page of tiktoks with a specific sound.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        id: The sound id to search by</span>
+<span class="sd">            Note: Can be found in the URL of the sound specific page or with other methods.</span>
+<span class="sd">        cursor: offset for pagination</span>
+<span class="sd">        page_size: The number of posts to return</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span>
+            <span class="n">region</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">,</span>
+            <span class="n">proxy</span><span class="p">,</span>
+            <span class="n">maxCount</span><span class="p">,</span>
+            <span class="n">device_id</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__process_kwargs__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_id</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;musicID&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">),</span>
+            <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">page_size</span><span class="p">),</span>
+            <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
+            <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="n">language</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">api_url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">api/music/item_list/?</span><span class="si">{}</span><span class="s2">&amp;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">BASE_URL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_url_params__</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
 
     <span class="k">def</span> <span class="nf">get_music_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns a music object for a specific sound id.</span>
@@ -2814,6 +2913,10 @@
             <span class="n">BASE_URL</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_url_params__</span><span class="p">()</span>
         <span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;statusCode&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10203</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">()</span>
+
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">by_hashtag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hashtag</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
@@ -2860,7 +2963,7 @@
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span>
 
@@ -2940,7 +3043,7 @@
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span>
 
@@ -3611,7 +3714,7 @@
         <span class="c1"># Some Instance Vars</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">executablePath</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;executablePath&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_did&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Please use custom_device_id instead of custom_device_id&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">custom_device_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">userAgent</span> <span class="o">=</span> <span class="p">(</span>
@@ -3629,9 +3732,9 @@
             <span class="k">global</span> <span class="n">BASE_URL</span>
             <span class="n">BASE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://t.tiktok.com/&quot;</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_selenium&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">.browser_selenium</span> <span class="kn">import</span> <span class="n">browser</span>
+            <span class="kn">from</span> <span class="nn">.browser_utilities.browser_selenium</span> <span class="kn">import</span> <span class="n">browser</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">.browser</span> <span class="kn">import</span> <span class="n">browser</span>
+            <span class="kn">from</span> <span class="nn">.browser_utilities.browser</span> <span class="kn">import</span> <span class="n">browser</span>
 
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;generate_static_device_id&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">custom_device_id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">digits</span><span class="p">)</span> <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">19</span><span class="p">))</span>
@@ -3696,8 +3799,8 @@
 <span class="sd">        * custom_device_id: A TikTok parameter needed to download videos, optional</span>
 <span class="sd">            The code generates these and handles these pretty well itself, however</span>
 <span class="sd">            for some things such as video download you will need to set a consistent</span>
-<span class="sd">            one of these. All the methods take this as a optional parameter, however </span>
-<span class="sd">            it&#39;s cleaner code to store this at the instance level. You can override </span>
+<span class="sd">            one of these. All the methods take this as a optional parameter, however</span>
+<span class="sd">            it&#39;s cleaner code to store this at the instance level. You can override</span>
 <span class="sd">            this at the specific methods.</span>
 
 <span class="sd">        * generate_static_device_id: A parameter that generates a custom_device_id at the instance level</span>
@@ -3706,7 +3809,7 @@
 
 <span class="sd">        * custom_verifyFp: A TikTok parameter needed to work most of the time, optional</span>
 <span class="sd">            To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)</span>
-<span class="sd">            I recommend watching the entire thing, as it will help setup this package. All </span>
+<span class="sd">            I recommend watching the entire thing, as it will help setup this package. All</span>
 <span class="sd">            the methods take this as a optional parameter, however it&#39;s cleaner code</span>
 <span class="sd">            to store this at the instance level. You can override this at the specific</span>
 <span class="sd">            methods.</span>
@@ -3764,15 +3867,15 @@ many requests to TikTok for your IP.</p></li>
 <li><p>custom_device_id: A TikTok parameter needed to download videos, optional
 The code generates these and handles these pretty well itself, however
 for some things such as video download you will need to set a consistent
-one of these. All the methods take this as a optional parameter, however 
-it's cleaner code to store this at the instance level. You can override 
+one of these. All the methods take this as a optional parameter, however
+it's cleaner code to store this at the instance level. You can override
 this at the specific methods.</p></li>
 <li><p>generate_static_device_id: A parameter that generates a custom_device_id at the instance level
 Use this if you want to download videos from a script but don't want to generate
 your own custom_device_id parameter.</p></li>
 <li><p>custom_verifyFp: A TikTok parameter needed to work most of the time, optional
 To get this parameter look at <a href="https://youtu.be/zwLmLfVI-VQ?t=117">this video</a>
-I recommend watching the entire thing, as it will help setup this package. All 
+I recommend watching the entire thing, as it will help setup this package. All
 the methods take this as a optional parameter, however it's cleaner code
 to store this at the instance level. You can override this at the specific
 methods.</p>
@@ -3936,9 +4039,12 @@ I recommend watching the entire thing, as it will help setup this package.</p></
         <span class="k">else</span><span class="p">:</span>
             <span class="n">verifyFp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_verifyFp&quot;</span><span class="p">)</span>
 
+        <span class="n">tt_params</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">send_tt_params</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;send_tt_params&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signer_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_verifyFp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">verifyFp</span>
-            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">tt_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="n">calc_tt_params</span><span class="o">=</span><span class="n">send_tt_params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">userAgent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">userAgent</span>
             <span class="n">referrer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">referrer</span>
         <span class="k">else</span><span class="p">:</span>
@@ -3947,6 +4053,9 @@ I recommend watching the entire thing, as it will help setup this package.</p></
                 <span class="n">custom_device_id</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">),</span>
                 <span class="n">verifyFp</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_verifyFp&quot;</span><span class="p">,</span> <span class="n">verifyFp</span><span class="p">),</span>
             <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;send_tt_params&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">tt_params</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="n">query</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;verifyFp&quot;</span><span class="p">:</span> <span class="n">verify_fp</span><span class="p">,</span> <span class="s2">&quot;device_id&quot;</span><span class="p">:</span> <span class="n">device_id</span><span class="p">,</span> <span class="s2">&quot;_signature&quot;</span><span class="p">:</span> <span class="n">signature</span><span class="p">}</span>
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">))</span>
@@ -3979,6 +4088,7 @@ I recommend watching the entire thing, as it will help setup this package.</p></
                 <span class="s2">&quot;sec-gpc&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;user-agent&quot;</span><span class="p">:</span> <span class="n">userAgent</span><span class="p">,</span>
                 <span class="s2">&quot;x-secsdk-csrf-token&quot;</span><span class="p">:</span> <span class="n">csrf_token</span><span class="p">,</span>
+                <span class="s2">&quot;x-tt-params&quot;</span><span class="p">:</span> <span class="n">tt_params</span>
             <span class="p">},</span>
             <span class="n">cookies</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cookies</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
             <span class="n">proxies</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__format_proxy</span><span class="p">(</span><span class="n">proxy</span><span class="p">),</span>
@@ -4000,6 +4110,12 @@ I recommend watching the entire thing, as it will help setup this package.</p></
                 <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">(</span>
                     <span class="s2">&quot;TikTok returned a response indicating the entity is invalid&quot;</span>
                 <span class="p">)</span>
+            <span class="k">if</span> <span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;statusCode&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10219</span><span class="p">:</span>
+                <span class="c1"># not available in this region</span>
+                <span class="k">raise</span> <span class="n">TikTokNotAvailableError</span><span class="p">(</span>
+                    <span class="s2">&quot;Content not available for this region&quot;</span>
+                <span class="p">)</span>
+
             <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
@@ -4098,7 +4214,7 @@ you will need to use this.</p>
         <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__process_kwargs__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_id</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signer_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">userAgent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">userAgent</span>
             <span class="n">referrer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">referrer</span>
         <span class="k">else</span><span class="p">:</span>
@@ -4191,7 +4307,7 @@ you will need to use this.</p>
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span>
 
@@ -4477,13 +4593,13 @@ Note: maximum is around 28 for this type of endpoint.</p></li>
                 <span class="n">BASE_URL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_url_params__</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
             <span class="p">)</span>
 
-            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="s2">&quot;itemList&quot;</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                     <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span>
 
@@ -4622,7 +4738,7 @@ just use by_username to find it.</p></li>
             <span class="p">)</span>
         <span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -4793,7 +4909,7 @@ just use by_username to find it.</p></li>
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span>
 
@@ -4930,7 +5046,7 @@ just use by_username to find it.</p></li>
                 <span class="n">BASE_URL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_url_params__</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
             <span class="p">)</span>
 
-            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">]:</span>
@@ -4939,7 +5055,7 @@ just use by_username to find it.</p></li>
                 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                     <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span>
 
@@ -4963,6 +5079,62 @@ just use by_username to find it.</p></li>
 
 <p>Note: seems to only support up to ~2,000</p></li>
 </ul>
+</div>
+
+
+                            </div>
+                            <div id="TikTokApi.by_sound_page" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#TikTokApi.by_sound_page">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">by_sound_page</span><span class="signature">(self, id, page_size=30, cursor=0, **kwargs) -&gt; dict</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">by_sound_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a page of tiktoks with a specific sound.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        id: The sound id to search by</span>
+<span class="sd">            Note: Can be found in the URL of the sound specific page or with other methods.</span>
+<span class="sd">        cursor: offset for pagination</span>
+<span class="sd">        page_size: The number of posts to return</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span>
+            <span class="n">region</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">,</span>
+            <span class="n">proxy</span><span class="p">,</span>
+            <span class="n">maxCount</span><span class="p">,</span>
+            <span class="n">device_id</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__process_kwargs__</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_id</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;musicID&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">),</span>
+            <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">page_size</span><span class="p">),</span>
+            <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
+            <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="n">language</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">api_url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">api/music/item_list/?</span><span class="si">{}</span><span class="s2">&amp;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">BASE_URL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_url_params__</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Returns a page of tiktoks with a specific sound.</p>
+
+<h2 id="parameters">Parameters</h2>
+
+<p>id: The sound id to search by
+    Note: Can be found in the URL of the sound specific page or with other methods.
+cursor: offset for pagination
+page_size: The number of posts to return</p>
 </div>
 
 
@@ -5093,6 +5265,10 @@ just use by_username to find it.</p></li>
             <span class="n">BASE_URL</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_url_params__</span><span class="p">()</span>
         <span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">api_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;statusCode&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10203</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">()</span>
+
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">]</span>
 </pre></div>
 
@@ -5165,7 +5341,7 @@ just use by_username to find it.</p></li>
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span>
 
@@ -5301,7 +5477,7 @@ Note: seems to only support up to ~2,000</li>
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;hasMore&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok isn&#39;t sending more TikToks beyond this point.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">response</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span>
 
