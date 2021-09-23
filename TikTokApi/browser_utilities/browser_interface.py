@@ -10,7 +10,7 @@ class BrowserInterface(abc.ABC):
 
     # Returns verify_fp, device_id, signature, tt_params
     @abc.abstractmethod
-    def sign_url(self, calc_tt_params=False, **kwargs) -> tuple[str, str, str, str]:
+    def sign_url(self, calc_tt_params=False, **kwargs):
         pass
 
     @abc.abstractmethod
