@@ -49,6 +49,7 @@ If you're on MacOS you may need to install [XCode Developer Tools](https://webki
 Clone this repository onto a local machine then run the following commands.
 
 ```sh
+docker pull mcr.microsoft.com/playwright:focal
 docker build . -t tiktokapi:latest
 docker run -v TikTokApi --rm tiktokapi:latest python3 your_script.py
 ```
