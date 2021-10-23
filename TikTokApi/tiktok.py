@@ -57,7 +57,9 @@ class TikTokApi:
             from .browser_utilities.browser import browser
 
         if kwargs.get("generate_static_device_id", False):
-            self.custom_device_id = "".join(random.choice(string.digits) for num in range(19))
+            self.custom_device_id = "".join(
+                random.choice(string.digits) for num in range(19)
+            )
 
         if self.signer_url is None:
             self.browser = browser(**kwargs)
@@ -74,7 +76,9 @@ class TikTokApi:
             self.language = self.browser.language
         except Exception as e:
             logging.exception(e)
-            logging.warning("An error ocurred while opening your browser but it was ignored.")
+            logging.warning(
+                "An error ocurred while opening your browser but it was ignored."
+            )
             logging.warning("Are you sure you ran python -m playwright install")
 
             self.timezone_name = ""
@@ -185,7 +189,11 @@ class TikTokApi:
             I recommend watching the entire thing, as it will help setup this package.
         """
         if custom_device_id is not None:
-            query = {"url": url, "custom_device_id": custom_device_id, "verifyFp": verifyFp}
+            query = {
+                "url": url,
+                "custom_device_id": custom_device_id,
+                "verifyFp": verifyFp,
+            }
         else:
             query = {"url": url, "verifyFp": verifyFp}
         data = requests.get(
@@ -235,7 +243,9 @@ class TikTokApi:
 
         if self.signer_url is None:
             kwargs["custom_verifyFp"] = verifyFp
-            verify_fp, device_id, signature, tt_params = self.browser.sign_url(calc_tt_params=send_tt_params, **kwargs)
+            verify_fp, device_id, signature, tt_params = self.browser.sign_url(
+                calc_tt_params=send_tt_params, **kwargs
+            )
             userAgent = self.browser.userAgent
             referrer = self.browser.referrer
         else:
@@ -279,7 +289,7 @@ class TikTokApi:
                 "sec-gpc": "1",
                 "user-agent": userAgent,
                 "x-secsdk-csrf-token": csrf_token,
-                "x-tt-params": tt_params
+                "x-tt-params": tt_params,
             },
             cookies=self.get_cookies(**kwargs),
             proxies=self.__format_proxy(proxy),
@@ -303,9 +313,7 @@ class TikTokApi:
                 )
             if json.get("statusCode", 200) == 10219:
                 # not available in this region
-                raise TikTokNotAvailableError(
-                    "Content not available for this region"
-                )
+                raise TikTokNotAvailableError("Content not available for this region")
 
             return r.json()
         except ValueError as e:
@@ -323,7 +331,8 @@ class TikTokApi:
     def get_cookies(self, **kwargs):
         """Extracts cookies from the kwargs passed to the function for get_data"""
         device_id = kwargs.get(
-            "custom_device_id", "".join(random.choice(string.digits) for num in range(19))
+            "custom_device_id",
+            "".join(random.choice(string.digits) for num in range(19)),
         )
         if kwargs.get("custom_verifyFp") == None:
             if self.custom_verifyFp != None:
@@ -366,7 +375,9 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
         if self.signer_url is None:
-            verify_fp, device_id, signature, _ = self.browser.sign_url(calc_tt_params=False, **kwargs)
+            verify_fp, device_id, signature, _ = self.browser.sign_url(
+                calc_tt_params=False, **kwargs
+            )
             userAgent = self.browser.userAgent
             referrer = self.browser.referrer
         else:
@@ -425,9 +436,7 @@ class TikTokApi:
             query = {
                 "count": realCount,
                 "id": 1,
-                "secUid": "",
                 "sourceType": 12,
-                "appId": 1233,
                 "itemID": 1,
                 "insertedItemID": "",
                 "region": region,
@@ -877,7 +886,6 @@ class TikTokApi:
 
         return response[:count]
 
-
     def by_sound_page(self, id, page_size=30, cursor=0, **kwargs) -> dict:
         """Returns a page of tiktoks with a specific sound.
 
@@ -908,7 +916,6 @@ class TikTokApi:
         )
 
         return self.get_data(url=api_url, send_tt_params=True, **kwargs)
-
 
     def get_music_object(self, id, **kwargs) -> dict:
         """Returns a music object for a specific sound id.
@@ -1229,7 +1236,7 @@ class TikTokApi:
             device_id,
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
-        query = {"noUser": 1, "userCount": 30, "scene": 0}
+        query = {"count": 1, "scene": 17, "noUser": 0, "userId": ""}
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_url_params__(), urlencode(query)
         )
@@ -1718,7 +1725,7 @@ class TikTokApi:
             "focus_state": "true",
             "is_fullscreen": "false",
             "history_len": random.randint(0, 30),
-            "language": self.language or "en"
+            "language": self.language or "en",
         }
         return urlencode(query)
 
