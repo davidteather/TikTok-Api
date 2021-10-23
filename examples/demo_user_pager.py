@@ -31,8 +31,8 @@ APR_24 = 1587757438000  # 2020-04-24 15:43:58 to be precise. Must be ms-precisio
 user = api.get_user_object(username)
 page = api.user_page(user["id"], user["secUid"], page_size=30, after=APR_24)
 
-printPage(page['itemList'])
-new_posts = len(page['itemList'])
+printPage(page["itemList"])
+new_posts = len(page["itemList"])
 print("{} has {} posts after {}".format(username, new_posts, APR_24))
 
 

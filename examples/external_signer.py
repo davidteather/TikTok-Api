@@ -23,7 +23,9 @@ def sign_url():
 
     if device_id is not None:
         device_id = str(random.randint(10000, 999999999))
-    verifyFp, device_id, _signature = signing_browser.sign_url(url=url, custom_device_id=device_id)
+    verifyFp, device_id, _signature = signing_browser.sign_url(
+        url=url, custom_device_id=device_id
+    )
 
     return jsonify(
         {

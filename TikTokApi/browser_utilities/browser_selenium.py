@@ -13,6 +13,7 @@ from selenium import webdriver
 from .get_acrawler import get_acrawler, get_tt_params_script
 from urllib.parse import splitquery, parse_qs, parse_qsl
 
+
 class browser(BrowserInterface):
     def __init__(
         self,
@@ -89,12 +90,13 @@ class browser(BrowserInterface):
         self.browser.get("https://www.tiktok.com/@redbull")
         self.browser.execute_script(get_acrawler())
         self.browser.execute_script(get_tt_params_script())
-        
 
     def get_params(self, page) -> None:
         self.userAgent = page.execute_script("""return navigator.userAgent""")
-        self.browser_language = self.kwargs.get("browser_language", ("""return navigator.language"""))
-        self.browser_version = ("""return window.navigator.appVersion""")
+        self.browser_language = self.kwargs.get(
+            "browser_language", ("""return navigator.language""")
+        )
+        self.browser_version = """return window.navigator.appVersion"""
 
         if len(self.browser_language.split("-")) == 0:
             self.region = self.kwargs.get("region", "US")
@@ -104,11 +106,16 @@ class browser(BrowserInterface):
             self.language = self.browser_language.split("-")[0]
         else:
             self.region = self.kwargs.get("region", self.browser_language.split("-")[1])
-            self.language = self.kwargs.get("language", self.browser_language.split("-")[0])
+            self.language = self.kwargs.get(
+                "language", self.browser_language.split("-")[0]
+            )
 
-        self.timezone_name = self.kwargs.get("timezone_name", ("""return Intl.DateTimeFormat().resolvedOptions().timeZone"""))
-        self.width = ("""return screen.width""")
-        self.height = ("""return screen.height""")
+        self.timezone_name = self.kwargs.get(
+            "timezone_name",
+            ("""return Intl.DateTimeFormat().resolvedOptions().timeZone"""),
+        )
+        self.width = """return screen.width"""
+        self.height = """return screen.height"""
 
     def base36encode(self, number, alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
         """Converts an integer to a base36 string."""
@@ -168,36 +175,35 @@ class browser(BrowserInterface):
         else:
             device_id = self.device_id
 
-        url = '{}&verifyFp={}&device_id={}'.format(url, verifyFp, device_id)
+        url = "{}&verifyFp={}&device_id={}".format(url, verifyFp, device_id)
         # self.browser.execute_script(content=get_acrawler())
         # Should be covered by an earlier addition of get_acrawler.
-        evaluatedPage =  (
+        evaluatedPage = (
             self.browser.execute_script(
                 '''
-        var url = "'''+ url + """"
+        var url = "'''
+                + url
+                + """"
         var token = window.byted_acrawler.sign({url: url});
         return token;
         """
             ),
         )
 
-        url = '{}&_signature={}'.format(url, evaluatedPage)
+        url = "{}&_signature={}".format(url, evaluatedPage)
         # self.browser.execute_script(content=get_tt_params_script())
         # Should be covered by an earlier addition of get_acrawler.
 
         tt_params = self.browser.execute_script(
-            '''() => {
-                return window.genXTTParams(''' + json.dumps(dict(parse_qsl(splitquery(url)[1]))) + ''');
+            """() => {
+                return window.genXTTParams("""
+            + json.dumps(dict(parse_qsl(splitquery(url)[1])))
+            + """);
         
-            }'''
-        ) 
-
-        return (
-            verifyFp,
-            device_id,
-            evaluatedPage,
-            tt_params
+            }"""
         )
+
+        return (verifyFp, device_id, evaluatedPage, tt_params)
 
     def clean_up(self):
         try:

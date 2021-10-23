@@ -2,7 +2,9 @@ from TikTokApi import TikTokApi
 import os
 
 api = TikTokApi.get_instance(
-    custom_verifyFp=os.environ.get("verifyFp", None)# use_test_endpoints=True - test endpoint not working on this endpoint anymore
+    custom_verifyFp=os.environ.get(
+        "verifyFp", None
+    )  # use_test_endpoints=True - test endpoint not working on this endpoint anymore
 )
 
 

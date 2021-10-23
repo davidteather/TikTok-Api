@@ -89,8 +89,13 @@ class browser(BrowserInterface):
         context.close()
 
     def get_params(self, page) -> None:
-        self.browser_language = self.kwargs.get("browser_language", page.evaluate("""() => { return navigator.language; }"""))
-        self.browser_version = page.evaluate("""() => { return window.navigator.appVersion; }""")
+        self.browser_language = self.kwargs.get(
+            "browser_language",
+            page.evaluate("""() => { return navigator.language; }"""),
+        )
+        self.browser_version = page.evaluate(
+            """() => { return window.navigator.appVersion; }"""
+        )
 
         if len(self.browser_language.split("-")) == 0:
             self.region = self.kwargs.get("region", "US")
@@ -100,9 +105,16 @@ class browser(BrowserInterface):
             self.language = self.browser_language.split("-")[0]
         else:
             self.region = self.kwargs.get("region", self.browser_language.split("-")[1])
-            self.language = self.kwargs.get("language", self.browser_language.split("-")[0])
+            self.language = self.kwargs.get(
+                "language", self.browser_language.split("-")[0]
+            )
 
-        self.timezone_name = self.kwargs.get("timezone_name", page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }"""))
+        self.timezone_name = self.kwargs.get(
+            "timezone_name",
+            page.evaluate(
+                """() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }"""
+            ),
+        )
         self.width = page.evaluate("""() => { return screen.width; }""")
         self.height = page.evaluate("""() => { return screen.height; }""")
 
@@ -116,7 +128,7 @@ class browser(BrowserInterface):
         iphone["is_mobile"] = random.randint(1, 2) == 1
         iphone["has_touch"] = random.randint(1, 2) == 1
 
-        iphone['bypass_csp'] = True
+        iphone["bypass_csp"] = True
 
         context = self.browser.new_context(**iphone)
         if set_useragent:
@@ -175,7 +187,10 @@ class browser(BrowserInterface):
 
         if calc_tt_params:
             page.route(re.compile(r"(\.png)|(\.jpeg)|(\.mp4)|(x-expire)"), process)
-            page.goto(kwargs.get('default_url', 'https://www.tiktok.com/@redbull'), wait_until='load')
+            page.goto(
+                kwargs.get("default_url", "https://www.tiktok.com/@redbull"),
+                wait_until="load",
+            )
 
         verifyFp = "".join(
             random.choice(
@@ -198,7 +213,7 @@ class browser(BrowserInterface):
         else:
             device_id = self.device_id
 
-        url = '{}&verifyFp={}&device_id={}'.format(url, verifyFp, device_id)
+        url = "{}&verifyFp={}&device_id={}".format(url, verifyFp, device_id)
 
         page.add_script_tag(content=get_acrawler())
         evaluatedPage = page.evaluate(
@@ -212,25 +227,22 @@ class browser(BrowserInterface):
             }"""
         )
 
-        url = '{}&_signature={}'.format(url, evaluatedPage)
+        url = "{}&_signature={}".format(url, evaluatedPage)
 
         if calc_tt_params:
             page.add_script_tag(content=get_tt_params_script())
 
             tt_params = page.evaluate(
-                '''() => {
-                    return window.genXTTParams(''' + json.dumps(dict(parse_qsl(splitquery(url)[1]))) + ''');
+                """() => {
+                    return window.genXTTParams("""
+                + json.dumps(dict(parse_qsl(splitquery(url)[1])))
+                + """);
             
-                }'''
+                }"""
             )
 
         context.close()
-        return (
-            verifyFp,
-            device_id,
-            evaluatedPage,
-            tt_params
-        )
+        return (verifyFp, device_id, evaluatedPage, tt_params)
 
     def clean_up(self):
         try:
