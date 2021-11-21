@@ -260,13 +260,16 @@ class TikTokApi:
 
         query = {"verifyFp": verify_fp, "device_id": device_id, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
-
-        h = requests.head(
-            url,
-            headers={"x-secsdk-csrf-version": "1.2.5", "x-secsdk-csrf-request": "1"},
-            proxies=self.__format_proxy(proxy),
-            **self.requests_extra_kwargs,
-        )
+        
+        try:
+            h = requests.head(
+                url,
+                headers={"x-secsdk-csrf-version": "1.2.5", "x-secsdk-csrf-request": "1"},
+                proxies=self.__format_proxy(proxy),
+                **self.requests_extra_kwargs,
+            )
+        except requests.exceptions.Timeout:
+            print("Timeout occurred")
         csrf_session_id = h.cookies["csrf_session_id"]
         csrf_token = h.headers["X-Ware-Csrf-Token"].split(",")[1]
         kwargs["csrf_session_id"] = csrf_session_id
