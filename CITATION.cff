@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software academically, feel free to cite it as below."
+authors:
+- family-names: "Teather"
+  given-names: "David"
+  orcid: "https://orcid.org/0000-0002-9467-4676"
+title: "TikTokAPI"
+version: 4.0.4.1
+date-released: 2021-12-2
+url: "https://github.com/davidteather/tiktok-api"
