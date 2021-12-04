@@ -97,7 +97,7 @@ class TikTokApi:
         * logging_level: The logging level you want the program to run at, optional
             These are the standard python logging module's levels.
 
-        * request_delay: The amount of time to wait before making a request, optional
+        * request_delay: The amount of time in seconds to wait before making a request, optional
             This is used to throttle your own requests as you may end up making too
             many requests to TikTok for your IP.
 
