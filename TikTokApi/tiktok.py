@@ -34,7 +34,7 @@ class TikTokApi:
         # Some Instance Vars
         self.executablePath = kwargs.get("executablePath", None)
 
-        if kwargs.get("custom_device_id") != None:
+        if kwargs.get("custom_did") != None:
             raise Exception("Please use custom_device_id instead of custom_device_id")
         self.custom_device_id = kwargs.get("custom_device_id", None)
         self.userAgent = (
@@ -52,12 +52,14 @@ class TikTokApi:
             global BASE_URL
             BASE_URL = "https://t.tiktok.com/"
         if kwargs.get("use_selenium", False):
-            from .browser_selenium import browser
+            from .browser_utilities.browser_selenium import browser
         else:
-            from .browser import browser
+            from .browser_utilities.browser import browser
 
         if kwargs.get("generate_static_device_id", False):
-            self.custom_device_id = "".join(random.choice(string.digits) for num in range(19))
+            self.custom_device_id = "".join(
+                random.choice(string.digits) for num in range(19)
+            )
 
         if self.signer_url is None:
             self.browser = browser(**kwargs)
@@ -74,7 +76,9 @@ class TikTokApi:
             self.language = self.browser.language
         except Exception as e:
             logging.exception(e)
-            logging.warning("An error ocurred while opening your browser but it was ignored.")
+            logging.warning(
+                "An error ocurred while opening your browser but it was ignored."
+            )
             logging.warning("Are you sure you ran python -m playwright install")
 
             self.timezone_name = ""
@@ -93,15 +97,15 @@ class TikTokApi:
         * logging_level: The logging level you want the program to run at, optional
             These are the standard python logging module's levels.
 
-        * request_delay: The amount of time to wait before making a request, optional
+        * request_delay: The amount of time in seconds to wait before making a request, optional
             This is used to throttle your own requests as you may end up making too
             many requests to TikTok for your IP.
 
         * custom_device_id: A TikTok parameter needed to download videos, optional
             The code generates these and handles these pretty well itself, however
             for some things such as video download you will need to set a consistent
-            one of these. All the methods take this as a optional parameter, however 
-            it's cleaner code to store this at the instance level. You can override 
+            one of these. All the methods take this as a optional parameter, however
+            it's cleaner code to store this at the instance level. You can override
             this at the specific methods.
 
         * generate_static_device_id: A parameter that generates a custom_device_id at the instance level
@@ -110,7 +114,7 @@ class TikTokApi:
 
         * custom_verifyFp: A TikTok parameter needed to work most of the time, optional
             To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
-            I recommend watching the entire thing, as it will help setup this package. All 
+            I recommend watching the entire thing, as it will help setup this package. All
             the methods take this as a optional parameter, however it's cleaner code
             to store this at the instance level. You can override this at the specific
             methods.
@@ -185,7 +189,11 @@ class TikTokApi:
             I recommend watching the entire thing, as it will help setup this package.
         """
         if custom_device_id is not None:
-            query = {"url": url, "custom_device_id": custom_device_id, "verifyFp": verifyFp}
+            query = {
+                "url": url,
+                "custom_device_id": custom_device_id,
+                "verifyFp": verifyFp,
+            }
         else:
             query = {"url": url, "verifyFp": verifyFp}
         data = requests.get(
@@ -230,9 +238,14 @@ class TikTokApi:
         else:
             verifyFp = kwargs.get("custom_verifyFp")
 
+        tt_params = None
+        send_tt_params = kwargs.get("send_tt_params", False)
+
         if self.signer_url is None:
             kwargs["custom_verifyFp"] = verifyFp
-            verify_fp, device_id, signature = self.browser.sign_url(**kwargs)
+            verify_fp, device_id, signature, tt_params = self.browser.sign_url(
+                calc_tt_params=send_tt_params, **kwargs
+            )
             userAgent = self.browser.userAgent
             referrer = self.browser.referrer
         else:
@@ -241,6 +254,9 @@ class TikTokApi:
                 custom_device_id=kwargs.get("custom_device_id"),
                 verifyFp=kwargs.get("custom_verifyFp", verifyFp),
             )
+
+        if not kwargs.get("send_tt_params", False):
+            tt_params = None
 
         query = {"verifyFp": verify_fp, "device_id": device_id, "_signature": signature}
         url = "{}&{}".format(kwargs["url"], urlencode(query))
@@ -273,6 +289,7 @@ class TikTokApi:
                 "sec-gpc": "1",
                 "user-agent": userAgent,
                 "x-secsdk-csrf-token": csrf_token,
+                "x-tt-params": tt_params,
             },
             cookies=self.get_cookies(**kwargs),
             proxies=self.__format_proxy(proxy),
@@ -294,6 +311,10 @@ class TikTokApi:
                 raise TikTokNotFoundError(
                     "TikTok returned a response indicating the entity is invalid"
                 )
+            if json.get("statusCode", 200) == 10219:
+                # not available in this region
+                raise TikTokNotAvailableError("Content not available for this region")
+
             return r.json()
         except ValueError as e:
             text = r.text
@@ -310,7 +331,8 @@ class TikTokApi:
     def get_cookies(self, **kwargs):
         """Extracts cookies from the kwargs passed to the function for get_data"""
         device_id = kwargs.get(
-            "custom_device_id", "".join(random.choice(string.digits) for num in range(19))
+            "custom_device_id",
+            "".join(random.choice(string.digits) for num in range(19)),
         )
         if kwargs.get("custom_verifyFp") == None:
             if self.custom_verifyFp != None:
@@ -353,7 +375,9 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
         if self.signer_url is None:
-            verify_fp, device_id, signature = self.browser.sign_url(**kwargs)
+            verify_fp, device_id, signature, _ = self.browser.sign_url(
+                calc_tt_params=False, **kwargs
+            )
             userAgent = self.browser.userAgent
             referrer = self.browser.referrer
         else:
@@ -412,9 +436,7 @@ class TikTokApi:
             query = {
                 "count": realCount,
                 "id": 1,
-                "secUid": "",
                 "sourceType": 12,
-                "appId": 1233,
                 "itemID": 1,
                 "insertedItemID": "",
                 "region": region,
@@ -428,7 +450,7 @@ class TikTokApi:
             for t in res.get("itemList", []):
                 response.append(t)
 
-            if not res["hasMore"] and not first:
+            if not res.get("hasMore", False) and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response[:count]
 
@@ -579,13 +601,13 @@ class TikTokApi:
                 BASE_URL, self.__add_url_params__(), urlencode(query)
             )
 
-            res = self.get_data(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, send_tt_params=True, **kwargs)
 
             if "itemList" in res.keys():
                 for t in res.get("itemList", []):
                     response.append(t)
 
-            if not res["hasMore"] and not first:
+            if not res.get("hasMore", False) and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
@@ -663,7 +685,7 @@ class TikTokApi:
             )
         )
 
-        return self.get_data(url=api_url, **kwargs)
+        return self.get_data(url=api_url, send_tt_params=True, **kwargs)
 
     def get_user_pager(self, username, page_size=30, cursor=0, **kwargs):
         """Returns a generator to page through a user's feed
@@ -769,7 +791,7 @@ class TikTokApi:
             for t in res.get("itemList", []):
                 response.append(t)
 
-            if not res["hasMore"] and not first:
+            if not res.get("hasMore", False) and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
@@ -846,7 +868,7 @@ class TikTokApi:
                 BASE_URL, self.__add_url_params__(), urlencode(query)
             )
 
-            res = self.get_data(url=api_url, **kwargs)
+            res = self.get_data(url=api_url, send_tt_params=True, **kwargs)
 
             try:
                 for t in res["items"]:
@@ -855,7 +877,7 @@ class TikTokApi:
                 for t in res.get("itemList", []):
                     response.append(t)
 
-            if not res["hasMore"]:
+            if not res.get("hasMore", False):
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
@@ -863,6 +885,37 @@ class TikTokApi:
             offset = res["cursor"]
 
         return response[:count]
+
+    def by_sound_page(self, id, page_size=30, cursor=0, **kwargs) -> dict:
+        """Returns a page of tiktoks with a specific sound.
+
+        Parameters
+        ----------
+        id: The sound id to search by
+            Note: Can be found in the URL of the sound specific page or with other methods.
+        cursor: offset for pagination
+        page_size: The number of posts to return
+        """
+        (
+            region,
+            language,
+            proxy,
+            maxCount,
+            device_id,
+        ) = self.__process_kwargs__(kwargs)
+        kwargs["custom_device_id"] = device_id
+
+        query = {
+            "musicID": str(id),
+            "count": str(page_size),
+            "cursor": cursor,
+            "language": language,
+        }
+        api_url = "{}api/music/item_list/?{}&{}".format(
+            BASE_URL, self.__add_url_params__(), urlencode(query)
+        )
+
+        return self.get_data(url=api_url, send_tt_params=True, **kwargs)
 
     def get_music_object(self, id, **kwargs) -> dict:
         """Returns a music object for a specific sound id.
@@ -928,6 +981,10 @@ class TikTokApi:
             BASE_URL, id, self.__add_url_params__()
         )
         res = self.get_data(url=api_url, **kwargs)
+
+        if res.get("statusCode", 200) == 10203:
+            raise TikTokNotFoundError()
+
         return res["musicInfo"]
 
     def by_hashtag(self, hashtag, count=30, offset=0, **kwargs) -> dict:
@@ -974,7 +1031,7 @@ class TikTokApi:
             for t in res.get("itemList", []):
                 response.append(t)
 
-            if not res["hasMore"]:
+            if not res.get("hasMore", False):
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
@@ -1054,7 +1111,7 @@ class TikTokApi:
             for t in res.get("itemList", []):
                 response.append(t)
 
-            if not res["hasMore"] and not first:
+            if not res.get("hasMore", False) and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response[:count]
 
@@ -1180,7 +1237,7 @@ class TikTokApi:
             device_id,
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
-        query = {"noUser": 1, "userCount": 30, "scene": 0}
+        query = {"count": 1, "scene": 17, "noUser": 0, "userId": ""}
         api_url = "{}node/share/discover?{}&{}".format(
             BASE_URL, self.__add_url_params__(), urlencode(query)
         )
@@ -1669,7 +1726,7 @@ class TikTokApi:
             "focus_state": "true",
             "is_fullscreen": "false",
             "history_len": random.randint(0, 30),
-            "language": self.language or "en"
+            "language": self.language or "en",
         }
         return urlencode(query)
 

@@ -66,6 +66,15 @@
                 </ul>
 
             </li>
+            <li>
+                    <a class="class" href="#TikTokNotAvailableError">TikTokNotAvailableError</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#TikTokNotAvailableError.__init__">TikTokNotAvailableError</a>
+                        </li>
+                </ul>
+
+            </li>
     </ul>
 
 
@@ -107,6 +116,12 @@
 
 <span class="k">class</span> <span class="nc">JSONDecodeFailure</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;TikTok sent invalid JSON back&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">TikTokNotAvailableError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The requested object is not available in this region&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 </pre></div>
@@ -329,6 +344,59 @@
                                     <div><dt>builtins.BaseException</dt>
                                 <dd id="JSONDecodeFailure.with_traceback" class="function">with_traceback</dd>
                 <dd id="JSONDecodeFailure.args" class="variable">args</dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
+                <section id="TikTokNotAvailableError">
+                                <div class="attr class">
+        <a class="headerlink" href="#TikTokNotAvailableError">#&nbsp;&nbsp</a>
+
+        
+        <span class="def">class</span>
+        <span class="name">TikTokNotAvailableError</span><wbr>(<span class="base">builtins.Exception</span>):
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">TikTokNotAvailableError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The requested object is not available in this region&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Common base class for all non-exit exceptions.</p>
+</div>
+
+
+                            <div id="TikTokNotAvailableError.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#TikTokNotAvailableError.__init__">#&nbsp;&nbsp</a>
+
+        
+            <span class="name">TikTokNotAvailableError</span><span class="signature">(message=&#39;The requested object is not available in this region&#39;)</span>
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The requested object is not available in this region&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt>builtins.BaseException</dt>
+                                <dd id="TikTokNotAvailableError.with_traceback" class="function">with_traceback</dd>
+                <dd id="TikTokNotAvailableError.args" class="variable">args</dd>
 
             </div>
                                 </dl>

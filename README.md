@@ -3,9 +3,10 @@
 
 This is an unofficial api wrapper for TikTok.com in python. With this api you are able to call most trending and fetch specific user information as well as much more.
 
- [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white&style=flat-square)](https://www.linkedin.com/in/davidteather/) [![Sponsor Me](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub)](https://github.com/sponsors/davidteather)  [![GitHub release (latest by date)](https://img.shields.io/github/v/release/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/releases) [![Build Status](https://img.shields.io/github/workflow/status/davidteather/tiktok-api/TikTokApi%20CI/master)](https://github.com/davidteather/TikTok-Api/actions/workflows/package-test.yml) [![GitHub](https://img.shields.io/github/license/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/tiktokapi)](https://pypi.org/project/TikTokApi/) ![](https://visitor-badge.laobi.icu/badge?page_id=davidteather.TikTok-Api) [![Support Server](https://img.shields.io/discord/783108952111579166.svg?color=7289da&logo=discord&style=flat-square)](https://discord.gg/yyPhbfma6f)
+ [![DOI](https://zenodo.org/badge/188710490.svg)](https://zenodo.org/badge/latestdoi/188710490) [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white&style=flat-square)](https://www.linkedin.com/in/davidteather/) [![Sponsor Me](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub)](https://github.com/sponsors/davidteather)  [![GitHub release (latest by date)](https://img.shields.io/github/v/release/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/releases) [![Build Status](https://img.shields.io/github/workflow/status/davidteather/tiktok-api/TikTokApi%20CI/master)](https://github.com/davidteather/TikTok-Api/actions/workflows/package-test.yml) [![GitHub](https://img.shields.io/github/license/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/tiktokapi)](https://pypi.org/project/TikTokApi/) ![](https://visitor-badge.laobi.icu/badge?page_id=davidteather.TikTok-Api) [![Support Server](https://img.shields.io/discord/783108952111579166.svg?color=7289da&logo=discord&style=flat-square)](https://discord.gg/yyPhbfma6f)
 
-## Sponsors (TikTokApi is free)
+## Sponsors
+These sponsors have paid to be placed here and beyond that I do not have any affiliation with them, the TikTokAPI package will always be free and open-source. If you wish to be a sponsor of this project check out my [GitHub sponsors page](https://github.com/sponsors/davidteather).
 
 [![TikAPI](imgs/logo128.png)](https://tikapi.io/?ref=davidteather)   |  **[TikAPI](https://tikapi.io/?ref=davidteather)** is a paid TikTok API service providing an full out-of-the-box solution for developers, trusted by 100+ companies. [Learn more](https://tikapi.io/?ref=davidteather)
 :-------------------------:|:-------------------------:
@@ -49,6 +50,7 @@ If you're on MacOS you may need to install [XCode Developer Tools](https://webki
 Clone this repository onto a local machine then run the following commands.
 
 ```sh
+docker pull mcr.microsoft.com/playwright:focal
 docker build . -t tiktokapi:latest
 docker run -v TikTokApi --rm tiktokapi:latest python3 your_script.py
 ```

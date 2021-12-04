@@ -8,6 +8,7 @@ api = TikTokApi.get_instance(
 device_id = api.generate_device_id()
 trending = api.by_trending(custom_device_id=device_id)
 
+
 def unique_count(tiktoks):
     tmp = []
     for t in tiktoks:
@@ -18,10 +19,7 @@ def unique_count(tiktoks):
 
 def test_hashtag():
     assert len(api.by_hashtag("funny", 5)) == 5
-    assert len(api.by_hashtag("funny", 10)) == 10
-    assert len(api.by_hashtag("funny", 20)) == 20
-    # Grant A Little Lenience of at most a 15 difference
-    assert abs(len(unique_count(api.by_hashtag("funny", 500))) - 500) <= 15
+    assert len(api.by_hashtag("funny", 50)) == 50
 
 
 def test_non_latin1():

@@ -23,3 +23,9 @@ class JSONDecodeFailure(Exception):
     def __init__(self, message="TikTok sent invalid JSON back"):
         self.message = message
         super().__init__(self.message)
+
+
+class TikTokNotAvailableError(Exception):
+    def __init__(self, message="The requested object is not available in this region"):
+        self.message = message
+        super().__init__(self.message)

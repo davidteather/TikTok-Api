@@ -3,15 +3,16 @@ import time
 import string
 import requests
 import logging
-from threading import Thread
 import time
-import datetime
 import random
+import json
+import re
+from .browser_interface import BrowserInterface
+from urllib.parse import splitquery, parse_qs, parse_qsl
 
 
 # Import Detection From Stealth
-from .stealth import stealth
-from .get_acrawler import get_acrawler
+from .get_acrawler import get_acrawler, get_tt_params_script
 from playwright.sync_api import sync_playwright
 
 playwright = None
@@ -28,7 +29,7 @@ def get_playwright():
     return playwright
 
 
-class browser:
+class browser(BrowserInterface):
     def __init__(
         self,
         **kwargs,
@@ -41,7 +42,6 @@ class browser:
         self.language = kwargs.get("language", "en")
         self.executablePath = kwargs.get("executablePath", None)
         self.device_id = kwargs.get("custom_device_id", None)
-        find_redirect = kwargs.get("find_redirect", False)
 
         args = kwargs.get("browser_args", [])
         options = kwargs.get("browser_options", {})
@@ -80,8 +80,8 @@ class browser:
                 args=self.args, **self.options
             )
         except Exception as e:
-            raise e
             logging.critical(e)
+            raise e
 
         context = self.create_context(set_useragent=True)
         page = context.new_page()
@@ -89,8 +89,13 @@ class browser:
         context.close()
 
     def get_params(self, page) -> None:
-        self.browser_language = self.kwargs.get("browser_language", page.evaluate("""() => { return navigator.language; }"""))
-        self.browser_version = page.evaluate("""() => { return window.navigator.appVersion; }""")
+        self.browser_language = self.kwargs.get(
+            "browser_language",
+            page.evaluate("""() => { return navigator.language; }"""),
+        )
+        self.browser_version = page.evaluate(
+            """() => { return window.navigator.appVersion; }"""
+        )
 
         if len(self.browser_language.split("-")) == 0:
             self.region = self.kwargs.get("region", "US")
@@ -100,9 +105,16 @@ class browser:
             self.language = self.browser_language.split("-")[0]
         else:
             self.region = self.kwargs.get("region", self.browser_language.split("-")[1])
-            self.language = self.kwargs.get("language", self.browser_language.split("-")[0])
+            self.language = self.kwargs.get(
+                "language", self.browser_language.split("-")[0]
+            )
 
-        self.timezone_name = self.kwargs.get("timezone_name", page.evaluate("""() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }"""))
+        self.timezone_name = self.kwargs.get(
+            "timezone_name",
+            page.evaluate(
+                """() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }"""
+            ),
+        )
         self.width = page.evaluate("""() => { return screen.width; }""")
         self.height = page.evaluate("""() => { return screen.height; }""")
 
@@ -115,6 +127,8 @@ class browser:
         iphone["device_scale_factor"] = random.randint(1, 3)
         iphone["is_mobile"] = random.randint(1, 2) == 1
         iphone["has_touch"] = random.randint(1, 2) == 1
+
+        iphone["bypass_csp"] = True
 
         context = self.browser.new_context(**iphone)
         if set_useragent:
@@ -159,12 +173,25 @@ class browser:
 
         return f'verify_{scenario_title.lower()}_{"".join(uuid)}'
 
-    def sign_url(self, **kwargs):
+    def sign_url(self, calc_tt_params=False, **kwargs):
+        def process(route):
+            route.abort()
+
         url = kwargs.get("url", None)
         if url is None:
             raise Exception("sign_url required a url parameter")
+
+        tt_params = None
         context = self.create_context()
         page = context.new_page()
+
+        if calc_tt_params:
+            page.route(re.compile(r"(\.png)|(\.jpeg)|(\.mp4)|(x-expire)"), process)
+            page.goto(
+                kwargs.get("default_url", "https://www.tiktok.com/@redbull"),
+                wait_until="load",
+            )
+
         verifyFp = "".join(
             random.choice(
                 string.ascii_lowercase + string.ascii_uppercase + string.digits
@@ -186,26 +213,36 @@ class browser:
         else:
             device_id = self.device_id
 
-        page.set_content("<script> " + get_acrawler() + " </script>")
+        url = "{}&verifyFp={}&device_id={}".format(url, verifyFp, device_id)
+
+        page.add_script_tag(content=get_acrawler())
         evaluatedPage = page.evaluate(
             '''() => {
             var url = "'''
             + url
-            + "&verifyFp="
-            + verifyFp
-            + """&device_id="""
-            + device_id
             + """"
             var token = window.byted_acrawler.sign({url: url});
+            
             return token;
             }"""
         )
+
+        url = "{}&_signature={}".format(url, evaluatedPage)
+
+        if calc_tt_params:
+            page.add_script_tag(content=get_tt_params_script())
+
+            tt_params = page.evaluate(
+                """() => {
+                    return window.genXTTParams("""
+                + json.dumps(dict(parse_qsl(splitquery(url)[1])))
+                + """);
+            
+                }"""
+            )
+
         context.close()
-        return (
-            verifyFp,
-            device_id,
-            evaluatedPage,
-        )
+        return (verifyFp, device_id, evaluatedPage, tt_params)
 
     def clean_up(self):
         try:

@@ -1,22 +1,25 @@
 import random
 import time
-import string
 import requests
 import logging
 from threading import Thread
 import time
-import datetime
+import re
 import random
+import json
+from .browser_interface import BrowserInterface
 from selenium_stealth import stealth
 from selenium import webdriver
-from .get_acrawler import get_acrawler
+from .get_acrawler import get_acrawler, get_tt_params_script
+from urllib.parse import splitquery, parse_qs, parse_qsl
 
 
-class browser:
+class browser(BrowserInterface):
     def __init__(
         self,
         **kwargs,
     ):
+        self.kwargs = kwargs
         self.debug = kwargs.get("debug", False)
         self.proxy = kwargs.get("proxy", None)
         self.api_url = kwargs.get("api_url", None)
@@ -81,26 +84,38 @@ class browser:
             renderer="Intel Iris OpenGL Engine",
             fix_hairline=True,
         )
+
         self.get_params(self.browser)
+        # NOTE: Slower than playwright at loading this because playwright can ignore unneeded files.
+        self.browser.get("https://www.tiktok.com/@redbull")
         self.browser.execute_script(get_acrawler())
+        self.browser.execute_script(get_tt_params_script())
 
     def get_params(self, page) -> None:
-        # self.browser_language = await self.page.evaluate("""() => { return
-        # navigator.language || navigator.userLanguage; }""")
-        self.browser_language = ""
-        # self.timezone_name = await self.page.evaluate("""() => { return
-        # Intl.DateTimeFormat().resolvedOptions().timeZone; }""")
-        self.timezone_name = ""
-        # self.browser_platform = await self.page.evaluate("""() => { return window.navigator.platform; }""")
-        self.browser_platform = ""
-        # self.browser_name = await self.page.evaluate("""() => { return window.navigator.appCodeName; }""")
-        self.browser_name = ""
-        # self.browser_version = await self.page.evaluate("""() => { return window.navigator.appVersion; }""")
-        self.browser_version = ""
-
-        self.width = page.execute_script("""return screen.width""")
-        self.height = page.execute_script("""return screen.height""")
         self.userAgent = page.execute_script("""return navigator.userAgent""")
+        self.browser_language = self.kwargs.get(
+            "browser_language", ("""return navigator.language""")
+        )
+        self.browser_version = """return window.navigator.appVersion"""
+
+        if len(self.browser_language.split("-")) == 0:
+            self.region = self.kwargs.get("region", "US")
+            self.language = self.kwargs.get("language", "en")
+        elif len(self.browser_language.split("-")) == 1:
+            self.region = self.kwargs.get("region", "US")
+            self.language = self.browser_language.split("-")[0]
+        else:
+            self.region = self.kwargs.get("region", self.browser_language.split("-")[1])
+            self.language = self.kwargs.get(
+                "language", self.browser_language.split("-")[0]
+            )
+
+        self.timezone_name = self.kwargs.get(
+            "timezone_name",
+            ("""return Intl.DateTimeFormat().resolvedOptions().timeZone"""),
+        )
+        self.width = """return screen.width"""
+        self.height = """return screen.height"""
 
     def base36encode(self, number, alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
         """Converts an integer to a base36 string."""
@@ -139,11 +154,12 @@ class browser:
 
         return f'verify_{scenario_title.lower()}_{"".join(uuid)}'
 
-    def sign_url(self, **kwargs):
+    def sign_url(self, calc_tt_params=False, **kwargs):
         url = kwargs.get("url", None)
         if url is None:
             raise Exception("sign_url required a url parameter")
 
+        tt_params = None
         if kwargs.get("gen_new_verifyFp", False):
             verifyFp = self.gen_verifyFp()
         else:
@@ -159,23 +175,35 @@ class browser:
         else:
             device_id = self.device_id
 
-        return (
-            verifyFp,
-            device_id,
+        url = "{}&verifyFp={}&device_id={}".format(url, verifyFp, device_id)
+        # self.browser.execute_script(content=get_acrawler())
+        # Should be covered by an earlier addition of get_acrawler.
+        evaluatedPage = (
             self.browser.execute_script(
                 '''
         var url = "'''
                 + url
-                + "&verifyFp="
-                + verifyFp
-                + """&device_id="""
-                + device_id
                 + """"
         var token = window.byted_acrawler.sign({url: url});
         return token;
         """
             ),
         )
+
+        url = "{}&_signature={}".format(url, evaluatedPage)
+        # self.browser.execute_script(content=get_tt_params_script())
+        # Should be covered by an earlier addition of get_acrawler.
+
+        tt_params = self.browser.execute_script(
+            """() => {
+                return window.genXTTParams("""
+            + json.dumps(dict(parse_qsl(splitquery(url)[1])))
+            + """);
+        
+            }"""
+        )
+
+        return (verifyFp, device_id, evaluatedPage, tt_params)
 
     def clean_up(self):
         try:
