@@ -12,7 +12,6 @@ from playwright.sync_api import sync_playwright
 from .exceptions import *
 from .utilities import update_messager
 
-
 os.environ["no_proxy"] = "127.0.0.1,localhost"
 
 BASE_URL = "https://m.tiktok.com/"
@@ -298,8 +297,8 @@ class TikTokApi:
         try:
             json = r.json()
             if (
-                json.get("type") == "verify"
-                or json.get("verifyConfig", {}).get("type", "") == "verify"
+                    json.get("type") == "verify"
+                    or json.get("verifyConfig", {}).get("type", "") == "verify"
             ):
                 logging.error(
                     "Tiktok wants to display a catcha. Response is:\n" + r.text
@@ -673,16 +672,16 @@ class TikTokApi:
         kwargs["custom_device_id"] = device_id
 
         api_url = (
-            BASE_URL + "api/post/item_list/?{}&count={}&id={}&type=1&secUid={}"
-            "&cursor={}&sourceType=8&appId=1233&region={}&language={}".format(
-                self.__add_url_params__(),
-                page_size,
-                str(userID),
-                str(secUID),
-                cursor,
-                region,
-                language,
-            )
+                BASE_URL + "api/post/item_list/?{}&count={}&id={}&type=1&secUid={}"
+                           "&cursor={}&sourceType=8&appId=1233&region={}&language={}".format(
+            self.__add_url_params__(),
+            page_size,
+            str(userID),
+            str(secUID),
+            cursor,
+            region,
+            language,
+        )
         )
 
         return self.get_data(url=api_url, send_tt_params=True, **kwargs)
@@ -946,10 +945,8 @@ class TikTokApi:
             "https://www.tiktok.com/music/-{}".format(id),
             headers={
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "authority": "www.tiktok.com",
                 "Accept-Encoding": "gzip, deflate",
                 "Connection": "keep-alive",
-                "Host": "www.tiktok.com",
                 "User-Agent": self.userAgent,
             },
             proxies=self.__format_proxy(kwargs.get("proxy", None)),
@@ -1198,11 +1195,9 @@ class TikTokApi:
             url,
             headers={
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "authority": "www.tiktok.com",
                 "path": url.split("tiktok.com")[1],
                 "Accept-Encoding": "gzip, deflate",
                 "Connection": "keep-alive",
-                "Host": "www.tiktok.com",
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
             },
             proxies=self.__format_proxy(kwargs.get("proxy", None)),
@@ -1293,11 +1288,9 @@ class TikTokApi:
             "https://tiktok.com/@{}?lang=en".format(quote(username)),
             headers={
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "authority": "www.tiktok.com",
                 "path": "/@{}".format(quote(username)),
                 "Accept-Encoding": "gzip, deflate",
                 "Connection": "keep-alive",
-                "Host": "www.tiktok.com",
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
             },
             proxies=self.__format_proxy(kwargs.get("proxy", None)),
@@ -1326,7 +1319,7 @@ class TikTokApi:
         return user
 
     def get_suggested_users_by_id(
-        self, userId="6745191554350760966", count=30, **kwargs
+            self, userId="6745191554350760966", count=30, **kwargs
     ) -> list:
         """Returns suggested users given a different TikTok user.
 
@@ -1359,7 +1352,7 @@ class TikTokApi:
         return res[:count]
 
     def get_suggested_users_by_id_crawler(
-        self, count=30, startingId="6745191554350760966", **kwargs
+            self, count=30, startingId="6745191554350760966", **kwargs
     ) -> list:
         """Crawls for listing of all user objects it can find.
 
@@ -1394,7 +1387,7 @@ class TikTokApi:
         return users[:count]
 
     def get_suggested_hashtags_by_id(
-        self, count=30, userId="6745191554350760966", **kwargs
+            self, count=30, userId="6745191554350760966", **kwargs
     ) -> list:
         """Returns suggested hashtags given a TikTok user.
 
@@ -1425,7 +1418,7 @@ class TikTokApi:
         return res[:count]
 
     def get_suggested_hashtags_by_id_crawler(
-        self, count=30, startingId="6745191554350760966", **kwargs
+            self, count=30, startingId="6745191554350760966", **kwargs
     ) -> list:
         """Crawls for as many hashtags as it can find.
 
@@ -1458,7 +1451,7 @@ class TikTokApi:
         return hashtags[:count]
 
     def get_suggested_music_by_id(
-        self, count=30, userId="6745191554350760966", **kwargs
+            self, count=30, userId="6745191554350760966", **kwargs
     ) -> list:
         """Returns suggested music given a TikTok user.
 
@@ -1494,7 +1487,7 @@ class TikTokApi:
         return res[:count]
 
     def get_suggested_music_id_crawler(
-        self, count=30, startingId="6745191554350760966", **kwargs
+            self, count=30, startingId="6745191554350760966", **kwargs
     ) -> list:
         """Crawls for hashtags.
 
@@ -1622,10 +1615,8 @@ class TikTokApi:
             "https://www.tiktok.com/music/-{}".format(id),
             headers={
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "authority": "www.tiktok.com",
                 "Accept-Encoding": "gzip, deflate",
                 "Connection": "keep-alive",
-                "Host": "www.tiktok.com",
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
             },
             proxies=self.__format_proxy(kwargs.get("proxy", None)),
@@ -1651,11 +1642,9 @@ class TikTokApi:
             "https://tiktok.com/@{}?lang=en".format(quote(username)),
             headers={
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "authority": "www.tiktok.com",
                 "path": "/@{}".format(quote(username)),
                 "Accept-Encoding": "gzip, deflate",
                 "Connection": "keep-alive",
-                "Host": "www.tiktok.com",
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
             },
             proxies=self.__format_proxy(
