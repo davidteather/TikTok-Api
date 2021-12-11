@@ -40,6 +40,15 @@
 
             </li>
             <li>
+                    <a class="class" href="#GenericTikTokError">GenericTikTokError</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#GenericTikTokError.__init__">GenericTikTokError</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#TikTokNotFoundError">TikTokNotFoundError</a>
                             <ul class="memberlist">
                         <li>
@@ -101,6 +110,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 
+<span class="c1"># TODO: Update this so children are all subclasses of the generic error.</span>
+<span class="k">class</span> <span class="nc">GenericTikTokError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">TikTokNotFoundError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The requested object does not exists&quot;</span><span class="p">):</span>
@@ -185,6 +199,59 @@
                                     <div><dt>builtins.BaseException</dt>
                                 <dd id="TikTokCaptchaError.with_traceback" class="function">with_traceback</dd>
                 <dd id="TikTokCaptchaError.args" class="variable">args</dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
+                <section id="GenericTikTokError">
+                                <div class="attr class">
+        <a class="headerlink" href="#GenericTikTokError">#&nbsp;&nbsp</a>
+
+        
+        <span class="def">class</span>
+        <span class="name">GenericTikTokError</span><wbr>(<span class="base">builtins.Exception</span>):
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">GenericTikTokError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Common base class for all non-exit exceptions.</p>
+</div>
+
+
+                            <div id="GenericTikTokError.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#GenericTikTokError.__init__">#&nbsp;&nbsp</a>
+
+        
+            <span class="name">GenericTikTokError</span><span class="signature">(message)</span>
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt>builtins.BaseException</dt>
+                                <dd id="GenericTikTokError.with_traceback" class="function">with_traceback</dd>
+                <dd id="GenericTikTokError.args" class="variable">args</dd>
 
             </div>
                                 </dl>

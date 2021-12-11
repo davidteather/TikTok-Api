@@ -172,8 +172,13 @@
         <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;browser_language&quot;</span><span class="p">,</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return navigator.language; }&quot;&quot;&quot;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">browser_version</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return window.navigator.appVersion; }&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;browser_language&quot;</span><span class="p">,</span>
+            <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return navigator.language; }&quot;&quot;&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser_version</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="sd">&quot;&quot;&quot;() =&gt; { return window.navigator.appVersion; }&quot;&quot;&quot;</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;region&quot;</span><span class="p">,</span> <span class="s2">&quot;US&quot;</span><span class="p">)</span>
@@ -183,9 +188,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;region&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;language&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;language&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timezone_name&quot;</span><span class="p">,</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return Intl.DateTimeFormat().resolvedOptions().timeZone; }&quot;&quot;&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;timezone_name&quot;</span><span class="p">,</span>
+            <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                <span class="sd">&quot;&quot;&quot;() =&gt; { return Intl.DateTimeFormat().resolvedOptions().timeZone; }&quot;&quot;&quot;</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.width; }&quot;&quot;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.height; }&quot;&quot;&quot;</span><span class="p">)</span>
 
@@ -199,7 +211,7 @@
         <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;is_mobile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;has_touch&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
 
-        <span class="n">iphone</span><span class="p">[</span><span class="s1">&#39;bypass_csp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;bypass_csp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">(</span><span class="o">**</span><span class="n">iphone</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">set_useragent</span><span class="p">:</span>
@@ -258,7 +270,10 @@
 
         <span class="k">if</span> <span class="n">calc_tt_params</span><span class="p">:</span>
             <span class="n">page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\.png)|(\.jpeg)|(\.mp4)|(x-expire)&quot;</span><span class="p">),</span> <span class="n">process</span><span class="p">)</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default_url&#39;</span><span class="p">,</span> <span class="s1">&#39;https://www.tiktok.com/@redbull&#39;</span><span class="p">),</span> <span class="n">wait_until</span><span class="o">=</span><span class="s1">&#39;load&#39;</span><span class="p">)</span>
+            <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default_url&quot;</span><span class="p">,</span> <span class="s2">&quot;https://www.tiktok.com/@redbull&quot;</span><span class="p">),</span>
+                <span class="n">wait_until</span><span class="o">=</span><span class="s2">&quot;load&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="n">verifyFp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
@@ -281,7 +296,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">device_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device_id</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&amp;verifyFp=</span><span class="si">{}</span><span class="s1">&amp;device_id=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;verifyFp=</span><span class="si">{}</span><span class="s2">&amp;device_id=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">)</span>
 
         <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">get_acrawler</span><span class="p">())</span>
         <span class="n">evaluatedPage</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
@@ -295,25 +310,22 @@
 <span class="s2">            }&quot;&quot;&quot;</span>
         <span class="p">)</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&amp;_signature=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;_signature=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">calc_tt_params</span><span class="p">:</span>
             <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">get_tt_params_script</span><span class="p">())</span>
 
             <span class="n">tt_params</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
-                <span class="sd">&#39;&#39;&#39;() =&gt; {</span>
-<span class="sd">                    return window.genXTTParams(&#39;&#39;&#39;</span> <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">splitquery</span><span class="p">(</span><span class="n">url</span><span class="p">)[</span><span class="mi">1</span><span class="p">])))</span> <span class="o">+</span> <span class="s1">&#39;&#39;&#39;);</span>
-<span class="s1">            </span>
-<span class="s1">                }&#39;&#39;&#39;</span>
+                <span class="sd">&quot;&quot;&quot;() =&gt; {</span>
+<span class="sd">                    return window.genXTTParams(&quot;&quot;&quot;</span>
+                <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">splitquery</span><span class="p">(</span><span class="n">url</span><span class="p">)[</span><span class="mi">1</span><span class="p">])))</span>
+                <span class="o">+</span> <span class="s2">&quot;&quot;&quot;);</span>
+<span class="s2">            </span>
+<span class="s2">                }&quot;&quot;&quot;</span>
             <span class="p">)</span>
 
         <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="n">verifyFp</span><span class="p">,</span>
-            <span class="n">device_id</span><span class="p">,</span>
-            <span class="n">evaluatedPage</span><span class="p">,</span>
-            <span class="n">tt_params</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">,</span> <span class="n">tt_params</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">clean_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
@@ -439,8 +451,13 @@
         <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;browser_language&quot;</span><span class="p">,</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return navigator.language; }&quot;&quot;&quot;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">browser_version</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return window.navigator.appVersion; }&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;browser_language&quot;</span><span class="p">,</span>
+            <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return navigator.language; }&quot;&quot;&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser_version</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="sd">&quot;&quot;&quot;() =&gt; { return window.navigator.appVersion; }&quot;&quot;&quot;</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;region&quot;</span><span class="p">,</span> <span class="s2">&quot;US&quot;</span><span class="p">)</span>
@@ -450,9 +467,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;region&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;language&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;language&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timezone_name&quot;</span><span class="p">,</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return Intl.DateTimeFormat().resolvedOptions().timeZone; }&quot;&quot;&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;timezone_name&quot;</span><span class="p">,</span>
+            <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                <span class="sd">&quot;&quot;&quot;() =&gt; { return Intl.DateTimeFormat().resolvedOptions().timeZone; }&quot;&quot;&quot;</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.width; }&quot;&quot;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.height; }&quot;&quot;&quot;</span><span class="p">)</span>
 
@@ -466,7 +490,7 @@
         <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;is_mobile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;has_touch&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
 
-        <span class="n">iphone</span><span class="p">[</span><span class="s1">&#39;bypass_csp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;bypass_csp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">(</span><span class="o">**</span><span class="n">iphone</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">set_useragent</span><span class="p">:</span>
@@ -525,7 +549,10 @@
 
         <span class="k">if</span> <span class="n">calc_tt_params</span><span class="p">:</span>
             <span class="n">page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\.png)|(\.jpeg)|(\.mp4)|(x-expire)&quot;</span><span class="p">),</span> <span class="n">process</span><span class="p">)</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default_url&#39;</span><span class="p">,</span> <span class="s1">&#39;https://www.tiktok.com/@redbull&#39;</span><span class="p">),</span> <span class="n">wait_until</span><span class="o">=</span><span class="s1">&#39;load&#39;</span><span class="p">)</span>
+            <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default_url&quot;</span><span class="p">,</span> <span class="s2">&quot;https://www.tiktok.com/@redbull&quot;</span><span class="p">),</span>
+                <span class="n">wait_until</span><span class="o">=</span><span class="s2">&quot;load&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="n">verifyFp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
@@ -548,7 +575,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">device_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device_id</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&amp;verifyFp=</span><span class="si">{}</span><span class="s1">&amp;device_id=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;verifyFp=</span><span class="si">{}</span><span class="s2">&amp;device_id=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">)</span>
 
         <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">get_acrawler</span><span class="p">())</span>
         <span class="n">evaluatedPage</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
@@ -562,25 +589,22 @@
 <span class="s2">            }&quot;&quot;&quot;</span>
         <span class="p">)</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&amp;_signature=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;_signature=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">calc_tt_params</span><span class="p">:</span>
             <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">get_tt_params_script</span><span class="p">())</span>
 
             <span class="n">tt_params</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
-                <span class="sd">&#39;&#39;&#39;() =&gt; {</span>
-<span class="sd">                    return window.genXTTParams(&#39;&#39;&#39;</span> <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">splitquery</span><span class="p">(</span><span class="n">url</span><span class="p">)[</span><span class="mi">1</span><span class="p">])))</span> <span class="o">+</span> <span class="s1">&#39;&#39;&#39;);</span>
-<span class="s1">            </span>
-<span class="s1">                }&#39;&#39;&#39;</span>
+                <span class="sd">&quot;&quot;&quot;() =&gt; {</span>
+<span class="sd">                    return window.genXTTParams(&quot;&quot;&quot;</span>
+                <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">splitquery</span><span class="p">(</span><span class="n">url</span><span class="p">)[</span><span class="mi">1</span><span class="p">])))</span>
+                <span class="o">+</span> <span class="s2">&quot;&quot;&quot;);</span>
+<span class="s2">            </span>
+<span class="s2">                }&quot;&quot;&quot;</span>
             <span class="p">)</span>
 
         <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="n">verifyFp</span><span class="p">,</span>
-            <span class="n">device_id</span><span class="p">,</span>
-            <span class="n">evaluatedPage</span><span class="p">,</span>
-            <span class="n">tt_params</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">,</span> <span class="n">tt_params</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">clean_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
@@ -697,8 +721,13 @@ inheritance.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;browser_language&quot;</span><span class="p">,</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return navigator.language; }&quot;&quot;&quot;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">browser_version</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return window.navigator.appVersion; }&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;browser_language&quot;</span><span class="p">,</span>
+            <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return navigator.language; }&quot;&quot;&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser_version</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="sd">&quot;&quot;&quot;() =&gt; { return window.navigator.appVersion; }&quot;&quot;&quot;</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;region&quot;</span><span class="p">,</span> <span class="s2">&quot;US&quot;</span><span class="p">)</span>
@@ -708,9 +737,16 @@ inheritance.</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;region&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;language&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;language&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timezone_name&quot;</span><span class="p">,</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return Intl.DateTimeFormat().resolvedOptions().timeZone; }&quot;&quot;&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;timezone_name&quot;</span><span class="p">,</span>
+            <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                <span class="sd">&quot;&quot;&quot;() =&gt; { return Intl.DateTimeFormat().resolvedOptions().timeZone; }&quot;&quot;&quot;</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.width; }&quot;&quot;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.height; }&quot;&quot;&quot;</span><span class="p">)</span>
 </pre></div>
@@ -740,7 +776,7 @@ inheritance.</p>
         <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;is_mobile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;has_touch&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
 
-        <span class="n">iphone</span><span class="p">[</span><span class="s1">&#39;bypass_csp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;bypass_csp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">(</span><span class="o">**</span><span class="n">iphone</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">set_useragent</span><span class="p">:</span>
@@ -849,7 +885,10 @@ inheritance.</p>
 
         <span class="k">if</span> <span class="n">calc_tt_params</span><span class="p">:</span>
             <span class="n">page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\.png)|(\.jpeg)|(\.mp4)|(x-expire)&quot;</span><span class="p">),</span> <span class="n">process</span><span class="p">)</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default_url&#39;</span><span class="p">,</span> <span class="s1">&#39;https://www.tiktok.com/@redbull&#39;</span><span class="p">),</span> <span class="n">wait_until</span><span class="o">=</span><span class="s1">&#39;load&#39;</span><span class="p">)</span>
+            <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default_url&quot;</span><span class="p">,</span> <span class="s2">&quot;https://www.tiktok.com/@redbull&quot;</span><span class="p">),</span>
+                <span class="n">wait_until</span><span class="o">=</span><span class="s2">&quot;load&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="n">verifyFp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
@@ -872,7 +911,7 @@ inheritance.</p>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">device_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device_id</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&amp;verifyFp=</span><span class="si">{}</span><span class="s1">&amp;device_id=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;verifyFp=</span><span class="si">{}</span><span class="s2">&amp;device_id=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">)</span>
 
         <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">get_acrawler</span><span class="p">())</span>
         <span class="n">evaluatedPage</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
@@ -886,25 +925,22 @@ inheritance.</p>
 <span class="s2">            }&quot;&quot;&quot;</span>
         <span class="p">)</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&amp;_signature=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;_signature=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">calc_tt_params</span><span class="p">:</span>
             <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">get_tt_params_script</span><span class="p">())</span>
 
             <span class="n">tt_params</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
-                <span class="sd">&#39;&#39;&#39;() =&gt; {</span>
-<span class="sd">                    return window.genXTTParams(&#39;&#39;&#39;</span> <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">splitquery</span><span class="p">(</span><span class="n">url</span><span class="p">)[</span><span class="mi">1</span><span class="p">])))</span> <span class="o">+</span> <span class="s1">&#39;&#39;&#39;);</span>
-<span class="s1">            </span>
-<span class="s1">                }&#39;&#39;&#39;</span>
+                <span class="sd">&quot;&quot;&quot;() =&gt; {</span>
+<span class="sd">                    return window.genXTTParams(&quot;&quot;&quot;</span>
+                <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">splitquery</span><span class="p">(</span><span class="n">url</span><span class="p">)[</span><span class="mi">1</span><span class="p">])))</span>
+                <span class="o">+</span> <span class="s2">&quot;&quot;&quot;);</span>
+<span class="s2">            </span>
+<span class="s2">                }&quot;&quot;&quot;</span>
             <span class="p">)</span>
 
         <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="n">verifyFp</span><span class="p">,</span>
-            <span class="n">device_id</span><span class="p">,</span>
-            <span class="n">evaluatedPage</span><span class="p">,</span>
-            <span class="n">tt_params</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">,</span> <span class="n">tt_params</span><span class="p">)</span>
 </pre></div>
 
         </details>

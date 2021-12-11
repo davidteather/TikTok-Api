@@ -32,7 +32,7 @@
                     <ul>
   <li><a href="#unofficial-tiktok-api-in-python">Unofficial TikTok API in Python</a>
   <ul>
-    <li><a href="#sponsors-tiktokapi-is-free">Sponsors (TikTokApi is free)</a></li>
+    <li><a href="#sponsors">Sponsors</a></li>
     <li><a href="#table-of-contents">Table of Contents</a></li>
     <li><a href="#getting-started">Getting Started</a>
     <ul>
@@ -77,9 +77,11 @@ TikTokApi    </h1>
 
 <p>This is an unofficial api wrapper for TikTok.com in python. With this api you are able to call most trending and fetch specific user information as well as much more.</p>
 
-<p><a href="https://www.linkedin.com/in/davidteather/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&amp;logo=linkedin&amp;logoColor=white&amp;style=flat-square" alt="LinkedIn" /></a> <a href="https://github.com/sponsors/davidteather"><img src="https://img.shields.io/static/v1?label=Sponsor&amp;message=%E2%9D%A4&amp;logo=GitHub" alt="Sponsor Me" /></a>  <a href="https://github.com/davidteather/TikTok-Api/releases"><img src="https://img.shields.io/github/v/release/davidteather/TikTok-Api" alt="GitHub release (latest by date)" /></a> <a href="https://github.com/davidteather/TikTok-Api/actions/workflows/package-test.yml"><img src="https://img.shields.io/github/workflow/status/davidteather/tiktok-api/TikTokApi%20CI/master" alt="Build Status" /></a> <a href="https://github.com/davidteather/TikTok-Api/blob/master/LICENSE"><img src="https://img.shields.io/github/license/davidteather/TikTok-Api" alt="GitHub" /></a> <a href="https://pypi.org/project/TikTokApi/"><img src="https://pepy.tech/badge/tiktokapi" alt="Downloads" /></a> <img src="https://visitor-badge.laobi.icu/badge?page_id=davidteather.TikTok-Api" alt="" /> <a href="https://discord.gg/yyPhbfma6f"><img src="https://img.shields.io/discord/783108952111579166.svg?color=7289da&amp;logo=discord&amp;style=flat-square" alt="Support Server" /></a></p>
+<p><a href="https://zenodo.org/badge/latestdoi/188710490"><img src="https://zenodo.org/badge/188710490.svg" alt="DOI" /></a> <a href="https://www.linkedin.com/in/davidteather/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&amp;logo=linkedin&amp;logoColor=white&amp;style=flat-square" alt="LinkedIn" /></a> <a href="https://github.com/sponsors/davidteather"><img src="https://img.shields.io/static/v1?label=Sponsor&amp;message=%E2%9D%A4&amp;logo=GitHub" alt="Sponsor Me" /></a>  <a href="https://github.com/davidteather/TikTok-Api/releases"><img src="https://img.shields.io/github/v/release/davidteather/TikTok-Api" alt="GitHub release (latest by date)" /></a> <a href="https://github.com/davidteather/TikTok-Api/actions/workflows/package-test.yml"><img src="https://img.shields.io/github/workflow/status/davidteather/tiktok-api/TikTokApi%20CI/master" alt="Build Status" /></a> <a href="https://github.com/davidteather/TikTok-Api/blob/master/LICENSE"><img src="https://img.shields.io/github/license/davidteather/TikTok-Api" alt="GitHub" /></a> <a href="https://pypi.org/project/TikTokApi/"><img src="https://pepy.tech/badge/tiktokapi" alt="Downloads" /></a> <img src="https://visitor-badge.laobi.icu/badge?page_id=davidteather.TikTok-Api" alt="" /> <a href="https://discord.gg/yyPhbfma6f"><img src="https://img.shields.io/discord/783108952111579166.svg?color=7289da&amp;logo=discord&amp;style=flat-square" alt="Support Server" /></a></p>
 
-<h2 id="sponsors-tiktokapi-is-free">Sponsors (TikTokApi is free)</h2>
+<h2 id="sponsors">Sponsors</h2>
+
+<p>These sponsors have paid to be placed here and beyond that I do not have any affiliation with them, the TikTokAPI package will always be free and open-source. If you wish to be a sponsor of this project check out my <a href="https://github.com/sponsors/davidteather">GitHub sponsors page</a>.</p>
 
 <p><a href="https://tikapi.io/?ref=davidteather"><img src="imgs/logo128.png" alt="TikAPI" /></a>   |  <strong><a href="https://tikapi.io/?ref=davidteather">TikAPI</a></strong> is a paid TikTok API service providing an full out-of-the-box solution for developers, trusted by 100+ companies. <a href="https://tikapi.io/?ref=davidteather">Learn more</a>
 :-------------------------:|:-------------------------:</p>
@@ -130,7 +132,8 @@ python -m playwright install
 
 <p>Clone this repository onto a local machine then run the following commands.</p>
 
-<div class="codehilite"><pre><span></span><code>docker build . -t tiktokapi:latest
+<div class="codehilite"><pre><span></span><code>docker pull mcr.microsoft.com/playwright:focal
+docker build . -t tiktokapi:latest
 docker run -v TikTokApi --rm tiktokapi:latest python3 your_script.py
 </code></pre></div>
 

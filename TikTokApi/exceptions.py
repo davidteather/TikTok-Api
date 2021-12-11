@@ -7,6 +7,13 @@ class TikTokCaptchaError(Exception):
         super().__init__(self.message)
 
 
+# TODO: Update this so children are all subclasses of the generic error.
+class GenericTikTokError(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
+
 class TikTokNotFoundError(Exception):
     def __init__(self, message="The requested object does not exists"):
         self.message = message

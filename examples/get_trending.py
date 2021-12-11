@@ -7,7 +7,7 @@ api = TikTokApi.get_instance()
 results = 10
 
 # Returns a list of dictionaries of the trending object
-trending = api.trending(results)
+trending = api.by_trending(results)
 
 # Loops over every tiktok
 for tiktok in trending:
