@@ -308,7 +308,7 @@ class TikTokApi:
                 )
                 logging.error(self.get_cookies(**kwargs))
                 raise TikTokCaptchaError()
-            
+
             # statusCode from props->pageProps->statusCode thanks @adiantek on #403
             error_codes = {
                 "0": "OK",
@@ -348,7 +348,7 @@ class TikTokApi:
                 "10230": "VIDEO_RISK_MASK",
                 "10231": "VIDEO_GEOFENCE_BLOCK",
                 "10404": "FYP_VIDEO_LIST_LIMIT",
-                "undefined": "MEDIA_ERROR"
+                "undefined": "MEDIA_ERROR",
             }
             statusCode = json.get("statusCode", 0)
             logging.info(f"TikTok Returned: {json}")
@@ -361,7 +361,11 @@ class TikTokApi:
                 # not available in this region
                 raise TikTokNotAvailableError("Content not available for this region")
             elif statusCode != 0 and statusCode != -1:
-                raise GenericTikTokError(error_codes.get(statusCode, f"TikTok sent an unknown StatusCode of {statusCode}"))
+                raise GenericTikTokError(
+                    error_codes.get(
+                        statusCode, f"TikTok sent an unknown StatusCode of {statusCode}"
+                    )
+                )
 
             return r.json()
         except ValueError as e:
@@ -400,7 +404,7 @@ class TikTokApi:
                     for i in range(16)
                 ),
                 "s_v_web_id": verifyFp,
-                "ttwid": kwargs.get("ttwid")
+                "ttwid": kwargs.get("ttwid"),
             }
         else:
             return {
@@ -411,7 +415,7 @@ class TikTokApi:
                     random.choice(string.ascii_uppercase + string.ascii_lowercase)
                     for i in range(16)
                 ),
-                "ttwid": kwargs.get("ttwid")
+                "ttwid": kwargs.get("ttwid"),
             }
 
     def get_bytes(self, **kwargs) -> bytes:
@@ -473,14 +477,14 @@ class TikTokApi:
             device_id,
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
-        
+
         spawn = requests.head(
             "https://www.tiktok.com",
             proxies=self.__format_proxy(proxy),
-            **self.requests_extra_kwargs
+            **self.requests_extra_kwargs,
         )
         ttwid = spawn.cookies["ttwid"]
-        
+
         response = []
         first = True
 
