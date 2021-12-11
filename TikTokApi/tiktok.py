@@ -270,26 +270,28 @@ class TikTokApi:
         csrf_token = h.headers["X-Ware-Csrf-Token"].split(",")[1]
         kwargs["csrf_session_id"] = csrf_session_id
 
+        headers = {
+            "authority": "m.tiktok.com",
+            "method": "GET",
+            "path": url.split("tiktok.com")[1],
+            "scheme": "https",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, deflate, br",
+            "accept-language": "en-US,en;q=0.9",
+            "origin": referrer,
+            "referer": referrer,
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-site",
+            "sec-gpc": "1",
+            "user-agent": userAgent,
+            "x-secsdk-csrf-token": csrf_token,
+            "x-tt-params": tt_params,
+        }
+
         r = requests.get(
             url,
-            headers={
-                "authority": "m.tiktok.com",
-                "method": "GET",
-                "path": url.split("tiktok.com")[1],
-                "scheme": "https",
-                "accept": "application/json, text/plain, */*",
-                "accept-encoding": "gzip, deflate, br",
-                "accept-language": "en-US,en;q=0.9",
-                "origin": referrer,
-                "referer": referrer,
-                "sec-fetch-dest": "empty",
-                "sec-fetch-mode": "cors",
-                "sec-fetch-site": "same-site",
-                "sec-gpc": "1",
-                "user-agent": userAgent,
-                "x-secsdk-csrf-token": csrf_token,
-                "x-tt-params": tt_params,
-            },
+            headers=headers,
             cookies=self.get_cookies(**kwargs),
             proxies=self.__format_proxy(proxy),
             **self.requests_extra_kwargs,
@@ -297,8 +299,8 @@ class TikTokApi:
         try:
             json = r.json()
             if (
-                    json.get("type") == "verify"
-                    or json.get("verifyConfig", {}).get("type", "") == "verify"
+                json.get("type") == "verify"
+                or json.get("verifyConfig", {}).get("type", "") == "verify"
             ):
                 logging.error(
                     "Tiktok wants to display a catcha. Response is:\n" + r.text
@@ -672,16 +674,16 @@ class TikTokApi:
         kwargs["custom_device_id"] = device_id
 
         api_url = (
-                BASE_URL + "api/post/item_list/?{}&count={}&id={}&type=1&secUid={}"
-                           "&cursor={}&sourceType=8&appId=1233&region={}&language={}".format(
-            self.__add_url_params__(),
-            page_size,
-            str(userID),
-            str(secUID),
-            cursor,
-            region,
-            language,
-        )
+            BASE_URL + "api/post/item_list/?{}&count={}&id={}&type=1&secUid={}"
+            "&cursor={}&sourceType=8&appId=1233&region={}&language={}".format(
+                self.__add_url_params__(),
+                page_size,
+                str(userID),
+                str(secUID),
+                cursor,
+                region,
+                language,
+            )
         )
 
         return self.get_data(url=api_url, send_tt_params=True, **kwargs)
@@ -1319,7 +1321,7 @@ class TikTokApi:
         return user
 
     def get_suggested_users_by_id(
-            self, userId="6745191554350760966", count=30, **kwargs
+        self, userId="6745191554350760966", count=30, **kwargs
     ) -> list:
         """Returns suggested users given a different TikTok user.
 
@@ -1352,7 +1354,7 @@ class TikTokApi:
         return res[:count]
 
     def get_suggested_users_by_id_crawler(
-            self, count=30, startingId="6745191554350760966", **kwargs
+        self, count=30, startingId="6745191554350760966", **kwargs
     ) -> list:
         """Crawls for listing of all user objects it can find.
 
@@ -1387,7 +1389,7 @@ class TikTokApi:
         return users[:count]
 
     def get_suggested_hashtags_by_id(
-            self, count=30, userId="6745191554350760966", **kwargs
+        self, count=30, userId="6745191554350760966", **kwargs
     ) -> list:
         """Returns suggested hashtags given a TikTok user.
 
@@ -1418,7 +1420,7 @@ class TikTokApi:
         return res[:count]
 
     def get_suggested_hashtags_by_id_crawler(
-            self, count=30, startingId="6745191554350760966", **kwargs
+        self, count=30, startingId="6745191554350760966", **kwargs
     ) -> list:
         """Crawls for as many hashtags as it can find.
 
@@ -1451,7 +1453,7 @@ class TikTokApi:
         return hashtags[:count]
 
     def get_suggested_music_by_id(
-            self, count=30, userId="6745191554350760966", **kwargs
+        self, count=30, userId="6745191554350760966", **kwargs
     ) -> list:
         """Returns suggested music given a TikTok user.
 
@@ -1487,7 +1489,7 @@ class TikTokApi:
         return res[:count]
 
     def get_suggested_music_id_crawler(
-            self, count=30, startingId="6745191554350760966", **kwargs
+        self, count=30, startingId="6745191554350760966", **kwargs
     ) -> list:
         """Crawls for hashtags.
 
