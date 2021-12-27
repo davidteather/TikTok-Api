@@ -847,7 +847,7 @@ class TikTokApi:
                 res["itemList"]
             except Exception:
                 logging.error("User's likes are most likely private")
-                return []
+                return response
 
             for t in res.get("itemList", []):
                 response.append(t)
