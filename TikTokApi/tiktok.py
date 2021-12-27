@@ -852,7 +852,7 @@ class TikTokApi:
             for t in res.get("itemList", []):
                 response.append(t)
 
-            if not res.get("hasMore", False) and not first:
+            if not res.get("hasMore", False) or not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
