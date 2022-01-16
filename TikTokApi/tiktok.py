@@ -34,7 +34,7 @@ class TikTokApi:
         self.executablePath = kwargs.get("executablePath", None)
 
         if kwargs.get("custom_did") != None:
-            raise Exception("Please use custom_device_id instead of custom_device_id")
+            raise Exception("Please use custom_device_id instead of custom_did")
         self.custom_device_id = kwargs.get("custom_device_id", None)
         self.userAgent = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
