@@ -698,6 +698,7 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
         data = self.get_user_object(username, **kwargs)
+        print('data', data)
         return self.user_posts(
             data["id"],
             data["secUid"],
@@ -1298,7 +1299,10 @@ class TikTokApi:
             device_id,
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
-        return self.get_user(username, **kwargs)["userInfo"]["user"]
+        user = self.get_user(username, **kwargs)
+        print('user', user)
+        # User is an object with one user in it. Get the first and only user.
+        return user
 
     def get_user(self, username, **kwargs) -> dict:
         """Gets the full exposed user object
@@ -1338,12 +1342,16 @@ class TikTokApi:
                 logging.error("Tiktok response: \n " + t)
             raise TikTokCaptchaError()
 
-        user = json.loads(j_raw)["props"]["pageProps"]
+        user_data = json.loads(j_raw)
+        user_page = user_data['UserPage']
 
-        if user["serverCode"] == 404:
+        if user_page["statusCode"] == 10202:
             raise TikTokNotFoundError(
                 "TikTok user with username {} does not exist".format(username)
             )
+        user = list(user_data["UserModule"]["users"].values())[0]
+
+
 
         return user
 
@@ -1548,13 +1556,9 @@ class TikTokApi:
         return urlencode(query)
 
     def __extract_tag_contents(self, html):
-        nonce_start = '<head nonce="'
-        nonce_end = '">'
-        nonce = html.split(nonce_start)[1].split(nonce_end)[0]
-        j_raw = html.split(
-            '<script id="__NEXT_DATA__" type="application/json" nonce="%s" crossorigin="anonymous">'
-            % nonce
-        )[1].split("</script>")[0]
+        data_start = '<script id="sigi-persisted-data">window[\'SIGI_STATE\']='
+        data_end = ';window'
+        j_raw = html.split(data_start)[1].split(data_end)[0]
         return j_raw
 
     # Process the kwargs
