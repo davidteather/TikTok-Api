@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from urllib.parse import quote, urlencode
+from urllib.parse import urlencode
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -95,15 +95,14 @@ class Search():
 
             # When I move to 3.10+ support make this a match switch.
             if prefix == 'user':
-                cursor += len(data.get("user_list", []))
                 for result in data.get("user_list", []): yield result
             elif prefix == 'music':
-                cursor += len(data.get("music_list", []))
                 for result in data.get("music_list", []): yield result
             elif prefix == 'challenge':
-                cursor += len(data.get("challenge_list", []))
                 for result in data.get("challenge_list", []): yield result
 
             if data.get('has_more', 0) == 0:
                 logging.info("TikTok is not sending videos beyond this point.")
                 return
+
+            cursor = int(data.get('cursor'))

@@ -3,6 +3,7 @@ from urllib.parse import quote, urlencode
 from .exceptions import *
 
 import re
+import requests
 
 def extract_tag_contents(html):
     next_json = re.search(r'id=\"__NEXT_DATA__\"\s+type=\"application\/json\"\s*[^>]+>\s*(?P<next_data>[^<]+)', html)
@@ -21,3 +22,13 @@ def extract_tag_contents(html):
             return sigi_json.group(1)
         else:
             raise TikTokCaptchaError()
+
+def extract_video_id_from_url(url):
+    url = requests.head(url=url, allow_redirects=True).url
+    if "@" in url and "/video/" in url:
+        post_id = url.split("/video/")[1].split("?")[0]
+    else:
+        raise TypeError(
+            "URL format not supported. Below is an example of a supported url.\n"
+            "https://www.tiktok.com/@therock/video/6829267836783971589"
+        )

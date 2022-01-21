@@ -132,7 +132,7 @@ class browser(BrowserInterface):
 
         context = self.browser.new_context(**iphone)
         if set_useragent:
-            self.userAgent = iphone["user_agent"]
+            self.user_agent = iphone["user_agent"]
 
         return context
 

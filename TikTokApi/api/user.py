@@ -5,13 +5,13 @@ import json
 import logging
 import requests
 
-from typing import Optional
 from urllib.parse import quote, urlencode
 
 from ..exceptions import *
 from ..helpers import extract_tag_contents
+from .search import Search
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
 
@@ -19,8 +19,6 @@ class User():
     parent: TikTokApi
 
     def __init__(self, username: Optional[str] = None, user_id: Optional[str] = None, sec_uid: Optional[str] = None):
-        super()
-
         self.username = username
         self.user_id = user_id
         self.sec_uid = sec_uid
@@ -43,7 +41,7 @@ class User():
                 "path": "/@{}".format(quoted_username),
                 "Accept-Encoding": "gzip, deflate",
                 "Connection": "keep-alive",
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+                "User-Agent": self.parent.user_agent,
             },
             proxies=User.parent._format_proxy(kwargs.get("proxy", None)),
             cookies=User.parent.get_cookies(**kwargs),
@@ -62,14 +60,6 @@ class User():
         """Returns an array of dictionaries representing TikToks for a user.
 
         ##### Parameters
-        * userID: The userID of the user, which TikTok assigns
-
-            You can find this from utilizing other methods or
-            just use by_username to find it.
-        * secUID: The secUID of the user, which TikTok assigns
-
-            You can find this from utilizing other methods or
-            just use by_username to find it.
         * count: The number of posts to return
 
             Note: seems to only support up to ~2,000
@@ -190,7 +180,18 @@ class User():
             first = False
 
     def __find_attributes(self):
-        user_object = self.user_object()
-        self.user_id = user_object['id']
-        self.sec_uid = user_object['secUid']
-        self.username = user_object['uniqueId']
+        # It is more efficient to check search first, since self.user_object() makes HTML request.
+        user_object = None
+        for r in Search(self.parent).users(self.username):
+            if r['user_info']['unique_id'] == self.username:
+                user_object = r['user_info']
+                self.user_id = user_object['uid']
+                self.sec_uid = user_object['sec_uid']
+                self.username = user_object['unique_id']
+                break
+
+        if user_object is None:
+            user_object = self.user_object()
+            self.user_id = user_object['id']
+            self.sec_uid = user_object['secUid']
+            self.username = user_object['uniqueId']

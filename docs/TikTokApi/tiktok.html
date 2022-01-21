@@ -235,8 +235,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">userAgent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">userAgent</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__format_new_params__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">timezone_name</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__format_new_params__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">___format_new_params__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">timezone_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">___format_new_params__</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">browser_language</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">width</span>
@@ -1682,7 +1682,7 @@
             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">requests_extra_kwargs</span><span class="p">,</span>
         <span class="p">)</span><span class="o">.</span><span class="n">text</span>
 
-    <span class="k">def</span> <span class="nf">__format_new_params__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parm</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">___format_new_params__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parm</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="c1"># TODO: Maybe try not doing this? It should be handled by the urlencode.</span>
         <span class="k">return</span> <span class="n">parm</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%2F</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">,</span> <span class="s2">&quot;%3B&quot;</span><span class="p">)</span>
 
@@ -1702,7 +1702,7 @@
             <span class="s2">&quot;browser_language&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">&quot;en-us&quot;</span><span class="p">,</span>
             <span class="s2">&quot;browser_platform&quot;</span><span class="p">:</span> <span class="s2">&quot;iPhone&quot;</span><span class="p">,</span>
             <span class="s2">&quot;browser_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Mozilla&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;browser_version&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__format_new_params__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">userAgent</span><span class="p">),</span>
+            <span class="s2">&quot;browser_version&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">___format_new_params__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">userAgent</span><span class="p">),</span>
             <span class="s2">&quot;browser_online&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
             <span class="s2">&quot;timezone_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="ow">or</span> <span class="s2">&quot;America/Chicago&quot;</span><span class="p">,</span>
             <span class="s2">&quot;is_page_visible&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
@@ -1802,8 +1802,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">userAgent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">userAgent</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__format_new_params__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">timezone_name</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__format_new_params__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">___format_new_params__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">timezone_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">___format_new_params__</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">browser_language</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">width</span>
@@ -3249,7 +3249,7 @@
             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">requests_extra_kwargs</span><span class="p">,</span>
         <span class="p">)</span><span class="o">.</span><span class="n">text</span>
 
-    <span class="k">def</span> <span class="nf">__format_new_params__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parm</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">___format_new_params__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parm</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="c1"># TODO: Maybe try not doing this? It should be handled by the urlencode.</span>
         <span class="k">return</span> <span class="n">parm</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%2F</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">,</span> <span class="s2">&quot;%3B&quot;</span><span class="p">)</span>
 
@@ -3269,7 +3269,7 @@
             <span class="s2">&quot;browser_language&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">&quot;en-us&quot;</span><span class="p">,</span>
             <span class="s2">&quot;browser_platform&quot;</span><span class="p">:</span> <span class="s2">&quot;iPhone&quot;</span><span class="p">,</span>
             <span class="s2">&quot;browser_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Mozilla&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;browser_version&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__format_new_params__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">userAgent</span><span class="p">),</span>
+            <span class="s2">&quot;browser_version&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">___format_new_params__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">userAgent</span><span class="p">),</span>
             <span class="s2">&quot;browser_online&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
             <span class="s2">&quot;timezone_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="ow">or</span> <span class="s2">&quot;America/Chicago&quot;</span><span class="p">,</span>
             <span class="s2">&quot;is_page_visible&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
@@ -3365,8 +3365,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">userAgent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">userAgent</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__format_new_params__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">timezone_name</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__format_new_params__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">___format_new_params__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">timezone_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">___format_new_params__</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">browser_language</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">width</span>

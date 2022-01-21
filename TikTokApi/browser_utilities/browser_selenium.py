@@ -92,7 +92,7 @@ class browser(BrowserInterface):
         self.browser.execute_script(get_tt_params_script())
 
     def get_params(self, page) -> None:
-        self.userAgent = page.execute_script("""return navigator.userAgent""")
+        self.user_agent = page.execute_script("""return navigator.userAgent""")
         self.browser_language = self.kwargs.get(
             "browser_language", ("""return navigator.language""")
         )
