@@ -173,13 +173,9 @@ class browser(BrowserInterface):
 
         return f'verify_{scenario_title.lower()}_{"".join(uuid)}'
 
-    def sign_url(self, calc_tt_params=False, **kwargs):
+    def sign_url(self, url, calc_tt_params=False, **kwargs):
         def process(route):
             route.abort()
-
-        url = kwargs.get("url", None)
-        if url is None:
-            raise Exception("sign_url required a url parameter")
 
         tt_params = None
         context = self.create_context()
