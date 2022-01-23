@@ -4,17 +4,19 @@ import logging
 import requests
 from urllib.parse import urlencode
 
+from .video import Video
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generator
+
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
 
 
-class Trending():
+class Trending:
     parent: TikTokApi
 
     @staticmethod
-    def videos(count=30, **kwargs) -> dict:
+    def videos(count=30, **kwargs) -> Generator[Video, None, None]:
         """
         Gets trending TikToks
 
@@ -24,6 +26,7 @@ class Trending():
             Note: TikTok seems to only support at MOST ~2000 TikToks
             from a single endpoint.
         """
+
         (
             region,
             language,
@@ -58,11 +61,12 @@ class Trending():
                 Trending.parent._add_url_params(), urlencode(query)
             )
             res = Trending.parent.get_data(path, ttwid=ttwid, **kwargs)
-            for result in res.get("itemList", []): yield result
+            for result in res.get("itemList", []):
+                yield Video(data=result)
             amount_yielded += len(res.get("itemList", []))
 
             if not res.get("hasMore", False) and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
-                return 
+                return
 
             first = False

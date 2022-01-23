@@ -1,5 +1,4 @@
 from __future__ import annotations
-from concurrent.futures import process
 
 import json
 import logging
@@ -9,29 +8,55 @@ from urllib.parse import quote, urlencode
 
 from ..exceptions import *
 from ..helpers import extract_tag_contents
-from .search import Search
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, ClassVar, Generator, Optional
+
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
+    from .video import Video
 
-class User():
-    parent: TikTokApi
 
-    def __init__(self, username: Optional[str] = None, user_id: Optional[str] = None, sec_uid: Optional[str] = None):
-        self.username = username
-        self.user_id = user_id
-        self.sec_uid = sec_uid
+class User:
+    """A TikTok User class
 
-    def user_object(self, **kwargs):
-        return self.data_full(**kwargs)['UserModule']['users'][self.username]
+    Attributes
+        user_id: The TikTok user's ID.
+        sec_uid: The TikTok user's sec_uid.
+        username: The TikTok user's username.
+        as_dict: The dictionary provided to create the class.
+    """
 
-    def data_full(self, **kwargs) -> dict:
+    parent: ClassVar[TikTokApi]
+
+    user_id: str
+    sec_uid: str
+    username: str
+    data: dict
+
+    def __init__(
+        self,
+        username: Optional[str] = None,
+        user_id: Optional[str] = None,
+        sec_uid: Optional[str] = None,
+        data: Optional[str] = None,
+    ):
+        self.__update_id_sec_uid_username(user_id, sec_uid, username)
+        self.as_dict = data
+        if data is not None:
+            self.__extract_from_data()
+
+    def info(self, **kwargs):
+        # TODO: Might throw a key error with the HTML
+        return self.info_full(**kwargs)["props"]["pageProps"]["userInfo"]["user"]
+
+    def info_full(self, **kwargs) -> dict:
         """Gets all data associated with the user."""
 
         # TODO: Find the one using only user_id & sec_uid
         if not self.username:
-            raise TypeError('You must provide the username when creating this class to use this method.')
+            raise TypeError(
+                "You must provide the username when creating this class to use this method."
+            )
 
         quoted_username = quote(self.username)
         r = requests.get(
@@ -51,12 +76,14 @@ class User():
         data = extract_tag_contents(r.text)
         user = json.loads(data)
 
-        if user["UserPage"]["statusCode"] == 404:
-            raise TikTokNotFoundError("TikTok user with username {} does not exist".format(self.username))
+        if user["props"]["pageProps"]["statusCode"] == 404:
+            raise TikTokNotFoundError(
+                "TikTok user with username {} does not exist".format(self.username)
+            )
 
         return user
 
-    def videos(self, count=30, cursor=0, **kwargs) -> dict:
+    def videos(self, count=30, cursor=0, **kwargs) -> Generator[Video, None, None]:
         """Returns an array of dictionaries representing TikToks for a user.
 
         ##### Parameters
@@ -80,13 +107,8 @@ class User():
         amount_yielded = 0
 
         while amount_yielded < count:
-            if count < maxCount:
-                realCount = count
-            else:
-                realCount = maxCount
-
             query = {
-                "count": realCount,
+                "count": 30,
                 "id": self.user_id,
                 "cursor": cursor,
                 "type": 1,
@@ -105,17 +127,19 @@ class User():
 
             videos = res.get("itemList", [])
             amount_yielded += len(videos)
-            for video in videos: yield video
+            for video in videos:
+                yield self.parent.video(data=video)
 
             if not res.get("hasMore", False) and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return
 
-            realCount = count - amount_yielded
             cursor = res["cursor"]
             first = False
 
-    def liked(self, count: int = 30, cursor: int = 0, **kwargs):
+    def liked(
+        self, count: int = 30, cursor: int = 0, **kwargs
+    ) -> Generator[Video, None, None]:
         """Returns a dictionary listing TikToks that a given a user has liked.
             Note: The user's likes must be public
 
@@ -133,20 +157,18 @@ class User():
             proxy,
             maxCount,
             device_id,
-        ) = self._process_kwargs(kwargs)
+        ) = self.parent._process_kwargs(kwargs)
         kwargs["custom_device_id"] = device_id
 
         amount_yielded = 0
         first = True
 
-        while amount_yielded < count:
-            if count < maxCount:
-                realCount = count
-            else:
-                realCount = maxCount
+        if self.user_id is None and self.sec_uid is None:
+            self.__find_attributes()
 
+        while amount_yielded < count:
             query = {
-                "count": realCount,
+                "count": 30,
                 "id": self.user_id,
                 "type": 2,
                 "secUid": self.sec_uid,
@@ -157,11 +179,11 @@ class User():
                 "priority_region": region,
                 "language": language,
             }
-            api_url = "api/favorite/item_list/?{}&{}".format(
-                User.parent.__add_url_params__(), urlencode(query)
+            path = "api/favorite/item_list/?{}&{}".format(
+                User.parent._add_url_params(), urlencode(query)
             )
 
-            res = self.get_data(url=api_url, **kwargs)
+            res = self.parent.get_data(path, **kwargs)
 
             if "itemList" not in res.keys():
                 logging.error("User's likes are most likely private")
@@ -169,29 +191,59 @@ class User():
 
             videos = res.get("itemList", [])
             amount_yielded += len(videos)
-            for video in videos: yield video
+            for video in videos:
+                amount_yielded += 1
+                yield self.parent.video(data=video)
 
             if not res.get("hasMore", False) and not first:
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return
 
-            realCount = count - amount_yielded
             cursor = res["cursor"]
             first = False
 
-    def __find_attributes(self):
+    def __extract_from_data(self):
+        data = self.as_dict
+        keys = data.keys()
+
+        if "user_info" in keys:
+            self.__update_id_sec_uid_username(
+                data["user_info"]["uid"],
+                data["user_info"]["sec_uid"],
+                data["user_info"]["unique_id"],
+            )
+        elif "uniqueId" in keys:
+            self.__update_id_sec_uid_username(
+                data["id"], data["secUid"], data["uniqueId"]
+            )
+
+        if None in (self.username, self.user_id, self.sec_uid):
+            logging.error(
+                f"Failed to create User with data: {data}\nwhich has keys {data.keys()}"
+            )
+
+    def __update_id_sec_uid_username(self, id, sec_uid, username):
+        self.user_id = id
+        self.sec_uid = sec_uid
+        self.username = username
+
+    def __find_attributes(self) -> None:
         # It is more efficient to check search first, since self.user_object() makes HTML request.
-        user_object = None
-        for r in Search(self.parent).users(self.username):
-            if r['user_info']['unique_id'] == self.username:
-                user_object = r['user_info']
-                self.user_id = user_object['uid']
-                self.sec_uid = user_object['sec_uid']
-                self.username = user_object['unique_id']
+        found = False
+        for u in self.parent.search.users(self.username):
+            if u.username == self.username:
+                found = True
+                self.__update_id_sec_uid_username(u.user_id, u.sec_uid, u.username)
                 break
 
-        if user_object is None:
-            user_object = self.user_object()
-            self.user_id = user_object['id']
-            self.sec_uid = user_object['secUid']
-            self.username = user_object['uniqueId']
+        if not found:
+            user_object = self.info()
+            self.__update_id_sec_uid_username(
+                user_object["id"], user_object["secUid"], user_object["uniqueId"]
+            )
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return f"TikTokApi.user(username='{self.username}', user_id='{self.user_id}', sec_uid='{self.sec_uid}')"

@@ -164,7 +164,7 @@ class browser(BrowserInterface):
             verifyFp = self.gen_verifyFp()
         else:
             verifyFp = kwargs.get(
-                "custom_verifyFp",
+                "custom_verify_fp",
                 "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX",
             )
 

@@ -10,20 +10,33 @@ from urllib.parse import quote, urlencode
 from ..helpers import extract_tag_contents
 from ..exceptions import *
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar, Generator, Optional
+
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
+    from .user import User
+    from .video import Video
 
 
-class Music():
-    parent: TikTokApi
+class Sound:
+    parent: ClassVar[TikTokApi]
 
-    def __init__(self, music_id: str):
-        self.id = music_id
+    id: str
+    title: Optional[str]
+    author: Optional[User]
 
-    def music_info(self, use_html=False, **kwargs) -> dict:
+    def __init__(self, id: Optional[str] = None, data: Optional[str] = None):
+        self.as_dict = data
+        if data is not None:
+            self.__extract_from_data()
+        elif id is None:
+            raise TypeError("You must provide id parameter.")
+        else:
+            self.id = id
+
+    def info(self, use_html=False, **kwargs) -> dict:
         if use_html:
-            return self.data_full(**kwargs)['props']['pageProps']['musicInfo']
+            return self.info_full(**kwargs)["props"]["pageProps"]["musicInfo"]
 
         (
             region,
@@ -34,17 +47,15 @@ class Music():
         ) = self.parent._process_kwargs(kwargs)
         kwargs["custom_device_id"] = device_id
 
-        path = "node/share/music/-{}?{}".format(
-            self.id, self.parent._add_url_params()
-        )
+        path = "node/share/music/-{}?{}".format(self.id, self.parent._add_url_params())
         res = self.parent.get_data(path, **kwargs)
 
         if res.get("statusCode", 200) == 10203:
             raise TikTokNotFoundError()
 
-        return res['musicInfo']
+        return res["musicInfo"]
 
-    def data_full(self, **kwargs) -> dict:
+    def info_full(self, **kwargs) -> dict:
         r = requests.get(
             "https://www.tiktok.com/music/-{}".format(self.id),
             headers={
@@ -61,10 +72,10 @@ class Music():
         data = extract_tag_contents(r.text)
         return json.loads(data)
 
-    def videos(self, count=30, offset=0, **kwargs) -> dict:
+    def videos(self, count=30, offset=0, **kwargs) -> Generator[Video, None, None]:
         """Returns a dictionary listing TikToks with a specific sound.
 
-            Note: seems to only support up to ~2,000
+        Note: seems to only support up to ~2,000
         """
         (
             region,
@@ -78,13 +89,13 @@ class Music():
         cursor = offset
         page_size = 30
 
-        while cursor-offset < count:
+        while cursor - offset < count:
             query = {
                 "secUid": "",
                 "musicID": self.id,
                 "cursor": cursor,
                 "shareUid": "",
-                "count": page_size
+                "count": page_size,
             }
             path = "api/music/item_list/?{}&{}".format(
                 self.parent._add_url_params(), urlencode(query)
@@ -92,10 +103,33 @@ class Music():
 
             res = self.parent.get_data(path, send_tt_params=True, **kwargs)
 
-            for result in res.get("itemList", []): yield result
+            for result in res.get("itemList", []):
+                yield self.parent.video(data=result)
 
             if not res.get("hasMore", False):
                 logging.info("TikTok isn't sending more TikToks beyond this point.")
                 return
 
             cursor = int(res["cursor"])
+
+    def __extract_from_data(self):
+        data = self.as_dict
+        keys = data.keys()
+
+        if "authorName" in keys:
+            self.id = data["id"]
+            self.title = data["title"]
+
+            if data.get("authorName") is not None:
+                self.author = self.parent.user(username=data["authorName"])
+
+        if self.id is None:
+            logging.error(
+                f"Failed to create Sound with data: {data}\nwhich has keys {data.keys()}"
+            )
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return f"TikTokApi.sound(id='{self.id}')"

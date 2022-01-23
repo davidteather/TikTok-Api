@@ -7,7 +7,7 @@ import time
 from urllib.parse import quote, urlencode
 
 import requests
-from TikTokApi.api import user, music, search, hashtag, video, trending
+from TikTokApi.api import sound, user, search, hashtag, video, trending
 from playwright.sync_api import sync_playwright
 
 from .exceptions import *
@@ -46,7 +46,7 @@ class TikTokApi:
             Use this if you want to download videos from a script but don't want to generate
             your own custom_device_id parameter.
 
-        * custom_verifyFp: A TikTok parameter needed to work most of the time, optional
+        * custom_verify_fp: A TikTok parameter needed to work most of the time, optional
             To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
             I recommend watching the entire thing, as it will help setup this package. All
             the methods take this as a optional parameter, however it's cleaner code
@@ -59,7 +59,7 @@ class TikTokApi:
         * use_test_endpoints: Send requests to TikTok's test endpoints, optional
             This parameter when set to true will make requests to TikTok's testing
             endpoints instead of the live site. I can't guarantee this will work
-            in the future, however currently basically any custom_verifyFp will
+            in the future, however currently basically any custom_verify_fp will
             work here which is helpful.
 
         * proxy: A string containing your proxy address, optional
@@ -96,17 +96,18 @@ class TikTokApi:
         user.User.parent = self
         self.user = user.User
 
-        self.search = search.Search(self)
+        search.Search.parent = self
+        self.search = search.Search
 
-        music.Music.parent = self
-        self.music = music.Music
+        sound.Sound.parent = self
+        self.sound = sound.Sound
 
         hashtag.Hashtag.parent = self
         self.hashtag = hashtag.Hashtag
 
         video.Video.parent = self
         self.video = video.Video
-        
+
         trending.Trending.parent = self
         self.trending = trending.Trending
 
@@ -119,13 +120,9 @@ class TikTokApi:
         if kwargs.get("custom_did") != None:
             raise Exception("Please use custom_device_id instead of custom_device_id")
         self.custom_device_id = kwargs.get("custom_device_id", None)
-        self.user_agent = (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/86.0.4240.111 Safari/537.36"
-        )
+        self.user_agent = "5.0+(iPhone%3B+CPU+iPhone+OS+14_8+like+Mac+OS+X)+AppleWebKit%2F605.1.15+(KHTML,+like+Gecko)+Version%2F14.1.2+Mobile%2F15E148+Safari%2F604.1"
         self.proxy = kwargs.get("proxy", None)
-        self.custom_verifyFp = kwargs.get("custom_verifyFp")
+        self.custom_verify_fp = kwargs.get("custom_verify_fp")
         self.signer_url = kwargs.get("external_signer", None)
         self.request_delay = kwargs.get("request_delay", None)
         self.requests_extra_kwargs = kwargs.get("requests_extra_kwargs", {})
@@ -190,13 +187,13 @@ class TikTokApi:
         if self.proxy is not None:
             proxy = self.proxy
 
-        if kwargs.get("custom_verifyFp") == None:
-            if self.custom_verifyFp != None:
-                verifyFp = self.custom_verifyFp
+        if kwargs.get("custom_verify_fp") == None:
+            if self.custom_verify_fp != None:
+                verifyFp = self.custom_verify_fp
             else:
                 verifyFp = "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"
         else:
-            verifyFp = kwargs.get("custom_verifyFp")
+            verifyFp = kwargs.get("custom_verify_fp")
 
         tt_params = None
         send_tt_params = kwargs.get("send_tt_params", False)
@@ -207,17 +204,23 @@ class TikTokApi:
             full_url = BASE_URL + path
 
         if self.signer_url is None:
-            kwargs["custom_verifyFp"] = verifyFp
+            kwargs["custom_verify_fp"] = verifyFp
             verify_fp, device_id, signature, tt_params = self.browser.sign_url(
                 full_url, calc_tt_params=send_tt_params, **kwargs
             )
             user_agent = self.browser.user_agent
             referrer = self.browser.referrer
         else:
-            verify_fp, device_id, signature, user_agent, referrer = self.external_signer(
+            (
+                verify_fp,
+                device_id,
+                signature,
+                user_agent,
+                referrer,
+            ) = self.external_signer(
                 full_url,
                 custom_device_id=kwargs.get("custom_device_id"),
-                verifyFp=kwargs.get("custom_verifyFp", verifyFp),
+                verifyFp=kwargs.get("custom_verify_fp", verifyFp),
             )
 
         if not kwargs.get("send_tt_params", False):
@@ -276,7 +279,9 @@ class TikTokApi:
                 logging.error(
                     "Tiktok wants to display a catcha. Response is:\n" + r.text
                 )
-                logging.error(self.get_cookies(**kwargs))
+                logging.info(
+                    f"Request failed with\nurl:{url}\nheaders:{headers}\ncookies:{self.get_cookies(**kwargs)}"
+                )
                 raise TikTokCaptchaError()
 
             # statusCode from props->pageProps->statusCode thanks @adiantek on #403
@@ -379,7 +384,7 @@ class TikTokApi:
             for some things such as video download you will need to set a consistent
             one of these.
 
-        * custom_verifyFp: A TikTok parameter needed to work most of the time,
+        * custom_verify_fp: A TikTok parameter needed to work most of the time,
             To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
             I recommend watching the entire thing, as it will help setup this package.
         """
@@ -411,13 +416,13 @@ class TikTokApi:
             "custom_device_id",
             "".join(random.choice(string.digits) for num in range(19)),
         )
-        if kwargs.get("custom_verifyFp") == None:
-            if self.custom_verifyFp != None:
-                verifyFp = self.custom_verifyFp
+        if kwargs.get("custom_verify_fp") is None:
+            if self.custom_verify_fp is not None:
+                verifyFp = self.custom_verify_fp
             else:
-                verifyFp = "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"
+                verifyFp = None
         else:
-            verifyFp = kwargs.get("custom_verifyFp")
+            verifyFp = kwargs.get("custom_verify_fp")
 
         if kwargs.get("force_verify_fp_on_cookie_header", False):
             return {
@@ -460,7 +465,13 @@ class TikTokApi:
             user_agent = self.browser.user_agent
             referrer = self.browser.referrer
         else:
-            verify_fp, device_id, signature, user_agent, referrer = self.external_signer(
+            (
+                verify_fp,
+                device_id,
+                signature,
+                user_agent,
+                referrer,
+            ) = self.external_signer(
                 kwargs["url"], custom_device_id=kwargs.get("custom_device_id", None)
             )
         query = {"verifyFp": verify_fp, "_signature": signature}
@@ -520,7 +531,6 @@ class TikTokApi:
                 device_id = "".join(random.choice(string.digits) for num in range(19))
         return region, language, proxy, maxCount, device_id
 
-
     def __get_js(self, proxy=None) -> str:
         return requests.get(
             "https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js",
@@ -541,14 +551,13 @@ class TikTokApi:
             "priority_region": "",
             "os": "ios",
             "referer": "",
-            "root_referer": "",
             "cookie_enabled": "true",
             "screen_width": self.width,
             "screen_height": self.height,
             "browser_language": self.browser_language.lower() or "en-us",
             "browser_platform": "iPhone",
             "browser_name": "Mozilla",
-            "browser_version": self.__format_new_params(self.user_agent),
+            "browser_version": self.user_agent,
             "browser_online": "true",
             "timezone_name": self.timezone_name or "America/Chicago",
             "is_page_visible": "true",
@@ -557,4 +566,5 @@ class TikTokApi:
             "history_len": random.randint(0, 30),
             "language": self.language or "en",
         }
+
         return urlencode(query)
