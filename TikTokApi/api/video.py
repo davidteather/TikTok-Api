@@ -25,6 +25,8 @@ class Video:
 
     parent: ClassVar[TikTokApi]
 
+    # TODO: Use __getattribute__
+
     id: str
     author: Optional[User]
     sound: Optional[Sound]
@@ -38,8 +40,8 @@ class Video:
         data: Optional[dict] = None,
     ):
         self.id = id
-        self.as_dict = data
         if data is not None:
+            self.as_dict = data
             self.__extract_from_data()
         elif url is not None:
             self.id = extract_video_id_from_url(url)
@@ -110,3 +112,12 @@ class Video:
 
     def __str__(self):
         return f"TikTokApi.video(id='{self.id}')"
+
+    def __getattr__(self, name):
+        # Handle author, sound, hashtags, as_dict
+        if name in ["author", "sound", "hashtags", "as_dict"]:
+            self.as_dict = self.info()
+            self.__extract_from_data()
+            return self.__getattribute__(name)
+
+        raise AttributeError(f"{name} doesn't exist on TikTokApi.api.Video")

@@ -12,6 +12,7 @@ from playwright.sync_api import sync_playwright
 
 from .exceptions import *
 from .utilities import update_messager
+from .browser_utilities.browser import browser
 
 os.environ["no_proxy"] = "127.0.0.1,localhost"
 
@@ -23,7 +24,7 @@ class TikTokApi:
     _instance = None
 
     @staticmethod
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, logging_level=logging.WARNING, *args, **kwargs):
         """The TikTokApi class. Used to interact with TikTok. This is a singleton
             class to prevent issues from arising with playwright
 
@@ -88,10 +89,10 @@ class TikTokApi:
 
         if cls._instance is None:
             cls._instance = super(TikTokApi, cls).__new__(cls)
-            cls._instance._initialize(*args, **kwargs)
+            cls._instance._initialize(logging_level=logging_level, *args, **kwargs)
         return cls._instance
 
-    def _initialize(self, **kwargs):
+    def _initialize(self, logging_level=logging.WARNING, **kwargs):
         # Add classes from the api folder
         user.User.parent = self
         self.user = user.User
@@ -111,8 +112,7 @@ class TikTokApi:
         trending.Trending.parent = self
         self.trending = trending.Trending
 
-        logging.basicConfig(level=kwargs.get("logging_level", logging.WARNING))
-        logging.info("Class initalized")
+        logging.basicConfig(level=logging_level)
 
         # Some Instance Vars
         self.executablePath = kwargs.get("executablePath", None)
@@ -130,10 +130,6 @@ class TikTokApi:
         if kwargs.get("use_test_endpoints", False):
             global BASE_URL
             BASE_URL = "https://t.tiktok.com/"
-        if kwargs.get("use_selenium", False):
-            from .browser_utilities.browser_selenium import browser
-        else:
-            from .browser_utilities.browser import browser
 
         if kwargs.get("generate_static_device_id", False):
             self.custom_device_id = "".join(

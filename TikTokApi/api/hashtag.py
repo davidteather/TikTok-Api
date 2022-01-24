@@ -4,7 +4,7 @@ import logging
 from urllib.parse import urlencode
 from ..exceptions import *
 
-from typing import TYPE_CHECKING, Generator, Optional
+from typing import TYPE_CHECKING, ClassVar, Generator, Optional
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -12,7 +12,11 @@ if TYPE_CHECKING:
 
 
 class Hashtag:
-    parent: TikTokApi
+    parent: ClassVar[TikTokApi]
+
+    id: str
+    name: str
+    as_dict: dict
 
     def __init__(
         self,
@@ -20,10 +24,11 @@ class Hashtag:
         id: Optional[str] = None,
         data: Optional[str] = None,
     ):
-        self.as_dict = data
         self.name = name
         self.id = id
+
         if data is not None:
+            self.as_dict = data
             self.__extract_from_data()
 
     def info(self, **kwargs) -> dict:
@@ -46,7 +51,7 @@ class Hashtag:
         ) = self.parent._process_kwargs(kwargs)
         kwargs["custom_device_id"] = device_id
 
-        if self.name:
+        if self.name is not None:
             query = {"challengeName": self.name}
         else:
             query = {"challengeId": self.id}
@@ -121,3 +126,11 @@ class Hashtag:
 
     def __str__(self):
         return f"TikTokApi.hashtag(id='{self.id}', name='{self.name}')"
+
+    def __getattr__(self, name):
+        if name in ["id", "name", "as_dict"]:
+            self.as_dict = self.info()
+            self.__extract_from_data()
+            return self.__getattribute__(name)
+
+        raise AttributeError(f"{name} doesn't exist on TikTokApi.api.Hashtag")

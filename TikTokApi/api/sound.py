@@ -26,8 +26,8 @@ class Sound:
     author: Optional[User]
 
     def __init__(self, id: Optional[str] = None, data: Optional[str] = None):
-        self.as_dict = data
         if data is not None:
+            self.as_dict = data
             self.__extract_from_data()
         elif id is None:
             raise TypeError("You must provide id parameter.")
@@ -133,3 +133,11 @@ class Sound:
 
     def __str__(self):
         return f"TikTokApi.sound(id='{self.id}')"
+
+    def __getattr__(self, name):
+        if name in ["title", "author", "as_dict"]:
+            self.as_dict = self.info()
+            self.__extract_from_data()
+            return self.__getattribute__(name)
+
+        raise AttributeError(f"{name} doesn't exist on TikTokApi.api.Sound")

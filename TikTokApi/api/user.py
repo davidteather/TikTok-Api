@@ -31,7 +31,7 @@ class User:
     user_id: str
     sec_uid: str
     username: str
-    data: dict
+    as_dict: dict
 
     def __init__(
         self,
@@ -41,8 +41,8 @@ class User:
         data: Optional[str] = None,
     ):
         self.__update_id_sec_uid_username(user_id, sec_uid, username)
-        self.as_dict = data
         if data is not None:
+            self.as_dict = data
             self.__extract_from_data()
 
     def info(self, **kwargs):
@@ -247,3 +247,11 @@ class User:
 
     def __str__(self):
         return f"TikTokApi.user(username='{self.username}', user_id='{self.user_id}', sec_uid='{self.sec_uid}')"
+
+    def __getattr__(self, name):
+        if name in ["as_dict"]:
+            self.as_dict = self.info()
+            self.__extract_from_data()
+            return self.__getattribute__(name)
+
+        raise AttributeError(f"{name} doesn't exist on TikTokApi.api.User")
