@@ -19,4 +19,4 @@ def test_sound_videos():
 def test_sound_info():
     sound = api.sound(id=song_id)
     data = sound.info()
-    assert data["music"]["id"] == song_id
+    assert data["id"] == song_id

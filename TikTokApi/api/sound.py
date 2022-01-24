@@ -36,7 +36,7 @@ class Sound:
 
     def info(self, use_html=False, **kwargs) -> dict:
         if use_html:
-            return self.info_full(**kwargs)["props"]["pageProps"]["musicInfo"]
+            return self.info_full(**kwargs)["musicInfo"]
 
         (
             region,
@@ -53,7 +53,7 @@ class Sound:
         if res.get("statusCode", 200) == 10203:
             raise TikTokNotFoundError()
 
-        return res["musicInfo"]
+        return res["musicInfo"]["music"]
 
     def info_full(self, **kwargs) -> dict:
         r = requests.get(
@@ -70,7 +70,7 @@ class Sound:
         )
 
         data = extract_tag_contents(r.text)
-        return json.loads(data)
+        return json.loads(data)["props"]["pageProps"]["musicInfo"]
 
     def videos(self, count=30, offset=0, **kwargs) -> Generator[Video, None, None]:
         """Returns a dictionary listing TikToks with a specific sound.

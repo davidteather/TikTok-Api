@@ -47,7 +47,7 @@ class User:
 
     def info(self, **kwargs):
         # TODO: Might throw a key error with the HTML
-        return self.info_full(**kwargs)["props"]["pageProps"]["userInfo"]["user"]
+        return self.info_full(**kwargs)["user"]
 
     def info_full(self, **kwargs) -> dict:
         """Gets all data associated with the user."""
@@ -76,12 +76,13 @@ class User:
         data = extract_tag_contents(r.text)
         user = json.loads(data)
 
-        if user["props"]["pageProps"]["statusCode"] == 404:
+        user_props = user["props"]["pageProps"]
+        if user_props["statusCode"] == 404:
             raise TikTokNotFoundError(
                 "TikTok user with username {} does not exist".format(self.username)
             )
 
-        return user
+        return user_props["userInfo"]
 
     def videos(self, count=30, cursor=0, **kwargs) -> Generator[Video, None, None]:
         """Returns an array of dictionaries representing TikToks for a user.
