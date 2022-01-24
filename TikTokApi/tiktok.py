@@ -698,7 +698,7 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
         data = self.get_user_object(username, **kwargs)
-        print('data', data)
+        # print('data', data)
         return self.user_posts(
             data["id"],
             data["secUid"],
@@ -1300,7 +1300,7 @@ class TikTokApi:
         ) = self.__process_kwargs__(kwargs)
         kwargs["custom_device_id"] = device_id
         user = self.get_user(username, **kwargs)
-        print('user', user)
+        # print('user', user)
         # User is an object with one user in it. Get the first and only user.
         return user
 
@@ -1558,8 +1558,16 @@ class TikTokApi:
     def __extract_tag_contents(self, html):
         data_start = '<script id="sigi-persisted-data">window[\'SIGI_STATE\']='
         data_end = ';window'
-        j_raw = html.split(data_start)[1].split(data_end)[0]
-        return j_raw
+        try:
+            j_raw = html.split(data_start)[1].split(data_end)[0]
+            # print('SIGI_STATE not in data')
+            return j_raw
+        except Exception as e:
+            if not 'SIGI_STATE' in html:
+                print('SIGI_STATE' not in html)
+            if 'NEXT_DATA' in html:
+                print('NEXT_DATA in html')
+            raise e
 
     # Process the kwargs
     def __process_kwargs__(self, kwargs):
