@@ -10,8 +10,9 @@ import requests
 from playwright.sync_api import sync_playwright
 
 from .exceptions import *
-from .utilities import update_messager
+from .utilities import LOGGER_NAME, update_messager
 
+log = logging.getLogger(LOGGER_NAME)
 os.environ["no_proxy"] = "127.0.0.1,localhost"
 
 BASE_URL = "https://m.tiktok.com/"
@@ -27,14 +28,14 @@ class TikTokApi:
             TikTokApi.__instance = self
         else:
             raise Exception("Only one TikTokApi object is allowed")
-        logging.basicConfig(level=kwargs.get("logging_level", logging.WARNING))
-        logging.info("Class initalized")
+        log.setLevel(level=kwargs.get("logging_level", logging.WARNING))
+        log.info("Class initialized")
 
         # Some Instance Vars
         self.executablePath = kwargs.get("executablePath", None)
 
         if kwargs.get("custom_did") != None:
-            raise Exception("Please use custom_device_id instead of custom_device_id")
+            raise Exception("Please use 'custom_device_id' instead of 'custom_did'")
         self.custom_device_id = kwargs.get("custom_device_id", None)
         self.userAgent = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -73,12 +74,11 @@ class TikTokApi:
             self.height = self.browser.height
             self.region = self.browser.region
             self.language = self.browser.language
-        except Exception as e:
-            logging.exception(e)
-            logging.warning(
-                "An error ocurred while opening your browser but it was ignored."
+        except Exception:
+            log.exception(
+                "An error occurred while opening your browser but it was ignored. \n"
+                "Are you sure you ran python -m playwright install"
             )
-            logging.warning("Are you sure you ran python -m playwright install")
 
             self.timezone_name = ""
             self.browser_language = ""
@@ -289,7 +289,7 @@ class TikTokApi:
             "x-tt-params": tt_params,
         }
 
-        logging.info(f"GET: {url}\n\theaders: {headers}")
+        log.info(f"GET: %s\n\theaders: %s", url, headers)
         r = requests.get(
             url,
             headers=headers,
@@ -303,10 +303,10 @@ class TikTokApi:
                 json.get("type") == "verify"
                 or json.get("verifyConfig", {}).get("type", "") == "verify"
             ):
-                logging.error(
-                    "Tiktok wants to display a catcha. Response is:\n" + r.text
+                log.error(
+                    "Tiktok wants to display a captcha.\nResponse:\n%s\nCookies:\n%s",
+                    r.text, self.get_cookies(**kwargs)
                 )
-                logging.error(self.get_cookies(**kwargs))
                 raise TikTokCaptchaError()
 
             # statusCode from props->pageProps->statusCode thanks @adiantek on #403
@@ -351,7 +351,7 @@ class TikTokApi:
                 "undefined": "MEDIA_ERROR",
             }
             statusCode = json.get("statusCode", 0)
-            logging.info(f"TikTok Returned: {json}")
+            log.info(f"TikTok Returned: %s", json)
             if statusCode == 10201:
                 # Invalid Entity
                 raise TikTokNotFoundError(
@@ -370,14 +370,13 @@ class TikTokApi:
             return r.json()
         except ValueError as e:
             text = r.text
-            logging.error("TikTok response: " + text)
+            log.error("TikTok response: %s", text)
             if len(text) == 0:
                 raise EmptyResponseError(
                     "Empty response from Tiktok to " + url
                 ) from None
             else:
-                logging.error("Converting response to JSON failed")
-                logging.error(e)
+                log.exception("Converting response to JSON failed")
                 raise JSONDecodeFailure() from e
 
     def get_cookies(self, **kwargs):
@@ -512,7 +511,7 @@ class TikTokApi:
                 response.append(t)
 
             if not res.get("hasMore", False) and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                log.info("TikTok isn't sending more TikToks beyond this point.")
                 return response[:count]
 
             realCount = count - len(response)
@@ -605,7 +604,7 @@ class TikTokApi:
                 for x in data["challengeInfoList"]:
                     response.append(x)
             else:
-                logging.info("TikTok is not sending videos beyond this point.")
+                log.info("TikTok is not sending videos beyond this point.")
                 break
 
             offset += maxCount
@@ -669,7 +668,7 @@ class TikTokApi:
                     response.append(t)
 
             if not res.get("hasMore", False) and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                log.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count - len(response)
@@ -846,14 +845,14 @@ class TikTokApi:
             try:
                 res["itemList"]
             except Exception:
-                logging.error("User's likes are most likely private")
+                log.error("User's likes are most likely private")
                 return []
 
             for t in res.get("itemList", []):
                 response.append(t)
 
             if not res.get("hasMore", False) and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                log.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count - len(response)
@@ -939,7 +938,7 @@ class TikTokApi:
                     response.append(t)
 
             if not res.get("hasMore", False):
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                log.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             realCount = count - len(response)
@@ -1091,7 +1090,7 @@ class TikTokApi:
                 response.append(t)
 
             if not res.get("hasMore", False):
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                log.info("TikTok isn't sending more TikToks beyond this point.")
                 return response
 
             offset += maxCount
@@ -1171,7 +1170,7 @@ class TikTokApi:
                 response.append(t)
 
             if not res.get("hasMore", False) and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                log.info("TikTok isn't sending more TikToks beyond this point.")
                 return response[:count]
 
             realCount = count - len(response)
@@ -1272,9 +1271,9 @@ class TikTokApi:
             j_raw = self.__extract_tag_contents(r.text)
         except IndexError:
             if not t:
-                logging.error("TikTok response is empty")
+                log.error("TikTok response is empty")
             else:
-                logging.error("TikTok response: \n " + t)
+                log.error("TikTok response:\n%s", t)
             raise TikTokCaptchaError()
 
         data = json.loads(j_raw)["props"]["pageProps"]
@@ -1333,9 +1332,9 @@ class TikTokApi:
             j_raw = self.__extract_tag_contents(r.text)
         except IndexError:
             if not t:
-                logging.error("Tiktok response is empty")
+                log.error("Tiktok response is empty")
             else:
-                logging.error("Tiktok response: \n " + t)
+                log.error("Tiktok response:%s", t)
             raise TikTokCaptchaError()
 
         user = json.loads(j_raw)["props"]["pageProps"]
@@ -1482,9 +1481,8 @@ class TikTokApi:
         )
         try:
             return r.text.split('"secUid":"')[1].split('","secret":')[0]
-        except IndexError as e:
-            logging.info(r.text)
-            logging.error(e)
+        except IndexError:
+            log.exception('Unable to retrieve "secUid" from "%s"', r.text)
             raise Exception(
                 "Retrieving the user secUid failed. Likely due to TikTok wanting captcha validation. Try to use a proxy."
             )

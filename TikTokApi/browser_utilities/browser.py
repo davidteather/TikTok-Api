@@ -15,6 +15,9 @@ from urllib.parse import splitquery, parse_qs, parse_qsl
 from .get_acrawler import get_acrawler, get_tt_params_script
 from playwright.sync_api import sync_playwright
 
+from ..utilities import LOGGER_NAME
+
+log = logging.getLogger(LOGGER_NAME)
 playwright = None
 
 
@@ -80,7 +83,7 @@ class browser(BrowserInterface):
                 args=self.args, **self.options
             )
         except Exception as e:
-            logging.critical(e)
+            log.critical("Webkit launch failed", exc_info=True)
             raise e
 
         context = self.create_context(set_useragent=True)
@@ -248,7 +251,7 @@ class browser(BrowserInterface):
         try:
             self.browser.close()
         except Exception:
-            logging.info("cleanup failed")
+            log.exception("cleanup failed")
         # playwright.stop()
 
     def find_redirect(self, url):

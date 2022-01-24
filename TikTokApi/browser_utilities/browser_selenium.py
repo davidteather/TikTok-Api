@@ -13,6 +13,10 @@ from selenium import webdriver
 from .get_acrawler import get_acrawler, get_tt_params_script
 from urllib.parse import splitquery, parse_qs, parse_qsl
 
+from ..utilities import LOGGER_NAME
+
+log = logging.getLogger(LOGGER_NAME)
+
 
 class browser(BrowserInterface):
     def __init__(
@@ -208,8 +212,8 @@ class browser(BrowserInterface):
     def clean_up(self):
         try:
             self.browser.close()
-        except:
-            logging.warning("cleanup of browser failed")
+        except Exception:
+            log.warning("cleanup of browser failed", exc_info=True)
 
     def __format_proxy(self, proxy):
         if proxy is not None:
