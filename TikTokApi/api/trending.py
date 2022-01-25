@@ -66,7 +66,9 @@ class Trending:
             amount_yielded += len(res.get("itemList", []))
 
             if not res.get("hasMore", False) and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                Trending.parent.logger.info(
+                    "TikTok isn't sending more TikToks beyond this point."
+                )
                 return
 
             first = False

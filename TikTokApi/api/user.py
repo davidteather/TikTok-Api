@@ -132,7 +132,9 @@ class User:
                 yield self.parent.video(data=video)
 
             if not res.get("hasMore", False) and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                User.parent.logger.info(
+                    "TikTok isn't sending more TikToks beyond this point."
+                )
                 return
 
             cursor = res["cursor"]
@@ -187,7 +189,7 @@ class User:
             res = self.parent.get_data(path, **kwargs)
 
             if "itemList" not in res.keys():
-                logging.error("User's likes are most likely private")
+                User.parent.logger.error("User's likes are most likely private")
                 return
 
             videos = res.get("itemList", [])
@@ -197,7 +199,9 @@ class User:
                 yield self.parent.video(data=video)
 
             if not res.get("hasMore", False) and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                User.parent.logger.info(
+                    "TikTok isn't sending more TikToks beyond this point."
+                )
                 return
 
             cursor = res["cursor"]
@@ -219,7 +223,7 @@ class User:
             )
 
         if None in (self.username, self.user_id, self.sec_uid):
-            logging.error(
+            User.parent.logger.error(
                 f"Failed to create User with data: {data}\nwhich has keys {data.keys()}"
             )
 

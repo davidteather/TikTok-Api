@@ -106,7 +106,9 @@ class Search:
                 yield Hashtag(data=x["challenge"])
 
             if int(data["offset"]) <= offset:
-                logging.info("TikTok is not sending videos beyond this point.")
+                Search.parent.logger.info(
+                    "TikTok is not sending videos beyond this point."
+                )
                 return
 
             offset = int(data["offset"])
@@ -158,7 +160,9 @@ class Search:
                 yield User(data=result)
 
             if data.get("has_more", 0) == 0:
-                logging.info("TikTok is not sending videos beyond this point.")
+                Search.parent.logger.info(
+                    "TikTok is not sending videos beyond this point."
+                )
                 return
 
             cursor = int(data.get("cursor"))

@@ -4,6 +4,7 @@ import os
 import random
 import string
 import time
+from typing import ClassVar
 from urllib.parse import quote, urlencode
 
 import requests
@@ -11,7 +12,7 @@ from TikTokApi.api import sound, user, search, hashtag, video, trending
 from playwright.sync_api import sync_playwright
 
 from .exceptions import *
-from .utilities import update_messager
+from .utilities import LOGGER_NAME, update_messager
 from .browser_utilities.browser import browser
 
 os.environ["no_proxy"] = "127.0.0.1,localhost"
@@ -22,6 +23,7 @@ DESKTOP_BASE_URL = "https://www.tiktok.com/"
 
 class TikTokApi:
     _instance = None
+    logger: ClassVar[logging.Logger] = logging.getLogger(LOGGER_NAME)
 
     @staticmethod
     def __new__(cls, logging_level=logging.WARNING, *args, **kwargs):
@@ -112,13 +114,13 @@ class TikTokApi:
         trending.Trending.parent = self
         self.trending = trending.Trending
 
-        logging.basicConfig(level=logging_level)
+        self.logger.setLevel(level=logging_level)
 
         # Some Instance Vars
         self.executablePath = kwargs.get("executablePath", None)
 
         if kwargs.get("custom_did") != None:
-            raise Exception("Please use custom_device_id instead of custom_device_id")
+            raise Exception("Please use 'custom_device_id' instead of 'custom_did'")
         self.custom_device_id = kwargs.get("custom_device_id", None)
         self.user_agent = "5.0+(iPhone%3B+CPU+iPhone+OS+14_8+like+Mac+OS+X)+AppleWebKit%2F605.1.15+(KHTML,+like+Gecko)+Version%2F14.1.2+Mobile%2F15E148+Safari%2F604.1"
         self.proxy = kwargs.get("proxy", None)
@@ -150,11 +152,10 @@ class TikTokApi:
             self.region = self.browser.region
             self.language = self.browser.language
         except Exception as e:
-            logging.exception(e)
-            logging.warning(
-                "An error ocurred while opening your browser but it was ignored."
+            self.logger.exception(
+                "An error occurred while opening your browser, but it was ignored\n",
+                "Are you sure you ran python -m playwright install?",
             )
-            logging.warning("Are you sure you ran python -m playwright install")
 
             self.timezone_name = ""
             self.browser_language = ""
@@ -257,7 +258,7 @@ class TikTokApi:
             "x-tt-params": tt_params,
         }
 
-        logging.info(f"GET: {url}\n\theaders: {headers}")
+        self.logger.info(f"GET: %s\n\theaders: %s", url, headers)
         r = requests.get(
             url,
             headers=headers,
@@ -272,11 +273,10 @@ class TikTokApi:
                 json.get("type") == "verify"
                 or json.get("verifyConfig", {}).get("type", "") == "verify"
             ):
-                logging.error(
-                    "Tiktok wants to display a catcha. Response is:\n" + r.text
-                )
-                logging.info(
-                    f"Request failed with\nurl:{url}\nheaders:{headers}\ncookies:{self.get_cookies(**kwargs)}"
+                self.logger.error(
+                    "Tiktok wants to display a captcha.\nResponse:\n%s\nCookies:\n%s",
+                    r.text,
+                    self.get_cookies(**kwargs),
                 )
                 raise TikTokCaptchaError()
 
@@ -322,7 +322,7 @@ class TikTokApi:
                 "undefined": "MEDIA_ERROR",
             }
             statusCode = json.get("statusCode", 0)
-            logging.info(f"TikTok Returned: {json}")
+            self.logger.info(f"TikTok Returned: %s", json)
             if statusCode == 10201:
                 # Invalid Entity
                 raise TikTokNotFoundError(
@@ -341,14 +341,13 @@ class TikTokApi:
             return r.json()
         except ValueError as e:
             text = r.text
-            logging.error("TikTok response: " + text)
+            self.logger.info("TikTok response: %s", text)
             if len(text) == 0:
                 raise EmptyResponseError(
                     "Empty response from Tiktok to " + url
                 ) from None
             else:
-                logging.error("Converting response to JSON failed")
-                logging.error(e)
+                self.logger.exception("Converting response to JSON failed")
                 raise JSONDecodeFailure() from e
 
     def clean_up(self):

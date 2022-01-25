@@ -12,11 +12,13 @@ from urllib.parse import splitquery, parse_qs, parse_qsl
 
 
 # Import Detection From Stealth
+from ..utilities import LOGGER_NAME
 from .get_acrawler import get_acrawler, get_tt_params_script
 from playwright.sync_api import sync_playwright
 
 playwright = None
 
+logger = logging.getLogger(LOGGER_NAME)
 
 def get_playwright():
     global playwright
@@ -80,7 +82,7 @@ class browser(BrowserInterface):
                 args=self.args, **self.options
             )
         except Exception as e:
-            logging.critical(e)
+            logger.critical("Webkit launch failed", exc_info=True)
             raise e
 
         context = self.create_context(set_useragent=True)
@@ -244,7 +246,7 @@ class browser(BrowserInterface):
         try:
             self.browser.close()
         except Exception:
-            logging.info("cleanup failed")
+            logger.exception("cleanup failed")
         # playwright.stop()
 
     def find_redirect(self, url):

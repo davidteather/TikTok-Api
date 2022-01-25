@@ -103,7 +103,7 @@ class Video:
             ]
 
         if self.id is None:
-            logging.error(
+            Video.parent.logger.error(
                 f"Failed to create Video with data: {data}\nwhich has keys {data.keys()}"
             )
 

@@ -107,7 +107,9 @@ class Sound:
                 yield self.parent.video(data=result)
 
             if not res.get("hasMore", False):
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
+                self.parent.logger.info(
+                    "TikTok isn't sending more TikToks beyond this point."
+                )
                 return
 
             cursor = int(res["cursor"])
