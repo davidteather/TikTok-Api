@@ -4,7 +4,7 @@ import os
 import random
 import string
 import time
-from typing import ClassVar
+from typing import ClassVar, Optional
 from urllib.parse import quote, urlencode
 
 import requests
@@ -497,7 +497,7 @@ class TikTokApi:
     # PRIVATE METHODS
     #
 
-    def _format_proxy(self, proxy) -> dict | None:
+    def _format_proxy(self, proxy) -> Optional[dict]:
         """
         Formats the proxy object
         """
