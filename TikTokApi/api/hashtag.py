@@ -4,7 +4,7 @@ import logging
 from urllib.parse import urlencode
 from ..exceptions import *
 
-from typing import TYPE_CHECKING, ClassVar, Generator, Optional
+from typing import TYPE_CHECKING, ClassVar, Iterator, Optional
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -23,9 +23,9 @@ class Hashtag:
 
     parent: ClassVar[TikTokApi]
 
-    id: str
+    id: Optional[str]
     """The ID of the hashtag"""
-    name: str
+    name: Optional[str]
     """The name of the hashtag (omiting the #)"""
     as_dict: dict
     """The raw data associated with this hashtag."""
@@ -34,7 +34,7 @@ class Hashtag:
         self,
         name: Optional[str] = None,
         id: Optional[str] = None,
-        data: Optional[str] = None,
+        data: Optional[dict] = None,
     ):
         """
         You must provide the name or id of the hashtag.
@@ -72,8 +72,12 @@ class Hashtag:
 
         if self.name is not None:
             query = {"challengeName": self.name}
-        else:
+        elif self.id is not None:
             query = {"challengeId": self.id}
+        else:
+            self.parent.logger.warning("Malformed Hashtag Object")
+            return {}
+
         path = "api/challenge/detail/?{}&{}".format(
             self.parent._add_url_params(), urlencode(query)
         )
@@ -85,7 +89,7 @@ class Hashtag:
 
         return data
 
-    def videos(self, count=30, offset=0, **kwargs) -> Generator[Video, None, None]:
+    def videos(self, count=30, offset=0, **kwargs) -> Iterator[Video]:
         """Returns a dictionary listing TikToks with a specific hashtag.
 
         - Parameters:

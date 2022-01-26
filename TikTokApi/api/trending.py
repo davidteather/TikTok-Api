@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 
 from .video import Video
 
-from typing import TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Iterator
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -18,7 +18,7 @@ class Trending:
     parent: TikTokApi
 
     @staticmethod
-    def videos(count=30, **kwargs) -> Generator[Video, None, None]:
+    def videos(count=30, **kwargs) -> Iterator[Video]:
         """
         Returns Videos that are trending on TikTok.
 

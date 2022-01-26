@@ -8,7 +8,7 @@ import random
 import json
 import re
 from .browser_interface import BrowserInterface
-from urllib.parse import splitquery, parse_qs, parse_qsl
+from urllib.parse import parse_qsl, urlparse
 
 from ..utilities import LOGGER_NAME
 from .get_acrawler import _get_acrawler, _get_tt_params_script
@@ -232,7 +232,7 @@ class browser(BrowserInterface):
             tt_params = page.evaluate(
                 """() => {
                     return window.genXTTParams("""
-                + json.dumps(dict(parse_qsl(splitquery(url)[1])))
+                + json.dumps(dict(parse_qsl(urlparse(url).query)))
                 + """);
             
                 }"""

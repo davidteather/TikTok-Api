@@ -497,7 +497,7 @@ class TikTokApi:
     # PRIVATE METHODS
     #
 
-    def _format_proxy(self, proxy) -> dict:
+    def _format_proxy(self, proxy) -> dict | None:
         """
         Formats the proxy object
         """

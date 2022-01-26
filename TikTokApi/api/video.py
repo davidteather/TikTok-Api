@@ -26,7 +26,7 @@ class Video:
 
     parent: ClassVar[TikTokApi]
 
-    id: str
+    id: Optional[str]
     """TikTok's ID of the Video"""
     author: Optional[User]
     """The User who created the Video"""

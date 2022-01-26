@@ -100,7 +100,7 @@ This package has been difficult to maintain due to it's structure, difficult to 
 
 As a result, I've decided to at least attempt to remedy some of these issues, the biggest changes are that 
 1. The package has shifted to using classes for different TikTok objects resulting in an easier, higher-level programming experience.
-2. All methods that used to return a list of objects have been switched to using generators, to hopefully decrease memory utilization for most users.
+2. All methods that used to return a list of objects have been switched to using iterators, to hopefully decrease memory utilization for most users.
 
 
 ### Upgrading Examples

@@ -9,7 +9,7 @@ from urllib.parse import quote, urlencode
 from ..helpers import extract_tag_contents
 from ..exceptions import *
 
-from typing import TYPE_CHECKING, ClassVar, Generator, Optional
+from typing import TYPE_CHECKING, ClassVar, Iterator, Optional
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -111,7 +111,7 @@ class Sound:
         data = extract_tag_contents(r.text)
         return json.loads(data)["props"]["pageProps"]["musicInfo"]
 
-    def videos(self, count=30, offset=0, **kwargs) -> Generator[Video, None, None]:
+    def videos(self, count=30, offset=0, **kwargs) -> Iterator[Video]:
         """
         Returns Video objects of videos created with this sound.
 

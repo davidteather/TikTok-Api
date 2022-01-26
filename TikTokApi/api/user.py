@@ -8,7 +8,7 @@ from urllib.parse import quote, urlencode
 from ..exceptions import *
 from ..helpers import extract_tag_contents
 
-from typing import TYPE_CHECKING, ClassVar, Generator, Optional
+from typing import TYPE_CHECKING, ClassVar, Iterator, Optional
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -46,7 +46,7 @@ class User:
         username: Optional[str] = None,
         user_id: Optional[str] = None,
         sec_uid: Optional[str] = None,
-        data: Optional[str] = None,
+        data: Optional[dict] = None,
     ):
         """
         You must provide the username or (user_id and sec_uid) otherwise this
@@ -111,9 +111,9 @@ class User:
 
         return user_props["userInfo"]
 
-    def videos(self, count=30, cursor=0, **kwargs) -> Generator[Video, None, None]:
+    def videos(self, count=30, cursor=0, **kwargs) -> Iterator[Video]:
         """
-        Returns a Generator yielding Video objects.
+        Returns an iterator yielding Video objects.
 
         - Parameters:
             - count (int): The amount of videos you want returned.
@@ -174,9 +174,7 @@ class User:
             cursor = res["cursor"]
             first = False
 
-    def liked(
-        self, count: int = 30, cursor: int = 0, **kwargs
-    ) -> Generator[Video, None, None]:
+    def liked(self, count: int = 30, cursor: int = 0, **kwargs) -> Iterator[Video]:
         """
         Returns a dictionary listing TikToks that a given a user has liked.
 

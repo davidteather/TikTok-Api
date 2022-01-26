@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from urllib.parse import urlencode
 
-from typing import TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Iterator
 
 from .user import User
 from .sound import Sound
@@ -20,7 +20,7 @@ class Search:
     parent: TikTokApi
 
     @staticmethod
-    def users(search_term, count=28, **kwargs) -> Generator[User, None, None]:
+    def users(search_term, count=28, **kwargs) -> Iterator[User]:
         """
         Searches for users.
 
@@ -37,7 +37,7 @@ class Search:
         return Search.discover_type(search_term, prefix="user", count=count, **kwargs)
 
     @staticmethod
-    def sounds(search_term, count=28, **kwargs) -> Generator[Sound, None, None]:
+    def sounds(search_term, count=28, **kwargs) -> Iterator[Sound]:
         """
         Searches for sounds.
 
@@ -54,7 +54,7 @@ class Search:
         return Search.discover_type(search_term, prefix="music", count=count, **kwargs)
 
     @staticmethod
-    def hashtags(search_term, count=28, **kwargs) -> Generator[Hashtag, None, None]:
+    def hashtags(search_term, count=28, **kwargs) -> Iterator[Hashtag]:
         """
         Searches for hashtags/challenges.
 
@@ -73,7 +73,7 @@ class Search:
         )
 
     @staticmethod
-    def discover_type(search_term, prefix, count=28, offset=0, **kwargs) -> list:
+    def discover_type(search_term, prefix, count=28, offset=0, **kwargs) -> Iterator:
         """
         Searches for a specific type of object.
         You should instead use the users/sounds/hashtags as they all use data
@@ -137,7 +137,7 @@ class Search:
             offset = int(data["offset"])
 
     @staticmethod
-    def users_alternate(search_term, count=28, offset=0, **kwargs) -> list:
+    def users_alternate(search_term, count=28, offset=0, **kwargs) -> Iterator[User]:
         """
         Searches for users using an alternate endpoint than Search.users
 
@@ -180,18 +180,18 @@ class Search:
                 "user", Search.parent._add_url_params(), urlencode(query)
             )
 
-            data = Search.parent.get_data(
+            api_response = Search.parent.get_data(
                 path, use_desktop_base_url=True, ttwid=ttwid, **kwargs
             )
 
             # When I move to 3.10+ support make this a match switch.
-            for result in data.get("user_list", []):
+            for result in api_response.get("user_list", []):
                 yield User(data=result)
 
-            if data.get("has_more", 0) == 0:
+            if api_response.get("has_more", 0) == 0:
                 Search.parent.logger.info(
                     "TikTok is not sending videos beyond this point."
                 )
                 return
 
-            cursor = int(data.get("cursor"))
+            cursor = int(api_response.get("cursor", cursor))
