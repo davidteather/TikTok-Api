@@ -13,18 +13,17 @@ if TYPE_CHECKING:
 
 
 class Trending:
+    """Contains static methods related to trending."""
+
     parent: TikTokApi
 
     @staticmethod
     def videos(count=30, **kwargs) -> Generator[Video, None, None]:
         """
-        Gets trending TikToks
+        Returns Videos that are trending on TikTok.
 
-        ##### Parameters
-        * count: The amount of TikToks you want returned, optional
-
-            Note: TikTok seems to only support at MOST ~2000 TikToks
-            from a single endpoint.
+        - Parameters:
+            - count (int): The amount of videos you want returned.
         """
 
         (

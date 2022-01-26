@@ -3,6 +3,7 @@ import sys
 
 LOGGER_NAME: str = "TikTokApi"
 
+
 def update_messager():
     if not check("TikTokApi"):
         # Outdated

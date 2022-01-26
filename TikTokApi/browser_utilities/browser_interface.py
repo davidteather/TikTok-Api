@@ -16,5 +16,5 @@ class BrowserInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def clean_up(self) -> None:
+    def _clean_up(self) -> None:
         pass

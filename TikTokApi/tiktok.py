@@ -8,7 +8,13 @@ from typing import ClassVar
 from urllib.parse import quote, urlencode
 
 import requests
-from TikTokApi.api import sound, user, search, hashtag, video, trending
+from .api.sound import Sound
+from .api.user import User
+from .api.search import Search
+from .api.hashtag import Hashtag
+from .api.video import Video
+from .api.trending import Trending
+
 from playwright.sync_api import sync_playwright
 
 from .exceptions import *
@@ -24,6 +30,13 @@ DESKTOP_BASE_URL = "https://www.tiktok.com/"
 class TikTokApi:
     _instance = None
     logger: ClassVar[logging.Logger] = logging.getLogger(LOGGER_NAME)
+
+    user = User
+    search = Search
+    sound = Sound
+    hashtag = Hashtag
+    video = Video
+    trending = Trending
 
     @staticmethod
     def __new__(cls, logging_level=logging.WARNING, *args, **kwargs):
@@ -96,23 +109,12 @@ class TikTokApi:
 
     def _initialize(self, logging_level=logging.WARNING, **kwargs):
         # Add classes from the api folder
-        user.User.parent = self
-        self.user = user.User
-
-        search.Search.parent = self
-        self.search = search.Search
-
-        sound.Sound.parent = self
-        self.sound = sound.Sound
-
-        hashtag.Hashtag.parent = self
-        self.hashtag = hashtag.Hashtag
-
-        video.Video.parent = self
-        self.video = video.Video
-
-        trending.Trending.parent = self
-        self.trending = trending.Trending
+        User.parent = self
+        Search.parent = self
+        Sound.parent = self
+        Hashtag.parent = self
+        Video.parent = self
+        Trending.parent = self
 
         self.logger.setLevel(level=logging_level)
 
@@ -262,7 +264,7 @@ class TikTokApi:
         r = requests.get(
             url,
             headers=headers,
-            cookies=self.get_cookies(**kwargs),
+            cookies=self._get_cookies(**kwargs),
             proxies=self._format_proxy(proxy),
             **self.requests_extra_kwargs,
         )
@@ -276,7 +278,7 @@ class TikTokApi:
                 self.logger.error(
                     "Tiktok wants to display a captcha.\nResponse:\n%s\nCookies:\n%s",
                     r.text,
-                    self.get_cookies(**kwargs),
+                    self._get_cookies(**kwargs),
                 )
                 raise TikTokCaptchaError()
 
@@ -350,14 +352,10 @@ class TikTokApi:
                 self.logger.exception("Converting response to JSON failed")
                 raise JSONDecodeFailure() from e
 
-    def clean_up(self):
-        """A basic cleanup method, called automatically from the code"""
-        self.__del__()
-
     def __del__(self):
         """A basic cleanup method, called automatically from the code"""
         try:
-            self.browser.clean_up()
+            self.browser._clean_up()
         except Exception:
             pass
         try:
@@ -405,7 +403,7 @@ class TikTokApi:
             parsed_data["referrer"],
         )
 
-    def get_cookies(self, **kwargs):
+    def _get_cookies(self, **kwargs):
         """Extracts cookies from the kwargs passed to the function for get_data"""
         device_id = kwargs.get(
             "custom_device_id",
@@ -486,7 +484,7 @@ class TikTokApi:
                 "User-Agent": user_agent,
             },
             proxies=self._format_proxy(proxy),
-            cookies=self.get_cookies(**kwargs),
+            cookies=self._get_cookies(**kwargs),
         )
         return r.content
 

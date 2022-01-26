@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import logging
 import requests
 
 from urllib.parse import quote, urlencode
@@ -17,21 +16,30 @@ if TYPE_CHECKING:
 
 
 class User:
-    """A TikTok User class
+    """
+    A TikTok User.
 
-    Attributes
-        user_id: The TikTok user's ID.
-        sec_uid: The TikTok user's sec_uid.
-        username: The TikTok user's username.
-        as_dict: The dictionary provided to create the class.
+    Example Usage
+    ```py
+    user = api.user(username='therock')
+    # or
+    user_id = '5831967'
+    sec_uid = 'MS4wLjABAAAA-VASjiXTh7wDDyXvjk10VFhMWUAoxr8bgfO1kAL1-9s'
+    user = api.user(user_id=user_id, sec_uid=sec_uid)
+    ```
+
     """
 
     parent: ClassVar[TikTokApi]
 
     user_id: str
+    """The user ID of the user."""
     sec_uid: str
+    """The sec UID of the user."""
     username: str
+    """The username of the user."""
     as_dict: dict
+    """The raw data associated with this user."""
 
     def __init__(
         self,
@@ -40,17 +48,36 @@ class User:
         sec_uid: Optional[str] = None,
         data: Optional[str] = None,
     ):
+        """
+        You must provide the username or (user_id and sec_uid) otherwise this
+        will not function correctly.
+        """
         self.__update_id_sec_uid_username(user_id, sec_uid, username)
         if data is not None:
             self.as_dict = data
             self.__extract_from_data()
 
     def info(self, **kwargs):
-        # TODO: Might throw a key error with the HTML
+        """
+        Returns a dictionary of TikTok's User object
+
+        Example Usage
+        ```py
+        user_data = api.user(username='therock').info()
+        ```
+        """
         return self.info_full(**kwargs)["user"]
 
     def info_full(self, **kwargs) -> dict:
-        """Gets all data associated with the user."""
+        """
+        Returns a dictionary of information associated with this User.
+        Includes statistics about this user.
+
+        Example Usage
+        ```py
+        user_data = api.user(username='therock').info_full()
+        ```
+        """
 
         # TODO: Find the one using only user_id & sec_uid
         if not self.username:
@@ -69,7 +96,7 @@ class User:
                 "User-Agent": self.parent.user_agent,
             },
             proxies=User.parent._format_proxy(kwargs.get("proxy", None)),
-            cookies=User.parent.get_cookies(**kwargs),
+            cookies=User.parent._get_cookies(**kwargs),
             **User.parent.requests_extra_kwargs,
         )
 
@@ -85,12 +112,19 @@ class User:
         return user_props["userInfo"]
 
     def videos(self, count=30, cursor=0, **kwargs) -> Generator[Video, None, None]:
-        """Returns an array of dictionaries representing TikToks for a user.
+        """
+        Returns a Generator yielding Video objects.
 
-        ##### Parameters
-        * count: The number of posts to return
+        - Parameters:
+            - count (int): The amount of videos you want returned.
+            - cursor (int): The unix epoch to get videos since. TODO: Check this is right
 
-            Note: seems to only support up to ~2,000
+        Example Usage
+        ```py
+        user = api.user(username='therock')
+        for video in user.videos(count=100):
+            print(video.id)
+        ```
         """
         (
             region,
@@ -143,16 +177,20 @@ class User:
     def liked(
         self, count: int = 30, cursor: int = 0, **kwargs
     ) -> Generator[Video, None, None]:
-        """Returns a dictionary listing TikToks that a given a user has liked.
-            Note: The user's likes must be public
+        """
+        Returns a dictionary listing TikToks that a given a user has liked.
 
-        ##### Parameters
-        * count: The number of posts to return
+        **Note**: The user's likes must be **public** (which is not the default option)
 
-            Note: seems to only support up to ~2,000
-        * cursor: The offset of a page
+        - Parameters:
+            - count (int): The amount of videos you want returned.
+            - cursor (int): The unix epoch to get videos since. TODO: Check this is right
 
-            The offset to return new videos from
+        Example Usage
+        ```py
+        for liked_video in api.user(username='public_likes'):
+            print(liked_video.id)
+        ```
         """
         (
             region,

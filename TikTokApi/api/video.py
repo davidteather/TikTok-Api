@@ -15,23 +15,27 @@ if TYPE_CHECKING:
 
 
 class Video:
-    """A TikTok Video class
+    """
+    A TikTok Video class
 
-    Attributes
-        id: The TikTok video ID.
-        author: The author of the TikTok as a User object.
-        as_dict: The dictionary provided to create the class.
+    Example Usage
+    ```py
+    video = api.video(id='7041997751718137094')
+    ```
     """
 
     parent: ClassVar[TikTokApi]
 
-    # TODO: Use __getattribute__
-
     id: str
+    """TikTok's ID of the Video"""
     author: Optional[User]
+    """The User who created the Video"""
     sound: Optional[Sound]
+    """The Sound that is associated with the Video"""
     hashtags: Optional[list[Hashtag]]
+    """A List of Hashtags on the Video"""
     as_dict: dict
+    """The raw data associated with this Video."""
 
     def __init__(
         self,
@@ -39,6 +43,9 @@ class Video:
         url: Optional[str] = None,
         data: Optional[dict] = None,
     ):
+        """
+        You must provide the id or a valid url, else this will fail.
+        """
         self.id = id
         if data is not None:
             self.as_dict = data
@@ -50,10 +57,25 @@ class Video:
             raise TypeError("You must provide id or url parameter.")
 
     def info(self, **kwargs) -> dict:
+        """
+        Returns a dictionary of TikTok's Video object.
+
+        Example Usage
+        ```py
+        video_data = api.video(id='7041997751718137094').info()
+        ```
+        """
         return self.info_full(**kwargs)["itemInfo"]["itemStruct"]
 
     def info_full(self, **kwargs) -> dict:
-        """Returns a dictionary of a specific TikTok."""
+        """
+        Returns a dictionary of all data associated with a TikTok Video.
+
+        Example Usage
+        ```py
+        video_data = api.video(id='7041997751718137094').info_full()
+        ```
+        """
         (
             region,
             language,
@@ -74,6 +96,18 @@ class Video:
         return self.parent.get_data(path, **kwargs)
 
     def bytes(self, **kwargs) -> bytes:
+        """
+        Returns the bytes of a TikTok Video.
+
+        Example Usage
+        ```py
+        video_bytes = api.video(id='7041997751718137094').bytes()
+
+        # Saving The Video
+        with open('saved_video.mp4', 'wb') as output:
+            output.write(video_bytes)
+        ```
+        """
         (
             region,
             language,

@@ -11,49 +11,62 @@ from .hashtag import Hashtag
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
 
-import logging
 import requests
 
 
 class Search:
+    """Contains static methods about searching."""
+
     parent: TikTokApi
 
     @staticmethod
     def users(search_term, count=28, **kwargs) -> Generator[User, None, None]:
-        """Returns a list of users that match the search_term
+        """
+        Searches for users.
 
-        ##### Parameters
-        * search_term: The string to search for users by
-            This string is the term you want to search for users by.
+        - Parameters:
+            - search_term (str): The phrase you want to search for.
+            - count (int): The amount of videos you want returned.
 
-        * count: The number of users to return
-            Note: maximum is around 28 for this type of endpoint.
+        Example Usage
+        ```py
+        for user in api.search.users('therock'):
+            # do something
+        ```
         """
         return Search.discover_type(search_term, prefix="user", count=count, **kwargs)
 
     @staticmethod
     def sounds(search_term, count=28, **kwargs) -> Generator[Sound, None, None]:
-        """Returns a list of sounds that match the search_term
+        """
+        Searches for sounds.
 
-        ##### Parameters
-        * search_term: The string to search for sounds by
-            This string is the term you want to search for sounds by.
+        - Parameters:
+            - search_term (str): The phrase you want to search for.
+            - count (int): The amount of videos you want returned.
 
-        * count: The number of sounds to return
-            Note: maximum is around 28 for this type of endpoint.
+        Example Usage
+        ```py
+        for user in api.search.sounds('funny'):
+            # do something
+        ```
         """
         return Search.discover_type(search_term, prefix="music", count=count, **kwargs)
 
     @staticmethod
     def hashtags(search_term, count=28, **kwargs) -> Generator[Hashtag, None, None]:
-        """Returns a list of hashtags that match the search_term
+        """
+        Searches for hashtags/challenges.
 
-        ##### Parameters
-        * search_term: The string to search for hashtags by
-            This string is the term you want to search for hashtags by.
+        - Parameters:
+            - search_term (str): The phrase you want to search for.
+            - count (int): The amount of videos you want returned.
 
-        * count: The number of hashtags to return
-            Note: maximum is around 28 for this type of endpoint.
+        Example Usage
+        ```py
+        for user in api.search.hashtags('funny'):
+            # do something
+        ```
         """
         return Search.discover_type(
             search_term, prefix="challenge", count=count, **kwargs
@@ -61,12 +74,22 @@ class Search:
 
     @staticmethod
     def discover_type(search_term, prefix, count=28, offset=0, **kwargs) -> list:
-        """Returns a list of whatever the prefix type you pass in
-        ##### Parameters
-        * search_term: The string to search by
-        * prefix: The prefix of what to search for
-        * count: The number search results to return
-            Note: maximum is around 28 for this type of endpoint.
+        """
+        Searches for a specific type of object.
+        You should instead use the users/sounds/hashtags as they all use data
+        from this function.
+
+        - Parameters:
+            - search_term (str): The phrase you want to search for.
+            - prefix (str): either user|music|challenge
+            - count (int): The amount of videos you want returned.
+
+        Example Usage
+        ```py
+        for user in api.search.discover_type('therock', 'user'):
+            # do something
+        ```
+
         """
         # TODO: Investigate if this is actually working as expected. Doesn't seem to be
         (
@@ -115,12 +138,18 @@ class Search:
 
     @staticmethod
     def users_alternate(search_term, count=28, offset=0, **kwargs) -> list:
-        """Returns a list of whatever the prefix type you pass in
+        """
+        Searches for users using an alternate endpoint than Search.users
 
-        ##### Parameters
-        * search_term: The string to search by
+        - Parameters:
+            - search_term (str): The phrase you want to search for.
+            - count (int): The amount of videos you want returned.
 
-        * count: The number search results to return
+        Example Usage
+        ```py
+        for user in api.search.users_alternate('therock'):
+            # do something
+        ```
         """
         (
             region,

@@ -12,11 +12,23 @@ if TYPE_CHECKING:
 
 
 class Hashtag:
+    """
+    A TikTok Hashtag/Challenge.
+
+    Example Usage
+    ```py
+    hashtag = api.hashtag(name='funny')
+    ```
+    """
+
     parent: ClassVar[TikTokApi]
 
     id: str
+    """The ID of the hashtag"""
     name: str
+    """The name of the hashtag (omiting the #)"""
     as_dict: dict
+    """The raw data associated with this hashtag."""
 
     def __init__(
         self,
@@ -24,6 +36,9 @@ class Hashtag:
         id: Optional[str] = None,
         data: Optional[str] = None,
     ):
+        """
+        You must provide the name or id of the hashtag.
+        """
         self.name = name
         self.id = id
 
@@ -32,15 +47,19 @@ class Hashtag:
             self.__extract_from_data()
 
     def info(self, **kwargs) -> dict:
+        """
+        Returns TikTok's dictionary representation of the hashtag object.
+        """
         return self.info_full(**kwargs)["challengeInfo"]["challenge"]
 
     def info_full(self, **kwargs) -> dict:
-        """Returns a hashtag object.
+        """
+        Returns all information sent by TikTok related to this hashtag.
 
-        ##### Parameters
-        * hashtag: The hashtag to search by
-
-            Without the # symbol
+        Example Usage
+        ```py
+        hashtag_data = api.hashtag(name='funny').info_full()
+        ```
         """
         (
             region,
@@ -69,9 +88,15 @@ class Hashtag:
     def videos(self, count=30, offset=0, **kwargs) -> Generator[Video, None, None]:
         """Returns a dictionary listing TikToks with a specific hashtag.
 
-        ##### Parameters
-        * count: The number of posts to return
-            Note: seems to only support up to ~2,000
+        - Parameters:
+            - count (int): The amount of videos you want returned.
+            - cursor (int): The unix epoch to get videos since. TODO: Check this is right
+
+        Example Usage
+        ```py
+        for video in api.hashtag(name='funny').videos():
+            # do something
+        ```
         """
         (
             region,

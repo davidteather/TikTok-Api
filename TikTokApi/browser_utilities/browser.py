@@ -10,15 +10,14 @@ import re
 from .browser_interface import BrowserInterface
 from urllib.parse import splitquery, parse_qs, parse_qsl
 
-
-# Import Detection From Stealth
 from ..utilities import LOGGER_NAME
-from .get_acrawler import get_acrawler, get_tt_params_script
+from .get_acrawler import _get_acrawler, _get_tt_params_script
 from playwright.sync_api import sync_playwright
 
 playwright = None
 
 logger = logging.getLogger(LOGGER_NAME)
+
 
 def get_playwright():
     global playwright
@@ -85,7 +84,7 @@ class browser(BrowserInterface):
             logger.critical("Webkit launch failed", exc_info=True)
             raise e
 
-        context = self.create_context(set_useragent=True)
+        context = self._create_context(set_useragent=True)
         page = context.new_page()
         self.get_params(page)
         context.close()
@@ -120,7 +119,7 @@ class browser(BrowserInterface):
         self.width = page.evaluate("""() => { return screen.width; }""")
         self.height = page.evaluate("""() => { return screen.height; }""")
 
-    def create_context(self, set_useragent=False):
+    def _create_context(self, set_useragent=False):
         iphone = playwright.devices["iPhone 11 Pro"]
         iphone["viewport"] = {
             "width": random.randint(320, 1920),
@@ -138,7 +137,7 @@ class browser(BrowserInterface):
 
         return context
 
-    def base36encode(self, number, alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
+    def _base36encode(self, number, alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
         """Converts an integer to a base36 string."""
         base36 = ""
         sign = ""
@@ -159,7 +158,7 @@ class browser(BrowserInterface):
     def gen_verifyFp(self):
         chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"[:]
         chars_len = len(chars)
-        scenario_title = self.base36encode(int(time.time() * 1000))
+        scenario_title = self._base36encode(int(time.time() * 1000))
         uuid = [0] * 36
         uuid[8] = "_"
         uuid[13] = "_"
@@ -180,7 +179,7 @@ class browser(BrowserInterface):
             route.abort()
 
         tt_params = None
-        context = self.create_context()
+        context = self._create_context()
         page = context.new_page()
 
         if calc_tt_params:
@@ -213,7 +212,7 @@ class browser(BrowserInterface):
 
         url = "{}&verifyFp={}&device_id={}".format(url, verifyFp, device_id)
 
-        page.add_script_tag(content=get_acrawler())
+        page.add_script_tag(content=_get_acrawler())
         evaluatedPage = page.evaluate(
             '''() => {
             var url = "'''
@@ -228,7 +227,7 @@ class browser(BrowserInterface):
         url = "{}&_signature={}".format(url, evaluatedPage)
 
         if calc_tt_params:
-            page.add_script_tag(content=get_tt_params_script())
+            page.add_script_tag(content=_get_tt_params_script())
 
             tt_params = page.evaluate(
                 """() => {
@@ -242,7 +241,7 @@ class browser(BrowserInterface):
         context.close()
         return (verifyFp, device_id, evaluatedPage, tt_params)
 
-    def clean_up(self):
+    def _clean_up(self):
         try:
             self.browser.close()
         except Exception:

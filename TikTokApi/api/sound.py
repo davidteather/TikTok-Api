@@ -2,7 +2,6 @@ from __future__ import annotations
 from os import path
 
 import requests
-import logging
 import json
 
 from urllib.parse import quote, urlencode
@@ -19,13 +18,28 @@ if TYPE_CHECKING:
 
 
 class Sound:
+    """
+    A TikTok Sound/Music/Song.
+
+    Example Usage
+    ```py
+    song = api.song(id='7016547803243022337')
+    ```
+    """
+
     parent: ClassVar[TikTokApi]
 
     id: str
+    """TikTok's ID for the sound"""
     title: Optional[str]
+    """The title of the song."""
     author: Optional[User]
+    """The author of the song (if it exists)"""
 
     def __init__(self, id: Optional[str] = None, data: Optional[str] = None):
+        """
+        You must provide the id of the sound or it will not work.
+        """
         if data is not None:
             self.as_dict = data
             self.__extract_from_data()
@@ -35,6 +49,20 @@ class Sound:
             self.id = id
 
     def info(self, use_html=False, **kwargs) -> dict:
+        """
+        Returns a dictionary of TikTok's Sound/Music object.
+
+        - Parameters:
+            - use_html (bool): If you want to perform an HTML request or not.
+                Defaults to False to use an API call, which shouldn't get detected
+                as often as an HTML request.
+
+
+        Example Usage
+        ```py
+        sound_data = api.sound(id='7016547803243022337').info()
+        ```
+        """
         if use_html:
             return self.info_full(**kwargs)["musicInfo"]
 
@@ -56,6 +84,17 @@ class Sound:
         return res["musicInfo"]["music"]
 
     def info_full(self, **kwargs) -> dict:
+        """
+        Returns all the data associated with a TikTok Sound.
+
+        This makes an API request, there is no HTML request option, as such
+        with Sound.info()
+
+        Example Usage
+        ```py
+        sound_data = api.sound(id='7016547803243022337').info_full()
+        ```
+        """
         r = requests.get(
             "https://www.tiktok.com/music/-{}".format(self.id),
             headers={
@@ -65,7 +104,7 @@ class Sound:
                 "User-Agent": self.parent.user_agent,
             },
             proxies=self.parent._format_proxy(kwargs.get("proxy", None)),
-            cookies=self.parent.get_cookies(**kwargs),
+            cookies=self.parent._get_cookies(**kwargs),
             **self.parent.requests_extra_kwargs,
         )
 
@@ -73,9 +112,18 @@ class Sound:
         return json.loads(data)["props"]["pageProps"]["musicInfo"]
 
     def videos(self, count=30, offset=0, **kwargs) -> Generator[Video, None, None]:
-        """Returns a dictionary listing TikToks with a specific sound.
+        """
+        Returns Video objects of videos created with this sound.
 
-        Note: seems to only support up to ~2,000
+        - Parameters:
+            - count (int): The amount of videos you want returned.
+            - cursor (int): The unix epoch to get videos since. TODO: Check this is right
+
+        Example Usage
+        ```py
+        for video in api.sound(id='7016547803243022337').videos():
+            # do something
+        ```
         """
         (
             region,
