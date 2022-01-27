@@ -4,7 +4,7 @@ import os
 import random
 import string
 import time
-from typing import ClassVar
+from typing import ClassVar, Optional
 from urllib.parse import quote, urlencode
 
 import requests
@@ -166,7 +166,7 @@ class TikTokApi:
             self.region = "US"
             self.language = "en"
 
-    def get_data(self, path, use_desktop_base_url=False, **kwargs) -> dict:
+    def get_data(self, path, subdomain="m", **kwargs) -> dict:
         """Makes requests to TikTok and returns their JSON.
 
         This is all handled by the package so it's unlikely
@@ -197,10 +197,7 @@ class TikTokApi:
         tt_params = None
         send_tt_params = kwargs.get("send_tt_params", False)
 
-        if use_desktop_base_url:
-            full_url = DESKTOP_BASE_URL + path
-        else:
-            full_url = BASE_URL + path
+        full_url = f"https://{subdomain}.tiktok.com/" + path
 
         if self.signer_url is None:
             kwargs["custom_verify_fp"] = verifyFp
@@ -236,7 +233,7 @@ class TikTokApi:
         )
 
         csrf_token = None
-        if not use_desktop_base_url:
+        if subdomain == "m":
             csrf_session_id = h.cookies["csrf_session_id"]
             csrf_token = h.headers["X-Ware-Csrf-Token"].split(",")[1]
             kwargs["csrf_session_id"] = csrf_session_id
@@ -497,7 +494,7 @@ class TikTokApi:
     # PRIVATE METHODS
     #
 
-    def _format_proxy(self, proxy) -> dict | None:
+    def _format_proxy(self, proxy) -> Optional[dict]:
         """
         Formats the proxy object
         """

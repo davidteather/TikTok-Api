@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from urllib.parse import urlencode
 
-from typing import TYPE_CHECKING, Iterator
+from typing import TYPE_CHECKING, Iterator, Type
 
 from .user import User
 from .sound import Sound
 from .hashtag import Hashtag
+from .video import Video
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -20,7 +21,7 @@ class Search:
     parent: TikTokApi
 
     @staticmethod
-    def users(search_term, count=28, **kwargs) -> Iterator[User]:
+    def users_old(search_term, count=28, **kwargs) -> Iterator[User]:
         """
         Searches for users.
 
@@ -37,7 +38,7 @@ class Search:
         return Search.discover_type(search_term, prefix="user", count=count, **kwargs)
 
     @staticmethod
-    def sounds(search_term, count=28, **kwargs) -> Iterator[Sound]:
+    def sounds_old(search_term, count=28, **kwargs) -> Iterator[Sound]:
         """
         Searches for sounds.
 
@@ -54,7 +55,7 @@ class Search:
         return Search.discover_type(search_term, prefix="music", count=count, **kwargs)
 
     @staticmethod
-    def hashtags(search_term, count=28, **kwargs) -> Iterator[Hashtag]:
+    def hashtags_old(search_term, count=28, **kwargs) -> Iterator[Hashtag]:
         """
         Searches for hashtags/challenges.
 
@@ -137,7 +138,27 @@ class Search:
             offset = int(data["offset"])
 
     @staticmethod
-    def users_alternate(search_term, count=28, offset=0, **kwargs) -> Iterator[User]:
+    def videos(search_term, count=28, offset=0, **kwargs) -> Iterator[Video]:
+        """
+        Searches for Videos
+
+        - Parameters:
+            - search_term (str): The phrase you want to search for.
+            - count (int): The amount of videos you want returned.
+            TODO: Figure out offset
+
+        Example Usage
+        ```py
+        for video in api.search.videos('therock'):
+            # do something
+        ```
+        """
+        return Search.search_type(
+            search_term, "item", count=count, offset=offset, **kwargs
+        )
+
+    @staticmethod
+    def users(search_term, count=28, offset=0, **kwargs) -> Iterator[User]:
         """
         Searches for users using an alternate endpoint than Search.users
 
@@ -149,6 +170,23 @@ class Search:
         ```py
         for user in api.search.users_alternate('therock'):
             # do something
+        ```
+        """
+        return Search.search_type(
+            search_term, "user", count=count, offset=offset, **kwargs
+        )
+
+    @staticmethod
+    def search_type(search_term, obj_type, count=28, offset=0, **kwargs) -> Iterator:
+        """
+        Searches for users using an alternate endpoint than Search.users
+
+        - Parameters:
+            - search_term (str): The phrase you want to search for.
+            - count (int): The amount of videos you want returned.
+            - obj_type (str): user | item
+
+        Just use .video & .users
         ```
         """
         (
@@ -174,19 +212,29 @@ class Search:
             query = {
                 "keyword": search_term,
                 "cursor": cursor,
-                "app_language": "en",
+                "app_language": Search.parent.language,
             }
             path = "api/search/{}/full/?{}&{}".format(
-                "user", Search.parent._add_url_params(), urlencode(query)
+                obj_type, Search.parent._add_url_params(), urlencode(query)
             )
 
+            if obj_type == "user":
+                subdomain = "www"
+            elif obj_type == "item":
+                subdomain = "us"
+            else:
+                raise TypeError("invalid obj_type")
+
             api_response = Search.parent.get_data(
-                path, use_desktop_base_url=True, ttwid=ttwid, **kwargs
+                path, subdomain=subdomain, ttwid=ttwid, **kwargs
             )
 
             # When I move to 3.10+ support make this a match switch.
             for result in api_response.get("user_list", []):
                 yield User(data=result)
+
+            for result in api_response.get("item_list", []):
+                yield Video(data=result)
 
             if api_response.get("has_more", 0) == 0:
                 Search.parent.logger.info(
