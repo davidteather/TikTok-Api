@@ -510,6 +510,7 @@ class TikTokApi:
 
     # Process the kwargs
     def _process_kwargs(self, kwargs):
+        # TODO: Just return this as a dict, then only use the keys you need
         region = kwargs.get("region", "US")
         language = kwargs.get("language", "en")
         proxy = kwargs.get("proxy", None)

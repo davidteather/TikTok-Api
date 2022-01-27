@@ -159,6 +159,7 @@ class Hashtag:
         return f"TikTokApi.hashtag(id='{self.id}', name='{self.name}')"
 
     def __getattr__(self, name):
+        # TODO: Maybe switch to using @property instead
         if name in ["id", "name", "as_dict"]:
             self.as_dict = self.info()
             self.__extract_from_data()
