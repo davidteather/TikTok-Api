@@ -61,14 +61,8 @@ class Hashtag:
         hashtag_data = api.hashtag(name='funny').info_full()
         ```
         """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = device_id
+        processed = self.parent._process_kwargs(kwargs)
+        kwargs["custom_device_id"] = processed.device_id
 
         if self.name is not None:
             query = {"challengeName": self.name}
@@ -102,14 +96,8 @@ class Hashtag:
             # do something
         ```
         """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = device_id
+        processed = self.parent._process_kwargs(kwargs)
+        kwargs["custom_device_id"] = processed.device_id
 
         if self.id is None:
             self.id = self.info()["id"]

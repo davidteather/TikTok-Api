@@ -126,14 +126,8 @@ class User:
             print(video.id)
         ```
         """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = User.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = device_id
+        processed = User.parent._process_kwargs(kwargs)
+        kwargs["custom_device_id"] = processed.device_id
 
         if not self.user_id and not self.sec_uid:
             self.__find_attributes()
@@ -150,9 +144,9 @@ class User:
                 "secUid": self.sec_uid,
                 "sourceType": 8,
                 "appId": 1233,
-                "region": region,
-                "priority_region": region,
-                "language": language,
+                "region": processed.region,
+                "priority_region": processed.region,
+                "language": processed.language,
             }
             path = "api/post/item_list/?{}&{}".format(
                 User.parent._add_url_params(), urlencode(query)
@@ -190,14 +184,8 @@ class User:
             print(liked_video.id)
         ```
         """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = device_id
+        processed = User.parent._process_kwargs(kwargs)
+        kwargs["custom_device_id"] = processed.device_id
 
         amount_yielded = 0
         first = True
@@ -214,9 +202,9 @@ class User:
                 "cursor": cursor,
                 "sourceType": 9,
                 "appId": 1233,
-                "region": region,
-                "priority_region": region,
-                "language": language,
+                "region": processed.region,
+                "priority_region": processed.region,
+                "language": processed.language,
             }
             path = "api/favorite/item_list/?{}&{}".format(
                 User.parent._add_url_params(), urlencode(query)

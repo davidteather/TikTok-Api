@@ -66,14 +66,8 @@ class Sound:
         if use_html:
             return self.info_full(**kwargs)["musicInfo"]
 
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = device_id
+        processed = self.parent._process_kwargs(kwargs)
+        kwargs["custom_device_id"] = processed.device_id
 
         path = "node/share/music/-{}?{}".format(self.id, self.parent._add_url_params())
         res = self.parent.get_data(path, **kwargs)
@@ -125,14 +119,8 @@ class Sound:
             # do something
         ```
         """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = device_id
+        processed = self.parent._process_kwargs(kwargs)
+        kwargs["custom_device_id"] = processed.device_id
 
         cursor = offset
         page_size = 30

@@ -76,14 +76,8 @@ class Video:
         video_data = api.video(id='7041997751718137094').info_full()
         ```
         """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = device_id
+        processed = self.parent._process_kwargs(kwargs)
+        kwargs["custom_device_id"] = processed.device_id
 
         device_id = kwargs.get("custom_device_id", None)
         query = {
@@ -108,14 +102,8 @@ class Video:
             output.write(video_bytes)
         ```
         """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = device_id
+        processed = self.parent._process_kwargs(kwargs)
+        kwargs["custom_device_id"] = processed.device_id
 
         video_data = self.info(**kwargs)
         download_url = video_data["video"]["playAddr"]

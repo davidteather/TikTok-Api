@@ -20,6 +20,7 @@ from playwright.sync_api import sync_playwright
 from .exceptions import *
 from .utilities import LOGGER_NAME, update_messager
 from .browser_utilities.browser import browser
+from dataclasses import dataclass
 
 os.environ["no_proxy"] = "127.0.0.1,localhost"
 
@@ -172,14 +173,8 @@ class TikTokApi:
         This is all handled by the package so it's unlikely
         you will need to use this.
         """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = device_id
+        processed = self._process_kwargs(kwargs)
+        kwargs["custom_device_id"] = processed.device_id
         if self.request_delay is not None:
             time.sleep(self.request_delay)
 
@@ -228,7 +223,7 @@ class TikTokApi:
         h = requests.head(
             url,
             headers={"x-secsdk-csrf-version": "1.2.5", "x-secsdk-csrf-request": "1"},
-            proxies=self._format_proxy(proxy),
+            proxies=self._format_proxy(processed.proxy),
             **self.requests_extra_kwargs,
         )
 
@@ -262,7 +257,7 @@ class TikTokApi:
             url,
             headers=headers,
             cookies=self._get_cookies(**kwargs),
-            proxies=self._format_proxy(proxy),
+            proxies=self._format_proxy(processed.proxy),
             **self.requests_extra_kwargs,
         )
 
@@ -440,14 +435,8 @@ class TikTokApi:
 
     def get_bytes(self, **kwargs) -> bytes:
         """Returns TikTok's response as bytes, similar to get_data"""
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = device_id
+        processed = self._process_kwargs(kwargs)
+        kwargs["custom_device_id"] = processed.device_id
         if self.signer_url is None:
             verify_fp, device_id, signature, _ = self.browser.sign_url(
                 calc_tt_params=False, **kwargs
@@ -480,7 +469,7 @@ class TikTokApi:
                 "Referer": "https://www.tiktok.com/",
                 "User-Agent": user_agent,
             },
-            proxies=self._format_proxy(proxy),
+            proxies=self._format_proxy(processed.proxy),
             cookies=self._get_cookies(**kwargs),
         )
         return r.content
@@ -511,7 +500,6 @@ class TikTokApi:
         region = kwargs.get("region", "US")
         language = kwargs.get("language", "en")
         proxy = kwargs.get("proxy", None)
-        maxCount = kwargs.get("maxCount", 35)
 
         if kwargs.get("custom_device_id", None) != None:
             device_id = kwargs.get("custom_device_id")
@@ -520,7 +508,17 @@ class TikTokApi:
                 device_id = self.custom_device_id
             else:
                 device_id = "".join(random.choice(string.digits) for num in range(19))
-        return region, language, proxy, maxCount, device_id
+
+        @dataclass
+        class ProcessedKwargs:
+            region: str
+            language: str
+            proxy: str
+            device_id: str
+
+        return ProcessedKwargs(
+            region=region, language=language, proxy=proxy, device_id=device_id
+        )
 
     def __get_js(self, proxy=None) -> str:
         return requests.get(
