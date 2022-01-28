@@ -80,7 +80,7 @@ class Search:
         spawn = requests.head(
             "https://www.tiktok.com",
             proxies=Search.parent._format_proxy(processed.proxy),
-            **Search.parent.requests_extra_kwargs
+            **Search.parent._requests_extra_kwargs
         )
         ttwid = spawn.cookies["ttwid"]
 
@@ -89,7 +89,7 @@ class Search:
             query = {
                 "keyword": search_term,
                 "cursor": cursor,
-                "app_language": Search.parent.language,
+                "app_language": Search.parent._language,
             }
             path = "api/search/{}/full/?{}&{}".format(
                 obj_type, Search.parent._add_url_params(), urlencode(query)

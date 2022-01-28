@@ -93,11 +93,11 @@ class User:
                 "path": "/@{}".format(quoted_username),
                 "Accept-Encoding": "gzip, deflate",
                 "Connection": "keep-alive",
-                "User-Agent": self.parent.user_agent,
+                "User-Agent": self.parent._user_agent,
             },
             proxies=User.parent._format_proxy(kwargs.get("proxy", None)),
             cookies=User.parent._get_cookies(**kwargs),
-            **User.parent.requests_extra_kwargs,
+            **User.parent._requests_extra_kwargs,
         )
 
         data = extract_tag_contents(r.text)

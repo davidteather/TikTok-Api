@@ -99,7 +99,7 @@ class Sound:
             },
             proxies=self.parent._format_proxy(kwargs.get("proxy", None)),
             cookies=self.parent._get_cookies(**kwargs),
-            **self.parent.requests_extra_kwargs,
+            **self.parent._requests_extra_kwargs,
         )
 
         data = extract_tag_contents(r.text)

@@ -120,52 +120,50 @@ class TikTokApi:
         self.logger.setLevel(level=logging_level)
 
         # Some Instance Vars
-        self.executablePath = kwargs.get("executablePath", None)
+        self._executablePath = kwargs.get("executablePath", None)
 
         if kwargs.get("custom_did") != None:
             raise Exception("Please use 'custom_device_id' instead of 'custom_did'")
-        self.custom_device_id = kwargs.get("custom_device_id", None)
-        self.user_agent = "5.0+(iPhone%3B+CPU+iPhone+OS+14_8+like+Mac+OS+X)+AppleWebKit%2F605.1.15+(KHTML,+like+Gecko)+Version%2F14.1.2+Mobile%2F15E148+Safari%2F604.1"
-        self.proxy = kwargs.get("proxy", None)
-        self.custom_verify_fp = kwargs.get("custom_verify_fp")
-        self.signer_url = kwargs.get("external_signer", None)
-        self.request_delay = kwargs.get("request_delay", None)
-        self.requests_extra_kwargs = kwargs.get("requests_extra_kwargs", {})
+        self._custom_device_id = kwargs.get("custom_device_id", None)
+        self._user_agent = "5.0+(iPhone%3B+CPU+iPhone+OS+14_8+like+Mac+OS+X)+AppleWebKit%2F605.1.15+(KHTML,+like+Gecko)+Version%2F14.1.2+Mobile%2F15E148+Safari%2F604.1"
+        self._proxy = kwargs.get("proxy", None)
+        self._custom_verify_fp = kwargs.get("custom_verify_fp")
+        self._signer_url = kwargs.get("external_signer", None)
+        self._request_delay = kwargs.get("request_delay", None)
+        self._requests_extra_kwargs = kwargs.get("requests_extra_kwargs", {})
 
         if kwargs.get("use_test_endpoints", False):
             global BASE_URL
             BASE_URL = "https://t.tiktok.com/"
 
         if kwargs.get("generate_static_device_id", False):
-            self.custom_device_id = "".join(
+            self._custom_device_id = "".join(
                 random.choice(string.digits) for num in range(19)
             )
 
-        if self.signer_url is None:
-            self.browser = browser(**kwargs)
-            self.user_agent = self.browser.user_agent
+        if self._signer_url is None:
+            self._browser = browser(**kwargs)
+            self._user_agent = self._browser.user_agent
 
         try:
-            self.timezone_name = self.__format_new_params(self.browser.timezone_name)
-            self.browser_language = self.__format_new_params(
-                self.browser.browser_language
-            )
-            self.width = self.browser.width
-            self.height = self.browser.height
-            self.region = self.browser.region
-            self.language = self.browser.language
+            self._timezone_name = self._browser.timezone_name
+            self._browser_language = self._browser.browser_language
+            self._width = self._browser.width
+            self._height = self._browser.height
+            self._region = self._browser.region
+            self._language = self._browser.language
         except Exception as e:
             self.logger.exception(
                 "An error occurred while opening your browser, but it was ignored\n",
                 "Are you sure you ran python -m playwright install?",
             )
 
-            self.timezone_name = ""
-            self.browser_language = ""
-            self.width = "1920"
-            self.height = "1080"
-            self.region = "US"
-            self.language = "en"
+            self._timezone_name = ""
+            self._browser_language = ""
+            self._width = "1920"
+            self._height = "1080"
+            self._region = "US"
+            self._language = "en"
 
     def get_data(self, path, subdomain="m", **kwargs) -> dict:
         """Makes requests to TikTok and returns their JSON.
@@ -175,15 +173,15 @@ class TikTokApi:
         """
         processed = self._process_kwargs(kwargs)
         kwargs["custom_device_id"] = processed.device_id
-        if self.request_delay is not None:
-            time.sleep(self.request_delay)
+        if self._request_delay is not None:
+            time.sleep(self._request_delay)
 
-        if self.proxy is not None:
-            proxy = self.proxy
+        if self._proxy is not None:
+            proxy = self._proxy
 
         if kwargs.get("custom_verify_fp") == None:
-            if self.custom_verify_fp != None:
-                verifyFp = self.custom_verify_fp
+            if self._custom_verify_fp != None:
+                verifyFp = self._custom_verify_fp
             else:
                 verifyFp = "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"
         else:
@@ -194,13 +192,13 @@ class TikTokApi:
 
         full_url = f"https://{subdomain}.tiktok.com/" + path
 
-        if self.signer_url is None:
+        if self._signer_url is None:
             kwargs["custom_verify_fp"] = verifyFp
-            verify_fp, device_id, signature, tt_params = self.browser.sign_url(
+            verify_fp, device_id, signature, tt_params = self._browser.sign_url(
                 full_url, calc_tt_params=send_tt_params, **kwargs
             )
-            user_agent = self.browser.user_agent
-            referrer = self.browser.referrer
+            user_agent = self._browser.user_agent
+            referrer = self._browser.referrer
         else:
             (
                 verify_fp,
@@ -224,7 +222,7 @@ class TikTokApi:
             url,
             headers={"x-secsdk-csrf-version": "1.2.5", "x-secsdk-csrf-request": "1"},
             proxies=self._format_proxy(processed.proxy),
-            **self.requests_extra_kwargs,
+            **self._requests_extra_kwargs,
         )
 
         csrf_token = None
@@ -258,14 +256,14 @@ class TikTokApi:
             headers=headers,
             cookies=self._get_cookies(**kwargs),
             proxies=self._format_proxy(processed.proxy),
-            **self.requests_extra_kwargs,
+            **self._requests_extra_kwargs,
         )
 
         try:
-            json = r.json()
+            parsed_data = r.json()
             if (
-                json.get("type") == "verify"
-                or json.get("verifyConfig", {}).get("type", "") == "verify"
+                parsed_data.get("type") == "verify"
+                or parsed_data.get("verifyConfig", {}).get("type", "") == "verify"
             ):
                 self.logger.error(
                     "Tiktok wants to display a captcha.\nResponse:\n%s\nCookies:\n%s",
@@ -315,7 +313,7 @@ class TikTokApi:
                 "10404": "FYP_VIDEO_LIST_LIMIT",
                 "undefined": "MEDIA_ERROR",
             }
-            statusCode = json.get("statusCode", 0)
+            statusCode = parsed_data.get("statusCode", 0)
             self.logger.info(f"TikTok Returned: %s", json)
             if statusCode == 10201:
                 # Invalid Entity
@@ -347,7 +345,7 @@ class TikTokApi:
     def __del__(self):
         """A basic cleanup method, called automatically from the code"""
         try:
-            self.browser._clean_up()
+            self._browser._clean_up()
         except Exception:
             pass
         try:
@@ -382,8 +380,8 @@ class TikTokApi:
         else:
             query = {"url": url, "verifyFp": verifyFp}
         data = requests.get(
-            self.signer_url + "?{}".format(urlencode(query)),
-            **self.requests_extra_kwargs,
+            self._signer_url + "?{}".format(urlencode(query)),
+            **self._requests_extra_kwargs,
         )
         parsed_data = data.json()
 
@@ -402,8 +400,8 @@ class TikTokApi:
             "".join(random.choice(string.digits) for num in range(19)),
         )
         if kwargs.get("custom_verify_fp") is None:
-            if self.custom_verify_fp is not None:
-                verifyFp = self.custom_verify_fp
+            if self._custom_verify_fp is not None:
+                verifyFp = self._custom_verify_fp
             else:
                 verifyFp = None
         else:
@@ -437,12 +435,12 @@ class TikTokApi:
         """Returns TikTok's response as bytes, similar to get_data"""
         processed = self._process_kwargs(kwargs)
         kwargs["custom_device_id"] = processed.device_id
-        if self.signer_url is None:
-            verify_fp, device_id, signature, _ = self.browser.sign_url(
+        if self._signer_url is None:
+            verify_fp, device_id, signature, _ = self._browser.sign_url(
                 calc_tt_params=False, **kwargs
             )
-            user_agent = self.browser.user_agent
-            referrer = self.browser.referrer
+            user_agent = self._browser.user_agent
+            referrer = self._browser.referrer
         else:
             (
                 verify_fp,
@@ -487,8 +485,8 @@ class TikTokApi:
         """
         Formats the proxy object
         """
-        if proxy is None and self.proxy is not None:
-            proxy = self.proxy
+        if proxy is None and self._proxy is not None:
+            proxy = self._proxy
         if proxy is not None:
             return {"http": proxy, "https": proxy}
         else:
@@ -496,7 +494,6 @@ class TikTokApi:
 
     # Process the kwargs
     def _process_kwargs(self, kwargs):
-        # TODO: Just return this as a dict, then only use the keys you need
         region = kwargs.get("region", "US")
         language = kwargs.get("language", "en")
         proxy = kwargs.get("proxy", None)
@@ -504,8 +501,8 @@ class TikTokApi:
         if kwargs.get("custom_device_id", None) != None:
             device_id = kwargs.get("custom_device_id")
         else:
-            if self.custom_device_id != None:
-                device_id = self.custom_device_id
+            if self._custom_device_id != None:
+                device_id = self._custom_device_id
             else:
                 device_id = "".join(random.choice(string.digits) for num in range(19))
 
@@ -524,36 +521,32 @@ class TikTokApi:
         return requests.get(
             "https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js",
             proxies=self._format_proxy(proxy),
-            **self.requests_extra_kwargs,
+            **self._requests_extra_kwargs,
         ).text
-
-    def __format_new_params(self, parm) -> str:
-        # TODO: Maybe try not doing this? It should be handled by the urlencode.
-        return parm.replace("/", "%2F").replace(" ", "+").replace(";", "%3B")
 
     def _add_url_params(self) -> str:
         query = {
             "aid": 1988,
             "app_name": "tiktok_web",
             "device_platform": "web_mobile",
-            "region": self.region or "US",
+            "region": self._region or "US",
             "priority_region": "",
             "os": "ios",
             "referer": "",
             "cookie_enabled": "true",
-            "screen_width": self.width,
-            "screen_height": self.height,
-            "browser_language": self.browser_language.lower() or "en-us",
+            "screen_width": self._width,
+            "screen_height": self._height,
+            "browser_language": self._browser_language.lower() or "en-us",
             "browser_platform": "iPhone",
             "browser_name": "Mozilla",
-            "browser_version": self.user_agent,
+            "browser_version": self._user_agent,
             "browser_online": "true",
-            "timezone_name": self.timezone_name or "America/Chicago",
+            "timezone_name": self._timezone_name or "America/Chicago",
             "is_page_visible": "true",
             "focus_state": "true",
             "is_fullscreen": "false",
             "history_len": random.randint(0, 30),
-            "language": self.language or "en",
+            "language": self._language or "en",
         }
 
         return urlencode(query)
