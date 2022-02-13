@@ -95,7 +95,7 @@ class Sound:
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                 "Accept-Encoding": "gzip, deflate",
                 "Connection": "keep-alive",
-                "User-Agent": self.parent.user_agent,
+                "User-Agent": self.parent._user_agent,
             },
             proxies=self.parent._format_proxy(kwargs.get("proxy", None)),
             cookies=self.parent._get_cookies(**kwargs),
@@ -111,7 +111,7 @@ class Sound:
 
         - Parameters:
             - count (int): The amount of videos you want returned.
-            - cursor (int): The unix epoch to get videos since. TODO: Check this is right
+            - offset (int): The offset of videos you want returned.
 
         Example Usage
         ```py

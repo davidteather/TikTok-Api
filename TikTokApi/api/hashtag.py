@@ -88,7 +88,7 @@ class Hashtag:
 
         - Parameters:
             - count (int): The amount of videos you want returned.
-            - cursor (int): The unix epoch to get videos since. TODO: Check this is right
+            - offset (int): The the offset of videos from 0 you want to get.
 
         Example Usage
         ```py

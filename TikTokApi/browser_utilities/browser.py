@@ -41,7 +41,7 @@ class browser(BrowserInterface):
         self.api_url = kwargs.get("api_url", None)
         self.referrer = kwargs.get("referer", "https://www.tiktok.com/")
         self.language = kwargs.get("language", "en")
-        self.executablePath = kwargs.get("executablePath", None)
+        self.executable_path = kwargs.get("executable_path", None)
         self.device_id = kwargs.get("custom_device_id", None)
 
         args = kwargs.get("browser_args", [])
@@ -73,8 +73,8 @@ class browser(BrowserInterface):
 
         self.options.update(options)
 
-        if self.executablePath is not None:
-            self.options["executablePath"] = self.executablePath
+        if self.executable_path is not None:
+            self.options["executable_path"] = self.executable_path
 
         try:
             self.browser = get_playwright().webkit.launch(

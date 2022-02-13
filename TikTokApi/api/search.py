@@ -28,7 +28,7 @@ class Search:
         - Parameters:
             - search_term (str): The phrase you want to search for.
             - count (int): The amount of videos you want returned.
-            TODO: Figure out offset
+            - offset (int): The offset of videos from your data you want returned.
 
         Example Usage
         ```py

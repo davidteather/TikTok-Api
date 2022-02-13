@@ -117,13 +117,13 @@ class User:
 
         - Parameters:
             - count (int): The amount of videos you want returned.
-            - cursor (int): The unix epoch to get videos since. TODO: Check this is right
+            - cursor (int): The unix epoch to get uploaded videos since.
 
         Example Usage
         ```py
         user = api.user(username='therock')
         for video in user.videos(count=100):
-            print(video.id)
+            # do something
         ```
         """
         processed = User.parent._process_kwargs(kwargs)
@@ -176,12 +176,12 @@ class User:
 
         - Parameters:
             - count (int): The amount of videos you want returned.
-            - cursor (int): The unix epoch to get videos since. TODO: Check this is right
+            - cursor (int): The unix epoch to get uploaded videos since.
 
         Example Usage
         ```py
         for liked_video in api.user(username='public_likes'):
-            print(liked_video.id)
+            # do something
         ```
         """
         processed = User.parent._process_kwargs(kwargs)
@@ -213,7 +213,8 @@ class User:
             res = self.parent.get_data(path, **kwargs)
 
             if "itemList" not in res.keys():
-                User.parent.logger.error("User's likes are most likely private")
+                if first:
+                    User.parent.logger.error("User's likes are most likely private")
                 return
 
             videos = res.get("itemList", [])

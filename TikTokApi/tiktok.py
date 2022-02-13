@@ -5,6 +5,7 @@ import random
 import string
 import time
 from typing import ClassVar, Optional
+from urllib import request
 from urllib.parse import quote, urlencode
 
 import requests
@@ -40,7 +41,19 @@ class TikTokApi:
     trending = Trending
 
     @staticmethod
-    def __new__(cls, logging_level=logging.WARNING, *args, **kwargs):
+    def __new__(
+        cls,
+        logging_level=logging.WARNING,
+        request_delay: Optional[int] = None,
+        custom_device_id: Optional[str] = None,
+        generate_static_device_id: Optional[bool] = False,
+        custom_verify_fp: Optional[str] = None,
+        use_test_endpoints: Optional[bool] = False,
+        proxy: Optional[str] = None,
+        executable_path: Optional[str] = None,
+        *args,
+        **kwargs,
+    ):
         """The TikTokApi class. Used to interact with TikTok. This is a singleton
             class to prevent issues from arising with playwright
 
@@ -89,12 +102,7 @@ class TikTokApi:
             to store this at the instance level. You can override this at the specific
             methods.
 
-        * use_selenium: Option to use selenium over playwright, optional
-            Playwright is selected by default and is the one that I'm designing the
-            package to be compatable for, however if playwright doesn't work on
-            your machine feel free to set this to True.
-
-        * executablePath: The location of the driver, optional
+        * executable_path: The location of the driver, optional
             This shouldn't be needed if you're using playwright
 
         * **kwargs
@@ -105,7 +113,18 @@ class TikTokApi:
 
         if cls._instance is None:
             cls._instance = super(TikTokApi, cls).__new__(cls)
-            cls._instance._initialize(logging_level=logging_level, *args, **kwargs)
+            cls._instance._initialize(
+                logging_level=logging_level,
+                request_delay=request_delay,
+                custom_device_id=custom_device_id,
+                generate_static_device_id=generate_static_device_id,
+                custom_verify_fp=custom_verify_fp,
+                use_test_endpoints=use_test_endpoints,
+                proxy=proxy,
+                executable_path=executable_path,
+                *args,
+                **kwargs,
+            )
         return cls._instance
 
     def _initialize(self, logging_level=logging.WARNING, **kwargs):
@@ -120,7 +139,7 @@ class TikTokApi:
         self.logger.setLevel(level=logging_level)
 
         # Some Instance Vars
-        self._executablePath = kwargs.get("executablePath", None)
+        self._executable_path = kwargs.get("executable_path", None)
 
         if kwargs.get("custom_did") != None:
             raise Exception("Please use 'custom_device_id' instead of 'custom_did'")
@@ -266,9 +285,10 @@ class TikTokApi:
                 or parsed_data.get("verifyConfig", {}).get("type", "") == "verify"
             ):
                 self.logger.error(
-                    "Tiktok wants to display a captcha.\nResponse:\n%s\nCookies:\n%s",
+                    "Tiktok wants to display a captcha.\nResponse:\n%s\nCookies:\n%s\nURL:\n%s",
                     r.text,
                     self._get_cookies(**kwargs),
+                    url,
                 )
                 raise TikTokCaptchaError()
 
@@ -516,13 +536,6 @@ class TikTokApi:
         return ProcessedKwargs(
             region=region, language=language, proxy=proxy, device_id=device_id
         )
-
-    def __get_js(self, proxy=None) -> str:
-        return requests.get(
-            "https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js",
-            proxies=self._format_proxy(proxy),
-            **self._requests_extra_kwargs,
-        ).text
 
     def _add_url_params(self) -> str:
         query = {
