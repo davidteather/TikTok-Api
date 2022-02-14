@@ -8,14 +8,15 @@ import random
 import json
 import re
 from .browser_interface import BrowserInterface
-from urllib.parse import splitquery, parse_qs, parse_qsl
+from urllib.parse import parse_qsl, urlparse
 
-
-# Import Detection From Stealth
-from .get_acrawler import get_acrawler, get_tt_params_script
+from ..utilities import LOGGER_NAME
+from .get_acrawler import _get_acrawler, _get_tt_params_script
 from playwright.sync_api import sync_playwright
 
 playwright = None
+
+logger = logging.getLogger(LOGGER_NAME)
 
 
 def get_playwright():
@@ -40,7 +41,7 @@ class browser(BrowserInterface):
         self.api_url = kwargs.get("api_url", None)
         self.referrer = kwargs.get("referer", "https://www.tiktok.com/")
         self.language = kwargs.get("language", "en")
-        self.executablePath = kwargs.get("executablePath", None)
+        self.executable_path = kwargs.get("executable_path", None)
         self.device_id = kwargs.get("custom_device_id", None)
 
         args = kwargs.get("browser_args", [])
@@ -72,18 +73,18 @@ class browser(BrowserInterface):
 
         self.options.update(options)
 
-        if self.executablePath is not None:
-            self.options["executablePath"] = self.executablePath
+        if self.executable_path is not None:
+            self.options["executable_path"] = self.executable_path
 
         try:
             self.browser = get_playwright().webkit.launch(
                 args=self.args, **self.options
             )
         except Exception as e:
-            logging.critical(e)
+            logger.critical("Webkit launch failed", exc_info=True)
             raise e
 
-        context = self.create_context(set_useragent=True)
+        context = self._create_context(set_useragent=True)
         page = context.new_page()
         self.get_params(page)
         context.close()
@@ -118,7 +119,7 @@ class browser(BrowserInterface):
         self.width = page.evaluate("""() => { return screen.width; }""")
         self.height = page.evaluate("""() => { return screen.height; }""")
 
-    def create_context(self, set_useragent=False):
+    def _create_context(self, set_useragent=False):
         iphone = playwright.devices["iPhone 11 Pro"]
         iphone["viewport"] = {
             "width": random.randint(320, 1920),
@@ -132,11 +133,11 @@ class browser(BrowserInterface):
 
         context = self.browser.new_context(**iphone)
         if set_useragent:
-            self.userAgent = iphone["user_agent"]
+            self.user_agent = iphone["user_agent"]
 
         return context
 
-    def base36encode(self, number, alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
+    def _base36encode(self, number, alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
         """Converts an integer to a base36 string."""
         base36 = ""
         sign = ""
@@ -157,7 +158,7 @@ class browser(BrowserInterface):
     def gen_verifyFp(self):
         chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"[:]
         chars_len = len(chars)
-        scenario_title = self.base36encode(int(time.time() * 1000))
+        scenario_title = self._base36encode(int(time.time() * 1000))
         uuid = [0] * 36
         uuid[8] = "_"
         uuid[13] = "_"
@@ -173,16 +174,12 @@ class browser(BrowserInterface):
 
         return f'verify_{scenario_title.lower()}_{"".join(uuid)}'
 
-    def sign_url(self, calc_tt_params=False, **kwargs):
+    def sign_url(self, url, calc_tt_params=False, **kwargs):
         def process(route):
             route.abort()
 
-        url = kwargs.get("url", None)
-        if url is None:
-            raise Exception("sign_url required a url parameter")
-
         tt_params = None
-        context = self.create_context()
+        context = self._create_context()
         page = context.new_page()
 
         if calc_tt_params:
@@ -202,7 +199,7 @@ class browser(BrowserInterface):
             verifyFp = self.gen_verifyFp()
         else:
             verifyFp = kwargs.get(
-                "custom_verifyFp",
+                "custom_verify_fp",
                 "verify_khgp4f49_V12d4mRX_MdCO_4Wzt_Ar0k_z4RCQC9pUDpX",
             )
 
@@ -215,7 +212,7 @@ class browser(BrowserInterface):
 
         url = "{}&verifyFp={}&device_id={}".format(url, verifyFp, device_id)
 
-        page.add_script_tag(content=get_acrawler())
+        page.add_script_tag(content=_get_acrawler())
         evaluatedPage = page.evaluate(
             '''() => {
             var url = "'''
@@ -230,12 +227,12 @@ class browser(BrowserInterface):
         url = "{}&_signature={}".format(url, evaluatedPage)
 
         if calc_tt_params:
-            page.add_script_tag(content=get_tt_params_script())
+            page.add_script_tag(content=_get_tt_params_script())
 
             tt_params = page.evaluate(
                 """() => {
                     return window.genXTTParams("""
-                + json.dumps(dict(parse_qsl(splitquery(url)[1])))
+                + json.dumps(dict(parse_qsl(urlparse(url).query)))
                 + """);
             
                 }"""
@@ -244,11 +241,11 @@ class browser(BrowserInterface):
         context.close()
         return (verifyFp, device_id, evaluatedPage, tt_params)
 
-    def clean_up(self):
+    def _clean_up(self):
         try:
             self.browser.close()
         except Exception:
-            logging.info("cleanup failed")
+            logger.exception("cleanup failed")
         # playwright.stop()
 
     def find_redirect(self, url):

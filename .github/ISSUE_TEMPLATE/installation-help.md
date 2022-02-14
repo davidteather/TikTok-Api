@@ -8,6 +8,9 @@ assignees: ''
 
 ---
 
+Please first check the closed issues on GitHub for people with similar problems to you.
+If you'd like more instant help from the community consider joining the [discord](https://discord.gg/yyPhbfma6f)
+
 **Describe the error**
 
 Put the error trace here.

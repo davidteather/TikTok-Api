@@ -7,7 +7,7 @@ on:
     branches:
       - master
       - nightly
-      - 'releases/*'
+      - "releases/*"
 
 jobs:
   Unit-Tests:
@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest]
-        python-version: [3.7, 3.9]
+        python-version: [3.7, "3.10"]
     steps:
       - uses: actions/checkout@v2
       - uses: microsoft/playwright-github-action@v1

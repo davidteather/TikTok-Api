@@ -1,52 +1,41 @@
 from TikTokApi import TikTokApi
 import os
 
-api = TikTokApi.get_instance(
-    custom_verifyFp=os.environ.get("verifyFp", None), use_test_endpoints=True
-)
+api = TikTokApi(custom_verify_fp=os.environ.get("verifyFp", None))
 
 
-def test_user():
-    assert (
-        api.get_user("charlidamelio")["userInfo"]["user"]["uniqueId"] == "charlidamelio"
-    )
-    assert api.get_user_object("charlidamelio")["uniqueId"] == "charlidamelio"
-    assert (
-        abs(
-            len(
-                api.user_posts(
-                    userID="5058536",
-                    secUID="MS4wLjABAAAAoRsCq3Yj6BtSKBCQ4rf3WQYxIaxe5VetwJfYzW_U5K8",
-                    count=5,
-                )
-            )
-            - 5
-        )
-        <= 1
-    )
-    assert (
-        abs(
-            len(
-                api.user_posts(
-                    userID="5058536",
-                    secUID="MS4wLjABAAAAoRsCq3Yj6BtSKBCQ4rf3WQYxIaxe5VetwJfYzW_U5K8",
-                    count=10,
-                )
-            )
-            - 10
-        )
-        <= 1
-    )
-    assert (
-        abs(
-            len(
-                api.user_posts(
-                    userID="5058536",
-                    secUID="MS4wLjABAAAAoRsCq3Yj6BtSKBCQ4rf3WQYxIaxe5VetwJfYzW_U5K8",
-                    count=30,
-                )
-            )
-            - 30
-        )
-        <= 1
-    )
+username = "charlidamelio"
+user_id = "5831967"
+sec_uid = "MS4wLjABAAAA-VASjiXTh7wDDyXvjk10VFhMWUAoxr8bgfO1kAL1-9s"
+
+
+def test_user_info():
+    data = api.user(username=username).info()
+
+    assert data["uniqueId"] == username
+    assert data["id"] == user_id
+    assert data["secUid"] == sec_uid
+
+
+def test_user_videos():
+    count = 0
+    for video in api.user(username=username).videos(count=100):
+        count += 1
+
+    assert count >= 100
+
+    count = 0
+    for video in api.user(user_id=user_id, sec_uid=sec_uid).videos(count=100):
+        count += 1
+
+    assert count >= 100
+
+
+def test_user_liked():
+    user = api.user(username="public_likes")
+
+    count = 0
+    for v in user.liked():
+        count += 1
+
+    assert count >= 1

@@ -1,7 +1,7 @@
 class TikTokCaptchaError(Exception):
     def __init__(
         self,
-        message="TikTok blocks this request displaying a Captcha \nTip: Consider using a proxy or a custom_verifyFp as method parameters",
+        message="TikTok blocks this request displaying a Captcha \nTip: Consider using a proxy or a custom_verify_fp as method parameters",
     ):
         self.message = message
         super().__init__(self.message)

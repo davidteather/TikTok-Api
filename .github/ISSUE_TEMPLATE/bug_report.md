@@ -6,9 +6,7 @@ labels: bug
 assignees: ''
 
 ---
-
-# Read Below!!! If this doesn't fix your issue delete these two lines
-**You may need to install chromedriver for your machine globally. Download it [here](https://sites.google.com/a/chromium.org/chromedriver/) and add it to your path.**
+Fill Out the template :)
 
 **Describe the bug**
 
@@ -16,7 +14,9 @@ A clear and concise description of what the bug is.
 
 **The buggy code**
 
-Please insert the code that is throwing errors or is giving you weird unexpected results.
+Please add any relevant code that is giving you unexpected results.
+
+Preferably the smallest amount of code to reproduce the issue.
 
 ```
 # Code Goes Here
@@ -35,7 +35,7 @@ Put the error trace below if there's any error thrown.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows 10]
- - TikTokApi Version [e.g. 3.3.1] - if out of date upgrade before posting an issue
+ - TikTokApi Version [e.g. 5.0.0] - if out of date upgrade before posting an issue
 
 **Additional context**
 

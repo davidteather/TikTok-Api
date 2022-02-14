@@ -1,6 +1,7 @@
 import subprocess
 import sys
-import pkg_resources
+
+LOGGER_NAME: str = "TikTokApi"
 
 
 def update_messager():

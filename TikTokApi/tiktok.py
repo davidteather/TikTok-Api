@@ -4,91 +4,56 @@ import os
 import random
 import string
 import time
+from typing import ClassVar, Optional
+from urllib import request
 from urllib.parse import quote, urlencode
 
 import requests
+from .api.sound import Sound
+from .api.user import User
+from .api.search import Search
+from .api.hashtag import Hashtag
+from .api.video import Video
+from .api.trending import Trending
+
 from playwright.sync_api import sync_playwright
 
 from .exceptions import *
-from .utilities import update_messager
+from .utilities import LOGGER_NAME, update_messager
+from .browser_utilities.browser import browser
+from dataclasses import dataclass
 
 os.environ["no_proxy"] = "127.0.0.1,localhost"
 
 BASE_URL = "https://m.tiktok.com/"
+DESKTOP_BASE_URL = "https://www.tiktok.com/"
 
 
 class TikTokApi:
-    __instance = None
+    _instance = None
+    logger: ClassVar[logging.Logger] = logging.getLogger(LOGGER_NAME)
 
-    def __init__(self, **kwargs):
-        """The TikTokApi class. Used to interact with TikTok, use get_instance NOT this."""
-        # Forces Singleton
-        if TikTokApi.__instance is None:
-            TikTokApi.__instance = self
-        else:
-            raise Exception("Only one TikTokApi object is allowed")
-        logging.basicConfig(level=kwargs.get("logging_level", logging.WARNING))
-        logging.info("Class initalized")
-
-        # Some Instance Vars
-        self.executablePath = kwargs.get("executablePath", None)
-
-        if kwargs.get("custom_did") != None:
-            raise Exception("Please use custom_device_id instead of custom_device_id")
-        self.custom_device_id = kwargs.get("custom_device_id", None)
-        self.userAgent = (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/86.0.4240.111 Safari/537.36"
-        )
-        self.proxy = kwargs.get("proxy", None)
-        self.custom_verifyFp = kwargs.get("custom_verifyFp")
-        self.signer_url = kwargs.get("external_signer", None)
-        self.request_delay = kwargs.get("request_delay", None)
-        self.requests_extra_kwargs = kwargs.get("requests_extra_kwargs", {})
-
-        if kwargs.get("use_test_endpoints", False):
-            global BASE_URL
-            BASE_URL = "https://t.tiktok.com/"
-        if kwargs.get("use_selenium", False):
-            from .browser_utilities.browser_selenium import browser
-        else:
-            from .browser_utilities.browser import browser
-
-        if kwargs.get("generate_static_device_id", False):
-            self.custom_device_id = "".join(
-                random.choice(string.digits) for num in range(19)
-            )
-
-        if self.signer_url is None:
-            self.browser = browser(**kwargs)
-            self.userAgent = self.browser.userAgent
-
-        try:
-            self.timezone_name = self.__format_new_params__(self.browser.timezone_name)
-            self.browser_language = self.__format_new_params__(
-                self.browser.browser_language
-            )
-            self.width = self.browser.width
-            self.height = self.browser.height
-            self.region = self.browser.region
-            self.language = self.browser.language
-        except Exception as e:
-            logging.exception(e)
-            logging.warning(
-                "An error ocurred while opening your browser but it was ignored."
-            )
-            logging.warning("Are you sure you ran python -m playwright install")
-
-            self.timezone_name = ""
-            self.browser_language = ""
-            self.width = "1920"
-            self.height = "1080"
-            self.region = "US"
-            self.language = "en"
+    user = User
+    search = Search
+    sound = Sound
+    hashtag = Hashtag
+    video = Video
+    trending = Trending
 
     @staticmethod
-    def get_instance(**kwargs):
+    def __new__(
+        cls,
+        logging_level=logging.WARNING,
+        request_delay: Optional[int] = None,
+        custom_device_id: Optional[str] = None,
+        generate_static_device_id: Optional[bool] = False,
+        custom_verify_fp: Optional[str] = None,
+        use_test_endpoints: Optional[bool] = False,
+        proxy: Optional[str] = None,
+        executable_path: Optional[str] = None,
+        *args,
+        **kwargs,
+    ):
         """The TikTokApi class. Used to interact with TikTok. This is a singleton
             class to prevent issues from arising with playwright
 
@@ -111,7 +76,7 @@ class TikTokApi:
             Use this if you want to download videos from a script but don't want to generate
             your own custom_device_id parameter.
 
-        * custom_verifyFp: A TikTok parameter needed to work most of the time, optional
+        * custom_verify_fp: A TikTok parameter needed to work most of the time, optional
             To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
             I recommend watching the entire thing, as it will help setup this package. All
             the methods take this as a optional parameter, however it's cleaner code
@@ -124,7 +89,7 @@ class TikTokApi:
         * use_test_endpoints: Send requests to TikTok's test endpoints, optional
             This parameter when set to true will make requests to TikTok's testing
             endpoints instead of the live site. I can't guarantee this will work
-            in the future, however currently basically any custom_verifyFp will
+            in the future, however currently basically any custom_verify_fp will
             work here which is helpful.
 
         * proxy: A string containing your proxy address, optional
@@ -137,12 +102,7 @@ class TikTokApi:
             to store this at the instance level. You can override this at the specific
             methods.
 
-        * use_selenium: Option to use selenium over playwright, optional
-            Playwright is selected by default and is the one that I'm designing the
-            package to be compatable for, however if playwright doesn't work on
-            your machine feel free to set this to True.
-
-        * executablePath: The location of the driver, optional
+        * executable_path: The location of the driver, optional
             This shouldn't be needed if you're using playwright
 
         * **kwargs
@@ -150,125 +110,145 @@ class TikTokApi:
             that interact with this main class. These may or may not be documented
             in other places.
         """
-        if not TikTokApi.__instance:
-            TikTokApi(**kwargs)
-        return TikTokApi.__instance
 
-    def clean_up(self):
-        """A basic cleanup method, called automatically from the code"""
-        self.__del__()
+        if cls._instance is None:
+            cls._instance = super(TikTokApi, cls).__new__(cls)
+            cls._instance._initialize(
+                logging_level=logging_level,
+                request_delay=request_delay,
+                custom_device_id=custom_device_id,
+                generate_static_device_id=generate_static_device_id,
+                custom_verify_fp=custom_verify_fp,
+                use_test_endpoints=use_test_endpoints,
+                proxy=proxy,
+                executable_path=executable_path,
+                *args,
+                **kwargs,
+            )
+        return cls._instance
 
-    def __del__(self):
-        """A basic cleanup method, called automatically from the code"""
+    def _initialize(self, logging_level=logging.WARNING, **kwargs):
+        # Add classes from the api folder
+        User.parent = self
+        Search.parent = self
+        Sound.parent = self
+        Hashtag.parent = self
+        Video.parent = self
+        Trending.parent = self
+
+        self.logger.setLevel(level=logging_level)
+
+        # Some Instance Vars
+        self._executable_path = kwargs.get("executable_path", None)
+
+        if kwargs.get("custom_did") != None:
+            raise Exception("Please use 'custom_device_id' instead of 'custom_did'")
+        self._custom_device_id = kwargs.get("custom_device_id", None)
+        self._user_agent = "5.0+(iPhone%3B+CPU+iPhone+OS+14_8+like+Mac+OS+X)+AppleWebKit%2F605.1.15+(KHTML,+like+Gecko)+Version%2F14.1.2+Mobile%2F15E148+Safari%2F604.1"
+        self._proxy = kwargs.get("proxy", None)
+        self._custom_verify_fp = kwargs.get("custom_verify_fp")
+        self._signer_url = kwargs.get("external_signer", None)
+        self._request_delay = kwargs.get("request_delay", None)
+        self._requests_extra_kwargs = kwargs.get("requests_extra_kwargs", {})
+
+        if kwargs.get("use_test_endpoints", False):
+            global BASE_URL
+            BASE_URL = "https://t.tiktok.com/"
+
+        if kwargs.get("generate_static_device_id", False):
+            self._custom_device_id = "".join(
+                random.choice(string.digits) for num in range(19)
+            )
+
+        if self._signer_url is None:
+            self._browser = browser(**kwargs)
+            self._user_agent = self._browser.user_agent
+
         try:
-            self.browser.clean_up()
-        except Exception:
-            pass
-        try:
-            get_playwright().stop()
-        except Exception:
-            pass
-        TikTokApi.__instance = None
+            self._timezone_name = self._browser.timezone_name
+            self._browser_language = self._browser.browser_language
+            self._width = self._browser.width
+            self._height = self._browser.height
+            self._region = self._browser.region
+            self._language = self._browser.language
+        except Exception as e:
+            self.logger.exception(
+                "An error occurred while opening your browser, but it was ignored\n",
+                "Are you sure you ran python -m playwright install?",
+            )
 
-    def external_signer(self, url, custom_device_id=None, verifyFp=None):
-        """Makes requests to an external signer instead of using a browser.
+            self._timezone_name = ""
+            self._browser_language = ""
+            self._width = "1920"
+            self._height = "1080"
+            self._region = "US"
+            self._language = "en"
 
-        ##### Parameters
-        * url: The server to make requests to
-            This server is designed to sign requests. You can find an example
-            of this signature server in the examples folder.
-
-        * custom_device_id: A TikTok parameter needed to download videos
-            The code generates these and handles these pretty well itself, however
-            for some things such as video download you will need to set a consistent
-            one of these.
-
-        * custom_verifyFp: A TikTok parameter needed to work most of the time,
-            To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
-            I recommend watching the entire thing, as it will help setup this package.
-        """
-        if custom_device_id is not None:
-            query = {
-                "url": url,
-                "custom_device_id": custom_device_id,
-                "verifyFp": verifyFp,
-            }
-        else:
-            query = {"url": url, "verifyFp": verifyFp}
-        data = requests.get(
-            self.signer_url + "?{}".format(urlencode(query)),
-            **self.requests_extra_kwargs,
-        )
-        parsed_data = data.json()
-
-        return (
-            parsed_data["verifyFp"],
-            parsed_data["device_id"],
-            parsed_data["_signature"],
-            parsed_data["userAgent"],
-            parsed_data["referrer"],
-        )
-
-    def get_data(self, **kwargs) -> dict:
+    def get_data(self, path, subdomain="m", **kwargs) -> dict:
         """Makes requests to TikTok and returns their JSON.
 
         This is all handled by the package so it's unlikely
         you will need to use this.
         """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-        if self.request_delay is not None:
-            time.sleep(self.request_delay)
+        processed = self._process_kwargs(kwargs)
+        kwargs["custom_device_id"] = processed.device_id
+        if self._request_delay is not None:
+            time.sleep(self._request_delay)
 
-        if self.proxy is not None:
-            proxy = self.proxy
+        if self._proxy is not None:
+            proxy = self._proxy
 
-        if kwargs.get("custom_verifyFp") == None:
-            if self.custom_verifyFp != None:
-                verifyFp = self.custom_verifyFp
+        if kwargs.get("custom_verify_fp") == None:
+            if self._custom_verify_fp != None:
+                verifyFp = self._custom_verify_fp
             else:
                 verifyFp = "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"
         else:
-            verifyFp = kwargs.get("custom_verifyFp")
+            verifyFp = kwargs.get("custom_verify_fp")
 
         tt_params = None
         send_tt_params = kwargs.get("send_tt_params", False)
 
-        if self.signer_url is None:
-            kwargs["custom_verifyFp"] = verifyFp
-            verify_fp, device_id, signature, tt_params = self.browser.sign_url(
-                calc_tt_params=send_tt_params, **kwargs
+        full_url = f"https://{subdomain}.tiktok.com/" + path
+
+        if self._signer_url is None:
+            kwargs["custom_verify_fp"] = verifyFp
+            verify_fp, device_id, signature, tt_params = self._browser.sign_url(
+                full_url, calc_tt_params=send_tt_params, **kwargs
             )
-            userAgent = self.browser.userAgent
-            referrer = self.browser.referrer
+            user_agent = self._browser.user_agent
+            referrer = self._browser.referrer
         else:
-            verify_fp, device_id, signature, userAgent, referrer = self.external_signer(
-                kwargs["url"],
+            (
+                verify_fp,
+                device_id,
+                signature,
+                user_agent,
+                referrer,
+            ) = self.external_signer(
+                full_url,
                 custom_device_id=kwargs.get("custom_device_id"),
-                verifyFp=kwargs.get("custom_verifyFp", verifyFp),
+                verifyFp=kwargs.get("custom_verify_fp", verifyFp),
             )
 
         if not kwargs.get("send_tt_params", False):
             tt_params = None
 
         query = {"verifyFp": verify_fp, "device_id": device_id, "_signature": signature}
-        url = "{}&{}".format(kwargs["url"], urlencode(query))
+        url = "{}&{}".format(full_url, urlencode(query))
 
         h = requests.head(
             url,
             headers={"x-secsdk-csrf-version": "1.2.5", "x-secsdk-csrf-request": "1"},
-            proxies=self.__format_proxy(proxy),
-            **self.requests_extra_kwargs,
+            proxies=self._format_proxy(processed.proxy),
+            **self._requests_extra_kwargs,
         )
-        csrf_session_id = h.cookies["csrf_session_id"]
-        csrf_token = h.headers["X-Ware-Csrf-Token"].split(",")[1]
-        kwargs["csrf_session_id"] = csrf_session_id
+
+        csrf_token = None
+        if subdomain == "m":
+            csrf_session_id = h.cookies["csrf_session_id"]
+            csrf_token = h.headers["X-Ware-Csrf-Token"].split(",")[1]
+            kwargs["csrf_session_id"] = csrf_session_id
 
         headers = {
             "authority": "m.tiktok.com",
@@ -276,37 +256,40 @@ class TikTokApi:
             "path": url.split("tiktok.com")[1],
             "scheme": "https",
             "accept": "application/json, text/plain, */*",
-            "accept-encoding": "gzip, deflate, br",
+            "accept-encoding": "gzip",
             "accept-language": "en-US,en;q=0.9",
             "origin": referrer,
             "referer": referrer,
             "sec-fetch-dest": "empty",
             "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-site",
+            "sec-fetch-site": "none",
             "sec-gpc": "1",
-            "user-agent": userAgent,
+            "user-agent": user_agent,
             "x-secsdk-csrf-token": csrf_token,
             "x-tt-params": tt_params,
         }
 
-        logging.info(f"GET: {url}\n\theaders: {headers}")
+        self.logger.info(f"GET: %s\n\theaders: %s", url, headers)
         r = requests.get(
             url,
             headers=headers,
-            cookies=self.get_cookies(**kwargs),
-            proxies=self.__format_proxy(proxy),
-            **self.requests_extra_kwargs,
+            cookies=self._get_cookies(**kwargs),
+            proxies=self._format_proxy(processed.proxy),
+            **self._requests_extra_kwargs,
         )
+
         try:
-            json = r.json()
+            parsed_data = r.json()
             if (
-                json.get("type") == "verify"
-                or json.get("verifyConfig", {}).get("type", "") == "verify"
+                parsed_data.get("type") == "verify"
+                or parsed_data.get("verifyConfig", {}).get("type", "") == "verify"
             ):
-                logging.error(
-                    "Tiktok wants to display a catcha. Response is:\n" + r.text
+                self.logger.error(
+                    "Tiktok wants to display a captcha.\nResponse:\n%s\nCookies:\n%s\nURL:\n%s",
+                    r.text,
+                    self._get_cookies(**kwargs),
+                    url,
                 )
-                logging.error(self.get_cookies(**kwargs))
                 raise TikTokCaptchaError()
 
             # statusCode from props->pageProps->statusCode thanks @adiantek on #403
@@ -350,8 +333,8 @@ class TikTokApi:
                 "10404": "FYP_VIDEO_LIST_LIMIT",
                 "undefined": "MEDIA_ERROR",
             }
-            statusCode = json.get("statusCode", 0)
-            logging.info(f"TikTok Returned: {json}")
+            statusCode = parsed_data.get("statusCode", 0)
+            self.logger.info(f"TikTok Returned: %s", json)
             if statusCode == 10201:
                 # Invalid Entity
                 raise TikTokNotFoundError(
@@ -370,29 +353,79 @@ class TikTokApi:
             return r.json()
         except ValueError as e:
             text = r.text
-            logging.error("TikTok response: " + text)
+            self.logger.info("TikTok response: %s", text)
             if len(text) == 0:
                 raise EmptyResponseError(
                     "Empty response from Tiktok to " + url
                 ) from None
             else:
-                logging.error("Converting response to JSON failed")
-                logging.error(e)
+                self.logger.exception("Converting response to JSON failed")
                 raise JSONDecodeFailure() from e
 
-    def get_cookies(self, **kwargs):
+    def __del__(self):
+        """A basic cleanup method, called automatically from the code"""
+        try:
+            self._browser._clean_up()
+        except Exception:
+            pass
+        try:
+            get_playwright().stop()
+        except Exception:
+            pass
+        TikTokApi._instance = None
+
+    def external_signer(self, url, custom_device_id=None, verifyFp=None):
+        """Makes requests to an external signer instead of using a browser.
+
+        ##### Parameters
+        * url: The server to make requests to
+            This server is designed to sign requests. You can find an example
+            of this signature server in the examples folder.
+
+        * custom_device_id: A TikTok parameter needed to download videos
+            The code generates these and handles these pretty well itself, however
+            for some things such as video download you will need to set a consistent
+            one of these.
+
+        * custom_verify_fp: A TikTok parameter needed to work most of the time,
+            To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
+            I recommend watching the entire thing, as it will help setup this package.
+        """
+        if custom_device_id is not None:
+            query = {
+                "url": url,
+                "custom_device_id": custom_device_id,
+                "verifyFp": verifyFp,
+            }
+        else:
+            query = {"url": url, "verifyFp": verifyFp}
+        data = requests.get(
+            self._signer_url + "?{}".format(urlencode(query)),
+            **self._requests_extra_kwargs,
+        )
+        parsed_data = data.json()
+
+        return (
+            parsed_data["verifyFp"],
+            parsed_data["device_id"],
+            parsed_data["_signature"],
+            parsed_data["user_agent"],
+            parsed_data["referrer"],
+        )
+
+    def _get_cookies(self, **kwargs):
         """Extracts cookies from the kwargs passed to the function for get_data"""
         device_id = kwargs.get(
             "custom_device_id",
             "".join(random.choice(string.digits) for num in range(19)),
         )
-        if kwargs.get("custom_verifyFp") == None:
-            if self.custom_verifyFp != None:
-                verifyFp = self.custom_verifyFp
+        if kwargs.get("custom_verify_fp") is None:
+            if self._custom_verify_fp is not None:
+                verifyFp = self._custom_verify_fp
             else:
-                verifyFp = "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"
+                verifyFp = None
         else:
-            verifyFp = kwargs.get("custom_verifyFp")
+            verifyFp = kwargs.get("custom_verify_fp")
 
         if kwargs.get("force_verify_fp_on_cookie_header", False):
             return {
@@ -420,22 +453,22 @@ class TikTokApi:
 
     def get_bytes(self, **kwargs) -> bytes:
         """Returns TikTok's response as bytes, similar to get_data"""
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-        if self.signer_url is None:
-            verify_fp, device_id, signature, _ = self.browser.sign_url(
+        processed = self._process_kwargs(kwargs)
+        kwargs["custom_device_id"] = processed.device_id
+        if self._signer_url is None:
+            verify_fp, device_id, signature, _ = self._browser.sign_url(
                 calc_tt_params=False, **kwargs
             )
-            userAgent = self.browser.userAgent
-            referrer = self.browser.referrer
+            user_agent = self._browser.user_agent
+            referrer = self._browser.referrer
         else:
-            verify_fp, device_id, signature, userAgent, referrer = self.external_signer(
+            (
+                verify_fp,
+                device_id,
+                signature,
+                user_agent,
+                referrer,
+            ) = self.external_signer(
                 kwargs["url"], custom_device_id=kwargs.get("custom_device_id", None)
             )
         query = {"verifyFp": verify_fp, "_signature": signature}
@@ -452,1042 +485,12 @@ class TikTokApi:
                 "Pragma": "no-cache",
                 "Range": "bytes=0-",
                 "Referer": "https://www.tiktok.com/",
-                "User-Agent": userAgent,
+                "User-Agent": user_agent,
             },
-            proxies=self.__format_proxy(proxy),
-            cookies=self.get_cookies(**kwargs),
+            proxies=self._format_proxy(processed.proxy),
+            cookies=self._get_cookies(**kwargs),
         )
         return r.content
-
-    def by_trending(self, count=30, **kwargs) -> dict:
-        """
-        Gets trending TikToks
-
-        ##### Parameters
-        * count: The amount of TikToks you want returned, optional
-
-            Note: TikTok seems to only support at MOST ~2000 TikToks
-            from a single endpoint.
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-
-        spawn = requests.head(
-            "https://www.tiktok.com",
-            proxies=self.__format_proxy(proxy),
-            **self.requests_extra_kwargs,
-        )
-        ttwid = spawn.cookies["ttwid"]
-
-        response = []
-        first = True
-
-        while len(response) < count:
-            if count < maxCount:
-                realCount = count
-            else:
-                realCount = maxCount
-
-            query = {
-                "count": realCount,
-                "id": 1,
-                "sourceType": 12,
-                "itemID": 1,
-                "insertedItemID": "",
-                "region": region,
-                "priority_region": region,
-                "language": language,
-            }
-            api_url = "{}api/recommend/item_list/?{}&{}".format(
-                BASE_URL, self.__add_url_params__(), urlencode(query)
-            )
-            res = self.get_data(url=api_url, ttwid=ttwid, **kwargs)
-            for t in res.get("itemList", []):
-                response.append(t)
-
-            if not res.get("hasMore", False) and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
-                return response[:count]
-
-            realCount = count - len(response)
-
-            first = False
-
-        return response[:count]
-
-    def search_for_users(self, search_term, count=28, **kwargs) -> list:
-        """Returns a list of users that match the search_term
-
-        ##### Parameters
-        * search_term: The string to search for users by
-            This string is the term you want to search for users by.
-
-        * count: The number of users to return
-            Note: maximum is around 28 for this type of endpoint.
-        """
-        return self.discover_type(search_term, prefix="user", count=count, **kwargs)
-
-    def search_for_music(self, search_term, count=28, **kwargs) -> list:
-        """Returns a list of music that match the search_term
-
-        ##### Parameters
-        * search_term: The string to search for music by
-            This string is the term you want to search for music by.
-
-        * count: The number of music to return
-            Note: maximum is around 28 for this type of endpoint.
-        """
-        return self.discover_type(search_term, prefix="music", count=count, **kwargs)
-
-    def search_for_hashtags(self, search_term, count=28, **kwargs) -> list:
-        """Returns a list of hashtags that match the search_term
-
-        ##### Parameters
-        * search_term: The string to search for music by
-            This string is the term you want to search for music by.
-
-        * count: The number of music to return
-            Note: maximum is around 28 for this type of endpoint.
-        """
-        return self.discover_type(
-            search_term, prefix="challenge", count=count, **kwargs
-        )
-
-    def discover_type(self, search_term, prefix, count=28, offset=0, **kwargs) -> list:
-        """Returns a list of whatever the prefix type you pass in
-
-        ##### Parameters
-        * search_term: The string to search by
-
-        * prefix: The prefix of what to search for
-
-        * count: The number search results to return
-            Note: maximum is around 28 for this type of endpoint.
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-
-        response = []
-        while len(response) < count:
-            query = {
-                "discoverType": 0,
-                "needItemList": False,
-                "keyWord": search_term,
-                "offset": offset,
-                "count": count,
-                "useRecommend": False,
-                "language": "en",
-            }
-            api_url = "{}api/discover/{}/?{}&{}".format(
-                BASE_URL, prefix, self.__add_url_params__(), urlencode(query)
-            )
-            data = self.get_data(url=api_url, **kwargs)
-
-            if "userInfoList" in data.keys():
-                for x in data["userInfoList"]:
-                    response.append(x)
-            elif "musicInfoList" in data.keys():
-                for x in data["musicInfoList"]:
-                    response.append(x)
-            elif "challengeInfoList" in data.keys():
-                for x in data["challengeInfoList"]:
-                    response.append(x)
-            else:
-                logging.info("TikTok is not sending videos beyond this point.")
-                break
-
-            offset += maxCount
-
-        return response[:count]
-
-    def user_posts(self, userID, secUID, count=30, cursor=0, **kwargs) -> dict:
-        """Returns an array of dictionaries representing TikToks for a user.
-
-        ##### Parameters
-        * userID: The userID of the user, which TikTok assigns
-
-            You can find this from utilizing other methods or
-            just use by_username to find it.
-        * secUID: The secUID of the user, which TikTok assigns
-
-            You can find this from utilizing other methods or
-            just use by_username to find it.
-        * count: The number of posts to return
-
-            Note: seems to only support up to ~2,000
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-
-        response = []
-        first = True
-
-        while len(response) < count:
-            if count < maxCount:
-                realCount = count
-            else:
-                realCount = maxCount
-
-            query = {
-                "count": realCount,
-                "id": userID,
-                "cursor": cursor,
-                "type": 1,
-                "secUid": secUID,
-                "sourceType": 8,
-                "appId": 1233,
-                "region": region,
-                "priority_region": region,
-                "language": language,
-            }
-            api_url = "{}api/post/item_list/?{}&{}".format(
-                BASE_URL, self.__add_url_params__(), urlencode(query)
-            )
-
-            res = self.get_data(url=api_url, send_tt_params=True, **kwargs)
-
-            if "itemList" in res.keys():
-                for t in res.get("itemList", []):
-                    response.append(t)
-
-            if not res.get("hasMore", False) and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
-                return response
-
-            realCount = count - len(response)
-            cursor = res["cursor"]
-
-            first = False
-
-        return response[:count]
-
-    def by_username(self, username, count=30, **kwargs) -> dict:
-        """Returns a dictionary listing TikToks given a user's username.
-
-        ##### Parameters
-        * username: The username of the TikTok user to get TikToks from
-
-        * count: The number of posts to return
-
-            Note: seems to only support up to ~2,000
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-        data = self.get_user_object(username, **kwargs)
-        return self.user_posts(
-            data["id"],
-            data["secUid"],
-            count=count,
-            **kwargs,
-        )
-
-    def user_page(self, userID, secUID, page_size=30, cursor=0, **kwargs) -> dict:
-        """Returns a dictionary listing of one page of TikToks given a user's ID and secUID
-
-        ##### Parameters
-        * userID: The userID of the user, which TikTok assigns
-
-            You can find this from utilizing other methods or
-            just use by_username to find it.
-        * secUID: The secUID of the user, which TikTok assigns
-
-            You can find this from utilizing other methods or
-            just use by_username to find it.
-        * page_size: The number of posts to return per page
-
-            Gets a specific page of a user, doesn't iterate.
-        * cursor: The offset of a page
-
-            The offset to return new videos from
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-
-        api_url = (
-            BASE_URL + "api/post/item_list/?{}&count={}&id={}&type=1&secUid={}"
-            "&cursor={}&sourceType=8&appId=1233&region={}&language={}".format(
-                self.__add_url_params__(),
-                page_size,
-                str(userID),
-                str(secUID),
-                cursor,
-                region,
-                language,
-            )
-        )
-
-        return self.get_data(url=api_url, send_tt_params=True, **kwargs)
-
-    def get_user_pager(self, username, page_size=30, cursor=0, **kwargs):
-        """Returns a generator to page through a user's feed
-
-        ##### Parameters
-        * username: The username of the user
-
-        * page_size: The number of posts to return in a page
-
-        * cursor: The offset of a page
-
-            The offset to return new videos from
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-        data = self.get_user_object(username, **kwargs)
-
-        while True:
-            resp = self.user_page(
-                data["id"],
-                data["secUid"],
-                page_size=page_size,
-                cursor=cursor,
-                **kwargs,
-            )
-
-            try:
-                page = resp["itemList"]
-            except KeyError:
-                # No mo results
-                return
-
-            cursor = resp["cursor"]
-
-            yield page
-
-            if not resp["hasMore"]:
-                return  # all done
-
-    def user_liked(self, userID, secUID, count=30, cursor=0, **kwargs) -> dict:
-        """Returns a dictionary listing TikToks that a given a user has liked.
-            Note: The user's likes must be public
-
-        ##### Parameters
-        * userID: The userID of the user, which TikTok assigns
-
-        * secUID: The secUID of the user, which TikTok assigns
-
-        * count: The number of posts to return
-
-            Note: seems to only support up to ~2,000
-        * cursor: The offset of a page
-
-            The offset to return new videos from
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-        response = []
-        first = True
-
-        while len(response) < count:
-            if count < maxCount:
-                realCount = count
-            else:
-                realCount = maxCount
-
-            query = {
-                "count": realCount,
-                "id": userID,
-                "type": 2,
-                "secUid": secUID,
-                "cursor": cursor,
-                "sourceType": 9,
-                "appId": 1233,
-                "region": region,
-                "priority_region": region,
-                "language": language,
-            }
-            api_url = "{}api/favorite/item_list/?{}&{}".format(
-                BASE_URL, self.__add_url_params__(), urlencode(query)
-            )
-
-            res = self.get_data(url=api_url, **kwargs)
-
-            try:
-                res["itemList"]
-            except Exception:
-                logging.error("User's likes are most likely private")
-                return []
-
-            for t in res.get("itemList", []):
-                response.append(t)
-
-            if not res.get("hasMore", False) and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
-                return response
-
-            realCount = count - len(response)
-            cursor = res["cursor"]
-
-            first = False
-
-        return response[:count]
-
-    def user_liked_by_username(self, username, count=30, **kwargs) -> dict:
-        """Returns a dictionary listing TikToks a user has liked by username.
-            Note: The user's likes must be public
-
-        ##### Parameters
-        * username: The username of the user
-
-        * count: The number of posts to return
-
-            Note: seems to only support up to ~2,000
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-        data = self.get_user_object(username, **kwargs)
-        return self.user_liked(
-            data["id"],
-            data["secUid"],
-            count=count,
-            **kwargs,
-        )
-
-    def by_sound(self, id, count=30, offset=0, **kwargs) -> dict:
-        """Returns a dictionary listing TikToks with a specific sound.
-
-        ##### Parameters
-        * id: The sound id to search by
-
-            Note: Can be found in the URL of the sound specific page or with other methods.
-        * count: The number of posts to return
-
-            Note: seems to only support up to ~2,000
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-        response = []
-
-        while len(response) < count:
-            if count < maxCount:
-                realCount = count
-            else:
-                realCount = maxCount
-
-            query = {
-                "secUid": "",
-                "musicID": str(id),
-                "count": str(realCount),
-                "cursor": offset,
-                "shareUid": "",
-                "language": language,
-            }
-            api_url = "{}api/music/item_list/?{}&{}".format(
-                BASE_URL, self.__add_url_params__(), urlencode(query)
-            )
-
-            res = self.get_data(url=api_url, send_tt_params=True, **kwargs)
-
-            try:
-                for t in res["items"]:
-                    response.append(t)
-            except KeyError:
-                for t in res.get("itemList", []):
-                    response.append(t)
-
-            if not res.get("hasMore", False):
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
-                return response
-
-            realCount = count - len(response)
-            offset = res["cursor"]
-
-        return response[:count]
-
-    def by_sound_page(self, id, page_size=30, cursor=0, **kwargs) -> dict:
-        """Returns a page of tiktoks with a specific sound.
-
-        Parameters
-        ----------
-        id: The sound id to search by
-            Note: Can be found in the URL of the sound specific page or with other methods.
-        cursor: offset for pagination
-        page_size: The number of posts to return
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-
-        query = {
-            "musicID": str(id),
-            "count": str(page_size),
-            "cursor": cursor,
-            "language": language,
-        }
-        api_url = "{}api/music/item_list/?{}&{}".format(
-            BASE_URL, self.__add_url_params__(), urlencode(query)
-        )
-
-        return self.get_data(url=api_url, send_tt_params=True, **kwargs)
-
-    def get_music_object(self, id, **kwargs) -> dict:
-        """Returns a music object for a specific sound id.
-
-        ##### Parameters
-        * id: The sound id to get the object for
-
-            This can be found by using other methods.
-        """
-        return self.get_music_object_full(id, **kwargs)["music"]
-
-    def get_music_object_full(self, id, **kwargs):
-        """Returns a music object for a specific sound id.
-
-        ##### Parameters
-        * id: The sound id to get the object for
-
-            This can be found by using other methods.
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        r = requests.get(
-            "https://www.tiktok.com/music/-{}".format(id),
-            headers={
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "Accept-Encoding": "gzip, deflate",
-                "Connection": "keep-alive",
-                "User-Agent": self.userAgent,
-            },
-            proxies=self.__format_proxy(kwargs.get("proxy", None)),
-            cookies=self.get_cookies(**kwargs),
-            **self.requests_extra_kwargs,
-        )
-
-        j_raw = self.__extract_tag_contents(r.text)
-        return json.loads(j_raw)["props"]["pageProps"]["musicInfo"]
-
-    def get_music_object_full_by_api(self, id, **kwargs):
-        """Returns a music object for a specific sound id, but using the API rather than HTML requests.
-
-        ##### Parameters
-        * id: The sound id to get the object for
-
-            This can be found by using other methods.
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-
-        api_url = "{}node/share/music/-{}?{}".format(
-            BASE_URL, id, self.__add_url_params__()
-        )
-        res = self.get_data(url=api_url, **kwargs)
-
-        if res.get("statusCode", 200) == 10203:
-            raise TikTokNotFoundError()
-
-        return res["musicInfo"]
-
-    def by_hashtag(self, hashtag, count=30, offset=0, **kwargs) -> dict:
-        """Returns a dictionary listing TikToks with a specific hashtag.
-
-        ##### Parameters
-        * hashtag: The hashtag to search by
-
-            Without the # symbol
-
-            A valid string is "funny"
-        * count: The number of posts to return
-            Note: seems to only support up to ~2,000
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-        id = self.get_hashtag_object(hashtag)["challengeInfo"]["challenge"]["id"]
-        response = []
-
-        required_count = count
-
-        while len(response) < required_count:
-            if count > maxCount:
-                count = maxCount
-            query = {
-                "count": count,
-                "challengeID": id,
-                "type": 3,
-                "secUid": "",
-                "cursor": offset,
-                "priority_region": "",
-            }
-            api_url = "{}api/challenge/item_list/?{}&{}".format(
-                BASE_URL, self.__add_url_params__(), urlencode(query)
-            )
-            res = self.get_data(url=api_url, **kwargs)
-
-            for t in res.get("itemList", []):
-                response.append(t)
-
-            if not res.get("hasMore", False):
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
-                return response
-
-            offset += maxCount
-
-        return response[:required_count]
-
-    def get_hashtag_object(self, hashtag, **kwargs) -> dict:
-        """Returns a hashtag object.
-
-        ##### Parameters
-        * hashtag: The hashtag to search by
-
-            Without the # symbol
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-        query = {"name": hashtag, "isName": True, "lang": language}
-        api_url = "{}node/share/tag/{}?{}&{}".format(
-            BASE_URL, quote(hashtag), self.__add_url_params__(), urlencode(query)
-        )
-        data = self.get_data(url=api_url, **kwargs)
-        if data["challengeInfo"].get("challenge") is None:
-            raise TikTokNotFoundError("Challenge {} does not exist".format(hashtag))
-        return data
-
-    def get_recommended_tiktoks_by_video_id(self, id, count=30, **kwargs) -> dict:
-        """Returns a dictionary listing reccomended TikToks for a specific TikTok video.
-
-
-        ##### Parameters
-        * id: The id of the video to get suggestions for
-
-            Can be found using other methods
-        * count: The count of results you want to return
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-
-        response = []
-        first = True
-
-        while len(response) < count:
-            if count < maxCount:
-                realCount = count
-            else:
-                realCount = maxCount
-
-            query = {
-                "count": realCount,
-                "id": 1,
-                "secUid": "",
-                "sourceType": 12,
-                "appId": 1233,
-                "region": region,
-                "priority_region": region,
-                "language": language,
-            }
-            api_url = "{}api/recommend/item_list/?{}&{}".format(
-                BASE_URL, self.__add_url_params__(), urlencode(query)
-            )
-
-            res = self.get_data(url=api_url, **kwargs)
-
-            for t in res.get("itemList", []):
-                response.append(t)
-
-            if not res.get("hasMore", False) and not first:
-                logging.info("TikTok isn't sending more TikToks beyond this point.")
-                return response[:count]
-
-            realCount = count - len(response)
-
-            first = False
-
-        return response[:count]
-
-    def get_tiktok_by_id(self, id, **kwargs) -> dict:
-        """Returns a dictionary of a specific TikTok.
-
-        ##### Parameters
-        * id: The id of the TikTok you want to get the object for
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-        device_id = kwargs.get("custom_device_id", None)
-        query = {
-            "itemId": id,
-            "language": language,
-        }
-        api_url = "{}api/item/detail/?{}&{}".format(
-            BASE_URL, self.__add_url_params__(), urlencode(query)
-        )
-
-        return self.get_data(url=api_url, **kwargs)
-
-    def get_tiktok_by_url(self, url, **kwargs) -> dict:
-        """Returns a dictionary of a TikTok object by url.
-
-
-        ##### Parameters
-        * url: The TikTok url you want to retrieve
-
-        """
-
-        url = requests.head(url=url, allow_redirects=True).url
-
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-        custom_device_id = kwargs.get("custom_device_id", None)
-        if "@" in url and "/video/" in url:
-            post_id = url.split("/video/")[1].split("?")[0]
-        else:
-            raise Exception(
-                "URL format not supported. Below is an example of a supported url.\n"
-                "https://www.tiktok.com/@therock/video/6829267836783971589"
-            )
-
-        return self.get_tiktok_by_id(
-            post_id,
-            **kwargs,
-        )
-
-    def get_tiktok_by_html(self, url, **kwargs) -> dict:
-        """This method retrieves a TikTok using the html
-        endpoints rather than the API based ones.
-
-        ##### Parameters
-        * url: The url of the TikTok to get
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-
-        r = requests.get(
-            url,
-            headers={
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "path": url.split("tiktok.com")[1],
-                "Accept-Encoding": "gzip, deflate",
-                "Connection": "keep-alive",
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
-            },
-            proxies=self.__format_proxy(kwargs.get("proxy", None)),
-            cookies=self.get_cookies(**kwargs),
-            **self.requests_extra_kwargs,
-        )
-
-        t = r.text
-        try:
-            j_raw = self.__extract_tag_contents(r.text)
-        except IndexError:
-            if not t:
-                logging.error("TikTok response is empty")
-            else:
-                logging.error("TikTok response: \n " + t)
-            raise TikTokCaptchaError()
-
-        data = json.loads(j_raw)["props"]["pageProps"]
-
-        if data["serverCode"] == 404:
-            raise TikTokNotFoundError("TikTok with that url doesn't exist")
-
-        return data
-
-    def get_user_object(self, username, **kwargs) -> dict:
-        """Gets a user object (dictionary)
-
-        ##### Parameters
-        * username: The username of the user
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-        return self.get_user(username, **kwargs)["userInfo"]["user"]
-
-    def get_user(self, username, **kwargs) -> dict:
-        """Gets the full exposed user object
-
-        ##### Parameters
-        * username: The username of the user
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        r = requests.get(
-            "https://tiktok.com/@{}?lang=en".format(quote(username)),
-            headers={
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "path": "/@{}".format(quote(username)),
-                "Accept-Encoding": "gzip, deflate",
-                "Connection": "keep-alive",
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
-            },
-            proxies=self.__format_proxy(kwargs.get("proxy", None)),
-            cookies=self.get_cookies(**kwargs),
-            **self.requests_extra_kwargs,
-        )
-
-        t = r.text
-
-        try:
-            j_raw = self.__extract_tag_contents(r.text)
-        except IndexError:
-            if not t:
-                logging.error("Tiktok response is empty")
-            else:
-                logging.error("Tiktok response: \n " + t)
-            raise TikTokCaptchaError()
-
-        user = json.loads(j_raw)["props"]["pageProps"]
-
-        if user["serverCode"] == 404:
-            raise TikTokNotFoundError(
-                "TikTok user with username {} does not exist".format(username)
-            )
-
-        return user
-
-    def get_video_by_tiktok(self, data, **kwargs) -> bytes:
-        """Downloads video from TikTok using a TikTok object.
-
-        You will need to set a custom_device_id to do this for anything but trending.
-        To do this, this is pretty simple you can either generate one yourself or,
-        you can pass the generate_static_device_id=True into the constructor of the
-        TikTokApi class.
-
-        ##### Parameters
-        * data: A TikTok object
-
-            A TikTok JSON object from any other method.
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-        try:
-            api_url = data["video"]["downloadAddr"]
-        except Exception:
-            try:
-                api_url = data["itemInfos"]["video"]["urls"][0]
-            except Exception:
-                api_url = data["itemInfo"]["itemStruct"]["video"]["playAddr"]
-        return self.get_video_by_download_url(api_url, **kwargs)
-
-    def get_video_by_download_url(self, download_url, **kwargs) -> bytes:
-        """Downloads video from TikTok using download url in a TikTok object
-
-        ##### Parameters
-        * download_url: The download url key value in a TikTok object
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-        return self.get_bytes(url=download_url, **kwargs)
-
-    def get_video_by_url(self, video_url, **kwargs) -> bytes:
-        """Downloads a TikTok video by a URL
-
-        ##### Parameters
-        * video_url: The TikTok url to download the video from
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        kwargs["custom_device_id"] = device_id
-
-        tiktok_schema = self.get_tiktok_by_url(video_url, **kwargs)
-        download_url = tiktok_schema["itemInfo"]["itemStruct"]["video"]["downloadAddr"]
-
-        return self.get_bytes(url=download_url, **kwargs)
-
-    def get_video_no_watermark(self, video_url, return_bytes=1, **kwargs) -> bytes:
-        """Gets the video with no watermark
-        .. deprecated::
-
-        Deprecated due to TikTok fixing this
-
-        ##### Parameters
-        * video_url: The url of the video you want to download
-
-        * return_bytes: Set this to 0 if you want url, 1 if you want bytes
-        """
-        (
-            region,
-            language,
-            proxy,
-            maxCount,
-            device_id,
-        ) = self.__process_kwargs__(kwargs)
-        raise Exception("Deprecated method, TikTok fixed this.")
-
-    def get_music_title(self, id, **kwargs):
-        """Retrieves a music title given an ID
-
-        ##### Parameters
-        * id: The music id to get the title for
-        """
-        r = requests.get(
-            "https://www.tiktok.com/music/-{}".format(id),
-            headers={
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "Accept-Encoding": "gzip, deflate",
-                "Connection": "keep-alive",
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
-            },
-            proxies=self.__format_proxy(kwargs.get("proxy", None)),
-            cookies=self.get_cookies(**kwargs),
-            **self.requests_extra_kwargs,
-        )
-        t = r.text
-        j_raw = self.__extract_tag_contents(r.text)
-
-        music_object = json.loads(j_raw)["props"]["pageProps"]["musicInfo"]
-        if not music_object.get("title", None):
-            raise TikTokNotFoundError("Song of {} id does not exist".format(str(id)))
-
-        return music_object["title"]
-
-    def get_secuid(self, username, **kwargs):
-        """Gets the secUid for a specific username
-
-        ##### Parameters
-        * username: The username to get the secUid for
-        """
-        r = requests.get(
-            "https://tiktok.com/@{}?lang=en".format(quote(username)),
-            headers={
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "path": "/@{}".format(quote(username)),
-                "Accept-Encoding": "gzip, deflate",
-                "Connection": "keep-alive",
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
-            },
-            proxies=self.__format_proxy(
-                kwargs.get("proxy", None), cookies=self.get_cookies(**kwargs)
-            ),
-            **self.requests_extra_kwargs,
-        )
-        try:
-            return r.text.split('"secUid":"')[1].split('","secret":')[0]
-        except IndexError as e:
-            logging.info(r.text)
-            logging.error(e)
-            raise Exception(
-                "Retrieving the user secUid failed. Likely due to TikTok wanting captcha validation. Try to use a proxy."
-            )
 
     @staticmethod
     def generate_device_id():
@@ -1498,77 +501,65 @@ class TikTokApi:
     # PRIVATE METHODS
     #
 
-    def __format_proxy(self, proxy) -> dict:
+    def _format_proxy(self, proxy) -> Optional[dict]:
         """
         Formats the proxy object
         """
-        if proxy is None and self.proxy is not None:
-            proxy = self.proxy
+        if proxy is None and self._proxy is not None:
+            proxy = self._proxy
         if proxy is not None:
             return {"http": proxy, "https": proxy}
         else:
             return None
 
-    def __get_js(self, proxy=None) -> str:
-        return requests.get(
-            "https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-gcs/acrawler.js",
-            proxies=self.__format_proxy(proxy),
-            **self.requests_extra_kwargs,
-        ).text
-
-    def __format_new_params__(self, parm) -> str:
-        # TODO: Maybe try not doing this? It should be handled by the urlencode.
-        return parm.replace("/", "%2F").replace(" ", "+").replace(";", "%3B")
-
-    def __add_url_params__(self) -> str:
-        query = {
-            "aid": 1988,
-            "app_name": "tiktok_web",
-            "device_platform": "web_mobile",
-            "region": self.region or "US",
-            "priority_region": "",
-            "os": "ios",
-            "referer": "",
-            "root_referer": "",
-            "cookie_enabled": "true",
-            "screen_width": self.width,
-            "screen_height": self.height,
-            "browser_language": self.browser_language.lower() or "en-us",
-            "browser_platform": "iPhone",
-            "browser_name": "Mozilla",
-            "browser_version": self.__format_new_params__(self.userAgent),
-            "browser_online": "true",
-            "timezone_name": self.timezone_name or "America/Chicago",
-            "is_page_visible": "true",
-            "focus_state": "true",
-            "is_fullscreen": "false",
-            "history_len": random.randint(0, 30),
-            "language": self.language or "en",
-        }
-        return urlencode(query)
-
-    def __extract_tag_contents(self, html):
-        nonce_start = '<head nonce="'
-        nonce_end = '">'
-        nonce = html.split(nonce_start)[1].split(nonce_end)[0]
-        j_raw = html.split(
-            '<script id="__NEXT_DATA__" type="application/json" nonce="%s" crossorigin="anonymous">'
-            % nonce
-        )[1].split("</script>")[0]
-        return j_raw
-
     # Process the kwargs
-    def __process_kwargs__(self, kwargs):
+    def _process_kwargs(self, kwargs):
         region = kwargs.get("region", "US")
         language = kwargs.get("language", "en")
         proxy = kwargs.get("proxy", None)
-        maxCount = kwargs.get("maxCount", 35)
 
         if kwargs.get("custom_device_id", None) != None:
             device_id = kwargs.get("custom_device_id")
         else:
-            if self.custom_device_id != None:
-                device_id = self.custom_device_id
+            if self._custom_device_id != None:
+                device_id = self._custom_device_id
             else:
                 device_id = "".join(random.choice(string.digits) for num in range(19))
-        return region, language, proxy, maxCount, device_id
+
+        @dataclass
+        class ProcessedKwargs:
+            region: str
+            language: str
+            proxy: str
+            device_id: str
+
+        return ProcessedKwargs(
+            region=region, language=language, proxy=proxy, device_id=device_id
+        )
+
+    def _add_url_params(self) -> str:
+        query = {
+            "aid": 1988,
+            "app_name": "tiktok_web",
+            "device_platform": "web_mobile",
+            "region": self._region or "US",
+            "priority_region": "",
+            "os": "ios",
+            "referer": "",
+            "cookie_enabled": "true",
+            "screen_width": self._width,
+            "screen_height": self._height,
+            "browser_language": self._browser_language.lower() or "en-us",
+            "browser_platform": "iPhone",
+            "browser_name": "Mozilla",
+            "browser_version": self._user_agent,
+            "browser_online": "true",
+            "timezone_name": self._timezone_name or "America/Chicago",
+            "is_page_visible": "true",
+            "focus_state": "true",
+            "is_fullscreen": "false",
+            "history_len": random.randint(0, 30),
+            "language": self._language or "en",
+        }
+
+        return urlencode(query)

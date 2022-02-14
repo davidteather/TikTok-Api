@@ -8,46 +8,46 @@ This is an unofficial api wrapper for TikTok.com in python. With this api you ar
 ## Sponsors
 These sponsors have paid to be placed here and beyond that I do not have any affiliation with them, the TikTokAPI package will always be free and open-source. If you wish to be a sponsor of this project check out my [GitHub sponsors page](https://github.com/sponsors/davidteather).
 
-[![TikAPI](imgs/logo128.png)](https://tikapi.io/?ref=davidteather)   |  **[TikAPI](https://tikapi.io/?ref=davidteather)** is a paid TikTok API service providing an full out-of-the-box solution for developers, trusted by 100+ companies. [Learn more](https://tikapi.io/?ref=davidteather)
+[![TikAPI](https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/logo128.png)](https://tikapi.io/?ref=davidteather)   |  **[TikAPI](https://tikapi.io/?ref=davidteather)** is a paid TikTok API service providing an full out-of-the-box solution for developers, trusted by 100+ companies. [Learn more](https://tikapi.io/?ref=davidteather)
 :-------------------------:|:-------------------------:
 
 ## Table of Contents
+- [Documentation](#documentation)
 - [Getting Started](#getting-started)
+    - [How to Support The Project](#how-to-support-the-project)
     - [Installing](#installing)
     - [Common Issues](#common-issues)
 - [Quick Start Guide](#quick-start-guide)
     - [Examples](https://github.com/davidteather/TikTok-Api/tree/master/examples)
-- [Documentation](#documentation)
-- [Built With](#built-with)
-- [Authors](#authors)
-- [License](#license)
 
+[**Upgrading from V4 to V5**](#upgrading-from-v4-to-v5)
+
+## Documentation
+
+You can find the full documentation [here](https://davidteather.github.io/TikTok-Api/docs/TikTokApi.html), the [TikTokApi Class](https://davidteather.github.io/TikTok-Api/docs/TikTokApi/tiktok.html) is where you'll probably spend most of your time.
 ## Getting Started
 
 To get started using this api follow the instructions below.
 
-#### How to support the project
-* Feel free to sponsor me on GitHub
-* Feel free to tip the project using the brave browser
+### How to Support The Project
+* Star the repo 😎
+* Consider [sponsoring](https://github.com/sponsors/davidteather) me on GitHub
+* Send me an email or a [LinkedIn](https://www.linkedin.com/in/davidteather/) message telling me what you're using the API for, I really like hearing what people are using it for.
 * Submit PRs for issues :)
 
 ### Installing
 
-If you run into an issue please check the closed issues on the github. You're most likely not the first person to experience this issue. If nothing works feel free to open an issue.
+If you run into an issue please check the closed issues on the github, although feel free to re-open a new issue if you find an issue that's been closed for a few months. The codebase can and does run into similar issues as it has before, because TikTok changes things up.
 
 ```sh
 pip install TikTokApi
 python -m playwright install
 ```
-If you would prefer a video walk through of setting up this package I created a [YouTube video](https://www.youtube.com/watch?v=zwLmLfVI-VQ) just for that.
-
-
-
-If you're on MacOS you may need to install [XCode Developer Tools](https://webkit.org/build-tools/)
+If you would prefer a video walk through of setting up this package I created a currently semi-outdated (TODO: new one for v5 coming soon) [YouTube video](https://www.youtube.com/watch?v=zwLmLfVI-VQ) just for that.
 
 #### Docker Installation
 
-Clone this repository onto a local machine then run the following commands.
+Clone this repository onto a local machine (or just the Dockerfile since it installs TikTokApi from pip) then run the following commands.
 
 ```sh
 docker pull mcr.microsoft.com/playwright:focal
@@ -61,47 +61,93 @@ docker run -v TikTokApi --rm tiktokapi:latest python3 your_script.py
 
 Please don't open an issue if you're experiencing one of these just comment if the provided solution do not work for you.
 
-* **Browser Has no Attribute** - make sure you ran `python3 -m playwright install`, if your error persists try the [playwright](https://github.com/microsoft/playwright-python) quickstart guide and diagnose issues from there.
+* **Browser Has no Attribute** - make sure you ran `python3 -m playwright install`, if your error persists try the [playwright-python](https://github.com/microsoft/playwright-python) quickstart guide and diagnose issues from there.
 
 ## Quick Start Guide
 
-Here's a quick bit of code to get the most recent trending on TikTok. There's more examples in the examples directory.
+Here's a quick bit of code to get the most recent trending videos on TikTok. There's more examples in the [examples](https://github.com/davidteather/TikTok-Api/tree/master/examples) directory.
 
 ```py
 from TikTokApi import TikTokApi
-api = TikTokApi.get_instance()
-results = 10
 
-# Since TikTok changed their API you need to use the custom_verifyFp option. 
-# In your web browser you will need to go to TikTok, Log in and get the s_v_web_id value.
-trending = api.by_trending(count=results, custom_verifyFp="")
+# In your web browser you will need to go to TikTok, check the cookies 
+# and under www.tiktok.com s_v_web_id should exist, and use that value
+# as input to custom_verify_fp
+# Or watch https://www.youtube.com/watch?v=zwLmLfVI-VQ for a visual
+# TODO: Update link
+api = TikTokApi(custom_verify_fp="")
 
-for tiktok in trending:
-    # Prints the id of the tiktok
-    print(tiktok['id'])
-
-print(len(trending))
+for trending_video in api.trending.videos(count=50):
+    # Prints the author's username of the trending video.
+    print(trending_video.author.username)
 ```
 
-To run the example scripts from the repository root, make sure you use the
-module form of python the interpreter
-
+To run the example scripts from the repository root, make sure you use the `-m` option on python.
 ```sh
 python -m examples.get_trending
 ```
 
-[Here's](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d) an example of what a TikTok dictionary looks like.
+You can access the dictionary type of an object using `.as_dict`. On a video this may look like
+[this](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d), although TikTok changes their structure from time to time so it's worth investigating the structure of the dictionary when you use this package.
 
-## Documentation
+## Upgrading from V4 to V5
 
-You can find the documentation [here](https://davidteather.github.io/TikTok-Api/docs/TikTokApi.html) (you'll likely just need the TikTokApi section of the docs), I will be making this documentation more complete overtime as it's not super great right now, but better than just having it in the readme!
+All changes will be noted on [#803](https://github.com/davidteather/TikTok-Api/pull/803) if you want more information.
 
-## Authors
+### Motivation
 
-* **David Teather** - *Initial work* - [davidteather](https://github.com/davidteather)
+This package has been difficult to maintain due to it's structure, difficult to work with since the user of the package must write parsing methods to extract information from dictionaries, more memory intensive than it needs to be (although this can be further improved), and in general just difficult to work with for new users. 
 
-See also the list of [contributors](https://github.com/davidteather/TikTok-Api/contributors) who participated in this project.
+As a result, I've decided to at least attempt to remedy some of these issues, the biggest changes are that 
+1. The package has shifted to using classes for different TikTok objects resulting in an easier, higher-level programming experience.
+2. All methods that used to return a list of objects have been switched to using iterators, to hopefully decrease memory utilization for most users.
 
-## License
 
-This project is licensed under the MIT License
+### Upgrading Examples
+
+
+#### Accessing Dictionary on Objects (similar to V4)
+
+TODO: Make video upgrading from V4-V5?
+
+You'll probably need to use this beyond just for legacy support, since not all attributes are parsed out and attached
+to the different objects.
+
+You may want to use this as a workaround for legacy applications while you upgrade the rest of the app. I'd suggest that you do eventually upgrade to using the higher-level approach fully.
+```py
+user = api.user(username='therock')
+user.as_dict # -> dict of the user_object
+for video in user.videos():
+    video.as_dict # -> dict of TikTok's video object as found when requesting the videos endpoint
+```
+
+Here's a few more examples that help illustrate the differences in the flow of the usage of the package with V5.
+
+```py
+# V4
+api = TikTokApi.get_instance()
+trending_videos = api.by_trending()
+
+#V5
+api = TikTokApi() # .get_instance no longer exists
+for trending_video in api.trending.videos():
+    # do something
+```
+
+Where in V4 you had to extract information yourself, the package now handles that for you. So it's much easier to do chained related function calls.
+```py
+# V4
+trending_videos = api.by_trending()
+for video in trending_videos:
+    # The dictionary responses are also different depending on what endpoint you got them from
+    # So, it's usually more painful than this to deal with
+    trending_user = api.get_user(id=video['author']['id'], secUid=video['author']['secUid'])
+
+
+# V5
+# This is more complicated than above, but it illustrates the simplified approach
+for trending_video in api.trending.videos():
+    user_stats = trending_video.author.info_full['stats']
+    if user_stats['followerCount'] >= 10000:
+        # maybe save the user in a database
+```
