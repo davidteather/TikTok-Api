@@ -43,7 +43,7 @@ If you run into an issue please check the closed issues on the github, although 
 pip install TikTokApi
 python -m playwright install
 ```
-If you would prefer a video walk through of setting up this package I created a currently semi-outdated (TODO: new one for v5 coming soon) [YouTube video](https://www.youtube.com/watch?v=zwLmLfVI-VQ) just for that.
+If you would prefer a video walk through of setting up this package I created a currently semi-outdated [YouTube video](https://www.youtube.com/watch?v=-uCt1x8kINQ) just for that.
 
 #### Docker Installation
 
@@ -73,8 +73,7 @@ from TikTokApi import TikTokApi
 # In your web browser you will need to go to TikTok, check the cookies 
 # and under www.tiktok.com s_v_web_id should exist, and use that value
 # as input to custom_verify_fp
-# Or watch https://www.youtube.com/watch?v=zwLmLfVI-VQ for a visual
-# TODO: Update link
+# Or watch https://www.youtube.com/watch?v=-uCt1x8kINQ for a visual
 api = TikTokApi(custom_verify_fp="")
 
 for trending_video in api.trending.videos(count=50):
@@ -107,8 +106,6 @@ As a result, I've decided to at least attempt to remedy some of these issues, th
 
 
 #### Accessing Dictionary on Objects (similar to V4)
-
-TODO: Make video upgrading from V4-V5?
 
 You'll probably need to use this beyond just for legacy support, since not all attributes are parsed out and attached
 to the different objects.
