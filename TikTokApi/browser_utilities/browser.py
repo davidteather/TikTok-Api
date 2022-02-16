@@ -181,13 +181,20 @@ class browser(BrowserInterface):
         tt_params = None
         context = self._create_context()
         page = context.new_page()
+        if len(self.browser.contexts) > 1:
+            logger.warn(f'context count {len(self.browser.contexts)}')
 
         if calc_tt_params:
-            page.route(re.compile(r"(\.png)|(\.jpeg)|(\.mp4)|(x-expire)"), process)
-            page.goto(
-                kwargs.get("default_url", "https://www.tiktok.com/@redbull"),
-                wait_until="load",
-            )
+            page.route(re.compile(r"(\.png)|(\.jpeg)|(\.mp4)|(x-expire)|(googleads)|(facebook)"), process)
+            try:
+                page.goto(
+                    kwargs.get("default_url", "https://www.tiktok.com/@redbull"),
+                    wait_until="domcontentloaded",
+                )
+            except Exception as e:
+                logger.exception('error in goto for calculating tt params')
+                self.browser.close()
+                raise e
 
         verifyFp = "".join(
             random.choice(
@@ -211,33 +218,40 @@ class browser(BrowserInterface):
             device_id = self.device_id
 
         url = "{}&verifyFp={}&device_id={}".format(url, verifyFp, device_id)
+        try:
+            page.add_script_tag(content=_get_acrawler())
+            evaluatedPage = page.evaluate(
+                '''() => {
+                var url = "'''
+                + url
+                + """"
+                var token = window.byted_acrawler.sign({url: url});
 
-        page.add_script_tag(content=_get_acrawler())
-        evaluatedPage = page.evaluate(
-            '''() => {
-            var url = "'''
-            + url
-            + """"
-            var token = window.byted_acrawler.sign({url: url});
-            
-            return token;
-            }"""
-        )
+                return token;
+                }"""
+            )
+        except Exception as e:
+            logger.exception('error adding crawler')
+            context.close()
+            raise e
 
         url = "{}&_signature={}".format(url, evaluatedPage)
 
         if calc_tt_params:
-            page.add_script_tag(content=_get_tt_params_script())
+            try:
+                page.add_script_tag(content=_get_tt_params_script())
+                tt_params = page.evaluate(
+                    """() => {
+                        return window.genXTTParams("""
+                    + json.dumps(dict(parse_qsl(urlparse(url).query)))
+                    + """);
 
-            tt_params = page.evaluate(
-                """() => {
-                    return window.genXTTParams("""
-                + json.dumps(dict(parse_qsl(urlparse(url).query)))
-                + """);
-            
-                }"""
-            )
-
+                    }"""
+                )
+            except Exception as e:
+                logger.exception('error getting tt params')
+                context.close()
+                raise e
         context.close()
         return (verifyFp, device_id, evaluatedPage, tt_params)
 

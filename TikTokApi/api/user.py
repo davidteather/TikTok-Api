@@ -126,6 +126,7 @@ class User:
             # do something
         ```
         """
+
         processed = User.parent._process_kwargs(kwargs)
         kwargs["custom_device_id"] = processed.device_id
 
@@ -153,7 +154,6 @@ class User:
             )
 
             res = User.parent.get_data(path, send_tt_params=True, **kwargs)
-
             videos = res.get("itemList", [])
             amount_yielded += len(videos)
             for video in videos:

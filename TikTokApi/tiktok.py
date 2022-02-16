@@ -369,7 +369,7 @@ class TikTokApi:
         except Exception:
             pass
         try:
-            get_playwright().stop()
+            self._browser.stop()
         except Exception:
             pass
         TikTokApi._instance = None
