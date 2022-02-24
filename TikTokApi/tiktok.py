@@ -150,6 +150,7 @@ class TikTokApi:
         self._signer_url = kwargs.get("external_signer", None)
         self._request_delay = kwargs.get("request_delay", None)
         self._requests_extra_kwargs = kwargs.get("requests_extra_kwargs", {})
+        self._custom_ms_token = kwargs.get("custom_ms_token")
 
         if kwargs.get("use_test_endpoints", False):
             global BASE_URL
@@ -192,6 +193,8 @@ class TikTokApi:
         """
         processed = self._process_kwargs(kwargs)
         kwargs["custom_device_id"] = processed.device_id
+        kwargs["custom_ms_token"] = self._custom_ms_token
+
         if self._request_delay is not None:
             time.sleep(self._request_delay)
 
@@ -428,6 +431,7 @@ class TikTokApi:
             verifyFp = kwargs.get("custom_verify_fp")
 
         if kwargs.get("force_verify_fp_on_cookie_header", False):
+            print('force_verfiy_fp_on_cookie_header is present')
             return {
                 "tt_webid": device_id,
                 "tt_webid_v2": device_id,
@@ -438,6 +442,7 @@ class TikTokApi:
                 ),
                 "s_v_web_id": verifyFp,
                 "ttwid": kwargs.get("ttwid"),
+                "msToken": kwargs.get("msToken")
             }
         else:
             return {
@@ -449,12 +454,14 @@ class TikTokApi:
                     for i in range(16)
                 ),
                 "ttwid": kwargs.get("ttwid"),
+                "msToken": kwargs.get("msToken")
             }
 
     def get_bytes(self, **kwargs) -> bytes:
         """Returns TikTok's response as bytes, similar to get_data"""
         processed = self._process_kwargs(kwargs)
         kwargs["custom_device_id"] = processed.device_id
+        kwargs["custom_ms_token"] = self._custom_ms_token
         if self._signer_url is None:
             verify_fp, device_id, signature, _ = self._browser.sign_url(
                 calc_tt_params=False, **kwargs
@@ -560,6 +567,7 @@ class TikTokApi:
             "is_fullscreen": "false",
             "history_len": random.randint(0, 30),
             "language": self._language or "en",
+            "msToken": self._custom_ms_token
         }
 
         return urlencode(query)

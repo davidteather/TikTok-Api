@@ -216,8 +216,9 @@ class browser(BrowserInterface):
             device_id = str(random.randint(10000, 999999999))
         else:
             device_id = self.device_id
+        msToken = kwargs.get('custom_ms_token')
 
-        url = "{}&verifyFp={}&device_id={}".format(url, verifyFp, device_id)
+        url = "{}&verifyFp={}&device_id={}&msToken={}".format(url, verifyFp, device_id, msToken)
         try:
             page.add_script_tag(content=_get_acrawler())
             evaluatedPage = page.evaluate(
