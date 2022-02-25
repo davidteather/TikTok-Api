@@ -442,7 +442,7 @@ class TikTokApi:
                 ),
                 "s_v_web_id": verifyFp,
                 "ttwid": kwargs.get("ttwid"),
-                "msToken": kwargs.get("msToken")
+                "msToken": kwargs.get("custom_ms_token")
             }
         else:
             return {
@@ -454,7 +454,7 @@ class TikTokApi:
                     for i in range(16)
                 ),
                 "ttwid": kwargs.get("ttwid"),
-                "msToken": kwargs.get("msToken")
+                "msToken": kwargs.get("custom_ms_token")
             }
 
     def get_bytes(self, **kwargs) -> bytes:
