@@ -28,6 +28,10 @@ class Video:
 
     id: Optional[str]
     """TikTok's ID of the Video"""
+    createTime: Optional[str]
+    """TikTok's createTime of the Video"""
+    stats: Optional[str]
+    """TikTok's stats of the Video"""
     author: Optional[User]
     """The User who created the Video"""
     sound: Optional[Sound]
@@ -116,9 +120,14 @@ class Video:
 
         if "author" in keys:
             self.id = data["id"]
+            self.createTime = data["createTime"]
+            self.stats = data["stats"]
             self.author = self.parent.user(data=data["author"])
-            self.sound = self.parent.sound(data=data["music"])
-
+            if data["music"]["id"]:
+                self.sound = self.parent.sound(data=data["music"])
+            else:
+                print(data["music"])
+                
             self.hashtags = [
                 self.parent.hashtag(data=hashtag)
                 for hashtag in data.get("challenges", [])
