@@ -9,25 +9,12 @@ import json
 import re
 from .browser_interface import BrowserInterface
 from urllib.parse import parse_qsl, urlparse
-
+import threading
 from ..utilities import LOGGER_NAME
 from .get_acrawler import _get_acrawler, _get_tt_params_script
 from playwright.sync_api import sync_playwright
 
-playwright = None
-
 logger = logging.getLogger(LOGGER_NAME)
-
-
-def get_playwright():
-    global playwright
-    if playwright is None:
-        try:
-            playwright = sync_playwright().start()
-        except Exception as e:
-            raise e
-
-    return playwright
 
 
 class browser(BrowserInterface):
@@ -76,14 +63,10 @@ class browser(BrowserInterface):
         if self.executable_path is not None:
             self.options["executable_path"] = self.executable_path
 
-        try:
-            self.browser = get_playwright().webkit.launch(
-                args=self.args, **self.options
-            )
-        except Exception as e:
-            logger.critical("Webkit launch failed", exc_info=True)
-            raise e
-
+        self._thread_locals = threading.local()
+        self._thread_locals.playwright = sync_playwright().start()
+        self.playwright = self._thread_locals.playwright
+        self.browser = self.playwright.webkit.launch(args=self.args, **self.options)
         context = self._create_context(set_useragent=True)
         page = context.new_page()
         self.get_params(page)
@@ -120,7 +103,7 @@ class browser(BrowserInterface):
         self.height = page.evaluate("""() => { return screen.height; }""")
 
     def _create_context(self, set_useragent=False):
-        iphone = playwright.devices["iPhone 11 Pro"]
+        iphone = self.playwright.devices["iPhone 11 Pro"]
         iphone["viewport"] = {
             "width": random.randint(320, 1920),
             "height": random.randint(320, 1920),
@@ -242,11 +225,8 @@ class browser(BrowserInterface):
         return (verifyFp, device_id, evaluatedPage, tt_params)
 
     def _clean_up(self):
-        try:
-            self.browser.close()
-        except Exception:
-            logger.exception("cleanup failed")
-        # playwright.stop()
+        self.browser.close()
+        self.playwright.stop()
 
     def find_redirect(self, url):
         self.page.goto(url, {"waitUntil": "load"})
