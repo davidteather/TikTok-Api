@@ -105,7 +105,7 @@ class User:
 
         user_props = user["props"]["pageProps"]
         if user_props["statusCode"] == 404:
-            raise TikTokNotFoundError(
+            raise NotFoundException(
                 "TikTok user with username {} does not exist".format(self.username)
             )
 
