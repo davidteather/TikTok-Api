@@ -8,6 +8,8 @@ This is an unofficial api wrapper for TikTok.com in python. With this api you ar
 ## Sponsors
 These sponsors have paid to be placed here and beyond that I do not have any affiliation with them, the TikTokAPI package will always be free and open-source. If you wish to be a sponsor of this project check out my [GitHub sponsors page](https://github.com/sponsors/davidteather).
 
+[![Trendpop](https://trendpop-entity-assets.s3.us-west-2.amazonaws.com/customers/app/wide.png)](https://trendpop.social/careers?ref=github-davidteather-tiktokapi) | **[Trendpop](https://trendpop.social)** builds software to help creators and businesses go viral on social video platforms (like TikTok). Excited about TikTok? We're [hiring engineers across all roles](https://trendpop.social/careers) -- please drop us a message `founders@trendpop.social`.
+
 [![TikAPI](https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/logo128.png)](https://tikapi.io/?ref=davidteather)   |  **[TikAPI](https://tikapi.io/?ref=davidteather)** is a paid TikTok API service providing an full out-of-the-box solution for developers, trusted by 100+ companies. [Learn more](https://tikapi.io/?ref=davidteather)
 :-------------------------:|:-------------------------:
 
