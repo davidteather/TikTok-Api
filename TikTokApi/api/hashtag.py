@@ -79,7 +79,7 @@ class Hashtag:
         data = self.parent.get_data(path, **kwargs)
 
         if data["challengeInfo"].get("challenge") is None:
-            raise TikTokNotFoundError("Challenge {} does not exist".format(self.name))
+            raise NotFoundException("Challenge {} does not exist".format(self.name))
 
         return data
 

@@ -289,7 +289,7 @@ class TikTokApi:
                     self._get_cookies(**kwargs),
                     url,
                 )
-                raise TikTokCaptchaError()
+                raise CaptchaException("TikTok blocks this request displaying a Captcha \nTip: Consider using a proxy or a custom_verify_fp as method parameters")
 
             # statusCode from props->pageProps->statusCode thanks @adiantek on #403
             error_codes = {
@@ -336,14 +336,14 @@ class TikTokApi:
             logger.debug(f"TikTok Returned: %s", json)
             if statusCode == 10201:
                 # Invalid Entity
-                raise TikTokNotFoundError(
+                raise NotFoundException(
                     "TikTok returned a response indicating the entity is invalid"
                 )
             elif statusCode == 10219:
-                # not available in this region
-                raise TikTokNotAvailableError("Content not available for this region")
+                # Not available in this region
+                raise NotAvailableException("Content not available for this region")
             elif statusCode != 0 and statusCode != -1:
-                raise GenericTikTokError(
+                raise TikTokException(
                     error_codes.get(
                         statusCode, f"TikTok sent an unknown StatusCode of {statusCode}"
                     )
@@ -354,12 +354,11 @@ class TikTokApi:
             text = r.text
             logger.debug("TikTok response: %s", text)
             if len(text) == 0:
-                raise EmptyResponseError(
+                raise EmptyResponseException(
                     "Empty response from Tiktok to " + url
                 ) from None
             else:
-                logger.exception("Converting response to JSON failed")
-                raise JSONDecodeFailure() from e
+                raise InvalidJSONException('TikTok sent invalid JSON') from e
 
     def __del__(self):
         """A basic cleanup method, called automatically from the code"""
