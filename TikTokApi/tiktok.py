@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import threading
 import random
 import string
 import time
@@ -28,11 +29,12 @@ os.environ["no_proxy"] = "127.0.0.1,localhost"
 BASE_URL = "https://m.tiktok.com/"
 DESKTOP_BASE_URL = "https://www.tiktok.com/"
 
+_thread_lock = threading.Lock()
+logger = logging.getLogger(LOGGER_NAME)
+
 
 class TikTokApi:
-    _instance = None
-    logger: ClassVar[logging.Logger] = logging.getLogger(LOGGER_NAME)
-
+    _is_context_manager = False
     user = User
     search = Search
     sound = Sound
@@ -40,10 +42,9 @@ class TikTokApi:
     video = Video
     trending = Trending
 
-    @staticmethod
-    def __new__(
-        cls,
-        logging_level=logging.WARNING,
+    def __init__(
+        self,
+        logging_level: str = None,
         request_delay: Optional[int] = None,
         custom_device_id: Optional[str] = None,
         generate_static_device_id: Optional[bool] = False,
@@ -110,11 +111,11 @@ class TikTokApi:
             that interact with this main class. These may or may not be documented
             in other places.
         """
-
-        if cls._instance is None:
-            cls._instance = super(TikTokApi, cls).__new__(cls)
-            cls._instance._initialize(
-                logging_level=logging_level,
+        if logging_level:
+            logger.setLevel(logging_level)
+        
+        with _thread_lock:
+            self._initialize(
                 request_delay=request_delay,
                 custom_device_id=custom_device_id,
                 generate_static_device_id=generate_static_device_id,
@@ -125,9 +126,8 @@ class TikTokApi:
                 *args,
                 **kwargs,
             )
-        return cls._instance
-
-    def _initialize(self, logging_level=logging.WARNING, **kwargs):
+        
+    def _initialize(self, **kwargs):
         # Add classes from the api folder
         User.parent = self
         Search.parent = self
@@ -135,8 +135,6 @@ class TikTokApi:
         Hashtag.parent = self
         Video.parent = self
         Trending.parent = self
-
-        self.logger.setLevel(level=logging_level)
 
         # Some Instance Vars
         self._executable_path = kwargs.get("executable_path", None)
@@ -172,7 +170,7 @@ class TikTokApi:
             self._region = self._browser.region
             self._language = self._browser.language
         except Exception as e:
-            self.logger.exception(
+            logger.exception(
                 "An error occurred while opening your browser, but it was ignored\n",
                 "Are you sure you ran python -m playwright install?",
             )
@@ -183,6 +181,7 @@ class TikTokApi:
             self._height = "1080"
             self._region = "US"
             self._language = "en"
+            raise e from e
 
     def get_data(self, path, subdomain="m", **kwargs) -> dict:
         """Makes requests to TikTok and returns their JSON.
@@ -269,7 +268,7 @@ class TikTokApi:
             "x-tt-params": tt_params,
         }
 
-        self.logger.info(f"GET: %s\n\theaders: %s", url, headers)
+        logger.debug(f"GET: %s\n\theaders: %s", url, headers)
         r = requests.get(
             url,
             headers=headers,
@@ -284,7 +283,7 @@ class TikTokApi:
                 parsed_data.get("type") == "verify"
                 or parsed_data.get("verifyConfig", {}).get("type", "") == "verify"
             ):
-                self.logger.error(
+                logger.error(
                     "Tiktok wants to display a captcha.\nResponse:\n%s\nCookies:\n%s\nURL:\n%s",
                     r.text,
                     self._get_cookies(**kwargs),
@@ -334,7 +333,7 @@ class TikTokApi:
                 "undefined": "MEDIA_ERROR",
             }
             statusCode = parsed_data.get("statusCode", 0)
-            self.logger.info(f"TikTok Returned: %s", json)
+            logger.debug(f"TikTok Returned: %s", json)
             if statusCode == 10201:
                 # Invalid Entity
                 raise NotFoundException(
@@ -353,7 +352,7 @@ class TikTokApi:
             return r.json()
         except ValueError as e:
             text = r.text
-            self.logger.info("TikTok response: %s", text)
+            logger.debug("TikTok response: %s", text)
             if len(text) == 0:
                 raise EmptyResponseException(
                     "Empty response from Tiktok to " + url
@@ -363,15 +362,12 @@ class TikTokApi:
 
     def __del__(self):
         """A basic cleanup method, called automatically from the code"""
-        try:
-            self._browser._clean_up()
-        except Exception:
-            pass
-        try:
-            get_playwright().stop()
-        except Exception:
-            pass
-        TikTokApi._instance = None
+        if not self._is_context_manager:
+            logger.debug(
+                "TikTokAPI was shutdown improperlly. Ensure the instance is terminated with .shutdown()"
+            )
+            self.shutdown()
+        return
 
     def external_signer(self, url, custom_device_id=None, verifyFp=None):
         """Makes requests to an external signer instead of using a browser.
@@ -562,3 +558,18 @@ class TikTokApi:
         }
 
         return urlencode(query)
+
+    def shutdown(self) -> None:
+        with _thread_lock:
+            logger.debug("Shutting down Playwright")
+            self._browser._clean_up()
+
+    def __enter__(self):
+        with _thread_lock:
+
+            self._is_context_manager = True
+            return self
+
+    def __exit__(self, type, value, traceback):
+
+        self.shutdown()
