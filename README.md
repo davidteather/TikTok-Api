@@ -74,11 +74,10 @@ from TikTokApi import TikTokApi
 # and under www.tiktok.com s_v_web_id should exist, and use that value
 # as input to custom_verify_fp
 # Or watch https://www.youtube.com/watch?v=-uCt1x8kINQ for a visual
-api = TikTokApi(custom_verify_fp="")
-
-for trending_video in api.trending.videos(count=50):
-    # Prints the author's username of the trending video.
-    print(trending_video.author.username)
+with TikTokApi(custom_verify_fp="") as api:
+    for trending_video in api.trending.videos(count=50):
+        # Prints the author's username of the trending video.
+        print(trending_video.author.username)
 ```
 
 To run the example scripts from the repository root, make sure you use the `-m` option on python.
@@ -125,10 +124,10 @@ Here's a few more examples that help illustrate the differences in the flow of t
 api = TikTokApi.get_instance()
 trending_videos = api.by_trending()
 
-#V5
-api = TikTokApi() # .get_instance no longer exists
-for trending_video in api.trending.videos():
-    # do something
+#V5.1
+with TikTokApi() as api: # .get_instance no longer exists
+    for trending_video in api.trending.videos():
+        # do something
 ```
 
 Where in V4 you had to extract information yourself, the package now handles that for you. So it's much easier to do chained related function calls.

@@ -30,7 +30,6 @@ BASE_URL = "https://m.tiktok.com/"
 DESKTOP_BASE_URL = "https://www.tiktok.com/"
 
 _thread_lock = threading.Lock()
-logger = logging.getLogger(LOGGER_NAME)
 
 
 class TikTokApi:
@@ -41,10 +40,11 @@ class TikTokApi:
     hashtag = Hashtag
     video = Video
     trending = Trending
+    logger = logging.getLogger(LOGGER_NAME)
 
     def __init__(
         self,
-        logging_level: str = None,
+        logging_level: int = logging.WARNING,
         request_delay: Optional[int] = None,
         custom_device_id: Optional[str] = None,
         generate_static_device_id: Optional[bool] = False,
@@ -111,9 +111,9 @@ class TikTokApi:
             that interact with this main class. These may or may not be documented
             in other places.
         """
-        if logging_level:
-            logger.setLevel(logging_level)
-        
+
+        self.logger.setLevel(logging_level)
+
         with _thread_lock:
             self._initialize(
                 request_delay=request_delay,
@@ -126,7 +126,7 @@ class TikTokApi:
                 *args,
                 **kwargs,
             )
-        
+
     def _initialize(self, **kwargs):
         # Add classes from the api folder
         User.parent = self
@@ -142,7 +142,7 @@ class TikTokApi:
         if kwargs.get("custom_did") != None:
             raise Exception("Please use 'custom_device_id' instead of 'custom_did'")
         self._custom_device_id = kwargs.get("custom_device_id", None)
-        self._user_agent = "5.0+(iPhone%3B+CPU+iPhone+OS+14_8+like+Mac+OS+X)+AppleWebKit%2F605.1.15+(KHTML,+like+Gecko)+Version%2F14.1.2+Mobile%2F15E148+Safari%2F604.1"
+        self._user_agent = "5.0 (iPhone; CPU iPhone OS 14_8 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1"
         self._proxy = kwargs.get("proxy", None)
         self._custom_verify_fp = kwargs.get("custom_verify_fp")
         self._signer_url = kwargs.get("external_signer", None)
@@ -170,7 +170,7 @@ class TikTokApi:
             self._region = self._browser.region
             self._language = self._browser.language
         except Exception as e:
-            logger.exception(
+            self.logger.exception(
                 "An error occurred while opening your browser, but it was ignored\n",
                 "Are you sure you ran python -m playwright install?",
             )
@@ -268,7 +268,7 @@ class TikTokApi:
             "x-tt-params": tt_params,
         }
 
-        logger.debug(f"GET: %s\n\theaders: %s", url, headers)
+        self.logger.debug(f"GET: %s\n\theaders: %s", url, headers)
         r = requests.get(
             url,
             headers=headers,
@@ -283,13 +283,15 @@ class TikTokApi:
                 parsed_data.get("type") == "verify"
                 or parsed_data.get("verifyConfig", {}).get("type", "") == "verify"
             ):
-                logger.error(
+                self.logger.error(
                     "Tiktok wants to display a captcha.\nResponse:\n%s\nCookies:\n%s\nURL:\n%s",
                     r.text,
                     self._get_cookies(**kwargs),
                     url,
                 )
-                raise CaptchaException("TikTok blocks this request displaying a Captcha \nTip: Consider using a proxy or a custom_verify_fp as method parameters")
+                raise CaptchaException(
+                    "TikTok blocks this request displaying a Captcha \nTip: Consider using a proxy or a custom_verify_fp as method parameters"
+                )
 
             # statusCode from props->pageProps->statusCode thanks @adiantek on #403
             error_codes = {
@@ -333,7 +335,7 @@ class TikTokApi:
                 "undefined": "MEDIA_ERROR",
             }
             statusCode = parsed_data.get("statusCode", 0)
-            logger.debug(f"TikTok Returned: %s", json)
+            self.logger.debug(f"TikTok Returned: %s", json)
             if statusCode == 10201:
                 # Invalid Entity
                 raise NotFoundException(
@@ -352,18 +354,18 @@ class TikTokApi:
             return r.json()
         except ValueError as e:
             text = r.text
-            logger.debug("TikTok response: %s", text)
+            self.logger.debug("TikTok response: %s", text)
             if len(text) == 0:
                 raise EmptyResponseException(
                     "Empty response from Tiktok to " + url
                 ) from None
             else:
-                raise InvalidJSONException('TikTok sent invalid JSON') from e
+                raise InvalidJSONException("TikTok sent invalid JSON") from e
 
     def __del__(self):
         """A basic cleanup method, called automatically from the code"""
         if not self._is_context_manager:
-            logger.debug(
+            self.logger.debug(
                 "TikTokAPI was shutdown improperlly. Ensure the instance is terminated with .shutdown()"
             )
             self.shutdown()
@@ -533,43 +535,52 @@ class TikTokApi:
         )
 
     def _add_url_params(self) -> str:
+        try:
+            region = self._region
+            browser_language = self._browser_language.lower()
+            timezone = self._timezone_name
+            language = self._language
+        except AttributeError as e:
+            self.logger.debug("Attribute Error on add_url_params", exc_info=e)
+            region = "US"
+            browser_language = "en-us"
+            timezone = "America/Chicago"
+            language = "en"
         query = {
             "aid": 1988,
             "app_name": "tiktok_web",
             "device_platform": "web_mobile",
-            "region": self._region or "US",
+            "region": region,
             "priority_region": "",
             "os": "ios",
             "referer": "",
             "cookie_enabled": "true",
             "screen_width": self._width,
             "screen_height": self._height,
-            "browser_language": self._browser_language.lower() or "en-us",
+            "browser_language": browser_language,
             "browser_platform": "iPhone",
             "browser_name": "Mozilla",
             "browser_version": self._user_agent,
             "browser_online": "true",
-            "timezone_name": self._timezone_name or "America/Chicago",
+            "timezone_name": timezone,
             "is_page_visible": "true",
             "focus_state": "true",
             "is_fullscreen": "false",
-            "history_len": random.randint(0, 30),
-            "language": self._language or "en",
+            "history_len": random.randint(1, 5),
+            "language": language,
         }
 
         return urlencode(query)
 
     def shutdown(self) -> None:
         with _thread_lock:
-            logger.debug("Shutting down Playwright")
+            self.logger.debug("Shutting down Playwright")
             self._browser._clean_up()
 
     def __enter__(self):
         with _thread_lock:
-
             self._is_context_manager = True
             return self
 
     def __exit__(self, type, value, traceback):
-
         self.shutdown()

@@ -22,7 +22,7 @@ Preferably the smallest amount of code to reproduce the issue.
 **SET LOGGING LEVEL TO INFO BEFORE POSTING CODE OUTPUT**
 ```py
 import logging
-api = TikTokApi(logging_level=logging.INFO) # SETS LOGGING_LEVEL TO INFO
+TikTokApi(logging_level=logging.INFO) # SETS LOGGING_LEVEL TO INFO
 # Hopefully the info level will help you debug or at least someone else on the issue
 ```
 
