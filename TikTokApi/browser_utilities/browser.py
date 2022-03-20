@@ -67,7 +67,7 @@ class browser(BrowserInterface):
 
         if self.executable_path is not None:
             self.options["executable_path"] = self.executable_path
-
+        
         self._thread_locals = threading.local()
         self._thread_locals.playwright = await async_playwright().start()
         self.playwright = self._thread_locals.playwright
@@ -167,8 +167,8 @@ class browser(BrowserInterface):
         return f'verify_{scenario_title.lower()}_{"".join(uuid)}'
 
     async def sign_url(self, url, calc_tt_params=False, **kwargs):
-        def process(route):
-            route.abort()
+        async def process(route):
+            await route.abort()
 
         tt_params = None
         context = await self._create_context()
