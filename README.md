@@ -11,6 +11,9 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
 [![TikAPI](https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/logo128.png)](https://tikapi.io/?ref=davidteather)   |  **[TikAPI](https://tikapi.io/?ref=davidteather)** is a paid TikTok API service providing an full out-of-the-box solution for developers, trusted by 100+ companies. [Learn more](https://tikapi.io/?ref=davidteather)
 :-------------------------:|:-------------------------:
 
+[![Trendpop](https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/trendpop.png)](https://trendpop.social/careers?ref=github-davidteather-tiktokapi) | **[Trendpop](https://trendpop.social)** builds software to help creators and businesses go viral on social video platforms. Excited about building in this space? We're [hiring engineers across all roles](https://trendpop.social/careers) - shoot us a message at `founders@trendpop.social`.
+:-------------------------:|:-------------------------:
+
 ## Table of Contents
 - [Documentation](#documentation)
 - [Getting Started](#getting-started)
