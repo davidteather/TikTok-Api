@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import threading
+import asyncio
 import random
 import string
 import time
@@ -159,7 +160,10 @@ class TikTokApi:
             )
 
         if self._signer_url is None:
-            self._browser = browser(**kwargs)
+            self._browser = asyncio.get_event_loop().run_until_complete(
+                asyncio.gather(browser.create(**kwargs))
+            )[0]
+
             self._user_agent = self._browser.user_agent
 
         try:
@@ -212,9 +216,21 @@ class TikTokApi:
 
         if self._signer_url is None:
             kwargs["custom_verify_fp"] = verifyFp
-            verify_fp, device_id, signature, tt_params = self._browser.sign_url(
-                full_url, calc_tt_params=send_tt_params, **kwargs
-            )
+            (
+                verify_fp,
+                device_id,
+                signature,
+                tt_params,
+            ) = asyncio.get_event_loop().run_until_complete(
+                asyncio.gather(
+                    self._browser.sign_url(
+                        full_url, calc_tt_params=send_tt_params, **kwargs
+                    )
+                )
+            )[
+                0
+            ]
+
             user_agent = self._browser.user_agent
             referrer = self._browser.referrer
         else:
@@ -453,9 +469,16 @@ class TikTokApi:
         processed = self._process_kwargs(kwargs)
         kwargs["custom_device_id"] = processed.device_id
         if self._signer_url is None:
-            verify_fp, device_id, signature, _ = self._browser.sign_url(
-                calc_tt_params=False, **kwargs
-            )
+            (
+                verify_fp,
+                device_id,
+                signature,
+                _,
+            ) = asyncio.get_event_loop().run_until_complete(
+                asyncio.gather(self._browser.sign_url(calc_tt_params=False, **kwargs))
+            )[
+                0
+            ]
             user_agent = self._browser.user_agent
             referrer = self._browser.referrer
         else:
@@ -575,7 +598,7 @@ class TikTokApi:
     def shutdown(self) -> None:
         with _thread_lock:
             self.logger.debug("Shutting down Playwright")
-            self._browser._clean_up()
+            asyncio.get_event_loop().run_until_complete(self._browser._clean_up())
 
     def __enter__(self):
         with _thread_lock:
