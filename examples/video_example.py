@@ -1,7 +1,6 @@
 from TikTokApi import TikTokApi
 
-verify_fp = "verify_xxx"
-with TikTokApi(custom_verify_fp=verify_fp) as api:
+with TikTokApi() as api:
     video = api.video(id="7041997751718137094")
 
     # Bytes of the TikTok video

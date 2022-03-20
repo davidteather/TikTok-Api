@@ -1,7 +1,6 @@
 from TikTokApi import TikTokApi
 
-verify_fp = "verify_xxx"
-with TikTokApi(custom_verify_fp=verify_fp) as api:
+with TikTokApi() as api:
     user = api.user(username="therock")
 
     for video in user.videos():
