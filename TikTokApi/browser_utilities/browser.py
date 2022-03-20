@@ -67,7 +67,7 @@ class browser(BrowserInterface):
 
         if self.executable_path is not None:
             self.options["executable_path"] = self.executable_path
-        
+
         self._thread_locals = threading.local()
         self._thread_locals.playwright = await async_playwright().start()
         self.playwright = self._thread_locals.playwright

@@ -157,8 +157,8 @@ class Sound:
         data = self.as_dict
         keys = data.keys()
 
-        if data.get('id') == '':
-            self.id = ''
+        if data.get("id") == "":
+            self.id = ""
 
         if "authorName" in keys:
             self.id = data["id"]
@@ -173,8 +173,8 @@ class Sound:
             )
 
     def __ensure_valid(self):
-        if self.id == '':
-            raise SoundRemovedException('This sound has been removed!')
+        if self.id == "":
+            raise SoundRemovedException("This sound has been removed!")
 
     def __repr__(self):
         return self.__str__()

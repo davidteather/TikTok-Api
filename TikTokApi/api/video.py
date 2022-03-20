@@ -122,7 +122,7 @@ class Video:
             self.stats = data["stats"]
             self.author = self.parent.user(data=data["author"])
             self.sound = self.parent.sound(data=data["music"])
-                
+
             self.hashtags = [
                 self.parent.hashtag(data=hashtag)
                 for hashtag in data.get("challenges", [])
