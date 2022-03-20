@@ -9,32 +9,24 @@ import json
 import re
 from .browser_interface import BrowserInterface
 from urllib.parse import parse_qsl, urlparse
-
+import threading
 from ..utilities import LOGGER_NAME
 from .get_acrawler import _get_acrawler, _get_tt_params_script
-from playwright.sync_api import sync_playwright
-
-playwright = None
+from playwright.async_api import async_playwright
+import asyncio
 
 logger = logging.getLogger(LOGGER_NAME)
 
 
-def get_playwright():
-    global playwright
-    if playwright is None:
-        try:
-            playwright = sync_playwright().start()
-        except Exception as e:
-            raise e
-
-    return playwright
-
-
 class browser(BrowserInterface):
-    def __init__(
-        self,
+    def __init__(self, **kwargs):
+        pass
+
+    @staticmethod
+    async def create(
         **kwargs,
     ):
+        self = browser()
         self.kwargs = kwargs
         self.debug = kwargs.get("debug", False)
         self.proxy = kwargs.get("proxy", None)
@@ -76,25 +68,25 @@ class browser(BrowserInterface):
         if self.executable_path is not None:
             self.options["executable_path"] = self.executable_path
 
-        try:
-            self.browser = get_playwright().webkit.launch(
-                args=self.args, **self.options
-            )
-        except Exception as e:
-            logger.critical("Webkit launch failed", exc_info=True)
-            raise e
+        self._thread_locals = threading.local()
+        self._thread_locals.playwright = await async_playwright().start()
+        self.playwright = self._thread_locals.playwright
+        self.browser = await self.playwright.webkit.launch(
+            args=self.args, **self.options
+        )
+        context = await self._create_context(set_useragent=True)
+        page = await context.new_page()
+        await self.get_params(page)
+        await context.close()
 
-        context = self._create_context(set_useragent=True)
-        page = context.new_page()
-        self.get_params(page)
-        context.close()
+        return self
 
-    def get_params(self, page) -> None:
+    async def get_params(self, page) -> None:
         self.browser_language = self.kwargs.get(
             "browser_language",
-            page.evaluate("""() => { return navigator.language; }"""),
+            await page.evaluate("""() => { return navigator.language; }"""),
         )
-        self.browser_version = page.evaluate(
+        self.browser_version = await page.evaluate(
             """() => { return window.navigator.appVersion; }"""
         )
 
@@ -112,15 +104,15 @@ class browser(BrowserInterface):
 
         self.timezone_name = self.kwargs.get(
             "timezone_name",
-            page.evaluate(
+            await page.evaluate(
                 """() => { return Intl.DateTimeFormat().resolvedOptions().timeZone; }"""
             ),
         )
-        self.width = page.evaluate("""() => { return screen.width; }""")
-        self.height = page.evaluate("""() => { return screen.height; }""")
+        self.width = await page.evaluate("""() => { return screen.width; }""")
+        self.height = await page.evaluate("""() => { return screen.height; }""")
 
-    def _create_context(self, set_useragent=False):
-        iphone = playwright.devices["iPhone 11 Pro"]
+    async def _create_context(self, set_useragent=False):
+        iphone = self.playwright.devices["iPhone 11 Pro"]
         iphone["viewport"] = {
             "width": random.randint(320, 1920),
             "height": random.randint(320, 1920),
@@ -131,7 +123,7 @@ class browser(BrowserInterface):
 
         iphone["bypass_csp"] = True
 
-        context = self.browser.new_context(**iphone)
+        context = await self.browser.new_context(**iphone)
         if set_useragent:
             self.user_agent = iphone["user_agent"]
 
@@ -174,17 +166,19 @@ class browser(BrowserInterface):
 
         return f'verify_{scenario_title.lower()}_{"".join(uuid)}'
 
-    def sign_url(self, url, calc_tt_params=False, **kwargs):
-        def process(route):
-            route.abort()
+    async def sign_url(self, url, calc_tt_params=False, **kwargs):
+        async def process(route):
+            await route.abort()
 
         tt_params = None
-        context = self._create_context()
-        page = context.new_page()
+        context = await self._create_context()
+        page = await context.new_page()
 
         if calc_tt_params:
-            page.route(re.compile(r"(\.png)|(\.jpeg)|(\.mp4)|(x-expire)"), process)
-            page.goto(
+            await page.route(
+                re.compile(r"(\.png)|(\.jpeg)|(\.mp4)|(x-expire)"), process
+            )
+            await page.goto(
                 kwargs.get("default_url", "https://www.tiktok.com/@redbull"),
                 wait_until="load",
             )
@@ -212,8 +206,8 @@ class browser(BrowserInterface):
 
         url = "{}&verifyFp={}&device_id={}".format(url, verifyFp, device_id)
 
-        page.add_script_tag(content=_get_acrawler())
-        evaluatedPage = page.evaluate(
+        await page.add_script_tag(content=_get_acrawler())
+        evaluatedPage = await page.evaluate(
             '''() => {
             var url = "'''
             + url
@@ -227,9 +221,9 @@ class browser(BrowserInterface):
         url = "{}&_signature={}".format(url, evaluatedPage)
 
         if calc_tt_params:
-            page.add_script_tag(content=_get_tt_params_script())
+            await page.add_script_tag(content=_get_tt_params_script())
 
-            tt_params = page.evaluate(
+            tt_params = await page.evaluate(
                 """() => {
                     return window.genXTTParams("""
                 + json.dumps(dict(parse_qsl(urlparse(url).query)))
@@ -238,15 +232,12 @@ class browser(BrowserInterface):
                 }"""
             )
 
-        context.close()
+        await context.close()
         return (verifyFp, device_id, evaluatedPage, tt_params)
 
-    def _clean_up(self):
-        try:
-            self.browser.close()
-        except Exception:
-            logger.exception("cleanup failed")
-        # playwright.stop()
+    async def _clean_up(self):
+        await self.browser.close()
+        await self.playwright.stop()
 
     def find_redirect(self, url):
         self.page.goto(url, {"waitUntil": "load"})

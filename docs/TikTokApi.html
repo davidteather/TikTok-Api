@@ -69,8 +69,24 @@ TikTokApi    </h1>
 
 <p>These sponsors have paid to be placed here and beyond that I do not have any affiliation with them, the TikTokAPI package will always be free and open-source. If you wish to be a sponsor of this project check out my <a href="https://github.com/sponsors/davidteather">GitHub sponsors page</a>.</p>
 
-<p><a href="https://tikapi.io/?ref=davidteather"><img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/logo128.png" alt="TikAPI" /></a>   |  <strong><a href="https://tikapi.io/?ref=davidteather">TikAPI</a></strong> is a paid TikTok API service providing an full out-of-the-box solution for developers, trusted by 100+ companies. <a href="https://tikapi.io/?ref=davidteather">Learn more</a>
-:-------------------------:|:-------------------------:</p>
+<table>
+<thead>
+<tr>
+  <th style="text-align:center;"><a href="https://tikapi.io/?ref=davidteather"><img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/logo128.png" alt="TikAPI" /></a></th>
+  <th style="text-align:center;"><strong><a href="https://tikapi.io/?ref=davidteather">TikAPI</a></strong> is a paid TikTok API service providing an full out-of-the-box solution for developers, trusted by 100+ companies. <a href="https://tikapi.io/?ref=davidteather">Learn more</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:center;"><a href="https://trendpop.social/careers?ref=github-davidteather-tiktokapi"><img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/trendpop.png" alt="Trendpop" /></a></td>
+  <td style="text-align:center;"><strong><a href="https://trendpop.social">Trendpop</a></strong> builds software to help creators and businesses go viral on social video platforms. Excited about building in this space? We're <a href="https://trendpop.social/careers">hiring engineers across all roles</a> - shoot us a message at <code>founders@trendpop.social</code>.</td>
+</tr>
+<tr>
+  <td style="text-align:center;">:-------------------------:</td>
+  <td style="text-align:center;">:-------------------------:</td>
+</tr>
+</tbody>
+</table>
 
 <h2 id="table-of-contents">Table of Contents</h2>
 
@@ -115,7 +131,9 @@ TikTokApi    </h1>
 python -m playwright install
 </code></pre></div>
 
-<p>If you would prefer a video walk through of setting up this package I created a currently semi-outdated <a href="https://www.youtube.com/watch?v=-uCt1x8kINQ">YouTube video</a> just for that.</p>
+<p>If you would prefer a video walk through of setting up this package <a href="https://www.youtube.com/watch?v=-uCt1x8kINQ">YouTube video</a> just for that.</p>
+
+<p>If you want a quick video to listen for <a href="https://www.youtube.com/watch?v=307ijmA3_lc">TikTok Live</a> events in python.</p>
 
 <h4 id="docker-installation">Docker Installation</h4>
 
@@ -142,16 +160,14 @@ docker run -v TikTokApi --rm tiktokapi:latest python3 your_script.py
 
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">TikTokApi</span> <span class="kn">import</span> <span class="n">TikTokApi</span>
 
-<span class="c1"># In your web browser you will need to go to TikTok, check the cookies </span>
-<span class="c1"># and under www.tiktok.com s_v_web_id should exist, and use that value</span>
-<span class="c1"># as input to custom_verify_fp</span>
-<span class="c1"># Or watch https://www.youtube.com/watch?v=-uCt1x8kINQ for a visual</span>
-<span class="n">api</span> <span class="o">=</span> <span class="n">TikTokApi</span><span class="p">(</span><span class="n">custom_verify_fp</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">trending_video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">trending</span><span class="o">.</span><span class="n">videos</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
-    <span class="c1"># Prints the author&#39;s username of the trending video.</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">trending_video</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+<span class="c1"># Watch https://www.youtube.com/watch?v=-uCt1x8kINQ for a brief setup tutorial</span>
+<span class="k">with</span> <span class="n">TikTokApi</span><span class="p">()</span> <span class="k">as</span> <span class="n">api</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">trending_video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">trending</span><span class="o">.</span><span class="n">videos</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+        <span class="c1"># Prints the author&#39;s username of the trending video.</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">trending_video</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
 </code></pre></div>
+
+<p><strong>Note</strong>: Jupyter (ipynb) only works on linux, see <a href="https://github.com/microsoft/playwright-python/issues/178">microsoft/playwright-python #178</a></p>
 
 <p>To run the example scripts from the repository root, make sure you use the <code>-m</code> option on python.</p>
 
@@ -197,10 +213,10 @@ to the different objects.</p>
 <span class="n">api</span> <span class="o">=</span> <span class="n">TikTokApi</span><span class="o">.</span><span class="n">get_instance</span><span class="p">()</span>
 <span class="n">trending_videos</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">by_trending</span><span class="p">()</span>
 
-<span class="c1">#V5</span>
-<span class="n">api</span> <span class="o">=</span> <span class="n">TikTokApi</span><span class="p">()</span> <span class="c1"># .get_instance no longer exists</span>
-<span class="k">for</span> <span class="n">trending_video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">trending</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
-    <span class="c1"># do something</span>
+<span class="c1">#V5.1</span>
+<span class="k">with</span> <span class="n">TikTokApi</span><span class="p">()</span> <span class="k">as</span> <span class="n">api</span><span class="p">:</span> <span class="c1"># .get_instance no longer exists</span>
+    <span class="k">for</span> <span class="n">trending_video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">trending</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
+        <span class="c1"># do something</span>
 </code></pre></div>
 
 <p>Where in V4 you had to extract information yourself, the package now handles that for you. So it's much easier to do chained related function calls.</p>

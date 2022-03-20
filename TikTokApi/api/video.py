@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 from urllib.parse import urlencode
-
 from ..helpers import extract_video_id_from_url
-
-import logging
 from typing import TYPE_CHECKING, ClassVar, Optional
+from datetime import datetime
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -28,6 +26,10 @@ class Video:
 
     id: Optional[str]
     """TikTok's ID of the Video"""
+    create_time: Optional[datetime]
+    """The creation time of the Video"""
+    stats: Optional[dict]
+    """TikTok's stats of the Video"""
     author: Optional[User]
     """The User who created the Video"""
     sound: Optional[Sound]
@@ -116,6 +118,8 @@ class Video:
 
         if "author" in keys:
             self.id = data["id"]
+            self.create_time = datetime.fromtimestamp(data["createTime"])
+            self.stats = data["stats"]
             self.author = self.parent.user(data=data["author"])
             self.sound = self.parent.sound(data=data["music"])
 
@@ -137,7 +141,7 @@ class Video:
 
     def __getattr__(self, name):
         # Handle author, sound, hashtags, as_dict
-        if name in ["author", "sound", "hashtags", "as_dict"]:
+        if name in ["author", "sound", "hashtags", "stats", "create_time", "as_dict"]:
             self.as_dict = self.info()
             self.__extract_from_data()
             return self.__getattribute__(name)

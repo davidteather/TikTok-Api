@@ -27,3 +27,4 @@ build
 MANIFEST
 src
 .vscode
+.env

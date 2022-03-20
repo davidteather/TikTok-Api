@@ -189,7 +189,7 @@
 
         <span class="n">user_props</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s2">&quot;props&quot;</span><span class="p">][</span><span class="s2">&quot;pageProps&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">user_props</span><span class="p">[</span><span class="s2">&quot;statusCode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">NotFoundException</span><span class="p">(</span>
                 <span class="s2">&quot;TikTok user with username </span><span class="si">{}</span><span class="s2"> does not exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
             <span class="p">)</span>
 
@@ -475,7 +475,7 @@
 
         <span class="n">user_props</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s2">&quot;props&quot;</span><span class="p">][</span><span class="s2">&quot;pageProps&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">user_props</span><span class="p">[</span><span class="s2">&quot;statusCode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">NotFoundException</span><span class="p">(</span>
                 <span class="s2">&quot;TikTok user with username </span><span class="si">{}</span><span class="s2"> does not exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
             <span class="p">)</span>
 
@@ -836,7 +836,7 @@ will not function correctly.</p>
 
         <span class="n">user_props</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s2">&quot;props&quot;</span><span class="p">][</span><span class="s2">&quot;pageProps&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">user_props</span><span class="p">[</span><span class="s2">&quot;statusCode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">NotFoundException</span><span class="p">(</span>
                 <span class="s2">&quot;TikTok user with username </span><span class="si">{}</span><span class="s2"> does not exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
             <span class="p">)</span>
 

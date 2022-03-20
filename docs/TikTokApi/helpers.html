@@ -84,7 +84,9 @@
         <span class="k">if</span> <span class="n">sigi_json</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sigi_json</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TikTokCaptchaError</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">CaptchaException</span><span class="p">(</span>
+                <span class="s2">&quot;TikTok blocks this request displaying a Captcha </span><span class="se">\n</span><span class="s2">Tip: Consider using a proxy or a custom_verify_fp as method parameters&quot;</span>
+            <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">extract_video_id_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
@@ -132,7 +134,9 @@
         <span class="k">if</span> <span class="n">sigi_json</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sigi_json</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TikTokCaptchaError</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">CaptchaException</span><span class="p">(</span>
+                <span class="s2">&quot;TikTok blocks this request displaying a Captcha </span><span class="se">\n</span><span class="s2">Tip: Consider using a proxy or a custom_verify_fp as method parameters&quot;</span>
+            <span class="p">)</span>
 </pre></div>
 
         </details>

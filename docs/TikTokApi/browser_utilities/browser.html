@@ -31,13 +31,13 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
-                    <a class="function" href="#get_playwright">get_playwright</a>
-            </li>
-            <li>
                     <a class="class" href="#browser">browser</a>
                             <ul class="memberlist">
                         <li>
                                 <a class="function" href="#browser.__init__">browser</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#browser.create">create</a>
                         </li>
                         <li>
                                 <a class="function" href="#browser.get_params">get_params</a>
@@ -84,32 +84,24 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">.browser_interface</span> <span class="kn">import</span> <span class="n">BrowserInterface</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">parse_qsl</span><span class="p">,</span> <span class="n">urlparse</span>
-
+<span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">from</span> <span class="nn">..utilities</span> <span class="kn">import</span> <span class="n">LOGGER_NAME</span>
 <span class="kn">from</span> <span class="nn">.get_acrawler</span> <span class="kn">import</span> <span class="n">_get_acrawler</span><span class="p">,</span> <span class="n">_get_tt_params_script</span>
-<span class="kn">from</span> <span class="nn">playwright.sync_api</span> <span class="kn">import</span> <span class="n">sync_playwright</span>
-
-<span class="n">playwright</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="kn">from</span> <span class="nn">playwright.async_api</span> <span class="kn">import</span> <span class="n">async_playwright</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">LOGGER_NAME</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">get_playwright</span><span class="p">():</span>
-    <span class="k">global</span> <span class="n">playwright</span>
-    <span class="k">if</span> <span class="n">playwright</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">playwright</span> <span class="o">=</span> <span class="n">sync_playwright</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">e</span>
-
-    <span class="k">return</span> <span class="n">playwright</span>
-
-
 <span class="k">class</span> <span class="nc">browser</span><span class="p">(</span><span class="n">BrowserInterface</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">create</span><span class="p">(</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="n">browser</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;proxy&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -151,25 +143,25 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">executable_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;executable_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">executable_path</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="n">get_playwright</span><span class="p">()</span><span class="o">.</span><span class="n">webkit</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-                <span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span>
-            <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Webkit launch failed&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">e</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thread_locals</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thread_locals</span><span class="o">.</span><span class="n">playwright</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_playwright</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread_locals</span><span class="o">.</span><span class="n">playwright</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">webkit</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span>
+        <span class="p">)</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_context</span><span class="p">(</span><span class="n">set_useragent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_context</span><span class="p">(</span><span class="n">set_useragent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">page</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
-        <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;browser_language&quot;</span><span class="p">,</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return navigator.language; }&quot;&quot;&quot;</span><span class="p">),</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return navigator.language; }&quot;&quot;&quot;</span><span class="p">),</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">browser_version</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser_version</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
             <span class="sd">&quot;&quot;&quot;() =&gt; { return window.navigator.appVersion; }&quot;&quot;&quot;</span>
         <span class="p">)</span>
 
@@ -187,15 +179,15 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;timezone_name&quot;</span><span class="p">,</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
                 <span class="sd">&quot;&quot;&quot;() =&gt; { return Intl.DateTimeFormat().resolvedOptions().timeZone; }&quot;&quot;&quot;</span>
             <span class="p">),</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.width; }&quot;&quot;&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.height; }&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.width; }&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.height; }&quot;&quot;&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_create_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_useragent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="n">iphone</span> <span class="o">=</span> <span class="n">playwright</span><span class="o">.</span><span class="n">devices</span><span class="p">[</span><span class="s2">&quot;iPhone 11 Pro&quot;</span><span class="p">]</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_create_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_useragent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">iphone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">devices</span><span class="p">[</span><span class="s2">&quot;iPhone 11 Pro&quot;</span><span class="p">]</span>
         <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;viewport&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">320</span><span class="p">,</span> <span class="mi">1920</span><span class="p">),</span>
             <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">320</span><span class="p">,</span> <span class="mi">1920</span><span class="p">),</span>
@@ -206,7 +198,7 @@
 
         <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;bypass_csp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">(</span><span class="o">**</span><span class="n">iphone</span><span class="p">)</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">(</span><span class="o">**</span><span class="n">iphone</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">set_useragent</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">user_agent</span> <span class="o">=</span> <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;user_agent&quot;</span><span class="p">]</span>
 
@@ -249,17 +241,19 @@
 
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;verify_</span><span class="si">{</span><span class="n">scenario_title</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
 
-    <span class="k">def</span> <span class="nf">sign_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="n">route</span><span class="p">):</span>
-            <span class="n">route</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">sign_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">async</span> <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="n">route</span><span class="p">):</span>
+            <span class="k">await</span> <span class="n">route</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
 
         <span class="n">tt_params</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_context</span><span class="p">()</span>
-        <span class="n">page</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_context</span><span class="p">()</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">calc_tt_params</span><span class="p">:</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\.png)|(\.jpeg)|(\.mp4)|(x-expire)&quot;</span><span class="p">),</span> <span class="n">process</span><span class="p">)</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\.png)|(\.jpeg)|(\.mp4)|(x-expire)&quot;</span><span class="p">),</span> <span class="n">process</span>
+            <span class="p">)</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span>
                 <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default_url&quot;</span><span class="p">,</span> <span class="s2">&quot;https://www.tiktok.com/@redbull&quot;</span><span class="p">),</span>
                 <span class="n">wait_until</span><span class="o">=</span><span class="s2">&quot;load&quot;</span><span class="p">,</span>
             <span class="p">)</span>
@@ -287,8 +281,8 @@
 
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;verifyFp=</span><span class="si">{}</span><span class="s2">&amp;device_id=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">)</span>
 
-        <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">_get_acrawler</span><span class="p">())</span>
-        <span class="n">evaluatedPage</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">_get_acrawler</span><span class="p">())</span>
+        <span class="n">evaluatedPage</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
             <span class="sd">&#39;&#39;&#39;() =&gt; {</span>
 <span class="sd">            var url = &quot;&#39;&#39;&#39;</span>
             <span class="o">+</span> <span class="n">url</span>
@@ -302,9 +296,9 @@
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;_signature=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">calc_tt_params</span><span class="p">:</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">_get_tt_params_script</span><span class="p">())</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">_get_tt_params_script</span><span class="p">())</span>
 
-            <span class="n">tt_params</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="n">tt_params</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
                 <span class="sd">&quot;&quot;&quot;() =&gt; {</span>
 <span class="sd">                    return window.genXTTParams(&quot;&quot;&quot;</span>
                 <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">)))</span>
@@ -313,15 +307,12 @@
 <span class="s2">                }&quot;&quot;&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">,</span> <span class="n">tt_params</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_clean_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;cleanup failed&quot;</span><span class="p">)</span>
-        <span class="c1"># playwright.stop()</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_clean_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">find_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;waitUntil&quot;</span><span class="p">:</span> <span class="s2">&quot;load&quot;</span><span class="p">})</span>
@@ -343,32 +334,6 @@
         </details>
 
             </section>
-                <section id="get_playwright">
-                            <div class="attr function"><a class="headerlink" href="#get_playwright">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">get_playwright</span><span class="signature">()</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_playwright</span><span class="p">():</span>
-    <span class="k">global</span> <span class="n">playwright</span>
-    <span class="k">if</span> <span class="n">playwright</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">playwright</span> <span class="o">=</span> <span class="n">sync_playwright</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">e</span>
-
-    <span class="k">return</span> <span class="n">playwright</span>
-</pre></div>
-
-        </details>
-
-    
-
-                </section>
                 <section id="browser">
                                 <div class="attr class">
         <a class="headerlink" href="#browser">#&nbsp;&nbsp</a>
@@ -381,10 +346,14 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">browser</span><span class="p">(</span><span class="n">BrowserInterface</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">create</span><span class="p">(</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="n">browser</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;proxy&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -426,25 +395,25 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">executable_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;executable_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">executable_path</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="n">get_playwright</span><span class="p">()</span><span class="o">.</span><span class="n">webkit</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-                <span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span>
-            <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Webkit launch failed&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">e</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thread_locals</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thread_locals</span><span class="o">.</span><span class="n">playwright</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_playwright</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread_locals</span><span class="o">.</span><span class="n">playwright</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">webkit</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span>
+        <span class="p">)</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_context</span><span class="p">(</span><span class="n">set_useragent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_context</span><span class="p">(</span><span class="n">set_useragent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">page</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
-        <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;browser_language&quot;</span><span class="p">,</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return navigator.language; }&quot;&quot;&quot;</span><span class="p">),</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return navigator.language; }&quot;&quot;&quot;</span><span class="p">),</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">browser_version</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser_version</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
             <span class="sd">&quot;&quot;&quot;() =&gt; { return window.navigator.appVersion; }&quot;&quot;&quot;</span>
         <span class="p">)</span>
 
@@ -462,15 +431,15 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;timezone_name&quot;</span><span class="p">,</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
                 <span class="sd">&quot;&quot;&quot;() =&gt; { return Intl.DateTimeFormat().resolvedOptions().timeZone; }&quot;&quot;&quot;</span>
             <span class="p">),</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.width; }&quot;&quot;&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.height; }&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.width; }&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.height; }&quot;&quot;&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_create_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_useragent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="n">iphone</span> <span class="o">=</span> <span class="n">playwright</span><span class="o">.</span><span class="n">devices</span><span class="p">[</span><span class="s2">&quot;iPhone 11 Pro&quot;</span><span class="p">]</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_create_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_useragent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">iphone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">devices</span><span class="p">[</span><span class="s2">&quot;iPhone 11 Pro&quot;</span><span class="p">]</span>
         <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;viewport&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">320</span><span class="p">,</span> <span class="mi">1920</span><span class="p">),</span>
             <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">320</span><span class="p">,</span> <span class="mi">1920</span><span class="p">),</span>
@@ -481,7 +450,7 @@
 
         <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;bypass_csp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">(</span><span class="o">**</span><span class="n">iphone</span><span class="p">)</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">(</span><span class="o">**</span><span class="n">iphone</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">set_useragent</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">user_agent</span> <span class="o">=</span> <span class="n">iphone</span><span class="p">[</span><span class="s2">&quot;user_agent&quot;</span><span class="p">]</span>
 
@@ -524,17 +493,19 @@
 
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;verify_</span><span class="si">{</span><span class="n">scenario_title</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
 
-    <span class="k">def</span> <span class="nf">sign_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="n">route</span><span class="p">):</span>
-            <span class="n">route</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">sign_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">async</span> <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="n">route</span><span class="p">):</span>
+            <span class="k">await</span> <span class="n">route</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
 
         <span class="n">tt_params</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_context</span><span class="p">()</span>
-        <span class="n">page</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_context</span><span class="p">()</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">calc_tt_params</span><span class="p">:</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\.png)|(\.jpeg)|(\.mp4)|(x-expire)&quot;</span><span class="p">),</span> <span class="n">process</span><span class="p">)</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\.png)|(\.jpeg)|(\.mp4)|(x-expire)&quot;</span><span class="p">),</span> <span class="n">process</span>
+            <span class="p">)</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span>
                 <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default_url&quot;</span><span class="p">,</span> <span class="s2">&quot;https://www.tiktok.com/@redbull&quot;</span><span class="p">),</span>
                 <span class="n">wait_until</span><span class="o">=</span><span class="s2">&quot;load&quot;</span><span class="p">,</span>
             <span class="p">)</span>
@@ -562,8 +533,8 @@
 
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;verifyFp=</span><span class="si">{}</span><span class="s2">&amp;device_id=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">)</span>
 
-        <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">_get_acrawler</span><span class="p">())</span>
-        <span class="n">evaluatedPage</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">_get_acrawler</span><span class="p">())</span>
+        <span class="n">evaluatedPage</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
             <span class="sd">&#39;&#39;&#39;() =&gt; {</span>
 <span class="sd">            var url = &quot;&#39;&#39;&#39;</span>
             <span class="o">+</span> <span class="n">url</span>
@@ -577,9 +548,9 @@
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;_signature=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">calc_tt_params</span><span class="p">:</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">_get_tt_params_script</span><span class="p">())</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">_get_tt_params_script</span><span class="p">())</span>
 
-            <span class="n">tt_params</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="n">tt_params</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
                 <span class="sd">&quot;&quot;&quot;() =&gt; {</span>
 <span class="sd">                    return window.genXTTParams(&quot;&quot;&quot;</span>
                 <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">)))</span>
@@ -588,15 +559,12 @@
 <span class="s2">                }&quot;&quot;&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">,</span> <span class="n">tt_params</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_clean_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;cleanup failed&quot;</span><span class="p">)</span>
-        <span class="c1"># playwright.stop()</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_clean_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">find_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;waitUntil&quot;</span><span class="p">:</span> <span class="s2">&quot;load&quot;</span><span class="p">})</span>
@@ -631,10 +599,31 @@ inheritance.</p>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="browser.create" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#browser.create">#&nbsp;&nbsp</a>
+
+                <div class="decorator">@staticmethod</div>
+
+            <span class="def">async def</span>
+            <span class="name">create</span><span class="signature">(**kwargs)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="nd">@staticmethod</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">create</span><span class="p">(</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="n">browser</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;proxy&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -676,18 +665,18 @@ inheritance.</p>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">executable_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;executable_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">executable_path</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="n">get_playwright</span><span class="p">()</span><span class="o">.</span><span class="n">webkit</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-                <span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span>
-            <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Webkit launch failed&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">e</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thread_locals</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thread_locals</span><span class="o">.</span><span class="n">playwright</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_playwright</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread_locals</span><span class="o">.</span><span class="n">playwright</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">webkit</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span>
+        <span class="p">)</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_context</span><span class="p">(</span><span class="n">set_useragent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_context</span><span class="p">(</span><span class="n">set_useragent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">page</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
-        <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
 
         </details>
@@ -699,18 +688,18 @@ inheritance.</p>
                                         <div class="attr function"><a class="headerlink" href="#browser.get_params">#&nbsp;&nbsp</a>
 
         
-            <span class="def">def</span>
+            <span class="def">async def</span>
             <span class="name">get_params</span><span class="signature">(self, page) -&gt; None</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;browser_language&quot;</span><span class="p">,</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return navigator.language; }&quot;&quot;&quot;</span><span class="p">),</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return navigator.language; }&quot;&quot;&quot;</span><span class="p">),</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">browser_version</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser_version</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
             <span class="sd">&quot;&quot;&quot;() =&gt; { return window.navigator.appVersion; }&quot;&quot;&quot;</span>
         <span class="p">)</span>
 
@@ -728,12 +717,12 @@ inheritance.</p>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">timezone_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;timezone_name&quot;</span><span class="p">,</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
                 <span class="sd">&quot;&quot;&quot;() =&gt; { return Intl.DateTimeFormat().resolvedOptions().timeZone; }&quot;&quot;&quot;</span>
             <span class="p">),</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.width; }&quot;&quot;&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.height; }&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.width; }&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;() =&gt; { return screen.height; }&quot;&quot;&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -780,23 +769,25 @@ inheritance.</p>
                                         <div class="attr function"><a class="headerlink" href="#browser.sign_url">#&nbsp;&nbsp</a>
 
         
-            <span class="def">def</span>
+            <span class="def">async def</span>
             <span class="name">sign_url</span><span class="signature">(self, url, calc_tt_params=False, **kwargs)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">sign_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="n">route</span><span class="p">):</span>
-            <span class="n">route</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">async</span> <span class="k">def</span> <span class="nf">sign_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">async</span> <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="n">route</span><span class="p">):</span>
+            <span class="k">await</span> <span class="n">route</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
 
         <span class="n">tt_params</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_context</span><span class="p">()</span>
-        <span class="n">page</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_context</span><span class="p">()</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">calc_tt_params</span><span class="p">:</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\.png)|(\.jpeg)|(\.mp4)|(x-expire)&quot;</span><span class="p">),</span> <span class="n">process</span><span class="p">)</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\.png)|(\.jpeg)|(\.mp4)|(x-expire)&quot;</span><span class="p">),</span> <span class="n">process</span>
+            <span class="p">)</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span>
                 <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default_url&quot;</span><span class="p">,</span> <span class="s2">&quot;https://www.tiktok.com/@redbull&quot;</span><span class="p">),</span>
                 <span class="n">wait_until</span><span class="o">=</span><span class="s2">&quot;load&quot;</span><span class="p">,</span>
             <span class="p">)</span>
@@ -824,8 +815,8 @@ inheritance.</p>
 
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;verifyFp=</span><span class="si">{}</span><span class="s2">&amp;device_id=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">)</span>
 
-        <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">_get_acrawler</span><span class="p">())</span>
-        <span class="n">evaluatedPage</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">_get_acrawler</span><span class="p">())</span>
+        <span class="n">evaluatedPage</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
             <span class="sd">&#39;&#39;&#39;() =&gt; {</span>
 <span class="sd">            var url = &quot;&#39;&#39;&#39;</span>
             <span class="o">+</span> <span class="n">url</span>
@@ -839,9 +830,9 @@ inheritance.</p>
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&amp;_signature=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">calc_tt_params</span><span class="p">:</span>
-            <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">_get_tt_params_script</span><span class="p">())</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">add_script_tag</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">_get_tt_params_script</span><span class="p">())</span>
 
-            <span class="n">tt_params</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="n">tt_params</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
                 <span class="sd">&quot;&quot;&quot;() =&gt; {</span>
 <span class="sd">                    return window.genXTTParams(&quot;&quot;&quot;</span>
                 <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">)))</span>
@@ -850,7 +841,7 @@ inheritance.</p>
 <span class="s2">                }&quot;&quot;&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">verifyFp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">evaluatedPage</span><span class="p">,</span> <span class="n">tt_params</span><span class="p">)</span>
 </pre></div>
 

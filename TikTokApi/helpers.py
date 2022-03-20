@@ -27,7 +27,9 @@ def extract_tag_contents(html):
         if sigi_json:
             return sigi_json.group(1)
         else:
-            raise TikTokCaptchaError()
+            raise CaptchaException(
+                "TikTok blocks this request displaying a Captcha \nTip: Consider using a proxy or a custom_verify_fp as method parameters"
+            )
 
 
 def extract_video_id_from_url(url):

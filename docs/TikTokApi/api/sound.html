@@ -141,6 +141,7 @@
 <span class="sd">        sound_data = api.sound(id=&#39;7016547803243022337&#39;).info()</span>
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ensure_valid</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">use_html</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">info_full</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">]</span>
 
@@ -151,7 +152,7 @@
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;statusCode&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10203</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">NotFoundException</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">][</span><span class="s2">&quot;music&quot;</span><span class="p">]</span>
 
@@ -167,6 +168,7 @@
 <span class="sd">        sound_data = api.sound(id=&#39;7016547803243022337&#39;).info_full()</span>
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ensure_valid</span><span class="p">()</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;https://www.tiktok.com/music/-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
             <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
@@ -197,6 +199,7 @@
 <span class="sd">            # do something</span>
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ensure_valid</span><span class="p">()</span>
         <span class="n">processed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_process_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">processed</span><span class="o">.</span><span class="n">device_id</span>
 
@@ -232,6 +235,9 @@
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span>
         <span class="n">keys</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
         <span class="k">if</span> <span class="s2">&quot;authorName&quot;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span>
@@ -243,6 +249,10 @@
             <span class="n">Sound</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Failed to create Sound with data: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="se">\n</span><span class="s2">which has keys </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ensure_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SoundRemovedException</span><span class="p">(</span><span class="s2">&quot;This sound has been removed!&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
@@ -319,6 +329,7 @@
 <span class="sd">        sound_data = api.sound(id=&#39;7016547803243022337&#39;).info()</span>
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ensure_valid</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">use_html</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">info_full</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">]</span>
 
@@ -329,7 +340,7 @@
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;statusCode&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10203</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">NotFoundException</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">][</span><span class="s2">&quot;music&quot;</span><span class="p">]</span>
 
@@ -345,6 +356,7 @@
 <span class="sd">        sound_data = api.sound(id=&#39;7016547803243022337&#39;).info_full()</span>
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ensure_valid</span><span class="p">()</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;https://www.tiktok.com/music/-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
             <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
@@ -375,6 +387,7 @@
 <span class="sd">            # do something</span>
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ensure_valid</span><span class="p">()</span>
         <span class="n">processed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_process_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">processed</span><span class="o">.</span><span class="n">device_id</span>
 
@@ -410,6 +423,9 @@
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span>
         <span class="n">keys</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
         <span class="k">if</span> <span class="s2">&quot;authorName&quot;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span>
@@ -421,6 +437,10 @@
             <span class="n">Sound</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Failed to create Sound with data: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="se">\n</span><span class="s2">which has keys </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ensure_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SoundRemovedException</span><span class="p">(</span><span class="s2">&quot;This sound has been removed!&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
@@ -535,6 +555,7 @@
 <span class="sd">        sound_data = api.sound(id=&#39;7016547803243022337&#39;).info()</span>
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ensure_valid</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">use_html</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">info_full</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">]</span>
 
@@ -545,7 +566,7 @@
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;statusCode&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10203</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">NotFoundException</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">][</span><span class="s2">&quot;music&quot;</span><span class="p">]</span>
 </pre></div>
@@ -593,6 +614,7 @@ as often as an HTML request.</li>
 <span class="sd">        sound_data = api.sound(id=&#39;7016547803243022337&#39;).info_full()</span>
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ensure_valid</span><span class="p">()</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;https://www.tiktok.com/music/-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
             <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
@@ -654,6 +676,7 @@ with Sound.info()</p>
 <span class="sd">            # do something</span>
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ensure_valid</span><span class="p">()</span>
         <span class="n">processed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_process_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">processed</span><span class="o">.</span><span class="n">device_id</span>
 

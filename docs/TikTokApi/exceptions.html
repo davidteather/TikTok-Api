@@ -31,56 +31,47 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
-                    <a class="class" href="#TikTokCaptchaError">TikTokCaptchaError</a>
+                    <a class="class" href="#TikTokException">TikTokException</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#TikTokCaptchaError.__init__">TikTokCaptchaError</a>
+                                <a class="function" href="#TikTokException.__init__">TikTokException</a>
                         </li>
                 </ul>
 
             </li>
             <li>
-                    <a class="class" href="#GenericTikTokError">GenericTikTokError</a>
+                    <a class="class" href="#CaptchaException">CaptchaException</a>
                             <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#GenericTikTokError.__init__">GenericTikTokError</a>
-                        </li>
                 </ul>
 
             </li>
             <li>
-                    <a class="class" href="#TikTokNotFoundError">TikTokNotFoundError</a>
+                    <a class="class" href="#NotFoundException">NotFoundException</a>
                             <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#TikTokNotFoundError.__init__">TikTokNotFoundError</a>
-                        </li>
                 </ul>
 
             </li>
             <li>
-                    <a class="class" href="#EmptyResponseError">EmptyResponseError</a>
+                    <a class="class" href="#EmptyResponseException">EmptyResponseException</a>
                             <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#EmptyResponseError.__init__">EmptyResponseError</a>
-                        </li>
                 </ul>
 
             </li>
             <li>
-                    <a class="class" href="#JSONDecodeFailure">JSONDecodeFailure</a>
+                    <a class="class" href="#SoundRemovedException">SoundRemovedException</a>
                             <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#JSONDecodeFailure.__init__">JSONDecodeFailure</a>
-                        </li>
                 </ul>
 
             </li>
             <li>
-                    <a class="class" href="#TikTokNotAvailableError">TikTokNotAvailableError</a>
+                    <a class="class" href="#InvalidJSONException">InvalidJSONException</a>
                             <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#TikTokNotAvailableError.__init__">TikTokNotAvailableError</a>
-                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#NotAvailableException">NotAvailableException</a>
+                            <ul class="memberlist">
                 </ul>
 
             </li>
@@ -103,92 +94,75 @@
                 
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">TikTokCaptchaError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">message</span><span class="o">=</span><span class="s2">&quot;TikTok blocks this request displaying a Captcha </span><span class="se">\n</span><span class="s2">Tip: Consider using a proxy or a custom_verify_fp as method parameters&quot;</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">TikTokException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generic exception that all other TikTok errors are children of.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<span class="c1"># TODO: Update this so children are all subclasses of the generic error.</span>
-<span class="k">class</span> <span class="nc">GenericTikTokError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">CaptchaException</span><span class="p">(</span><span class="n">TikTokException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;TikTok is showing captcha&quot;&quot;&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">TikTokNotFoundError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The requested object does not exists&quot;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">NotFoundException</span><span class="p">(</span><span class="n">TikTokException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;TikTok indicated that this object does not exist.&quot;&quot;&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">EmptyResponseError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;TikTok sent no data back&quot;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">EmptyResponseException</span><span class="p">(</span><span class="n">TikTokException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;TikTok sent back an empty response.&quot;&quot;&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">JSONDecodeFailure</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;TikTok sent invalid JSON back&quot;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">SoundRemovedException</span><span class="p">(</span><span class="n">TikTokException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This TikTok sound has no id from being removed by TikTok.&quot;&quot;&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">TikTokNotAvailableError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The requested object is not available in this region&quot;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">InvalidJSONException</span><span class="p">(</span><span class="n">TikTokException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;TikTok returned invalid JSON.&quot;&quot;&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">NotAvailableException</span><span class="p">(</span><span class="n">TikTokException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The requested object is not available in this region.&quot;&quot;&quot;</span>
 </pre></div>
 
         </details>
 
             </section>
-                <section id="TikTokCaptchaError">
+                <section id="TikTokException">
                                 <div class="attr class">
-        <a class="headerlink" href="#TikTokCaptchaError">#&nbsp;&nbsp</a>
+        <a class="headerlink" href="#TikTokException">#&nbsp;&nbsp</a>
 
         
         <span class="def">class</span>
-        <span class="name">TikTokCaptchaError</span><wbr>(<span class="base">builtins.Exception</span>):
+        <span class="name">TikTokException</span><wbr>(<span class="base">builtins.Exception</span>):
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">TikTokCaptchaError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">message</span><span class="o">=</span><span class="s2">&quot;TikTok blocks this request displaying a Captcha </span><span class="se">\n</span><span class="s2">Tip: Consider using a proxy or a custom_verify_fp as method parameters&quot;</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">TikTokException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generic exception that all other TikTok errors are children of.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Common base class for all non-exit exceptions.</p>
+            <div class="docstring"><p>Generic exception that all other TikTok errors are children of.</p>
 </div>
 
 
-                            <div id="TikTokCaptchaError.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#TikTokCaptchaError.__init__">#&nbsp;&nbsp</a>
+                            <div id="TikTokException.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#TikTokException.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">TikTokCaptchaError</span><span class="signature">(
-    message=&#39;TikTok blocks this request displaying a Captcha \nTip: Consider using a proxy or a custom_verify_fp as method parameters&#39;
-)</span>
+            <span class="name">TikTokException</span><span class="signature">(*args, **kwargs)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">message</span><span class="o">=</span><span class="s2">&quot;TikTok blocks this request displaying a Captcha </span><span class="se">\n</span><span class="s2">Tip: Consider using a proxy or a custom_verify_fp as method parameters&quot;</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -200,273 +174,224 @@
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt>builtins.BaseException</dt>
-                                <dd id="TikTokCaptchaError.with_traceback" class="function">with_traceback</dd>
-                <dd id="TikTokCaptchaError.args" class="variable">args</dd>
+                                <dd id="TikTokException.with_traceback" class="function">with_traceback</dd>
+                <dd id="TikTokException.args" class="variable">args</dd>
 
             </div>
                                 </dl>
                             </div>
                 </section>
-                <section id="GenericTikTokError">
+                <section id="CaptchaException">
                                 <div class="attr class">
-        <a class="headerlink" href="#GenericTikTokError">#&nbsp;&nbsp</a>
+        <a class="headerlink" href="#CaptchaException">#&nbsp;&nbsp</a>
 
         
         <span class="def">class</span>
-        <span class="name">GenericTikTokError</span><wbr>(<span class="base">builtins.Exception</span>):
+        <span class="name">CaptchaException</span><wbr>(<span class="base"><a href="#TikTokException">TikTokException</a></span>):
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">GenericTikTokError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">CaptchaException</span><span class="p">(</span><span class="n">TikTokException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;TikTok is showing captcha&quot;&quot;&quot;</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Common base class for all non-exit exceptions.</p>
+            <div class="docstring"><p>TikTok is showing captcha</p>
 </div>
 
 
-                            <div id="GenericTikTokError.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#GenericTikTokError.__init__">#&nbsp;&nbsp</a>
-
-        
-            <span class="name">GenericTikTokError</span><span class="signature">(message)</span>
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
-                                    <div><dt>builtins.BaseException</dt>
-                                <dd id="GenericTikTokError.with_traceback" class="function">with_traceback</dd>
-                <dd id="GenericTikTokError.args" class="variable">args</dd>
+                                    <div><dt><a href="#TikTokException">TikTokException</a></dt>
+                                <dd id="CaptchaException.__init__" class="function"><a href="#TikTokException.__init__">TikTokException</a></dd>
+
+            </div>
+            <div><dt>builtins.BaseException</dt>
+                                <dd id="CaptchaException.with_traceback" class="function">with_traceback</dd>
+                <dd id="CaptchaException.args" class="variable">args</dd>
 
             </div>
                                 </dl>
                             </div>
                 </section>
-                <section id="TikTokNotFoundError">
+                <section id="NotFoundException">
                                 <div class="attr class">
-        <a class="headerlink" href="#TikTokNotFoundError">#&nbsp;&nbsp</a>
+        <a class="headerlink" href="#NotFoundException">#&nbsp;&nbsp</a>
 
         
         <span class="def">class</span>
-        <span class="name">TikTokNotFoundError</span><wbr>(<span class="base">builtins.Exception</span>):
+        <span class="name">NotFoundException</span><wbr>(<span class="base"><a href="#TikTokException">TikTokException</a></span>):
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">TikTokNotFoundError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The requested object does not exists&quot;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">NotFoundException</span><span class="p">(</span><span class="n">TikTokException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;TikTok indicated that this object does not exist.&quot;&quot;&quot;</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Common base class for all non-exit exceptions.</p>
+            <div class="docstring"><p>TikTok indicated that this object does not exist.</p>
 </div>
 
 
-                            <div id="TikTokNotFoundError.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#TikTokNotFoundError.__init__">#&nbsp;&nbsp</a>
-
-        
-            <span class="name">TikTokNotFoundError</span><span class="signature">(message=&#39;The requested object does not exists&#39;)</span>
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The requested object does not exists&quot;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
-                                    <div><dt>builtins.BaseException</dt>
-                                <dd id="TikTokNotFoundError.with_traceback" class="function">with_traceback</dd>
-                <dd id="TikTokNotFoundError.args" class="variable">args</dd>
+                                    <div><dt><a href="#TikTokException">TikTokException</a></dt>
+                                <dd id="NotFoundException.__init__" class="function"><a href="#TikTokException.__init__">TikTokException</a></dd>
+
+            </div>
+            <div><dt>builtins.BaseException</dt>
+                                <dd id="NotFoundException.with_traceback" class="function">with_traceback</dd>
+                <dd id="NotFoundException.args" class="variable">args</dd>
 
             </div>
                                 </dl>
                             </div>
                 </section>
-                <section id="EmptyResponseError">
+                <section id="EmptyResponseException">
                                 <div class="attr class">
-        <a class="headerlink" href="#EmptyResponseError">#&nbsp;&nbsp</a>
+        <a class="headerlink" href="#EmptyResponseException">#&nbsp;&nbsp</a>
 
         
         <span class="def">class</span>
-        <span class="name">EmptyResponseError</span><wbr>(<span class="base">builtins.Exception</span>):
+        <span class="name">EmptyResponseException</span><wbr>(<span class="base"><a href="#TikTokException">TikTokException</a></span>):
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">EmptyResponseError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;TikTok sent no data back&quot;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">EmptyResponseException</span><span class="p">(</span><span class="n">TikTokException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;TikTok sent back an empty response.&quot;&quot;&quot;</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Common base class for all non-exit exceptions.</p>
+            <div class="docstring"><p>TikTok sent back an empty response.</p>
 </div>
 
 
-                            <div id="EmptyResponseError.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#EmptyResponseError.__init__">#&nbsp;&nbsp</a>
-
-        
-            <span class="name">EmptyResponseError</span><span class="signature">(message=&#39;TikTok sent no data back&#39;)</span>
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;TikTok sent no data back&quot;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
-                                    <div><dt>builtins.BaseException</dt>
-                                <dd id="EmptyResponseError.with_traceback" class="function">with_traceback</dd>
-                <dd id="EmptyResponseError.args" class="variable">args</dd>
+                                    <div><dt><a href="#TikTokException">TikTokException</a></dt>
+                                <dd id="EmptyResponseException.__init__" class="function"><a href="#TikTokException.__init__">TikTokException</a></dd>
+
+            </div>
+            <div><dt>builtins.BaseException</dt>
+                                <dd id="EmptyResponseException.with_traceback" class="function">with_traceback</dd>
+                <dd id="EmptyResponseException.args" class="variable">args</dd>
 
             </div>
                                 </dl>
                             </div>
                 </section>
-                <section id="JSONDecodeFailure">
+                <section id="SoundRemovedException">
                                 <div class="attr class">
-        <a class="headerlink" href="#JSONDecodeFailure">#&nbsp;&nbsp</a>
+        <a class="headerlink" href="#SoundRemovedException">#&nbsp;&nbsp</a>
 
         
         <span class="def">class</span>
-        <span class="name">JSONDecodeFailure</span><wbr>(<span class="base">builtins.Exception</span>):
+        <span class="name">SoundRemovedException</span><wbr>(<span class="base"><a href="#TikTokException">TikTokException</a></span>):
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">JSONDecodeFailure</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;TikTok sent invalid JSON back&quot;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">SoundRemovedException</span><span class="p">(</span><span class="n">TikTokException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This TikTok sound has no id from being removed by TikTok.&quot;&quot;&quot;</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Common base class for all non-exit exceptions.</p>
+            <div class="docstring"><p>This TikTok sound has no id from being removed by TikTok.</p>
 </div>
 
 
-                            <div id="JSONDecodeFailure.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#JSONDecodeFailure.__init__">#&nbsp;&nbsp</a>
-
-        
-            <span class="name">JSONDecodeFailure</span><span class="signature">(message=&#39;TikTok sent invalid JSON back&#39;)</span>
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;TikTok sent invalid JSON back&quot;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
-                                    <div><dt>builtins.BaseException</dt>
-                                <dd id="JSONDecodeFailure.with_traceback" class="function">with_traceback</dd>
-                <dd id="JSONDecodeFailure.args" class="variable">args</dd>
+                                    <div><dt><a href="#TikTokException">TikTokException</a></dt>
+                                <dd id="SoundRemovedException.__init__" class="function"><a href="#TikTokException.__init__">TikTokException</a></dd>
+
+            </div>
+            <div><dt>builtins.BaseException</dt>
+                                <dd id="SoundRemovedException.with_traceback" class="function">with_traceback</dd>
+                <dd id="SoundRemovedException.args" class="variable">args</dd>
 
             </div>
                                 </dl>
                             </div>
                 </section>
-                <section id="TikTokNotAvailableError">
+                <section id="InvalidJSONException">
                                 <div class="attr class">
-        <a class="headerlink" href="#TikTokNotAvailableError">#&nbsp;&nbsp</a>
+        <a class="headerlink" href="#InvalidJSONException">#&nbsp;&nbsp</a>
 
         
         <span class="def">class</span>
-        <span class="name">TikTokNotAvailableError</span><wbr>(<span class="base">builtins.Exception</span>):
+        <span class="name">InvalidJSONException</span><wbr>(<span class="base"><a href="#TikTokException">TikTokException</a></span>):
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">TikTokNotAvailableError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The requested object is not available in this region&quot;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">InvalidJSONException</span><span class="p">(</span><span class="n">TikTokException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;TikTok returned invalid JSON.&quot;&quot;&quot;</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Common base class for all non-exit exceptions.</p>
+            <div class="docstring"><p>TikTok returned invalid JSON.</p>
 </div>
 
 
-                            <div id="TikTokNotAvailableError.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#TikTokNotAvailableError.__init__">#&nbsp;&nbsp</a>
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#TikTokException">TikTokException</a></dt>
+                                <dd id="InvalidJSONException.__init__" class="function"><a href="#TikTokException.__init__">TikTokException</a></dd>
+
+            </div>
+            <div><dt>builtins.BaseException</dt>
+                                <dd id="InvalidJSONException.with_traceback" class="function">with_traceback</dd>
+                <dd id="InvalidJSONException.args" class="variable">args</dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
+                <section id="NotAvailableException">
+                                <div class="attr class">
+        <a class="headerlink" href="#NotAvailableException">#&nbsp;&nbsp</a>
 
         
-            <span class="name">TikTokNotAvailableError</span><span class="signature">(message=&#39;The requested object is not available in this region&#39;)</span>
+        <span class="def">class</span>
+        <span class="name">NotAvailableException</span><wbr>(<span class="base"><a href="#TikTokException">TikTokException</a></span>):
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The requested object is not available in this region&quot;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">NotAvailableException</span><span class="p">(</span><span class="n">TikTokException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The requested object is not available in this region.&quot;&quot;&quot;</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>The requested object is not available in this region.</p>
+</div>
 
-                            </div>
+
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
-                                    <div><dt>builtins.BaseException</dt>
-                                <dd id="TikTokNotAvailableError.with_traceback" class="function">with_traceback</dd>
-                <dd id="TikTokNotAvailableError.args" class="variable">args</dd>
+                                    <div><dt><a href="#TikTokException">TikTokException</a></dt>
+                                <dd id="NotAvailableException.__init__" class="function"><a href="#TikTokException.__init__">TikTokException</a></dd>
+
+            </div>
+            <div><dt>builtins.BaseException</dt>
+                                <dd id="NotAvailableException.with_traceback" class="function">with_traceback</dd>
+                <dd id="NotAvailableException.args" class="variable">args</dd>
 
             </div>
                                 </dl>

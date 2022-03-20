@@ -1,38 +1,29 @@
-class TikTokCaptchaError(Exception):
-    def __init__(
-        self,
-        message="TikTok blocks this request displaying a Captcha \nTip: Consider using a proxy or a custom_verify_fp as method parameters",
-    ):
-        self.message = message
-        super().__init__(self.message)
+class TikTokException(Exception):
+    """Generic exception that all other TikTok errors are children of."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
-# TODO: Update this so children are all subclasses of the generic error.
-class GenericTikTokError(Exception):
-    def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)
+class CaptchaException(TikTokException):
+    """TikTok is showing captcha"""
 
 
-class TikTokNotFoundError(Exception):
-    def __init__(self, message="The requested object does not exists"):
-        self.message = message
-        super().__init__(self.message)
+class NotFoundException(TikTokException):
+    """TikTok indicated that this object does not exist."""
 
 
-class EmptyResponseError(Exception):
-    def __init__(self, message="TikTok sent no data back"):
-        self.message = message
-        super().__init__(self.message)
+class EmptyResponseException(TikTokException):
+    """TikTok sent back an empty response."""
 
 
-class JSONDecodeFailure(Exception):
-    def __init__(self, message="TikTok sent invalid JSON back"):
-        self.message = message
-        super().__init__(self.message)
+class SoundRemovedException(TikTokException):
+    """This TikTok sound has no id from being removed by TikTok."""
 
 
-class TikTokNotAvailableError(Exception):
-    def __init__(self, message="The requested object is not available in this region"):
-        self.message = message
-        super().__init__(self.message)
+class InvalidJSONException(TikTokException):
+    """TikTok returned invalid JSON."""
+
+
+class NotAvailableException(TikTokException):
+    """The requested object is not available in this region."""

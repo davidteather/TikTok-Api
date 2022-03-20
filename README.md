@@ -46,7 +46,9 @@ If you run into an issue please check the closed issues on the github, although 
 pip install TikTokApi
 python -m playwright install
 ```
-If you would prefer a video walk through of setting up this package I created a currently semi-outdated [YouTube video](https://www.youtube.com/watch?v=-uCt1x8kINQ) just for that.
+If you would prefer a video walk through of setting up this package [YouTube video](https://www.youtube.com/watch?v=-uCt1x8kINQ) just for that.
+
+If you want a quick video to listen for [TikTok Live](https://www.youtube.com/watch?v=307ijmA3_lc) events in python.
 
 #### Docker Installation
 
@@ -73,16 +75,14 @@ Here's a quick bit of code to get the most recent trending videos on TikTok. The
 ```py
 from TikTokApi import TikTokApi
 
-# In your web browser you will need to go to TikTok, check the cookies 
-# and under www.tiktok.com s_v_web_id should exist, and use that value
-# as input to custom_verify_fp
-# Or watch https://www.youtube.com/watch?v=-uCt1x8kINQ for a visual
-api = TikTokApi(custom_verify_fp="")
-
-for trending_video in api.trending.videos(count=50):
-    # Prints the author's username of the trending video.
-    print(trending_video.author.username)
+# Watch https://www.youtube.com/watch?v=-uCt1x8kINQ for a brief setup tutorial
+with TikTokApi() as api:
+    for trending_video in api.trending.videos(count=50):
+        # Prints the author's username of the trending video.
+        print(trending_video.author.username)
 ```
+
+**Note**: Jupyter (ipynb) only works on linux, see [microsoft/playwright-python #178](https://github.com/microsoft/playwright-python/issues/178)
 
 To run the example scripts from the repository root, make sure you use the `-m` option on python.
 ```sh
@@ -128,10 +128,10 @@ Here's a few more examples that help illustrate the differences in the flow of t
 api = TikTokApi.get_instance()
 trending_videos = api.by_trending()
 
-#V5
-api = TikTokApi() # .get_instance no longer exists
-for trending_video in api.trending.videos():
-    # do something
+#V5.1
+with TikTokApi() as api: # .get_instance no longer exists
+    for trending_video in api.trending.videos():
+        # do something
 ```
 
 Where in V4 you had to extract information yourself, the package now handles that for you. So it's much easier to do chained related function calls.

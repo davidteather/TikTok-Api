@@ -37,9 +37,6 @@
                                 <a class="function" href="#TikTokApi.__init__">TikTokApi</a>
                         </li>
                         <li>
-                                <a class="variable" href="#TikTokApi.logger">logger</a>
-                        </li>
-                        <li>
                                 <a class="class" href="#TikTokApi.user">TikTokApi.user</a>
                         </li>
                         <li>
@@ -58,6 +55,9 @@
                                 <a class="class" href="#TikTokApi.trending">TikTokApi.trending</a>
                         </li>
                         <li>
+                                <a class="variable" href="#TikTokApi.logger">logger</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#TikTokApi.get_data">get_data</a>
                         </li>
                         <li>
@@ -68,6 +68,9 @@
                         </li>
                         <li>
                                 <a class="function" href="#TikTokApi.generate_device_id">generate_device_id</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#TikTokApi.shutdown">shutdown</a>
                         </li>
                 </ul>
 
@@ -94,6 +97,8 @@
             <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">time</span>
@@ -121,22 +126,22 @@
 <span class="n">BASE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://m.tiktok.com/&quot;</span>
 <span class="n">DESKTOP_BASE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://www.tiktok.com/&quot;</span>
 
+<span class="n">_thread_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
 
 <span class="k">class</span> <span class="nc">TikTokApi</span><span class="p">:</span>
-    <span class="n">_instance</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">logger</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">LOGGER_NAME</span><span class="p">)</span>
-
+    <span class="n">_is_context_manager</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">user</span> <span class="o">=</span> <span class="n">User</span>
     <span class="n">search</span> <span class="o">=</span> <span class="n">Search</span>
     <span class="n">sound</span> <span class="o">=</span> <span class="n">Sound</span>
     <span class="n">hashtag</span> <span class="o">=</span> <span class="n">Hashtag</span>
     <span class="n">video</span> <span class="o">=</span> <span class="n">Video</span>
     <span class="n">trending</span> <span class="o">=</span> <span class="n">Trending</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">LOGGER_NAME</span><span class="p">)</span>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">logging_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">logging_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
         <span class="n">request_delay</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">custom_device_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">generate_static_device_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -204,10 +209,10 @@
 <span class="sd">            in other places.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TikTokApi</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span>
-                <span class="n">logging_level</span><span class="o">=</span><span class="n">logging_level</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging_level</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">_thread_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span>
                 <span class="n">request_delay</span><span class="o">=</span><span class="n">request_delay</span><span class="p">,</span>
                 <span class="n">custom_device_id</span><span class="o">=</span><span class="n">custom_device_id</span><span class="p">,</span>
                 <span class="n">generate_static_device_id</span><span class="o">=</span><span class="n">generate_static_device_id</span><span class="p">,</span>
@@ -218,9 +223,8 @@
                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span>
 
-    <span class="k">def</span> <span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logging_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Add classes from the api folder</span>
         <span class="n">User</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="n">Search</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
@@ -229,15 +233,13 @@
         <span class="n">Video</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="n">Trending</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging_level</span><span class="p">)</span>
-
         <span class="c1"># Some Instance Vars</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_executable_path</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;executable_path&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_did&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Please use &#39;custom_device_id&#39; instead of &#39;custom_did&#39;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_custom_device_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_user_agent</span> <span class="o">=</span> <span class="s2">&quot;5.0+(iPhone%3B+CPU+iPhone+OS+14_8+like+Mac+OS+X)+AppleWebKit</span><span class="si">%2F</span><span class="s2">605.1.15+(KHTML,+like+Gecko)+Version</span><span class="si">%2F</span><span class="s2">14.1.2+Mobile</span><span class="si">%2F</span><span class="s2">15E148+Safari</span><span class="si">%2F</span><span class="s2">604.1&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_agent</span> <span class="o">=</span> <span class="s2">&quot;5.0 (iPhone; CPU iPhone OS 14_8 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_proxy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;proxy&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_custom_verify_fp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_verify_fp&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_signer_url</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;external_signer&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -254,7 +256,10 @@
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signer_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span> <span class="o">=</span> <span class="n">browser</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span>
+                <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">_user_agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">user_agent</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -276,6 +281,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">=</span> <span class="s2">&quot;1080&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_region</span> <span class="o">=</span> <span class="s2">&quot;US&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_language</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span>
+            <span class="k">raise</span> <span class="n">e</span> <span class="kn">from</span> <span class="nn">e</span>
 
     <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">subdomain</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Makes requests to TikTok and returns their JSON.</span>
@@ -306,9 +312,21 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signer_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_verify_fp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">verifyFp</span>
-            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">tt_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span>
-                <span class="n">full_url</span><span class="p">,</span> <span class="n">calc_tt_params</span><span class="o">=</span><span class="n">send_tt_params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-            <span class="p">)</span>
+            <span class="p">(</span>
+                <span class="n">verify_fp</span><span class="p">,</span>
+                <span class="n">device_id</span><span class="p">,</span>
+                <span class="n">signature</span><span class="p">,</span>
+                <span class="n">tt_params</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span>
+                <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span>
+                        <span class="n">full_url</span><span class="p">,</span> <span class="n">calc_tt_params</span><span class="o">=</span><span class="n">send_tt_params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)[</span>
+                <span class="mi">0</span>
+            <span class="p">]</span>
+
             <span class="n">user_agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">user_agent</span>
             <span class="n">referrer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">referrer</span>
         <span class="k">else</span><span class="p">:</span>
@@ -362,7 +380,7 @@
             <span class="s2">&quot;x-tt-params&quot;</span><span class="p">:</span> <span class="n">tt_params</span><span class="p">,</span>
         <span class="p">}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GET: %s</span><span class="se">\n\t</span><span class="s2">headers: %s&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GET: %s</span><span class="se">\n\t</span><span class="s2">headers: %s&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="n">url</span><span class="p">,</span>
             <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
@@ -383,7 +401,9 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_get_cookies</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
                     <span class="n">url</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="k">raise</span> <span class="n">TikTokCaptchaError</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="n">CaptchaException</span><span class="p">(</span>
+                    <span class="s2">&quot;TikTok blocks this request displaying a Captcha </span><span class="se">\n</span><span class="s2">Tip: Consider using a proxy or a custom_verify_fp as method parameters&quot;</span>
+                <span class="p">)</span>
 
             <span class="c1"># statusCode from props-&gt;pageProps-&gt;statusCode thanks @adiantek on #403</span>
             <span class="n">error_codes</span> <span class="o">=</span> <span class="p">{</span>
@@ -427,17 +447,17 @@
                 <span class="s2">&quot;undefined&quot;</span><span class="p">:</span> <span class="s2">&quot;MEDIA_ERROR&quot;</span><span class="p">,</span>
             <span class="p">}</span>
             <span class="n">statusCode</span> <span class="o">=</span> <span class="n">parsed_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;statusCode&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TikTok Returned: %s&quot;</span><span class="p">,</span> <span class="n">json</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TikTok Returned: %s&quot;</span><span class="p">,</span> <span class="n">json</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">statusCode</span> <span class="o">==</span> <span class="mi">10201</span><span class="p">:</span>
                 <span class="c1"># Invalid Entity</span>
-                <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">NotFoundException</span><span class="p">(</span>
                     <span class="s2">&quot;TikTok returned a response indicating the entity is invalid&quot;</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="n">statusCode</span> <span class="o">==</span> <span class="mi">10219</span><span class="p">:</span>
-                <span class="c1"># not available in this region</span>
-                <span class="k">raise</span> <span class="n">TikTokNotAvailableError</span><span class="p">(</span><span class="s2">&quot;Content not available for this region&quot;</span><span class="p">)</span>
+                <span class="c1"># Not available in this region</span>
+                <span class="k">raise</span> <span class="n">NotAvailableException</span><span class="p">(</span><span class="s2">&quot;Content not available for this region&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">statusCode</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">statusCode</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">GenericTikTokError</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">TikTokException</span><span class="p">(</span>
                     <span class="n">error_codes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
                         <span class="n">statusCode</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;TikTok sent an unknown StatusCode of </span><span class="si">{</span><span class="n">statusCode</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="p">)</span>
@@ -446,26 +466,22 @@
             <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok response: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;TikTok response: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">EmptyResponseError</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">EmptyResponseException</span><span class="p">(</span>
                     <span class="s2">&quot;Empty response from Tiktok to &quot;</span> <span class="o">+</span> <span class="n">url</span>
                 <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Converting response to JSON failed&quot;</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="n">JSONDecodeFailure</span><span class="p">()</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="k">raise</span> <span class="n">InvalidJSONException</span><span class="p">(</span><span class="s2">&quot;TikTok sent invalid JSON&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
     <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;A basic cleanup method, called automatically from the code&quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">_clean_up</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">get_playwright</span><span class="p">()</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="n">TikTokApi</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_context_manager</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;TikTokAPI was shutdown improperlly. Ensure the instance is terminated with .shutdown()&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+        <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">external_signer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">custom_device_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verifyFp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Makes requests to an external signer instead of using a browser.</span>
@@ -549,9 +565,16 @@
         <span class="n">processed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">processed</span><span class="o">.</span><span class="n">device_id</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signer_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span>
-                <span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-            <span class="p">)</span>
+            <span class="p">(</span>
+                <span class="n">verify_fp</span><span class="p">,</span>
+                <span class="n">device_id</span><span class="p">,</span>
+                <span class="n">signature</span><span class="p">,</span>
+                <span class="n">_</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span>
+                <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="p">)[</span>
+                <span class="mi">0</span>
+            <span class="p">]</span>
             <span class="n">user_agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">user_agent</span>
             <span class="n">referrer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">referrer</span>
         <span class="k">else</span><span class="p">:</span>
@@ -631,31 +654,55 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_add_url_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region</span>
+            <span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser_language</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">timezone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timezone_name</span>
+            <span class="n">language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_language</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Attribute Error on add_url_params&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="s2">&quot;US&quot;</span>
+            <span class="n">browser_language</span> <span class="o">=</span> <span class="s2">&quot;en-us&quot;</span>
+            <span class="n">timezone</span> <span class="o">=</span> <span class="s2">&quot;America/Chicago&quot;</span>
+            <span class="n">language</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span>
         <span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;aid&quot;</span><span class="p">:</span> <span class="mi">1988</span><span class="p">,</span>
             <span class="s2">&quot;app_name&quot;</span><span class="p">:</span> <span class="s2">&quot;tiktok_web&quot;</span><span class="p">,</span>
             <span class="s2">&quot;device_platform&quot;</span><span class="p">:</span> <span class="s2">&quot;web_mobile&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region</span> <span class="ow">or</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="n">region</span><span class="p">,</span>
             <span class="s2">&quot;priority_region&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="s2">&quot;os&quot;</span><span class="p">:</span> <span class="s2">&quot;ios&quot;</span><span class="p">,</span>
             <span class="s2">&quot;referer&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="s2">&quot;cookie_enabled&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
             <span class="s2">&quot;screen_width&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span><span class="p">,</span>
             <span class="s2">&quot;screen_height&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span><span class="p">,</span>
-            <span class="s2">&quot;browser_language&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser_language</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">&quot;en-us&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;browser_language&quot;</span><span class="p">:</span> <span class="n">browser_language</span><span class="p">,</span>
             <span class="s2">&quot;browser_platform&quot;</span><span class="p">:</span> <span class="s2">&quot;iPhone&quot;</span><span class="p">,</span>
             <span class="s2">&quot;browser_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Mozilla&quot;</span><span class="p">,</span>
             <span class="s2">&quot;browser_version&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_agent</span><span class="p">,</span>
             <span class="s2">&quot;browser_online&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;timezone_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timezone_name</span> <span class="ow">or</span> <span class="s2">&quot;America/Chicago&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;timezone_name&quot;</span><span class="p">:</span> <span class="n">timezone</span><span class="p">,</span>
             <span class="s2">&quot;is_page_visible&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
             <span class="s2">&quot;focus_state&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
             <span class="s2">&quot;is_fullscreen&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;history_len&quot;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
-            <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_language</span> <span class="ow">or</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;history_len&quot;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+            <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="n">language</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="k">return</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">_thread_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Shutting down Playwright&quot;</span><span class="p">)</span>
+            <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">_clean_up</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">_thread_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_context_manager</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -673,20 +720,18 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">TikTokApi</span><span class="p">:</span>
-    <span class="n">_instance</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">logger</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">LOGGER_NAME</span><span class="p">)</span>
-
+    <span class="n">_is_context_manager</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">user</span> <span class="o">=</span> <span class="n">User</span>
     <span class="n">search</span> <span class="o">=</span> <span class="n">Search</span>
     <span class="n">sound</span> <span class="o">=</span> <span class="n">Sound</span>
     <span class="n">hashtag</span> <span class="o">=</span> <span class="n">Hashtag</span>
     <span class="n">video</span> <span class="o">=</span> <span class="n">Video</span>
     <span class="n">trending</span> <span class="o">=</span> <span class="n">Trending</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">LOGGER_NAME</span><span class="p">)</span>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">logging_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">logging_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
         <span class="n">request_delay</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">custom_device_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">generate_static_device_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -754,10 +799,10 @@
 <span class="sd">            in other places.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TikTokApi</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span>
-                <span class="n">logging_level</span><span class="o">=</span><span class="n">logging_level</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging_level</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">_thread_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span>
                 <span class="n">request_delay</span><span class="o">=</span><span class="n">request_delay</span><span class="p">,</span>
                 <span class="n">custom_device_id</span><span class="o">=</span><span class="n">custom_device_id</span><span class="p">,</span>
                 <span class="n">generate_static_device_id</span><span class="o">=</span><span class="n">generate_static_device_id</span><span class="p">,</span>
@@ -768,9 +813,8 @@
                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span>
 
-    <span class="k">def</span> <span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logging_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Add classes from the api folder</span>
         <span class="n">User</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="n">Search</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
@@ -779,15 +823,13 @@
         <span class="n">Video</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="n">Trending</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging_level</span><span class="p">)</span>
-
         <span class="c1"># Some Instance Vars</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_executable_path</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;executable_path&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_did&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Please use &#39;custom_device_id&#39; instead of &#39;custom_did&#39;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_custom_device_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_user_agent</span> <span class="o">=</span> <span class="s2">&quot;5.0+(iPhone%3B+CPU+iPhone+OS+14_8+like+Mac+OS+X)+AppleWebKit</span><span class="si">%2F</span><span class="s2">605.1.15+(KHTML,+like+Gecko)+Version</span><span class="si">%2F</span><span class="s2">14.1.2+Mobile</span><span class="si">%2F</span><span class="s2">15E148+Safari</span><span class="si">%2F</span><span class="s2">604.1&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_agent</span> <span class="o">=</span> <span class="s2">&quot;5.0 (iPhone; CPU iPhone OS 14_8 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_proxy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;proxy&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_custom_verify_fp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_verify_fp&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_signer_url</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;external_signer&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -804,7 +846,10 @@
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signer_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span> <span class="o">=</span> <span class="n">browser</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span>
+                <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">_user_agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">user_agent</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -826,6 +871,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">=</span> <span class="s2">&quot;1080&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_region</span> <span class="o">=</span> <span class="s2">&quot;US&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_language</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span>
+            <span class="k">raise</span> <span class="n">e</span> <span class="kn">from</span> <span class="nn">e</span>
 
     <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">subdomain</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Makes requests to TikTok and returns their JSON.</span>
@@ -856,9 +902,21 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signer_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_verify_fp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">verifyFp</span>
-            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">tt_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span>
-                <span class="n">full_url</span><span class="p">,</span> <span class="n">calc_tt_params</span><span class="o">=</span><span class="n">send_tt_params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-            <span class="p">)</span>
+            <span class="p">(</span>
+                <span class="n">verify_fp</span><span class="p">,</span>
+                <span class="n">device_id</span><span class="p">,</span>
+                <span class="n">signature</span><span class="p">,</span>
+                <span class="n">tt_params</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span>
+                <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span>
+                        <span class="n">full_url</span><span class="p">,</span> <span class="n">calc_tt_params</span><span class="o">=</span><span class="n">send_tt_params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)[</span>
+                <span class="mi">0</span>
+            <span class="p">]</span>
+
             <span class="n">user_agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">user_agent</span>
             <span class="n">referrer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">referrer</span>
         <span class="k">else</span><span class="p">:</span>
@@ -912,7 +970,7 @@
             <span class="s2">&quot;x-tt-params&quot;</span><span class="p">:</span> <span class="n">tt_params</span><span class="p">,</span>
         <span class="p">}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GET: %s</span><span class="se">\n\t</span><span class="s2">headers: %s&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GET: %s</span><span class="se">\n\t</span><span class="s2">headers: %s&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="n">url</span><span class="p">,</span>
             <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
@@ -933,7 +991,9 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_get_cookies</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
                     <span class="n">url</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="k">raise</span> <span class="n">TikTokCaptchaError</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="n">CaptchaException</span><span class="p">(</span>
+                    <span class="s2">&quot;TikTok blocks this request displaying a Captcha </span><span class="se">\n</span><span class="s2">Tip: Consider using a proxy or a custom_verify_fp as method parameters&quot;</span>
+                <span class="p">)</span>
 
             <span class="c1"># statusCode from props-&gt;pageProps-&gt;statusCode thanks @adiantek on #403</span>
             <span class="n">error_codes</span> <span class="o">=</span> <span class="p">{</span>
@@ -977,17 +1037,17 @@
                 <span class="s2">&quot;undefined&quot;</span><span class="p">:</span> <span class="s2">&quot;MEDIA_ERROR&quot;</span><span class="p">,</span>
             <span class="p">}</span>
             <span class="n">statusCode</span> <span class="o">=</span> <span class="n">parsed_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;statusCode&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TikTok Returned: %s&quot;</span><span class="p">,</span> <span class="n">json</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TikTok Returned: %s&quot;</span><span class="p">,</span> <span class="n">json</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">statusCode</span> <span class="o">==</span> <span class="mi">10201</span><span class="p">:</span>
                 <span class="c1"># Invalid Entity</span>
-                <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">NotFoundException</span><span class="p">(</span>
                     <span class="s2">&quot;TikTok returned a response indicating the entity is invalid&quot;</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="n">statusCode</span> <span class="o">==</span> <span class="mi">10219</span><span class="p">:</span>
-                <span class="c1"># not available in this region</span>
-                <span class="k">raise</span> <span class="n">TikTokNotAvailableError</span><span class="p">(</span><span class="s2">&quot;Content not available for this region&quot;</span><span class="p">)</span>
+                <span class="c1"># Not available in this region</span>
+                <span class="k">raise</span> <span class="n">NotAvailableException</span><span class="p">(</span><span class="s2">&quot;Content not available for this region&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">statusCode</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">statusCode</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">GenericTikTokError</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">TikTokException</span><span class="p">(</span>
                     <span class="n">error_codes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
                         <span class="n">statusCode</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;TikTok sent an unknown StatusCode of </span><span class="si">{</span><span class="n">statusCode</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="p">)</span>
@@ -996,26 +1056,22 @@
             <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok response: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;TikTok response: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">EmptyResponseError</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">EmptyResponseException</span><span class="p">(</span>
                     <span class="s2">&quot;Empty response from Tiktok to &quot;</span> <span class="o">+</span> <span class="n">url</span>
                 <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Converting response to JSON failed&quot;</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="n">JSONDecodeFailure</span><span class="p">()</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="k">raise</span> <span class="n">InvalidJSONException</span><span class="p">(</span><span class="s2">&quot;TikTok sent invalid JSON&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
     <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;A basic cleanup method, called automatically from the code&quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">_clean_up</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">get_playwright</span><span class="p">()</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="n">TikTokApi</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_context_manager</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;TikTokAPI was shutdown improperlly. Ensure the instance is terminated with .shutdown()&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+        <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">external_signer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">custom_device_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verifyFp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Makes requests to an external signer instead of using a browser.</span>
@@ -1099,9 +1155,16 @@
         <span class="n">processed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">processed</span><span class="o">.</span><span class="n">device_id</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signer_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span>
-                <span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-            <span class="p">)</span>
+            <span class="p">(</span>
+                <span class="n">verify_fp</span><span class="p">,</span>
+                <span class="n">device_id</span><span class="p">,</span>
+                <span class="n">signature</span><span class="p">,</span>
+                <span class="n">_</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span>
+                <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="p">)[</span>
+                <span class="mi">0</span>
+            <span class="p">]</span>
             <span class="n">user_agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">user_agent</span>
             <span class="n">referrer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">referrer</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1181,31 +1244,55 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_add_url_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region</span>
+            <span class="n">browser_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser_language</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">timezone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timezone_name</span>
+            <span class="n">language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_language</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Attribute Error on add_url_params&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="s2">&quot;US&quot;</span>
+            <span class="n">browser_language</span> <span class="o">=</span> <span class="s2">&quot;en-us&quot;</span>
+            <span class="n">timezone</span> <span class="o">=</span> <span class="s2">&quot;America/Chicago&quot;</span>
+            <span class="n">language</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span>
         <span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;aid&quot;</span><span class="p">:</span> <span class="mi">1988</span><span class="p">,</span>
             <span class="s2">&quot;app_name&quot;</span><span class="p">:</span> <span class="s2">&quot;tiktok_web&quot;</span><span class="p">,</span>
             <span class="s2">&quot;device_platform&quot;</span><span class="p">:</span> <span class="s2">&quot;web_mobile&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region</span> <span class="ow">or</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="n">region</span><span class="p">,</span>
             <span class="s2">&quot;priority_region&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="s2">&quot;os&quot;</span><span class="p">:</span> <span class="s2">&quot;ios&quot;</span><span class="p">,</span>
             <span class="s2">&quot;referer&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="s2">&quot;cookie_enabled&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
             <span class="s2">&quot;screen_width&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span><span class="p">,</span>
             <span class="s2">&quot;screen_height&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span><span class="p">,</span>
-            <span class="s2">&quot;browser_language&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser_language</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">&quot;en-us&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;browser_language&quot;</span><span class="p">:</span> <span class="n">browser_language</span><span class="p">,</span>
             <span class="s2">&quot;browser_platform&quot;</span><span class="p">:</span> <span class="s2">&quot;iPhone&quot;</span><span class="p">,</span>
             <span class="s2">&quot;browser_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Mozilla&quot;</span><span class="p">,</span>
             <span class="s2">&quot;browser_version&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_agent</span><span class="p">,</span>
             <span class="s2">&quot;browser_online&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;timezone_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timezone_name</span> <span class="ow">or</span> <span class="s2">&quot;America/Chicago&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;timezone_name&quot;</span><span class="p">:</span> <span class="n">timezone</span><span class="p">,</span>
             <span class="s2">&quot;is_page_visible&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
             <span class="s2">&quot;focus_state&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
             <span class="s2">&quot;is_fullscreen&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;history_len&quot;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
-            <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_language</span> <span class="ow">or</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;history_len&quot;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+            <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="n">language</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="k">return</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">_thread_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Shutting down Playwright&quot;</span><span class="p">)</span>
+            <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">_clean_up</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">_thread_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_context_manager</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -1215,10 +1302,9 @@
                             <div id="TikTokApi.__init__" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#TikTokApi.__init__">#&nbsp;&nbsp</a>
 
-                <div class="decorator">@staticmethod</div>
-
+        
             <span class="name">TikTokApi</span><span class="signature">(
-    logging_level=30,
+    logging_level: int = 30,
     request_delay: Optional[int] = None,
     custom_device_id: Optional[str] = None,
     generate_static_device_id: Optional[bool] = False,
@@ -1233,10 +1319,9 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">logging_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">logging_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
         <span class="n">request_delay</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">custom_device_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">generate_static_device_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1304,10 +1389,10 @@
 <span class="sd">            in other places.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TikTokApi</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span>
-                <span class="n">logging_level</span><span class="o">=</span><span class="n">logging_level</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging_level</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">_thread_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span>
                 <span class="n">request_delay</span><span class="o">=</span><span class="n">request_delay</span><span class="p">,</span>
                 <span class="n">custom_device_id</span><span class="o">=</span><span class="n">custom_device_id</span><span class="p">,</span>
                 <span class="n">generate_static_device_id</span><span class="o">=</span><span class="n">generate_static_device_id</span><span class="p">,</span>
@@ -1318,7 +1403,6 @@
                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span>
 </pre></div>
 
         </details>
@@ -1380,7 +1464,7 @@ in other places.</p></li>
                             <div id="TikTokApi.logger" class="classattr">
                                             <div class="attr variable"><a class="headerlink" href="#TikTokApi.logger">#&nbsp;&nbsp</a>
 
-        <span class="name">logger</span><span class="annotation">: ClassVar[logging.Logger]</span><span class="default_value"> = &lt;Logger TikTokApi (WARNING)&gt;</span>
+        <span class="name">logger</span><span class="default_value"> = &lt;Logger TikTokApi (WARNING)&gt;</span>
     </div>
 
     
@@ -1425,9 +1509,21 @@ in other places.</p></li>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signer_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_verify_fp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">verifyFp</span>
-            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">tt_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span>
-                <span class="n">full_url</span><span class="p">,</span> <span class="n">calc_tt_params</span><span class="o">=</span><span class="n">send_tt_params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-            <span class="p">)</span>
+            <span class="p">(</span>
+                <span class="n">verify_fp</span><span class="p">,</span>
+                <span class="n">device_id</span><span class="p">,</span>
+                <span class="n">signature</span><span class="p">,</span>
+                <span class="n">tt_params</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span>
+                <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span>
+                        <span class="n">full_url</span><span class="p">,</span> <span class="n">calc_tt_params</span><span class="o">=</span><span class="n">send_tt_params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)[</span>
+                <span class="mi">0</span>
+            <span class="p">]</span>
+
             <span class="n">user_agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">user_agent</span>
             <span class="n">referrer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">referrer</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1481,7 +1577,7 @@ in other places.</p></li>
             <span class="s2">&quot;x-tt-params&quot;</span><span class="p">:</span> <span class="n">tt_params</span><span class="p">,</span>
         <span class="p">}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GET: %s</span><span class="se">\n\t</span><span class="s2">headers: %s&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GET: %s</span><span class="se">\n\t</span><span class="s2">headers: %s&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="n">url</span><span class="p">,</span>
             <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
@@ -1502,7 +1598,9 @@ in other places.</p></li>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_get_cookies</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
                     <span class="n">url</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="k">raise</span> <span class="n">TikTokCaptchaError</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="n">CaptchaException</span><span class="p">(</span>
+                    <span class="s2">&quot;TikTok blocks this request displaying a Captcha </span><span class="se">\n</span><span class="s2">Tip: Consider using a proxy or a custom_verify_fp as method parameters&quot;</span>
+                <span class="p">)</span>
 
             <span class="c1"># statusCode from props-&gt;pageProps-&gt;statusCode thanks @adiantek on #403</span>
             <span class="n">error_codes</span> <span class="o">=</span> <span class="p">{</span>
@@ -1546,17 +1644,17 @@ in other places.</p></li>
                 <span class="s2">&quot;undefined&quot;</span><span class="p">:</span> <span class="s2">&quot;MEDIA_ERROR&quot;</span><span class="p">,</span>
             <span class="p">}</span>
             <span class="n">statusCode</span> <span class="o">=</span> <span class="n">parsed_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;statusCode&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TikTok Returned: %s&quot;</span><span class="p">,</span> <span class="n">json</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TikTok Returned: %s&quot;</span><span class="p">,</span> <span class="n">json</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">statusCode</span> <span class="o">==</span> <span class="mi">10201</span><span class="p">:</span>
                 <span class="c1"># Invalid Entity</span>
-                <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">NotFoundException</span><span class="p">(</span>
                     <span class="s2">&quot;TikTok returned a response indicating the entity is invalid&quot;</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="n">statusCode</span> <span class="o">==</span> <span class="mi">10219</span><span class="p">:</span>
-                <span class="c1"># not available in this region</span>
-                <span class="k">raise</span> <span class="n">TikTokNotAvailableError</span><span class="p">(</span><span class="s2">&quot;Content not available for this region&quot;</span><span class="p">)</span>
+                <span class="c1"># Not available in this region</span>
+                <span class="k">raise</span> <span class="n">NotAvailableException</span><span class="p">(</span><span class="s2">&quot;Content not available for this region&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">statusCode</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">statusCode</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">GenericTikTokError</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">TikTokException</span><span class="p">(</span>
                     <span class="n">error_codes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
                         <span class="n">statusCode</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;TikTok sent an unknown StatusCode of </span><span class="si">{</span><span class="n">statusCode</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="p">)</span>
@@ -1565,14 +1663,13 @@ in other places.</p></li>
             <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TikTok response: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;TikTok response: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">EmptyResponseError</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">EmptyResponseException</span><span class="p">(</span>
                     <span class="s2">&quot;Empty response from Tiktok to &quot;</span> <span class="o">+</span> <span class="n">url</span>
                 <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Converting response to JSON failed&quot;</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="n">JSONDecodeFailure</span><span class="p">()</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="k">raise</span> <span class="n">InvalidJSONException</span><span class="p">(</span><span class="s2">&quot;TikTok sent invalid JSON&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 </pre></div>
 
         </details>
@@ -1672,9 +1769,16 @@ I recommend watching the entire thing, as it will help setup this package.</p></
         <span class="n">processed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">processed</span><span class="o">.</span><span class="n">device_id</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signer_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">verify_fp</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span>
-                <span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-            <span class="p">)</span>
+            <span class="p">(</span>
+                <span class="n">verify_fp</span><span class="p">,</span>
+                <span class="n">device_id</span><span class="p">,</span>
+                <span class="n">signature</span><span class="p">,</span>
+                <span class="n">_</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span>
+                <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="n">calc_tt_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="p">)[</span>
+                <span class="mi">0</span>
+            <span class="p">]</span>
             <span class="n">user_agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">user_agent</span>
             <span class="n">referrer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">referrer</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1738,6 +1842,27 @@ I recommend watching the entire thing, as it will help setup this package.</p></
             <div class="docstring"><p>Generates a valid device_id for other methods. Pass this as the custom_device_id field to download videos</p>
 </div>
 
+
+                            </div>
+                            <div id="TikTokApi.shutdown" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#TikTokApi.shutdown">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">shutdown</span><span class="signature">(self) -&gt; None</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">_thread_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Shutting down Playwright&quot;</span><span class="p">)</span>
+            <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_browser</span><span class="o">.</span><span class="n">_clean_up</span><span class="p">())</span>
+</pre></div>
+
+        </details>
+
+    
 
                             </div>
                 </section>
@@ -1842,7 +1967,7 @@ I recommend watching the entire thing, as it will help setup this package.</p></
 
         <span class="n">user_props</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s2">&quot;props&quot;</span><span class="p">][</span><span class="s2">&quot;pageProps&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">user_props</span><span class="p">[</span><span class="s2">&quot;statusCode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">NotFoundException</span><span class="p">(</span>
                 <span class="s2">&quot;TikTok user with username </span><span class="si">{}</span><span class="s2"> does not exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
             <span class="p">)</span>
 
@@ -2251,6 +2376,7 @@ I recommend watching the entire thing, as it will help setup this package.</p></
 <span class="sd">        sound_data = api.sound(id=&#39;7016547803243022337&#39;).info()</span>
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ensure_valid</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">use_html</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">info_full</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">]</span>
 
@@ -2261,7 +2387,7 @@ I recommend watching the entire thing, as it will help setup this package.</p></
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;statusCode&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10203</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">NotFoundException</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">][</span><span class="s2">&quot;music&quot;</span><span class="p">]</span>
 
@@ -2277,6 +2403,7 @@ I recommend watching the entire thing, as it will help setup this package.</p></
 <span class="sd">        sound_data = api.sound(id=&#39;7016547803243022337&#39;).info_full()</span>
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ensure_valid</span><span class="p">()</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;https://www.tiktok.com/music/-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
             <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
@@ -2307,6 +2434,7 @@ I recommend watching the entire thing, as it will help setup this package.</p></
 <span class="sd">            # do something</span>
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ensure_valid</span><span class="p">()</span>
         <span class="n">processed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_process_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">processed</span><span class="o">.</span><span class="n">device_id</span>
 
@@ -2342,6 +2470,9 @@ I recommend watching the entire thing, as it will help setup this package.</p></
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span>
         <span class="n">keys</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
         <span class="k">if</span> <span class="s2">&quot;authorName&quot;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span>
@@ -2353,6 +2484,10 @@ I recommend watching the entire thing, as it will help setup this package.</p></
             <span class="n">Sound</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Failed to create Sound with data: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="se">\n</span><span class="s2">which has keys </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ensure_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SoundRemovedException</span><span class="p">(</span><span class="s2">&quot;This sound has been removed!&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
@@ -2475,7 +2610,7 @@ I recommend watching the entire thing, as it will help setup this package.</p></
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;challengeInfo&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;challenge&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TikTokNotFoundError</span><span class="p">(</span><span class="s2">&quot;Challenge </span><span class="si">{}</span><span class="s2"> does not exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">NotFoundException</span><span class="p">(</span><span class="s2">&quot;Challenge </span><span class="si">{}</span><span class="s2"> does not exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">data</span>
 
@@ -2604,6 +2739,10 @@ I recommend watching the entire thing, as it will help setup this package.</p></
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="sd">&quot;&quot;&quot;TikTok&#39;s ID of the Video&quot;&quot;&quot;</span>
+    <span class="n">create_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;The creation time of the Video&quot;&quot;&quot;</span>
+    <span class="n">stats</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;TikTok&#39;s stats of the Video&quot;&quot;&quot;</span>
     <span class="n">author</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]</span>
     <span class="sd">&quot;&quot;&quot;The User who created the Video&quot;&quot;&quot;</span>
     <span class="n">sound</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sound</span><span class="p">]</span>
@@ -2692,6 +2831,8 @@ I recommend watching the entire thing, as it will help setup this package.</p></
 
         <span class="k">if</span> <span class="s2">&quot;author&quot;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;createTime&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;stats&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sound</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">sound</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;music&quot;</span><span class="p">])</span>
 
@@ -2713,7 +2854,7 @@ I recommend watching the entire thing, as it will help setup this package.</p></
 
     <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="c1"># Handle author, sound, hashtags, as_dict</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">,</span> <span class="s2">&quot;sound&quot;</span><span class="p">,</span> <span class="s2">&quot;hashtags&quot;</span><span class="p">,</span> <span class="s2">&quot;as_dict&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">,</span> <span class="s2">&quot;sound&quot;</span><span class="p">,</span> <span class="s2">&quot;hashtags&quot;</span><span class="p">,</span> <span class="s2">&quot;stats&quot;</span><span class="p">,</span> <span class="s2">&quot;create_time&quot;</span><span class="p">,</span> <span class="s2">&quot;as_dict&quot;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__extract_from_data</span><span class="p">()</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -2738,6 +2879,8 @@ I recommend watching the entire thing, as it will help setup this package.</p></
                                     <div><dt><a href="api/video.html#Video">TikTokApi.api.video.Video</a></dt>
                                 <dd id="TikTokApi.video.__init__" class="function"><a href="api/video.html#Video.__init__">Video</a></dd>
                 <dd id="TikTokApi.video.id" class="variable"><a href="api/video.html#Video.id">id</a></dd>
+                <dd id="TikTokApi.video.create_time" class="variable"><a href="api/video.html#Video.create_time">create_time</a></dd>
+                <dd id="TikTokApi.video.stats" class="variable"><a href="api/video.html#Video.stats">stats</a></dd>
                 <dd id="TikTokApi.video.author" class="variable"><a href="api/video.html#Video.author">author</a></dd>
                 <dd id="TikTokApi.video.sound" class="variable"><a href="api/video.html#Video.sound">sound</a></dd>
                 <dd id="TikTokApi.video.hashtags" class="variable"><a href="api/video.html#Video.hashtags">hashtags</a></dd>
