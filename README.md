@@ -8,11 +8,48 @@ This is an unofficial api wrapper for TikTok.com in python. With this api you ar
 ## Sponsors
 These sponsors have paid to be placed here and beyond that I do not have any affiliation with them, the TikTokAPI package will always be free and open-source. If you wish to be a sponsor of this project check out my [GitHub sponsors page](https://github.com/sponsors/davidteather).
 
-[![TikAPI](https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/logo128.png)](https://tikapi.io/?ref=davidteather)   |  **[TikAPI](https://tikapi.io/?ref=davidteather)** is a paid TikTok API service providing an full out-of-the-box solution for developers, trusted by 100+ companies. [Learn more](https://tikapi.io/?ref=davidteather)
-:-------------------------:|:-------------------------:
+<div align="center">
+    <p>
+    <a href="https://tikapi.io/?ref=davidteather" target="_blank">
+			<div>
+				<img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/logo128.png" width="100" alt="TikApi">
+			</div>
+			<b></b>
+			<div>
+				TikApi is a paid TikTok API service providing an full out-of-the-box solution for developers, trusted by 100+ companies.
+			</div>
+		</a>
+    </p>
+</div>
 
-[![Trendpop](https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/trendpop.png)](https://trendpop.social/careers?ref=github-davidteather-tiktokapi) | **[Trendpop](https://trendpop.social)** builds software to help creators and businesses go viral on social video platforms. Excited about building in this space? We're [hiring engineers across all roles](https://trendpop.social/careers) - shoot us a message at `founders@trendpop.social`.
-:-------------------------:|:-------------------------:
+<br>
+
+<div align="center">
+    <p>
+    <a href="https://tikapi.io/?ref=davidteather" target="_blank">
+			<div>
+				<img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/trendpop.png" width="100" alt="Trendpop">
+			</div>
+			<div>
+				Trendpop builds software to help creators and businesses go viral on social video platforms.
+			</div>
+            <div>
+                <sub>
+                    Excited about building in this space?
+                    <a href="https://trendpop.social/careers">
+                        <sub>We're hiring engineers across all roles</sub>
+                    </a>
+                    <a href="https://tikapi.io/?ref=davidteather" target="_blank">
+                    <sub>- shoot us a message at </sub>
+                    </a>
+                    <a href="mailto:founders@trendpop.social" target="_blank">
+                    <sub><code>founders@trendpop.social</code></sub>
+                    </a>
+                </sub>
+            </div>
+		</a>
+    </p>
+</div>
 
 ## Table of Contents
 - [Documentation](#documentation)
