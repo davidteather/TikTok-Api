@@ -26,7 +26,7 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
 
 <div align="center">
     <p>
-    <a href="https://tikapi.io/?ref=davidteather" target="_blank">
+    <a href="https://trendpop.social/careers?ref=github-davidteather-tiktokapi" target="_blank">
 			<div>
 				<img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/trendpop.png" width="100" alt="Trendpop">
 			</div>
@@ -39,7 +39,7 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
                     <a href="https://trendpop.social/careers">
                         <sub>We're hiring engineers across all roles</sub>
                     </a>
-                    <a href="https://tikapi.io/?ref=davidteather" target="_blank">
+                    <a href="https://trendpop.social/careers?ref=github-davidteather-tiktokapi" target="_blank">
                     <sub>- shoot us a message at </sub>
                     </a>
                     <a href="mailto:founders@trendpop.social" target="_blank">
