@@ -18,7 +18,6 @@ def update_messager():
 
 
 def check(name):
-
     latest_version = str(
         subprocess.run(
             [sys.executable, "-m", "pip", "install", "{}==random".format(name)],
