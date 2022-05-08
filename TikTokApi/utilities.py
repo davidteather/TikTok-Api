@@ -25,7 +25,7 @@ def check(name):
             text=True,
         )
     )
-    latest_version = latest_version[latest_version.find("(from versions:") + 15 :]
+    latest_version = latest_version[latest_version.find("(from versions:") + 15:]
     latest_version = latest_version[: latest_version.find(")")]
     latest_version = latest_version.replace(" ", "").split(",")[-1]
 
@@ -36,7 +36,7 @@ def check(name):
             text=True,
         )
     )
-    current_version = current_version[current_version.find("Version:") + 8 :]
+    current_version = current_version[current_version.find("Version:") + 8:]
     current_version = current_version[: current_version.find("\\n")].replace(" ", "")
 
     if latest_version == current_version:
