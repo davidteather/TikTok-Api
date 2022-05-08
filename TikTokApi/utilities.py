@@ -39,10 +39,7 @@ def check(name):
     current_version = current_version[current_version.find("Version:") + 8:]
     current_version = current_version[: current_version.find("\\n")].replace(" ", "")
 
-    if latest_version == current_version:
-        return True
-    else:
-        return False
+    return latest_version == current_version
 
 
 def check_future_deprecation():
