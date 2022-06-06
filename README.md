@@ -51,6 +51,22 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
     </p>
 </div>
 
+<br>
+
+<div align="center">
+    <p>
+    <a href="https://influencerhunters.com/docs.html?utm_source=github&utm_medium=githubpage&utm_campaign=david_thea_github&utm_id=david_t" target="_blank">
+			<div>
+				<img src="https://raw.githubusercontent.com/andrearama/TikTok-Api/master/imgs/IH_LOGO.png" width="100" alt="IH_logo">
+			</div>
+			<b></b>
+			<div>
+				TikTok data through APIs, providing 10+ Million posts / day to the largest Marketing and Social listening platforms.
+			</div>
+		</a>
+    </p>
+</div>
+
 ## Table of Contents
 - [Documentation](#documentation)
 - [Getting Started](#getting-started)
