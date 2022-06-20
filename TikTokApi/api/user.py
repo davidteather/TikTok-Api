@@ -155,8 +155,8 @@ class User:
             res = User.parent.get_data(path, send_tt_params=True, **kwargs)
 
             videos = res.get("itemList", [])
-            amount_yielded += len(videos)
             for video in videos:
+                amount_yielded += 1
                 yield self.parent.video(data=video)
 
             if not res.get("hasMore", False) and not first:
@@ -218,7 +218,6 @@ class User:
                 return
 
             videos = res.get("itemList", [])
-            amount_yielded += len(videos)
             for video in videos:
                 amount_yielded += 1
                 yield self.parent.video(data=video)
