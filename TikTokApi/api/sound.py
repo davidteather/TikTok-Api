@@ -151,6 +151,7 @@ class Sound:
             cursor = int(res["cursor"])
 
     def __extract_from_data(self):
+        print('hello im extracting data', self.as_dict)
         data = self.as_dict
         keys = data.keys()
 
@@ -173,6 +174,7 @@ class Sound:
         return f"TikTokApi.sound(id='{self.id}')"
 
     def __getattr__(self, name):
+        print('hello im getting name', name)
         if name in ["title", "author", "as_dict"]:
             self.as_dict = self.info()
             self.__extract_from_data()

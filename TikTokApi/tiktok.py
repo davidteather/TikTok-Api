@@ -249,7 +249,7 @@ class TikTokApi:
 
         csrf_token = None
         if subdomain == "m":
-            csrf_session_id = h.cookies["csrf_session_id"]
+            csrf_session_id = h.cookies.get("csrf_session_id")
             csrf_token = h.headers["X-Ware-Csrf-Token"].split(",")[1]
             kwargs["csrf_session_id"] = csrf_session_id
 

@@ -48,6 +48,7 @@ class Video:
         """
         self.id = id
         if data is not None:
+            print('hello received data', data)
             self.as_dict = data
             self.__extract_from_data()
         elif url is not None:
@@ -113,6 +114,7 @@ class Video:
     def __extract_from_data(self) -> None:
         data = self.as_dict
         keys = data.keys()
+        print('hello im in extract_from_data, keys are', keys)
 
         if "author" in keys:
             self.id = data["id"]
