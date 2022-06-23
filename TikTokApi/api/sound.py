@@ -155,7 +155,7 @@ class Sound:
         print('hello im extracting data, keys are', self.as_dict.keys())
         data = self.as_dict
         keys = data.keys()
-
+        print('hello im about to check authorName')
         if "authorName" in keys:
             print('authorName is in keys')
             self.id = data["id"]
