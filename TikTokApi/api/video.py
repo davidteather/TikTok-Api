@@ -117,6 +117,7 @@ class Video:
 
         if "author" in keys:
             self.id = data["id"]
+            print('video id is', self.id)
             print('hello im getting user from data["author"]', data["author"])
             self.author = self.parent.user(data=data["author"])
             print('hello im getting sound from data["music"]', data["music"])

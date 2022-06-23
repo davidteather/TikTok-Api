@@ -164,6 +164,9 @@ class Sound:
             if data["authorName"] is not None:
                 self.author = self.parent.user(username=data["authorName"])
         print('hello i made it here')
+        self.id = data.get("id")
+        self.title = data.get("title")
+
         if self.id is None:
             print('hello self.id is None')
             Sound.parent.logger.error(
@@ -176,11 +179,11 @@ class Sound:
     def __str__(self):
         return f"TikTokApi.sound(id='{self.id}')"
 
-    # def __getattr__(self, name):
-    #     print('hello im getting name', name)
-    #     if name in ["title", "author", "as_dict"]:
-    #         self.as_dict = self.info()
-    #         self.__extract_from_data()
-    #         return self.__getattribute__(name)
+    def __getattr__(self, name):
+        print('hello im getting name', name)
+        if name in ["title", "author", "as_dict"]:
+            self.as_dict = self.info()
+            self.__extract_from_data()
+            return self.__getattribute__(name)
 
-        raise AttributeError(f"{name} doesn't exist on TikTokApi.api.Sound")
+        # raise AttributeError(f"{name} doesn't exist on TikTokApi.api.Sound")
