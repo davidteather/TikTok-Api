@@ -42,6 +42,7 @@ class Sound:
         """
         if data is not None:
             self.as_dict = data
+            print('hello im in Sound, extracting from data')
             self.__extract_from_data()
         elif id is None:
             raise TypeError("You must provide id parameter.")
@@ -151,7 +152,7 @@ class Sound:
             cursor = int(res["cursor"])
 
     def __extract_from_data(self):
-        print('hello im extracting data', self.as_dict)
+        print('hello im extracting data, keys are', self.as_dict.keys())
         data = self.as_dict
         keys = data.keys()
 

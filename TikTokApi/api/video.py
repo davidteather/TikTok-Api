@@ -48,7 +48,6 @@ class Video:
         """
         self.id = id
         if data is not None:
-            print('hello received data', data)
             self.as_dict = data
             self.__extract_from_data()
         elif url is not None:
@@ -118,7 +117,9 @@ class Video:
 
         if "author" in keys:
             self.id = data["id"]
+            print('hello im getting user from data["author"]', data["author"])
             self.author = self.parent.user(data=data["author"])
+            print('hello im getting sound from data["music"]', data["music"])
             self.sound = self.parent.sound(data=data["music"])
 
             self.hashtags = [
