@@ -165,6 +165,7 @@ class Sound:
                 self.author = self.parent.user(username=data["authorName"])
         print('hello i made it here')
         if self.id is None:
+            print('hello self.id is None')
             Sound.parent.logger.error(
                 f"Failed to create Sound with data: {data}\nwhich has keys {data.keys()}"
             )
