@@ -85,6 +85,8 @@ You can find the full documentation [here](https://davidteather.github.io/TikTok
 
 To get started using this api follow the instructions below.
 
+**Note:** If you want to learn how to web scrape websites check my [free and open-source course for web scraping](https://github.com/davidteather/web-scraping-with-reverse-engineering)
+
 ### How to Support The Project
 * Star the repo 😎
 * Consider [sponsoring](https://github.com/sponsors/davidteather) me on GitHub
@@ -124,6 +126,8 @@ Please don't open an issue if you're experiencing one of these just comment if t
 ## Quick Start Guide
 
 Here's a quick bit of code to get the most recent trending videos on TikTok. There's more examples in the [examples](https://github.com/davidteather/TikTok-Api/tree/master/examples) directory.
+
+**Note:** If you want to learn how to web scrape websites check my [free and open-source course for web scraping](https://github.com/davidteather/web-scraping-with-reverse-engineering)
 
 ```py
 from TikTokApi import TikTokApi
