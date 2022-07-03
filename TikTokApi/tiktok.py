@@ -17,6 +17,7 @@ from .api.search import Search
 from .api.hashtag import Hashtag
 from .api.video import Video
 from .api.trending import Trending
+from .api.comment import Comment
 
 from playwright.sync_api import sync_playwright
 
@@ -41,6 +42,7 @@ class TikTokApi:
     hashtag = Hashtag
     video = Video
     trending = Trending
+    comment = Comment
     logger = logging.getLogger(LOGGER_NAME)
 
     def __init__(
@@ -136,14 +138,16 @@ class TikTokApi:
         Hashtag.parent = self
         Video.parent = self
         Trending.parent = self
+        Comment.parent = self
 
         # Some Instance Vars
         self._executable_path = kwargs.get("executable_path", None)
+        self.cookie_jar = None
 
         if kwargs.get("custom_did") != None:
             raise Exception("Please use 'custom_device_id' instead of 'custom_did'")
         self._custom_device_id = kwargs.get("custom_device_id", None)
-        self._user_agent = "5.0 (iPhone; CPU iPhone OS 14_8 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1"
+        self._user_agent = "5.0 (iPhone; CPU iPhone OS 14_8 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1"  # TODO: Randomly generate agents
         self._proxy = kwargs.get("proxy", None)
         self._custom_verify_fp = kwargs.get("custom_verify_fp")
         self._signer_url = kwargs.get("external_signer", None)
@@ -293,6 +297,8 @@ class TikTokApi:
             **self._requests_extra_kwargs,
         )
 
+        self.cookie_jar = r.cookies
+
         try:
             parsed_data = r.json()
             if (
@@ -377,6 +383,37 @@ class TikTokApi:
                 ) from None
             else:
                 raise InvalidJSONException("TikTok sent invalid JSON") from e
+
+    def get_data_no_sig(self, path, subdomain="m", **kwargs) -> dict:
+        processed = self._process_kwargs(kwargs)
+        full_url = f"https://{subdomain}.tiktok.com/" + path
+        referrer = self._browser.referrer
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:101.0) Gecko/20100101 Firefox/101.0",
+            "authority": "m.tiktok.com",
+            "method": "GET",
+            "path": full_url.split("tiktok.com")[1],
+            "scheme": "https",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip",
+            "accept-language": "en-US,en;q=0.9",
+            "origin": referrer,
+            "referer": referrer,
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "none",
+            "sec-gpc": "1",
+        }
+        self.logger.debug(f"GET: %s\n\theaders: %s", full_url, headers)
+
+        r = requests.get(
+            full_url,
+            headers=headers,
+            cookies=self._get_cookies(**kwargs),
+            proxies=self._format_proxy(processed.proxy),
+            **self._requests_extra_kwargs,
+        )
+        return r.json()
 
     def __del__(self):
         """A basic cleanup method, called automatically from the code"""

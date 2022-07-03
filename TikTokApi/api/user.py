@@ -111,6 +111,26 @@ class User:
 
         return user_props["userInfo"]
 
+        """
+        TODO: There is a route for user info, but uses msToken :\
+        processed = self.parent._process_kwargs(kwargs)
+        kwargs["custom_device_id"] = processed.device_id
+
+        query = {
+            "uniqueId": "therock",
+            "secUid": "",
+            "msToken": User.parent._get_cookies()["msToken"]
+        }
+
+        path = "api/user/detail/?{}&{}".format(
+            User.parent._add_url_params(), urlencode(query)
+        )
+
+        res = User.parent.get_data(path, subdomain="m", **kwargs)
+        print(res)
+
+        return res["userInfo"]"""
+
     def videos(self, count=30, cursor=0, **kwargs) -> Iterator[Video]:
         """
         Returns an iterator yielding Video objects.
@@ -155,8 +175,8 @@ class User:
             res = User.parent.get_data(path, send_tt_params=True, **kwargs)
 
             videos = res.get("itemList", [])
-            amount_yielded += len(videos)
             for video in videos:
+                amount_yielded += 1
                 yield self.parent.video(data=video)
 
             if not res.get("hasMore", False) and not first:
@@ -218,7 +238,6 @@ class User:
                 return
 
             videos = res.get("itemList", [])
-            amount_yielded += len(videos)
             for video in videos:
                 amount_yielded += 1
                 yield self.parent.video(data=video)

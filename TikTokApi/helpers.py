@@ -1,3 +1,4 @@
+import TikTokApi
 from TikTokApi.browser_utilities.browser import browser
 from urllib.parse import quote, urlencode
 from .exceptions import *
@@ -32,8 +33,8 @@ def extract_tag_contents(html):
             )
 
 
-def extract_video_id_from_url(url):
-    url = requests.head(url=url, allow_redirects=True).url
+def extract_video_id_from_url(url, headers={}):
+    url = requests.head(url=url, allow_redirects=True, headers=headers).url
     if "@" in url and "/video/" in url:
         return url.split("/video/")[1].split("?")[0]
     else:

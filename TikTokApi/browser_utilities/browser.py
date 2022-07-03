@@ -1,6 +1,7 @@
 import random
 import time
 import string
+from typing import Any, Optional
 import requests
 import logging
 import time
@@ -19,6 +20,9 @@ logger = logging.getLogger(LOGGER_NAME)
 
 
 class browser(BrowserInterface):
+
+    kwargs: dict[str, Any]
+
     def __init__(self, **kwargs):
         pass
 

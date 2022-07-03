@@ -4,20 +4,20 @@ import os
 
 def test_video_id_from_url():
     with TikTokApi(custom_verify_fp=os.environ.get("verifyFp", None)) as api:
-        url = "https://www.tiktok.com/@therock/video/7041997751718137094?is_copy_url=1&is_from_webapp=v1"
+        url = "https://www.tiktok.com/@therock/video/7107272719166901550"
         video = api.video(url=url)
 
-        assert video.id == "7041997751718137094"
+        assert video.id == "7107272719166901550"
 
-        mobile_url = "https://vm.tiktok.com/TTPdhJDvej"
+        mobile_url = "https://www.tiktok.com/t/ZTR8HHrjf"
         video = api.video(url=mobile_url)
 
-        assert video.id == "7041997751718137094"
+        assert video.id == "7107272719166901550"
 
 
 def test_video_info():
     with TikTokApi(custom_verify_fp=os.environ.get("verifyFp", None)) as api:
-        video_id = "7041997751718137094"
+        video_id = "7107272719166901550"
         video = api.video(id=video_id)
 
         data = video.info()
@@ -27,7 +27,7 @@ def test_video_info():
 
 def test_video_bytes():
     with TikTokApi(custom_verify_fp=os.environ.get("verifyFp", None)) as api:
-        video_id = "7041997751718137094"
+        video_id = "7107272719166901550"
         video = api.video(id=video_id)
 
         data = video.bytes()
