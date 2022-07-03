@@ -195,6 +195,26 @@
 
         <span class="k">return</span> <span class="n">user_props</span><span class="p">[</span><span class="s2">&quot;userInfo&quot;</span><span class="p">]</span>
 
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TODO: There is a route for user info, but uses msToken :\</span>
+<span class="sd">        processed = self.parent._process_kwargs(kwargs)</span>
+<span class="sd">        kwargs[&quot;custom_device_id&quot;] = processed.device_id</span>
+
+<span class="sd">        query = {</span>
+<span class="sd">            &quot;uniqueId&quot;: &quot;therock&quot;,</span>
+<span class="sd">            &quot;secUid&quot;: &quot;&quot;,</span>
+<span class="sd">            &quot;msToken&quot;: User.parent._get_cookies()[&quot;msToken&quot;]</span>
+<span class="sd">        }</span>
+
+<span class="sd">        path = &quot;api/user/detail/?{}&amp;{}&quot;.format(</span>
+<span class="sd">            User.parent._add_url_params(), urlencode(query)</span>
+<span class="sd">        )</span>
+
+<span class="sd">        res = User.parent.get_data(path, subdomain=&quot;m&quot;, **kwargs)</span>
+<span class="sd">        print(res)</span>
+
+<span class="sd">        return res[&quot;userInfo&quot;]&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">videos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Video</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns an iterator yielding Video objects.</span>
@@ -239,8 +259,8 @@
             <span class="n">res</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="n">videos</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="n">amount_yielded</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">videos</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
+                <span class="n">amount_yielded</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">video</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
@@ -302,7 +322,6 @@
                 <span class="k">return</span>
 
             <span class="n">videos</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="n">amount_yielded</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">videos</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
                 <span class="n">amount_yielded</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">video</span><span class="p">)</span>
@@ -481,6 +500,26 @@
 
         <span class="k">return</span> <span class="n">user_props</span><span class="p">[</span><span class="s2">&quot;userInfo&quot;</span><span class="p">]</span>
 
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TODO: There is a route for user info, but uses msToken :\</span>
+<span class="sd">        processed = self.parent._process_kwargs(kwargs)</span>
+<span class="sd">        kwargs[&quot;custom_device_id&quot;] = processed.device_id</span>
+
+<span class="sd">        query = {</span>
+<span class="sd">            &quot;uniqueId&quot;: &quot;therock&quot;,</span>
+<span class="sd">            &quot;secUid&quot;: &quot;&quot;,</span>
+<span class="sd">            &quot;msToken&quot;: User.parent._get_cookies()[&quot;msToken&quot;]</span>
+<span class="sd">        }</span>
+
+<span class="sd">        path = &quot;api/user/detail/?{}&amp;{}&quot;.format(</span>
+<span class="sd">            User.parent._add_url_params(), urlencode(query)</span>
+<span class="sd">        )</span>
+
+<span class="sd">        res = User.parent.get_data(path, subdomain=&quot;m&quot;, **kwargs)</span>
+<span class="sd">        print(res)</span>
+
+<span class="sd">        return res[&quot;userInfo&quot;]&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">videos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Video</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns an iterator yielding Video objects.</span>
@@ -525,8 +564,8 @@
             <span class="n">res</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="n">videos</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="n">amount_yielded</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">videos</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
+                <span class="n">amount_yielded</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">video</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
@@ -588,7 +627,6 @@
                 <span class="k">return</span>
 
             <span class="n">videos</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="n">amount_yielded</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">videos</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
                 <span class="n">amount_yielded</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">video</span><span class="p">)</span>
@@ -841,6 +879,26 @@ will not function correctly.</p>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">user_props</span><span class="p">[</span><span class="s2">&quot;userInfo&quot;</span><span class="p">]</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TODO: There is a route for user info, but uses msToken :\</span>
+<span class="sd">        processed = self.parent._process_kwargs(kwargs)</span>
+<span class="sd">        kwargs[&quot;custom_device_id&quot;] = processed.device_id</span>
+
+<span class="sd">        query = {</span>
+<span class="sd">            &quot;uniqueId&quot;: &quot;therock&quot;,</span>
+<span class="sd">            &quot;secUid&quot;: &quot;&quot;,</span>
+<span class="sd">            &quot;msToken&quot;: User.parent._get_cookies()[&quot;msToken&quot;]</span>
+<span class="sd">        }</span>
+
+<span class="sd">        path = &quot;api/user/detail/?{}&amp;{}&quot;.format(</span>
+<span class="sd">            User.parent._add_url_params(), urlencode(query)</span>
+<span class="sd">        )</span>
+
+<span class="sd">        res = User.parent.get_data(path, subdomain=&quot;m&quot;, **kwargs)</span>
+<span class="sd">        print(res)</span>
+
+<span class="sd">        return res[&quot;userInfo&quot;]&quot;&quot;&quot;</span>
 </pre></div>
 
         </details>
@@ -915,8 +973,8 @@ Includes statistics about this user.</p>
             <span class="n">res</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">send_tt_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="n">videos</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="n">amount_yielded</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">videos</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
+                <span class="n">amount_yielded</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">video</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
@@ -1016,7 +1074,6 @@ Includes statistics about this user.</p>
                 <span class="k">return</span>
 
             <span class="n">videos</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="n">amount_yielded</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">videos</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
                 <span class="n">amount_yielded</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">video</span><span class="p">)</span>

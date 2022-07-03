@@ -66,6 +66,9 @@
                         <li>
                                 <a class="function" href="#Video.bytes">bytes</a>
                         </li>
+                        <li>
+                                <a class="function" href="#Video.comments">comments</a>
+                        </li>
                 </ul>
 
             </li>
@@ -92,14 +95,16 @@
 
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlencode</span>
 <span class="kn">from</span> <span class="nn">..helpers</span> <span class="kn">import</span> <span class="n">extract_video_id_from_url</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">requests</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">..tiktok</span> <span class="kn">import</span> <span class="n">TikTokApi</span>
     <span class="kn">from</span> <span class="nn">.user</span> <span class="kn">import</span> <span class="n">User</span>
     <span class="kn">from</span> <span class="nn">.sound</span> <span class="kn">import</span> <span class="n">Sound</span>
     <span class="kn">from</span> <span class="nn">.hashtag</span> <span class="kn">import</span> <span class="n">Hashtag</span>
+    <span class="kn">from</span> <span class="nn">.comment</span> <span class="kn">import</span> <span class="n">Comment</span>
 
 
 <span class="k">class</span> <span class="nc">Video</span><span class="p">:</span>
@@ -143,7 +148,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span> <span class="o">=</span> <span class="n">data</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__extract_from_data</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">extract_video_id_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">extract_video_id_from_url</span><span class="p">(</span>
+                <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user-agent&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_user_agent</span><span class="p">}</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;You must provide id or url parameter.&quot;</span><span class="p">)</span>
@@ -178,7 +185,6 @@
         <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;api/item/detail/?</span><span class="si">{}</span><span class="s2">&amp;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_add_url_params</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
         <span class="p">)</span>
-
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
@@ -223,6 +229,52 @@
                 <span class="sa">f</span><span class="s2">&quot;Failed to create Video with data: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="se">\n</span><span class="s2">which has keys </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">comments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Comment</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns Comments from the video</span>
+
+<span class="sd">        - Parameters:</span>
+<span class="sd">            - count (int): The amount of videos you want returned.</span>
+<span class="sd">            - offset (int): The offset you want to check comments of</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">processed</span> <span class="o">=</span> <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_process_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">processed</span><span class="o">.</span><span class="n">device_id</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">offset</span>
+
+        <span class="n">spawn</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">head</span><span class="p">(</span>
+            <span class="s2">&quot;https://www.tiktok.com&quot;</span><span class="p">,</span>
+            <span class="n">proxies</span><span class="o">=</span><span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_format_proxy</span><span class="p">(</span><span class="n">processed</span><span class="o">.</span><span class="n">proxy</span><span class="p">),</span>
+            <span class="o">**</span><span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_requests_extra_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ttwid</span> <span class="o">=</span> <span class="n">spawn</span><span class="o">.</span><span class="n">cookies</span><span class="p">[</span><span class="s2">&quot;ttwid&quot;</span><span class="p">]</span>
+
+        <span class="k">while</span> <span class="n">cursor</span> <span class="o">-</span> <span class="n">offset</span> <span class="o">&lt;=</span> <span class="n">count</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;aweme_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
+                <span class="s2">&quot;app_language&quot;</span><span class="p">:</span> <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span>
+                <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;api/comment/list/?</span><span class="si">{}</span><span class="s2">&amp;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_add_url_params</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">api_response</span> <span class="o">=</span> <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
+                <span class="n">path</span><span class="p">,</span> <span class="n">subdomain</span><span class="o">=</span><span class="s2">&quot;www&quot;</span><span class="p">,</span> <span class="n">ttwid</span><span class="o">=</span><span class="n">ttwid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">comment_data</span> <span class="ow">in</span> <span class="n">api_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;comments&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">comment_data</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">api_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;has_more&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;TikTok is not sending comments beyond this point.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">cursor</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">api_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cursor&quot;</span><span class="p">,</span> <span class="n">cursor</span><span class="p">))</span>
+
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
 
@@ -234,6 +286,11 @@
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">,</span> <span class="s2">&quot;sound&quot;</span><span class="p">,</span> <span class="s2">&quot;hashtags&quot;</span><span class="p">,</span> <span class="s2">&quot;stats&quot;</span><span class="p">,</span> <span class="s2">&quot;create_time&quot;</span><span class="p">,</span> <span class="s2">&quot;as_dict&quot;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__extract_from_data</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;comments&quot;</span><span class="p">]:</span>
+            <span class="c1"># Requires a different request to produce the comments</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__extract_comments</span><span class="p">()</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> doesn&#39;t exist on TikTokApi.api.Video&quot;</span><span class="p">)</span>
@@ -294,7 +351,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span> <span class="o">=</span> <span class="n">data</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__extract_from_data</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">extract_video_id_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">extract_video_id_from_url</span><span class="p">(</span>
+                <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user-agent&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_user_agent</span><span class="p">}</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;You must provide id or url parameter.&quot;</span><span class="p">)</span>
@@ -329,7 +388,6 @@
         <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;api/item/detail/?</span><span class="si">{}</span><span class="s2">&amp;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_add_url_params</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
         <span class="p">)</span>
-
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
@@ -374,6 +432,52 @@
                 <span class="sa">f</span><span class="s2">&quot;Failed to create Video with data: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="se">\n</span><span class="s2">which has keys </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">comments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Comment</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns Comments from the video</span>
+
+<span class="sd">        - Parameters:</span>
+<span class="sd">            - count (int): The amount of videos you want returned.</span>
+<span class="sd">            - offset (int): The offset you want to check comments of</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">processed</span> <span class="o">=</span> <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_process_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">processed</span><span class="o">.</span><span class="n">device_id</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">offset</span>
+
+        <span class="n">spawn</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">head</span><span class="p">(</span>
+            <span class="s2">&quot;https://www.tiktok.com&quot;</span><span class="p">,</span>
+            <span class="n">proxies</span><span class="o">=</span><span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_format_proxy</span><span class="p">(</span><span class="n">processed</span><span class="o">.</span><span class="n">proxy</span><span class="p">),</span>
+            <span class="o">**</span><span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_requests_extra_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ttwid</span> <span class="o">=</span> <span class="n">spawn</span><span class="o">.</span><span class="n">cookies</span><span class="p">[</span><span class="s2">&quot;ttwid&quot;</span><span class="p">]</span>
+
+        <span class="k">while</span> <span class="n">cursor</span> <span class="o">-</span> <span class="n">offset</span> <span class="o">&lt;=</span> <span class="n">count</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;aweme_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
+                <span class="s2">&quot;app_language&quot;</span><span class="p">:</span> <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span>
+                <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;api/comment/list/?</span><span class="si">{}</span><span class="s2">&amp;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_add_url_params</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">api_response</span> <span class="o">=</span> <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
+                <span class="n">path</span><span class="p">,</span> <span class="n">subdomain</span><span class="o">=</span><span class="s2">&quot;www&quot;</span><span class="p">,</span> <span class="n">ttwid</span><span class="o">=</span><span class="n">ttwid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">comment_data</span> <span class="ow">in</span> <span class="n">api_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;comments&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">comment_data</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">api_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;has_more&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;TikTok is not sending comments beyond this point.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">cursor</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">api_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cursor&quot;</span><span class="p">,</span> <span class="n">cursor</span><span class="p">))</span>
+
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
 
@@ -385,6 +489,11 @@
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">,</span> <span class="s2">&quot;sound&quot;</span><span class="p">,</span> <span class="s2">&quot;hashtags&quot;</span><span class="p">,</span> <span class="s2">&quot;stats&quot;</span><span class="p">,</span> <span class="s2">&quot;create_time&quot;</span><span class="p">,</span> <span class="s2">&quot;as_dict&quot;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__extract_from_data</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;comments&quot;</span><span class="p">]:</span>
+            <span class="c1"># Requires a different request to produce the comments</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__extract_comments</span><span class="p">()</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> doesn&#39;t exist on TikTokApi.api.Video&quot;</span><span class="p">)</span>
@@ -428,7 +537,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span> <span class="o">=</span> <span class="n">data</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__extract_from_data</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">extract_video_id_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">extract_video_id_from_url</span><span class="p">(</span>
+                <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user-agent&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_user_agent</span><span class="p">}</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;You must provide id or url parameter.&quot;</span><span class="p">)</span>
@@ -581,7 +692,6 @@
         <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;api/item/detail/?</span><span class="si">{}</span><span class="s2">&amp;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_add_url_params</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
         <span class="p">)</span>
-
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 
@@ -641,6 +751,83 @@
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;saved_video.mp4&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output</span><span class="p">:</span>
     <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">video_bytes</span><span class="p">)</span>
 </code></pre></div>
+</div>
+
+
+                            </div>
+                            <div id="Video.comments" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Video.comments">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">comments</span><span class="signature">(
+    self,
+    count=20,
+    offset=0,
+    **kwargs
+) -&gt; Iterator[<a href="comment.html#Comment">TikTokApi.api.comment.Comment</a>]</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">comments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Comment</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns Comments from the video</span>
+
+<span class="sd">        - Parameters:</span>
+<span class="sd">            - count (int): The amount of videos you want returned.</span>
+<span class="sd">            - offset (int): The offset you want to check comments of</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">processed</span> <span class="o">=</span> <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_process_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;custom_device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">processed</span><span class="o">.</span><span class="n">device_id</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">offset</span>
+
+        <span class="n">spawn</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">head</span><span class="p">(</span>
+            <span class="s2">&quot;https://www.tiktok.com&quot;</span><span class="p">,</span>
+            <span class="n">proxies</span><span class="o">=</span><span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_format_proxy</span><span class="p">(</span><span class="n">processed</span><span class="o">.</span><span class="n">proxy</span><span class="p">),</span>
+            <span class="o">**</span><span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_requests_extra_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ttwid</span> <span class="o">=</span> <span class="n">spawn</span><span class="o">.</span><span class="n">cookies</span><span class="p">[</span><span class="s2">&quot;ttwid&quot;</span><span class="p">]</span>
+
+        <span class="k">while</span> <span class="n">cursor</span> <span class="o">-</span> <span class="n">offset</span> <span class="o">&lt;=</span> <span class="n">count</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;aweme_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
+                <span class="s2">&quot;app_language&quot;</span><span class="p">:</span> <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span>
+                <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;api/comment/list/?</span><span class="si">{}</span><span class="s2">&amp;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_add_url_params</span><span class="p">(),</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">api_response</span> <span class="o">=</span> <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
+                <span class="n">path</span><span class="p">,</span> <span class="n">subdomain</span><span class="o">=</span><span class="s2">&quot;www&quot;</span><span class="p">,</span> <span class="n">ttwid</span><span class="o">=</span><span class="n">ttwid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">comment_data</span> <span class="ow">in</span> <span class="n">api_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;comments&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">comment_data</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">api_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;has_more&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;TikTok is not sending comments beyond this point.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">cursor</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">api_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cursor&quot;</span><span class="p">,</span> <span class="n">cursor</span><span class="p">))</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Returns Comments from the video</p>
+
+<ul>
+<li>Parameters:
+<ul>
+<li>count (int): The amount of videos you want returned.</li>
+<li>offset (int): The offset you want to check comments of</li>
+</ul></li>
+</ul>
 </div>
 
 
