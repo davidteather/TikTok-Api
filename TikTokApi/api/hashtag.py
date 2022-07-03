@@ -39,8 +39,11 @@ class Hashtag:
         """
         You must provide the name or id of the hashtag.
         """
-        self.name = name
-        self.id = id
+
+        if name is not None:
+            self.name = name
+        if id is not None:
+            self.id = id
 
         if data is not None:
             self.as_dict = data
@@ -96,35 +99,24 @@ class Hashtag:
             # do something
         ```
         """
-        processed = self.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = processed.device_id
-
-        if self.id is None:
-            self.id = self.info()["id"]
-
         cursor = offset
         page_size = 30
-
         while cursor - offset < count:
             query = {
+                "aid": 1988,
                 "count": page_size,
                 "challengeID": self.id,
                 "cursor": cursor,
             }
-            path = "api/challenge/item_list/?{}&{}".format(
-                self.parent._add_url_params(), urlencode(query)
-            )
-            res = self.parent.get_data(path, **kwargs)
-
+            path = "api/challenge/item_list/?{}".format(urlencode(query))
+            res = self.parent.get_data_no_sig(path, subdomain="us", **kwargs)
             for result in res.get("itemList", []):
                 yield self.parent.video(data=result)
-
             if not res.get("hasMore", False):
                 self.parent.logger.info(
                     "TikTok isn't sending more TikToks beyond this point."
                 )
                 return
-
             cursor = int(res["cursor"])
 
     def __extract_from_data(self):
