@@ -12,11 +12,11 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
     <p>
     <a href="https://tikapi.io/?ref=davidteather" target="_blank">
 			<div>
-				<img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/logo128.png" width="100" alt="TikApi">
+				<img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/tikapi.png" width="100" alt="TikApi">
 			</div>
 			<b></b>
 			<div>
-				TikApi is a paid TikTok API service providing an full out-of-the-box solution for developers, trusted by 100+ companies.
+				<b>TikAPI</b> is a paid TikTok API service providing a full out-of-the-box solution, making life easier for developers — trusted by 500+ companies.
 			</div>
 		</a>
     </p>
