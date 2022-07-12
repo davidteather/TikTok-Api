@@ -174,7 +174,7 @@ class Sound:
 
     def __ensure_valid(self):
         if self.id == "":
-            raise SoundRemovedException("This sound has been removed!")
+            raise SoundRemovedException(0, None, "This sound has been removed!")
 
     def __repr__(self):
         return self.__str__()
