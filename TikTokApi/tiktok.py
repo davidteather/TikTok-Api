@@ -1,30 +1,27 @@
+import asyncio
 import json
 import logging
 import os
-import threading
-import asyncio
 import random
 import string
+import threading
 import time
-from typing import ClassVar, Optional
-from urllib import request
-from urllib.parse import quote, urlencode
+from dataclasses import dataclass
+from typing import Optional
+from urllib.parse import urlencode
 
 import requests
-from .api.sound import Sound
-from .api.user import User
-from .api.search import Search
-from .api.hashtag import Hashtag
-from .api.video import Video
-from .api.trending import Trending
+
 from .api.comment import Comment
-
-from playwright.sync_api import sync_playwright
-
-from .exceptions import *
-from .utilities import LOGGER_NAME, update_messager
+from .api.hashtag import Hashtag
+from .api.search import Search
+from .api.sound import Sound
+from .api.trending import Trending
+from .api.user import User
+from .api.video import Video
 from .browser_utilities.browser import browser
-from dataclasses import dataclass
+from .exceptions import *
+from .utilities import LOGGER_NAME
 
 os.environ["no_proxy"] = "127.0.0.1,localhost"
 
@@ -32,6 +29,47 @@ BASE_URL = "https://m.tiktok.com/"
 DESKTOP_BASE_URL = "https://www.tiktok.com/"
 
 _thread_lock = threading.Lock()
+
+ERROR_CODES = {
+    "0": "OK",
+    "450": "CLIENT_PAGE_ERROR",
+    "10000": "VERIFY_CODE",
+    "10101": "SERVER_ERROR_NOT_500",
+    "10102": "USER_NOT_LOGIN",
+    "10111": "NET_ERROR",
+    "10113": "SHARK_SLIDE",
+    "10114": "SHARK_BLOCK",
+    "10119": "LIVE_NEED_LOGIN",
+    "10202": "USER_NOT_EXIST",
+    "10203": "MUSIC_NOT_EXIST",
+    "10204": "VIDEO_NOT_EXIST",
+    "10205": "HASHTAG_NOT_EXIST",
+    "10208": "EFFECT_NOT_EXIST",
+    "10209": "HASHTAG_BLACK_LIST",
+    "10210": "LIVE_NOT_EXIST",
+    "10211": "HASHTAG_SENSITIVITY_WORD",
+    "10212": "HASHTAG_UNSHELVE",
+    "10213": "VIDEO_LOW_AGE_M",
+    "10214": "VIDEO_LOW_AGE_T",
+    "10215": "VIDEO_ABNORMAL",
+    "10216": "VIDEO_PRIVATE_BY_USER",
+    "10217": "VIDEO_FIRST_REVIEW_UNSHELVE",
+    "10218": "MUSIC_UNSHELVE",
+    "10219": "MUSIC_NO_COPYRIGHT",
+    "10220": "VIDEO_UNSHELVE_BY_MUSIC",
+    "10221": "USER_BAN",
+    "10222": "USER_PRIVATE",
+    "10223": "USER_FTC",
+    "10224": "GAME_NOT_EXIST",
+    "10225": "USER_UNIQUE_SENSITIVITY",
+    "10227": "VIDEO_NEED_RECHECK",
+    "10228": "VIDEO_RISK",
+    "10229": "VIDEO_R_MASK",
+    "10230": "VIDEO_RISK_MASK",
+    "10231": "VIDEO_GEOFENCE_BLOCK",
+    "10404": "FYP_VIDEO_LIST_LIMIT",
+    "undefined": "MEDIA_ERROR",
+}
 
 
 class TikTokApi:
@@ -46,17 +84,17 @@ class TikTokApi:
     logger = logging.getLogger(LOGGER_NAME)
 
     def __init__(
-        self,
-        logging_level: int = logging.WARNING,
-        request_delay: Optional[int] = None,
-        custom_device_id: Optional[str] = None,
-        generate_static_device_id: Optional[bool] = False,
-        custom_verify_fp: Optional[str] = None,
-        use_test_endpoints: Optional[bool] = False,
-        proxy: Optional[str] = None,
-        executable_path: Optional[str] = None,
-        *args,
-        **kwargs,
+            self,
+            logging_level: int = logging.WARNING,
+            request_delay: Optional[int] = None,
+            custom_device_id: Optional[str] = None,
+            generate_static_device_id: Optional[bool] = False,
+            custom_verify_fp: Optional[str] = None,
+            use_test_endpoints: Optional[bool] = False,
+            proxy: Optional[str] = None,
+            executable_path: Optional[str] = None,
+            *args,
+            **kwargs,
     ):
         """The TikTokApi class. Used to interact with TikTok. This is a singleton
             class to prevent issues from arising with playwright
@@ -302,8 +340,8 @@ class TikTokApi:
         try:
             parsed_data = r.json()
             if (
-                parsed_data.get("type") == "verify"
-                or parsed_data.get("verifyConfig", {}).get("type", "") == "verify"
+                    parsed_data.get("type") == "verify"
+                    or parsed_data.get("verifyConfig", {}).get("type", "") == "verify"
             ):
                 self.logger.error(
                     "Tiktok wants to display a captcha.\nResponse:\n%s\nCookies:\n%s\nURL:\n%s",
@@ -311,78 +349,37 @@ class TikTokApi:
                     self._get_cookies(**kwargs),
                     url,
                 )
-                raise CaptchaException(
+                raise CaptchaException(0, None,
                     "TikTok blocks this request displaying a Captcha \nTip: Consider using a proxy or a custom_verify_fp as method parameters"
                 )
 
             # statusCode from props->pageProps->statusCode thanks @adiantek on #403
-            error_codes = {
-                "0": "OK",
-                "450": "CLIENT_PAGE_ERROR",
-                "10000": "VERIFY_CODE",
-                "10101": "SERVER_ERROR_NOT_500",
-                "10102": "USER_NOT_LOGIN",
-                "10111": "NET_ERROR",
-                "10113": "SHARK_SLIDE",
-                "10114": "SHARK_BLOCK",
-                "10119": "LIVE_NEED_LOGIN",
-                "10202": "USER_NOT_EXIST",
-                "10203": "MUSIC_NOT_EXIST",
-                "10204": "VIDEO_NOT_EXIST",
-                "10205": "HASHTAG_NOT_EXIST",
-                "10208": "EFFECT_NOT_EXIST",
-                "10209": "HASHTAG_BLACK_LIST",
-                "10210": "LIVE_NOT_EXIST",
-                "10211": "HASHTAG_SENSITIVITY_WORD",
-                "10212": "HASHTAG_UNSHELVE",
-                "10213": "VIDEO_LOW_AGE_M",
-                "10214": "VIDEO_LOW_AGE_T",
-                "10215": "VIDEO_ABNORMAL",
-                "10216": "VIDEO_PRIVATE_BY_USER",
-                "10217": "VIDEO_FIRST_REVIEW_UNSHELVE",
-                "10218": "MUSIC_UNSHELVE",
-                "10219": "MUSIC_NO_COPYRIGHT",
-                "10220": "VIDEO_UNSHELVE_BY_MUSIC",
-                "10221": "USER_BAN",
-                "10222": "USER_PRIVATE",
-                "10223": "USER_FTC",
-                "10224": "GAME_NOT_EXIST",
-                "10225": "USER_UNIQUE_SENSITIVITY",
-                "10227": "VIDEO_NEED_RECHECK",
-                "10228": "VIDEO_RISK",
-                "10229": "VIDEO_R_MASK",
-                "10230": "VIDEO_RISK_MASK",
-                "10231": "VIDEO_GEOFENCE_BLOCK",
-                "10404": "FYP_VIDEO_LIST_LIMIT",
-                "undefined": "MEDIA_ERROR",
-            }
+
             statusCode = parsed_data.get("statusCode", 0)
             self.logger.debug(f"TikTok Returned: %s", json)
             if statusCode == 10201:
                 # Invalid Entity
-                raise NotFoundException(
-                    "TikTok returned a response indicating the entity is invalid"
-                )
+                raise NotFoundException(10201, r,
+                                        "TikTok returned a response indicating the entity is invalid"
+                                        )
             elif statusCode == 10219:
                 # Not available in this region
-                raise NotAvailableException("Content not available for this region")
+                raise NotAvailableException(10219, r, "Content not available for this region")
             elif statusCode != 0 and statusCode != -1:
-                raise TikTokException(
-                    error_codes.get(
-                        statusCode, f"TikTok sent an unknown StatusCode of {statusCode}"
-                    )
-                )
+                raise TikTokException(statusCode, r,
+                                      ERROR_CODES.get(statusCode, f"TikTok sent an unknown StatusCode of {statusCode}")
+                                      )
 
             return r.json()
         except ValueError as e:
             text = r.text
             self.logger.debug("TikTok response: %s", text)
             if len(text) == 0:
-                raise EmptyResponseException(
+                raise EmptyResponseException(0, None,
                     "Empty response from Tiktok to " + url
                 ) from None
             else:
-                raise InvalidJSONException("TikTok sent invalid JSON") from e
+                raise InvalidJSONException(0, r, "TikTok sent invalid JSON") from e
 
     def get_data_no_sig(self, path, subdomain="m", **kwargs) -> dict:
         processed = self._process_kwargs(kwargs)
