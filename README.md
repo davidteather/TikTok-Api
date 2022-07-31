@@ -85,7 +85,7 @@ You can find the full documentation [here](https://davidteather.github.io/TikTok
 
 To get started using this api follow the instructions below.
 
-**Note:** If you want to learn how to web scrape websites check my [free and open-source course for web scraping](https://github.com/davidteather/web-scraping-with-reverse-engineering)
+**Note:** If you want to learn how to web scrape websites check my [free and open-source course for learning everything web scraping](https://github.com/davidteather/everything-web-scraping)
 
 ### How to Support The Project
 * Star the repo 😎
