@@ -10,21 +10,16 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
 
 <div align="center">
     <p>
-    <a href="https://tikapi.io/?ref=davidteather" target="_blank">
-			<div>
-				<img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/tikapi.png" width="100" alt="TikApi">
-			</div>
-			<b></b>
-			<div>
-				<b>TikAPI</b> is a paid TikTok API service providing a full out-of-the-box solution, making life easier for developers — trusted by 500+ companies.
-			</div>
-		</a>
+        <a href="https://tikapi.io/?ref=davidteather" target="_blank">
+            <div>
+                <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/tikapi.png" width="100" alt="TikApi">
+            </div>
+            <div>
+                <b>TikAPI</b> is a paid TikTok API service providing a full out-of-the-box solution, making life easier for developers — trusted by 500+ companies.
+            </div>
+        </a>
     </p>
-</div>
-
-<br>
-
-<div align="center">
+    <br>
     <p>
     <a href="https://trendpop.social/?ref=github-davidteather-tiktokapi" target="_blank">
 			<div>
@@ -49,11 +44,7 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
             </div>
 		</a>
     </p>
-</div>
-
-<br>
-
-<div align="center">
+    <br>
     <p>
     <a href="https://influencerhunters.com/docs.html?utm_source=github&utm_medium=githubpage&utm_campaign=david_thea_github&utm_id=david_t" target="_blank">
 			<div>
