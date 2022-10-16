@@ -9,16 +9,12 @@ This is an unofficial api wrapper for TikTok.com in python. With this api you ar
 These sponsors have paid to be placed here and beyond that I do not have any affiliation with them, the TikTokAPI package will always be free and open-source. If you wish to be a sponsor of this project check out my [GitHub sponsors page](https://github.com/sponsors/davidteather).
 
 <div align="center">
-    <p>
-        <a href="https://tikapi.io/?ref=davidteather" target="_blank">
-            <div>
-                <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/tikapi.png" width="100" alt="TikApi">
-            </div>
-            <div>
-                <b>TikAPI</b> is a paid TikTok API service providing a full out-of-the-box solution, making life easier for developers — trusted by 500+ companies.
-            </div>
-        </a>
-    </p>
+    <a href="https://tikapi.io/?ref=davidteather" target="_blank">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/tikapi.png" width="100" alt="TikApi">
+        <div>
+            <b>TikAPI</b> is a paid TikTok API service providing a full out-of-the-box solution, making life easier for developers — trusted by 500+ companies.
+        </div>
+    </a>
     <br>
     <p>
     <a href="https://trendpop.social/?ref=github-davidteather-tiktokapi" target="_blank">
