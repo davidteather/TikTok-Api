@@ -3,7 +3,7 @@ name: Installation Help
 about: If you're having trouble getting this to run for the first time please use
   this template
 title: "[INSTALLATION] - Your error here"
-labels: installation_help
+labels: ''
 assignees: ''
 
 ---

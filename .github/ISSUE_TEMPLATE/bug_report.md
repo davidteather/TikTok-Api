@@ -6,6 +6,7 @@ labels: bug
 assignees: ''
 
 ---
+
 Fill Out the template :)
 
 **Describe the bug**
