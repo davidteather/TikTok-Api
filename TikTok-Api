@@ -1,0 +1,165 @@
+
+davidteather
+/
+TikTok-Api
+Público
+El contenedor no oficial de la API de TikTok en Python
+
+davidteather.github.io/tiktok-api/docs
+Licencia
+ MIT, licencias MIT encontradas
+ 2.9k estrellas 703 tenedores 
+Código
+Asuntos
+93
+Solicitudes de extracción
+3
+Discusiones
+Comportamiento
+Proyectos
+1
+Seguridad
+Perspectivas
+davidteather/TikTok-Api
+Última confirmación
+@sameeeey
+@davidteather
+Sammeeey y davidteather
+…
+el 19 oct 2022
+Estadísticas de Git
+archivos
+LÉAME.md
+API no oficial de TikTok en Python
+Este es un contenedor api no oficial para TikTok.com en python. Con esta API, puede llamar a la mayoría de las tendencias y obtener información específica del usuario, así como mucho más.
+
+DOI LinkedIn Patrociname Lanzamiento de GitHub (último por fecha) Estado de construcción GitHub Descargas  Servidor de soporte
+
+Esta API está diseñada para recuperar datos TikTok. No se puede usar para publicar o cargar contenido en TikTok en nombre de un usuario. No admite ninguna ruta autenticada por el usuario , si no puede acceder a ella mientras está desconectado en su sitio web, no puede acceder aquí.
+
+Patrocinadores
+Estos patrocinadores han pagado para ser colocados aquí y más allá de eso, no tengo ninguna afiliación con ellos, el paquete TikTokAPI siempre será gratuito y de código abierto. Si desea ser patrocinador de este proyecto, consulte mi página de patrocinadores de GitHub .
+
+TikApi
+TikAPI es un servicio de API de pago de TikTok que proporciona una solución completa lista para usar, lo que facilita la vida de los desarrolladores, en el que confían más de 500 empresas.
+
+Tendenciapop
+Trendpop crea software para ayudar a los creadores y las empresas a volverse virales en las plataformas de videos sociales.
+¿Emocionado por construir en este espacio? Estamos contratando ingenieros en todos los roles ; envíenos un mensaje a founders@trendpop.social
+
+IH_logo
+Datos de TikTok a través de API, proporcionando más de 10 millones de publicaciones / día a las plataformas de escucha social y marketing más grandes.
+Tabla de contenido
+Documentación
+Empezando
+Cómo apoyar el proyecto
+Instalando
+Problemas comunes
+Guía de inicio rápido
+Ejemplos
+Actualización de V4 a V5
+
+Documentación
+Puede encontrar la documentación completa aquí , la clase TikTokApi es donde probablemente pasará la mayor parte de su tiempo.
+
+Empezando
+Para comenzar a usar esta API, siga las instrucciones a continuación.
+
+Nota: si desea aprender cómo raspar sitios web, consulte mi curso gratuito y de código abierto para aprender todo sobre el raspado web.
+
+Cómo apoyar el proyecto
+Destacar el repositorio😎
+Considere patrocinarme en GitHub
+Envíame un correo electrónico o un mensaje de LinkedIn diciéndome para qué estás usando la API, me gusta mucho saber para qué la usa la gente.
+Envíe PR para problemas :)
+Instalando
+Si se encuentra con un problema, verifique los problemas cerrados en github, aunque no dude en volver a abrir un problema nuevo si encuentra un problema que ha estado cerrado durante algunos meses. El código base puede y se encuentra con problemas similares a los anteriores, porque TikTok cambia las cosas.
+
+pip install TikTokApi
+python -m playwright install
+Si prefiere un video explicativo de la configuración de este paquete, un video de YouTube solo para eso.
+
+Si desea un video rápido para escuchar los eventos de TikTok Live en python.
+
+Instalación de la ventana acoplable
+Clone este repositorio en una máquina local (o solo en Dockerfile, ya que instala TikTokApi desde pip) y luego ejecute los siguientes comandos.
+
+docker pull mcr.microsoft.com/playwright:focal
+docker build . -t tiktokapi:latest
+docker run -v TikTokApi --rm tiktokapi:latest python3 your_script.py
+Tenga en cuenta que esto supone que su script se llama your_script.py y vive en la raíz de este directorio.
+
+Problemas comunes
+No abra un problema si está experimentando uno de estos, solo comente si la solución provista no funciona para usted.
+
+El navegador no tiene ningún atributo : asegúrese de ejecutarlo python3 -m playwright install; si el error persiste, pruebe la guía de inicio rápido de playwright-python y diagnostique los problemas desde allí.
+Guía de inicio rápido
+Aquí hay un código rápido para obtener los videos de tendencias más recientes en TikTok. Hay más ejemplos en el directorio de ejemplos .
+
+Nota: si desea aprender cómo raspar sitios web, consulte mi curso gratuito y de código abierto para raspado web
+
+from TikTokApi import TikTokApi
+
+# Watch https://www.youtube.com/watch?v=-uCt1x8kINQ for a brief setup tutorial
+with TikTokApi() as api:
+    for trending_video in api.trending.videos(count=50):
+        # Prints the author's username of the trending video.
+        print(trending_video.author.username)
+Nota : Jupyter (ipynb) solo funciona en Linux, consulte microsoft/playwright-python #178
+
+Para ejecutar los scripts de ejemplo desde la raíz del repositorio, asegúrese de usar la -mopción en python.
+
+python -m examples.get_trending
+Puede acceder al tipo de diccionario de un objeto usando .as_dict. En un video, esto puede verse así , aunque TikTok cambia su estructura de vez en cuando, por lo que vale la pena investigar la estructura del diccionario cuando usa este paquete.
+
+Actualización de V4 a V5
+Todos los cambios se anotarán en el n.º 803 si desea obtener más información.
+
+Motivación
+Este paquete ha sido difícil de mantener debido a su estructura, difícil de trabajar ya que el usuario del paquete debe escribir métodos de análisis para extraer información de los diccionarios, requiere más memoria de lo necesario (aunque esto se puede mejorar aún más), y en general, es difícil trabajar con ellos para los nuevos usuarios.
+
+Como resultado, he decidido al menos intentar remediar algunos de estos problemas, los cambios más importantes son que
+
+El paquete ha pasado a usar clases para diferentes objetos de TikTok, lo que resulta en una experiencia de programación más sencilla y de mayor nivel.
+Todos los métodos que solían devolver una lista de objetos se cambiaron para usar iteradores, con la esperanza de disminuir la utilización de la memoria para la mayoría de los usuarios.
+Ejemplos de actualización
+Acceso al diccionario de objetos (similar a V4)
+Probablemente necesitará usar esto más allá de la compatibilidad heredada, ya que no todos los atributos se analizan y adjuntan a los diferentes objetos.
+
+Es posible que desee utilizar esto como una solución alternativa para las aplicaciones heredadas mientras actualiza el resto de la aplicación. Le sugiero que eventualmente actualice para usar el enfoque de nivel superior por completo.
+
+user = api.user(username='therock')
+user.as_dict # -> dict of the user_object
+for video in user.videos():
+    video.as_dict # -> dict of TikTok's video object as found when requesting the videos endpoint
+Aquí hay algunos ejemplos más que ayudan a ilustrar las diferencias en el flujo del uso del paquete con V5.
+
+# V4
+api = TikTokApi.get_instance()
+trending_videos = api.by_trending()
+
+#V5.1
+with TikTokApi() as api: # .get_instance no longer exists
+    for trending_video in api.trending.videos():
+        # do something
+Mientras que en V4 tenía que extraer la información usted mismo, el paquete ahora lo maneja por usted. Por lo tanto, es mucho más fácil hacer llamadas a funciones relacionadas encadenadas.
+
+# V4
+trending_videos = api.by_trending()
+for video in trending_videos:
+    # The dictionary responses are also different depending on what endpoint you got them from
+    # So, it's usually more painful than this to deal with
+    trending_user = api.get_user(id=video['author']['id'], secUid=video['author']['secUid'])
+
+
+# V5
+# This is more complicated than above, but it illustrates the simplified approach
+for trending_video in api.trending.videos():
+    user_stats = trending_video.author.info_full['stats']
+    if user_stats['followerCount'] >= 10000:
+        # maybe save the user in a database
+Lanzamientos 108
+V5.2.2
+Último
+el 15 de julio de 2022
++ 107 lanzamientos
