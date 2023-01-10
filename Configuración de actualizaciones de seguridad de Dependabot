@@ -1,0 +1,64 @@
+GitHub Docs
+Configuración de actualizaciones de seguridad de Dependabot
+En este artículo
+Acerca de la configuración de las Dependabot security updates
+Repositorios compatibles
+Administrar las Dependabot security updates para tus repositorios
+Invalidación del comportamiento predeterminado con un archivo de configuración
+Información adicional
+Puedes utilizar las Dependabot security updates o las solicitudes de extracción manuales para actualizar fácilmente las dependencias vulnerables.
+
+Acerca de la configuración de las Dependabot security updates
+Puedes habilitar Dependabot security updates a nivel de repositorio o para todos los repositorios que pertenezcan a tu organización o cuenta personal. Puedes habilitar las Dependabot security updates para cualquier repositorio que utilice Dependabot alerts y la gráfica de dependencias. Para obtener más información, consulte "Acerca de Dependabot security updates".
+
+Puedes deshabilitar Dependabot security updates para un repositorio individual o para todos los repositorios que pertenezcan a tu organización o cuenta personal.
+
+Dependabot y todas las características relacionadas están sujetas por los Términos del servicio de GitHub. El acuerdo de licencia abarca
+
+Repositorios compatibles
+GitHub habilita automáticamente Dependabot security updates para repositorios recién creados si la cuenta personal o la organización ha habilitado Habilitar automáticamente para los nuevos repositorios para Dependabot security updates. Para obtener más información, consulta "Administración de Dependabot security updates para los repositorios".
+
+Si creas una bifurcación de un repositorio que tiene habilitadas las actualizaciones de seguridad, GitHub deshabilitará automáticamente Dependabot security updates para la bifurcación. Después, puedes decidir si quieres habilitar Dependabot security updates en la bifurcación específica.
+
+Si no se habilitan las actualizaciones de seguridad para tu repositorio y no sabes por qué, intenta primero habilitarles de acuerdo con las instrucciones que se encuentran en los procedimientos siguientes. Si las actualizaciones de seguridad aún no funcionan, puedes contactar al Soporte de GitHub.
+
+Administrar las Dependabot security updates para tus repositorios
+Puedes habilitar o deshabilitar Dependabot security updates para todos los repositorios aptos que pertenezcan a tu cuenta personal u organización. Para obtener más información, consulta "Administración de la configuración de seguridad y análisis de la cuenta personal" o "Administración de la configuración de seguridad y análisis de la organización".
+
+También puedes habilitar o inhabilitar Dependabot security updates para un repositorio individual.
+
+Habilitar o inhabilitar las Dependabot security updates para un repositorio individual.
+En , vaya a la página principal del repositorio. 1. Debajo del nombre del repositorio, haz clic en  Configuración.
+Botón de configuración del repositorio
+En la sección "Seguridad" de la barra lateral, haz clic en  Análisis y seguridad del código.
+
+En "Seguridad y análisis de código", a la derecha de "Dependabot actualizaciones de seguridad", haga clic en Habilitar para habilitar la característica o Deshabilitar para deshabilitarla. En el caso de los repositorios públicos, el botón está deshabilitado si la característica se encuentra siempre habilitada.
+Captura de pantalla de la sección "Análisis y seguridad del código" con el botón para habilitar Dependabot security updates
+
+Invalidación del comportamiento predeterminado con un archivo de configuración
+Puedes invalidar el comportamiento predeterminado de Dependabot security updates; para ello, agrega un archivo dependabot.yml al repositorio. Para más información, vea "Opciones de configuración para el archivo dependabot.yml".
+
+Si solo necesitas actualizaciones de seguridad y quieres excluir las actualizaciones de versión, puedes establecer open-pull-requests-limit en 0 para evitar las actualizaciones de versión de un elemento package-ecosystem determinado. Para obtener más información, consulta "open-pull-requests-limit".
+
+# Example configuration file that:
+#  - Ignores lodash dependency
+#  - Disables version-updates
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    ignore:
+      - dependency-name: "lodash"
+        # For Lodash, ignore all updates
+    # Disable version updates for npm dependencies
+    open-pull-requests-limit: 0
+A fin de obtener más información sobre las opciones de configuración disponibles para las actualizaciones de seguridad, consulta la tabla en "Opciones de configuración para el archivo dependabot.yml".
+
+Información adicional
+"Acerca de Dependabot alerts"
+"Configuración de Dependabot alerts"
+"Administración de la configuración de uso de datos para el repositorio privado"
+"Ecosistemas de paquetes admitidos"
