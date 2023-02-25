@@ -43,7 +43,7 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
         <img src="https://raw.githubusercontent.com/andrearama/TikTok-Api/master/imgs/EnsembleData.png" width="100" alt="Ensemble Data">
         <b></b>
         <div>
-            <b>Ensemble Data</b> is the leading provider of APIs to scrape all the major Social Media. <br> We provide 100+ Million posts / day to the largest Marketing and Social listening platforms.
+            <b>Ensemble Data</b> is the leading API provider for scraping all the major Social Media. <br> We provide 100+ Million posts / day to the largest Marketing and Social listening platforms.
         </div>
 	</a>
 </div>
