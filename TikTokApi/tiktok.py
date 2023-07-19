@@ -23,9 +23,11 @@ from .browser_utilities.browser import browser
 from .exceptions import *
 from .utilities import LOGGER_NAME
 
+print('HEY THERE IT"S ME')
+
 os.environ["no_proxy"] = "127.0.0.1,localhost"
 
-BASE_URL = "https://m.tiktok.com/"
+BASE_URL = "https://www.tiktok.com/"
 DESKTOP_BASE_URL = "https://www.tiktok.com/"
 
 _thread_lock = threading.Lock()
@@ -229,7 +231,7 @@ class TikTokApi:
             self._language = "en"
             raise e from e
 
-    def get_data(self, path, subdomain="m", **kwargs) -> dict:
+    def get_data(self, path, subdomain="www", **kwargs) -> dict:
         """Makes requests to TikTok and returns their JSON.
 
         This is all handled by the package so it's unlikely
@@ -302,13 +304,13 @@ class TikTokApi:
         )
 
         csrf_token = None
-        if subdomain == "m":
+        if subdomain == "www":
             csrf_session_id = h.cookies["csrf_session_id"]
             csrf_token = h.headers["X-Ware-Csrf-Token"].split(",")[1]
             kwargs["csrf_session_id"] = csrf_session_id
 
         headers = {
-            "authority": "m.tiktok.com",
+            "authority": "www.tiktok.com",
             "method": "GET",
             "path": url.split("tiktok.com")[1],
             "scheme": "https",
@@ -381,13 +383,13 @@ class TikTokApi:
             else:
                 raise InvalidJSONException(0, r, "TikTok sent invalid JSON") from e
 
-    def get_data_no_sig(self, path, subdomain="m", **kwargs) -> dict:
+    def get_data_no_sig(self, path, subdomain="www", **kwargs) -> dict:
         processed = self._process_kwargs(kwargs)
         full_url = f"https://{subdomain}.tiktok.com/" + path
         referrer = self._browser.referrer
         headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:101.0) Gecko/20100101 Firefox/101.0",
-            "authority": "m.tiktok.com",
+            "User-Agent": "5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1",
+            "authority": "www.tiktok.com",
             "method": "GET",
             "path": full_url.split("tiktok.com")[1],
             "scheme": "https",
@@ -606,7 +608,7 @@ class TikTokApi:
         query = {
             "aid": 1988,
             "app_name": "tiktok_web",
-            "device_platform": "web_mobile",
+            "device_platform": "MacIntel",
             "region": region,
             "priority_region": "",
             "os": "ios",
@@ -620,11 +622,11 @@ class TikTokApi:
             "browser_version": self._user_agent,
             "browser_online": "true",
             "timezone_name": timezone,
-            "is_page_visible": "true",
             "focus_state": "true",
             "is_fullscreen": "false",
             "history_len": random.randint(1, 5),
             "language": language,
+            "channel": "tiktok_web"
         }
 
         return urlencode(query)
