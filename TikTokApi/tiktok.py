@@ -615,7 +615,7 @@ class TikTokApi:
             "screen_width": self._width,
             "screen_height": self._height,
             "browser_language": browser_language,
-            "browser_platform": "iPhone",
+            "browser_platform": "MacIntel",
             "browser_name": "Mozilla",
             "browser_version": self._user_agent,
             "browser_online": "true",
