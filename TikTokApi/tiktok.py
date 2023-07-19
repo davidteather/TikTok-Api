@@ -23,8 +23,6 @@ from .browser_utilities.browser import browser
 from .exceptions import *
 from .utilities import LOGGER_NAME
 
-print('HEY THERE IT"S ME')
-
 os.environ["no_proxy"] = "127.0.0.1,localhost"
 
 BASE_URL = "https://www.tiktok.com/"
