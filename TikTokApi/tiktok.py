@@ -185,7 +185,7 @@ class TikTokApi:
         if kwargs.get("custom_did") != None:
             raise Exception("Please use 'custom_device_id' instead of 'custom_did'")
         self._custom_device_id = kwargs.get("custom_device_id", None)
-        self._user_agent = "5.0 (iPhone; CPU iPhone OS 14_8 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1"  # TODO: Randomly generate agents
+        self._user_agent = "5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.38 Safari/537.36 Edg/110.0.5481.38"
         self._proxy = kwargs.get("proxy", None)
         self._custom_verify_fp = kwargs.get("custom_verify_fp")
         self._signer_url = kwargs.get("external_signer", None)
@@ -606,25 +606,18 @@ class TikTokApi:
         query = {
             "aid": 1988,
             "app_name": "tiktok_web",
-            "device_platform": "MacIntel",
-            "region": region,
+            "browser_language": "en-US",
+            "browser_platform": "Win32",
+            "count": 20,
+            "cursor": 0,
+            "device_id": "",
+            "device_platform": "web_pc",
+            "os": "windows",
             "priority_region": "",
-            "os": "ios",
-            "referer": "",
-            "cookie_enabled": "true",
-            "screen_width": self._width,
-            "screen_height": self._height,
-            "browser_language": browser_language,
-            "browser_platform": "MacIntel",
-            "browser_name": "Mozilla",
-            "browser_version": self._user_agent,
-            "browser_online": "true",
-            "timezone_name": timezone,
-            "focus_state": "true",
-            "is_fullscreen": "false",
-            "history_len": random.randint(1, 5),
-            "language": language,
-            "channel": "tiktok_web"
+            "referrer": "",
+            "region": "US",
+            "screen_height": 0,
+            "screen_width": 0
         }
 
         return urlencode(query)
