@@ -1,3 +1,4 @@
+generate_magic_arrays = """
 generateFunctionMocks = (
     proto,
     itemMainProp,
@@ -140,3 +141,4 @@ function generateMagicArray(
         }
     })
 }
+"""

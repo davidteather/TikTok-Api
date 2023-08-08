@@ -1,3 +1,4 @@
+iframe_contentWindow = """
 try {
     // Adds a contentWindow proxy to the provided iframe element
     const addContentWindowProxy = iframe => {
@@ -95,3 +96,4 @@ try {
 } catch (err) {
     // console.warn(err)
 }
+"""

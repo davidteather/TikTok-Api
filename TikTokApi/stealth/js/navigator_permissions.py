@@ -1,3 +1,4 @@
+navigator_permissions = """
 const handler = {
     apply: function (target, ctx, args) {
         const param = (args || [])[0]
@@ -17,3 +18,5 @@ utils.replaceWithProxy(
     'query',
     handler
 )
+
+"""

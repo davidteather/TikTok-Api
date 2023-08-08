@@ -1,3 +1,4 @@
+navigator_plugins = """
 data = {
     "mimeTypes": [
         {
@@ -90,3 +91,4 @@ if (!(hasPlugins)) {
     patchNavigator('mimeTypes', mimeTypes)
     patchNavigator('plugins', plugins)
 }
+"""

@@ -1,3 +1,4 @@
+chrome_runtime = """
 const STATIC_DATA = {
     "OnInstalledReason": {
         "CHROME_UPDATE": "chrome_update",
@@ -260,3 +261,5 @@ if (!(existsAlready || (isNotSecure && !opts.runOnInsecureOrigins))) {
         return response
     }
 }
+
+"""

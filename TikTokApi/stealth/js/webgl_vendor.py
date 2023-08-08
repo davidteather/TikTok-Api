@@ -1,3 +1,4 @@
+webgl_vendor = """
 console.log(opts)
 const getParameterProxyHandler = {
     apply: function (target, ctx, args) {
@@ -23,3 +24,4 @@ const addProxy = (obj, propName) => {
 // For whatever weird reason loops don't play nice with Object.defineProperty, here's the next best thing:
 addProxy(WebGLRenderingContext.prototype, 'getParameter')
 addProxy(WebGL2RenderingContext.prototype, 'getParameter')
+"""

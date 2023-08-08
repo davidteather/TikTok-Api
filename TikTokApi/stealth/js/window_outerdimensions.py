@@ -1,3 +1,4 @@
+window_outerdimensions = """
 'use strict'
 
 try {
@@ -10,3 +11,5 @@ try {
     }
 } catch (err) {
 }
+
+"""

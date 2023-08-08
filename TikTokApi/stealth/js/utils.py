@@ -1,3 +1,4 @@
+utils = """
 /**
  * A set of shared utility functions specifically for the purpose of modifying native browser APIs without leaving traces.
  *
@@ -454,3 +455,4 @@ utils.materializeFns = (fnStrObj = { hello: "() => 'world'" }) => {
 // Stuff starting below this line is NodeJS specific.
 // --
 // module.exports = utils
+"""

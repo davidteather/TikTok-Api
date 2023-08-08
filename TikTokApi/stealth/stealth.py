@@ -3,35 +3,47 @@ import json
 from dataclasses import dataclass
 from typing import Tuple, Optional, Dict
 
-import pkg_resources
 from playwright.async_api import Page as AsyncPage
 
-
-def from_file(name):
-    """Read script from ./js directory"""
-    return pkg_resources.resource_string(__name__, f"js/{name}").decode()
-
+from .js.chrome_app import chrome_app
+from .js.chrome_csi import chrome_csi
+from .js.chrome_hairline import chrome_hairline
+from .js.chrome_load_times import chrome_load_times
+from .js.chrome_runtime import chrome_runtime
+from .js.generate_magic_arrays import generate_magic_arrays
+from .js.iframe_contentWindow import iframe_contentWindow
+from .js.media_codecs import media_codecs
+from .js.navigator_hardwareConcurrency import navigator_hardwareConcurrency
+from .js.navigator_languages import navigator_languages
+from .js.navigator_permissions import navigator_permissions
+from .js.navigator_platform import navigator_platform
+from .js.navigator_plugins import navigator_plugins
+from .js.navigator_userAgent import navigator_userAgent
+from .js.navigator_vendor import navigator_vendor
+from .js.webgl_vendor import webgl_vendor
+from .js.window_outerdimensions import window_outerdimensions
+from .js.utils import utils
 
 SCRIPTS: Dict[str, str] = {
-    "chrome_csi": from_file("chrome.csi.js"),
-    "chrome_app": from_file("chrome.app.js"),
-    "chrome_runtime": from_file("chrome.runtime.js"),
-    "chrome_load_times": from_file("chrome.load.times.js"),
-    "chrome_hairline": from_file("chrome.hairline.js"),
-    "generate_magic_arrays": from_file("generate.magic.arrays.js"),
-    "iframe_content_window": from_file("iframe.contentWindow.js"),
-    "media_codecs": from_file("media.codecs.js"),
-    "navigator_vendor": from_file("navigator.vendor.js"),
-    "navigator_plugins": from_file("navigator.plugins.js"),
-    "navigator_permissions": from_file("navigator.permissions.js"),
-    "navigator_languages": from_file("navigator.languages.js"),
-    "navigator_platform": from_file("navigator.platform.js"),
-    "navigator_user_agent": from_file("navigator.userAgent.js"),
-    "navigator_hardware_concurrency": from_file("navigator.hardwareConcurrency.js"),
-    "outerdimensions": from_file("window.outerdimensions.js"),
-    "utils": from_file("utils.js"),
+    "chrome_csi": chrome_csi,
+    "chrome_app": chrome_app,
+    "chrome_runtime": chrome_runtime,
+    "chrome_load_times": chrome_load_times,
+    "chrome_hairline": chrome_hairline,
+    "generate_magic_arrays": generate_magic_arrays,
+    "iframe_content_window": iframe_contentWindow,
+    "media_codecs": media_codecs,
+    "navigator_vendor": navigator_vendor,
+    "navigator_plugins": navigator_plugins,
+    "navigator_permissions": navigator_permissions,
+    "navigator_languages": navigator_languages,
+    "navigator_platform": navigator_platform,
+    "navigator_user_agent": navigator_userAgent,
+    "navigator_hardware_concurrency": navigator_hardwareConcurrency,
+    "outerdimensions": window_outerdimensions,
+    "utils": utils,
     "webdriver": "delete Object.getPrototypeOf(navigator).webdriver",
-    "webgl_vendor": from_file("webgl.vendor.js"),
+    "webgl_vendor": webgl_vendor,
 }
 
 

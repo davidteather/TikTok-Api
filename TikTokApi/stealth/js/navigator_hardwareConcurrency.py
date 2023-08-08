@@ -1,3 +1,4 @@
+navigator_hardwareConcurrency = """
 const patchNavigator = (name, value) =>
     utils.replaceProperty(Object.getPrototypeOf(navigator), name, {
         get() {
@@ -6,3 +7,4 @@ const patchNavigator = (name, value) =>
     })
 
 patchNavigator('hardwareConcurrency', opts.navigator_hardware_concurrency || 4);
+"""

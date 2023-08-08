@@ -1,3 +1,4 @@
+chrome_hairline = """
 // https://intoli.com/blog/making-chrome-headless-undetectable/
 // store the existing descriptor
 const elementDescriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetHeight');
@@ -12,3 +13,4 @@ Object.defineProperty(HTMLDivElement.prototype, 'offsetHeight', {
     return elementDescriptor.get.apply(this);
   },
 });
+"""
