@@ -1,3 +1,4 @@
+.. _tiktok-api-docs:
 TikTokApi.api package
 =====================
 
