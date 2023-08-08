@@ -9,7 +9,7 @@
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="canonical" href="https://davidteather.github.io/TikTok-Api/TikTokApi.html" />
   <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script> 
+    <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
         <script src="_static/jquery.js"></script>
@@ -45,9 +45,54 @@
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">TikTokApi package</a></li>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li><a class="reference internal" href="#tiktokapi-main-class">TikTokApi Main Class</a></li>
-<li><a class="reference internal" href="#tiktokapi-exceptions-module">TikTokApi.exceptions module</a></li>
-<li><a class="reference internal" href="#tiktokapi-helpers-module">TikTokApi.helpers module</a></li>
+<li><a class="reference internal" href="#tiktokapi-main-class">TikTokApi Main Class</a><ul>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi"><code class="docutils literal notranslate"><span class="pre">TikTokApi</span></code></a><ul>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.close_sessions"><code class="docutils literal notranslate"><span class="pre">TikTokApi.close_sessions()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.comment"><code class="docutils literal notranslate"><span class="pre">TikTokApi.comment</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.create_sessions"><code class="docutils literal notranslate"><span class="pre">TikTokApi.create_sessions()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.generate_js_fetch"><code class="docutils literal notranslate"><span class="pre">TikTokApi.generate_js_fetch()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.generate_x_bogus"><code class="docutils literal notranslate"><span class="pre">TikTokApi.generate_x_bogus()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.get_session_content"><code class="docutils literal notranslate"><span class="pre">TikTokApi.get_session_content()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.get_session_cookies"><code class="docutils literal notranslate"><span class="pre">TikTokApi.get_session_cookies()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.hashtag"><code class="docutils literal notranslate"><span class="pre">TikTokApi.hashtag</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.make_request"><code class="docutils literal notranslate"><span class="pre">TikTokApi.make_request()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.run_fetch_script"><code class="docutils literal notranslate"><span class="pre">TikTokApi.run_fetch_script()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.search"><code class="docutils literal notranslate"><span class="pre">TikTokApi.search</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.sign_url"><code class="docutils literal notranslate"><span class="pre">TikTokApi.sign_url()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.sound"><code class="docutils literal notranslate"><span class="pre">TikTokApi.sound</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.stop_playwright"><code class="docutils literal notranslate"><span class="pre">TikTokApi.stop_playwright()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.trending"><code class="docutils literal notranslate"><span class="pre">TikTokApi.trending</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.user"><code class="docutils literal notranslate"><span class="pre">TikTokApi.user</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.video"><code class="docutils literal notranslate"><span class="pre">TikTokApi.video</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokPlaywrightSession"><code class="docutils literal notranslate"><span class="pre">TikTokPlaywrightSession</span></code></a><ul>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokPlaywrightSession.base_url"><code class="docutils literal notranslate"><span class="pre">TikTokPlaywrightSession.base_url</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokPlaywrightSession.context"><code class="docutils literal notranslate"><span class="pre">TikTokPlaywrightSession.context</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokPlaywrightSession.headers"><code class="docutils literal notranslate"><span class="pre">TikTokPlaywrightSession.headers</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokPlaywrightSession.ms_token"><code class="docutils literal notranslate"><span class="pre">TikTokPlaywrightSession.ms_token</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokPlaywrightSession.page"><code class="docutils literal notranslate"><span class="pre">TikTokPlaywrightSession.page</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokPlaywrightSession.params"><code class="docutils literal notranslate"><span class="pre">TikTokPlaywrightSession.params</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokPlaywrightSession.proxy"><code class="docutils literal notranslate"><span class="pre">TikTokPlaywrightSession.proxy</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-TikTokApi.exceptions">TikTokApi.exceptions module</a><ul>
+<li><a class="reference internal" href="#TikTokApi.exceptions.CaptchaException"><code class="docutils literal notranslate"><span class="pre">CaptchaException</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.exceptions.EmptyResponseException"><code class="docutils literal notranslate"><span class="pre">EmptyResponseException</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.exceptions.InvalidJSONException"><code class="docutils literal notranslate"><span class="pre">InvalidJSONException</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.exceptions.InvalidResponseException"><code class="docutils literal notranslate"><span class="pre">InvalidResponseException</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.exceptions.NotFoundException"><code class="docutils literal notranslate"><span class="pre">NotFoundException</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.exceptions.SoundRemovedException"><code class="docutils literal notranslate"><span class="pre">SoundRemovedException</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.exceptions.TikTokException"><code class="docutils literal notranslate"><span class="pre">TikTokException</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-TikTokApi.helpers">TikTokApi.helpers module</a><ul>
+<li><a class="reference internal" href="#TikTokApi.helpers.extract_video_id_from_url"><code class="docutils literal notranslate"><span class="pre">extract_video_id_from_url()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.helpers.random_choice"><code class="docutils literal notranslate"><span class="pre">random_choice()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </div>
         </div>
@@ -96,12 +141,301 @@
 <h1>TikTokApi Main Class<a class="headerlink" href="#tiktokapi-main-class" title="Permalink to this heading"></a></h1>
 <p>This is the main TikTokApi module.
 It contains the TikTokApi class which is the main class of the package.</p>
+<span class="target" id="module-TikTokApi.tiktok"></span><dl class="py class">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.tiktok.</span></span><span class="sig-name descname"><span class="pre">TikTokApi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logging_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/tiktok.html#TikTokApi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The main TikTokApi class that contains all the endpoints.</p>
+<dl>
+<dt>Import With:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">TikTokApi</span> <span class="kn">import</span> <span class="n">TikTokApi</span>
+<span class="n">api</span> <span class="o">=</span> <span class="n">TikTokApi</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.close_sessions">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">close_sessions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/tiktok.html#TikTokApi.close_sessions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.close_sessions" title="Permalink to this definition"></a></dt>
+<dd><p>Close all the sessions. Should be called when you’re done with the TikTokApi object</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.comment">
+<span class="sig-name descname"><span class="pre">comment</span></span><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.comment" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="api/comment.html#TikTokApi.api.comment.Comment" title="TikTokApi.api.comment.Comment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Comment</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.create_sessions">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_sessions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_sessions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headless</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ms_tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starting_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://www.tiktok.com'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context_options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_browser_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cookies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/tiktok.html#TikTokApi.create_sessions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.create_sessions" title="Permalink to this definition"></a></dt>
+<dd><p>Create sessions for use within the TikTokApi class.</p>
+<p>These sessions are what will carry out requesting your data from TikTok.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_sessions</strong> (<em>int</em>) – The amount of sessions you want to create.</p></li>
+<li><p><strong>headless</strong> (<em>bool</em>) – Whether or not you want the browser to be headless.</p></li>
+<li><p><strong>ms_tokens</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – A list of msTokens to use for the sessions, you can get these from your cookies after visiting TikTok.
+If you don’t provide any, the sessions will try to get them themselves, but this is not guaranteed to work.</p></li>
+<li><p><strong>proxies</strong> (<em>list</em>) – A list of proxies to use for the sessions</p></li>
+<li><p><strong>sleep_after</strong> (<em>int</em>) – The amount of time to sleep after creating a session, this is to allow the msToken to be generated.</p></li>
+<li><p><strong>starting_url</strong> (<em>str</em>) – The url to start the sessions on, this is usually <a class="reference external" href="https://www.tiktok.com">https://www.tiktok.com</a>.</p></li>
+<li><p><strong>context_options</strong> (<em>dict</em>) – Options to pass to the playwright context.</p></li>
+<li><p><strong>override_browser_args</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – A list of dictionaries containing arguments to pass to the browser.</p></li>
+<li><p><strong>cookies</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – A list of cookies to use for the sessions, you can get these from your cookies after visiting TikTok.</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">TikTokApi</span> <span class="kn">import</span> <span class="n">TikTokApi</span>
+<span class="k">with</span> <span class="n">TikTokApi</span><span class="p">()</span> <span class="k">as</span> <span class="n">api</span><span class="p">:</span>
+    <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">create_sessions</span><span class="p">(</span><span class="n">num_sessions</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ms_tokens</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;msToken1&#39;</span><span class="p">,</span> <span class="s1">&#39;msToken2&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.generate_js_fetch">
+<span class="sig-name descname"><span class="pre">generate_js_fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/TikTokApi/tiktok.html#TikTokApi.generate_js_fetch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.generate_js_fetch" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a javascript fetch function for use in playwright</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.generate_x_bogus">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_x_bogus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/tiktok.html#TikTokApi.generate_x_bogus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.generate_x_bogus" title="Permalink to this definition"></a></dt>
+<dd><p>Generate the X-Bogus header for a url</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.get_session_content">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_session_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/tiktok.html#TikTokApi.get_session_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.get_session_content" title="Permalink to this definition"></a></dt>
+<dd><p>Get the content of a url</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.get_session_cookies">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_session_cookies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/tiktok.html#TikTokApi.get_session_cookies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.get_session_cookies" title="Permalink to this definition"></a></dt>
+<dd><p>Get the cookies for a session</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>session</strong> (<a class="reference internal" href="#TikTokApi.tiktok.TikTokPlaywrightSession" title="TikTokApi.tiktok.TikTokPlaywrightSession"><em>TikTokPlaywrightSession</em></a>) – The session to get the cookies for.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The cookies for the session.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.hashtag">
+<span class="sig-name descname"><span class="pre">hashtag</span></span><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.hashtag" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="api/hashtag.html#TikTokApi.api.hashtag.Hashtag" title="TikTokApi.api.hashtag.Hashtag"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashtag</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.make_request">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">make_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exponential_backoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/tiktok.html#TikTokApi.make_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.make_request" title="Permalink to this definition"></a></dt>
+<dd><p>Makes a request to TikTok through a session.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) – The url to make the request to.</p></li>
+<li><p><strong>headers</strong> (<em>dict</em>) – The headers to use for the request.</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params to use for the request.</p></li>
+<li><p><strong>retries</strong> (<em>int</em>) – The amount of times to retry the request if it fails.</p></li>
+<li><p><strong>exponential_backoff</strong> (<em>bool</em>) – Whether or not to use exponential backoff when retrying the request.</p></li>
+<li><p><strong>session_index</strong> (<em>int</em>) – The index of the session you want to use, if not provided a random session will be used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The json response from TikTok.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – If the request fails.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.run_fetch_script">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run_fetch_script</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/tiktok.html#TikTokApi.run_fetch_script"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.run_fetch_script" title="Permalink to this definition"></a></dt>
+<dd><p>Execute a javascript fetch function in a session</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) – The url to fetch.</p></li>
+<li><p><strong>headers</strong> (<em>dict</em>) – The headers to use for the fetch.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result of the fetch. Seems to be a string or dict</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.search">
+<span class="sig-name descname"><span class="pre">search</span></span><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.search" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="api/search.html#TikTokApi.api.search.Search" title="TikTokApi.api.search.Search"><code class="xref py py-class docutils literal notranslate"><span class="pre">Search</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.sign_url">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sign_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/tiktok.html#TikTokApi.sign_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.sign_url" title="Permalink to this definition"></a></dt>
+<dd><p>Sign a url</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.sound">
+<span class="sig-name descname"><span class="pre">sound</span></span><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.sound" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="api/sound.html#TikTokApi.api.sound.Sound" title="TikTokApi.api.sound.Sound"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sound</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.stop_playwright">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stop_playwright</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/tiktok.html#TikTokApi.stop_playwright"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.stop_playwright" title="Permalink to this definition"></a></dt>
+<dd><p>Stop the playwright browser</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.trending">
+<span class="sig-name descname"><span class="pre">trending</span></span><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.trending" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="api/trending.html#TikTokApi.api.trending.Trending" title="TikTokApi.api.trending.Trending"><code class="xref py py-class docutils literal notranslate"><span class="pre">Trending</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.user">
+<span class="sig-name descname"><span class="pre">user</span></span><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.user" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="api/user.html#TikTokApi.api.user.User" title="TikTokApi.api.user.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.video">
+<span class="sig-name descname"><span class="pre">video</span></span><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.video" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="api/video.html#TikTokApi.api.video.Video" title="TikTokApi.api.video.Video"><code class="xref py py-class docutils literal notranslate"><span class="pre">Video</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokPlaywrightSession">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.tiktok.</span></span><span class="sig-name descname"><span class="pre">TikTokPlaywrightSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ms_token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'https://www.tiktok.com'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/tiktok.html#TikTokPlaywrightSession"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.tiktok.TikTokPlaywrightSession" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A TikTok session using Playwright</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokPlaywrightSession.base_url">
+<span class="sig-name descname"><span class="pre">base_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'https://www.tiktok.com'</span></em><a class="headerlink" href="#TikTokApi.tiktok.TikTokPlaywrightSession.base_url" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokPlaywrightSession.context">
+<span class="sig-name descname"><span class="pre">context</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#TikTokApi.tiktok.TikTokPlaywrightSession.context" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokPlaywrightSession.headers">
+<span class="sig-name descname"><span class="pre">headers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.tiktok.TikTokPlaywrightSession.headers" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokPlaywrightSession.ms_token">
+<span class="sig-name descname"><span class="pre">ms_token</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.tiktok.TikTokPlaywrightSession.ms_token" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokPlaywrightSession.page">
+<span class="sig-name descname"><span class="pre">page</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#TikTokApi.tiktok.TikTokPlaywrightSession.page" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokPlaywrightSession.params">
+<span class="sig-name descname"><span class="pre">params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.tiktok.TikTokPlaywrightSession.params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokPlaywrightSession.proxy">
+<span class="sig-name descname"><span class="pre">proxy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.tiktok.TikTokPlaywrightSession.proxy" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="tiktokapi-exceptions-module">
-<h1>TikTokApi.exceptions module<a class="headerlink" href="#tiktokapi-exceptions-module" title="Permalink to this heading"></a></h1>
+<section id="module-TikTokApi.exceptions">
+<span id="tiktokapi-exceptions-module"></span><h1>TikTokApi.exceptions module<a class="headerlink" href="#module-TikTokApi.exceptions" title="Permalink to this heading"></a></h1>
+<dl class="py exception">
+<dt class="sig sig-object py" id="TikTokApi.exceptions.CaptchaException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.exceptions.</span></span><span class="sig-name descname"><span class="pre">CaptchaException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/exceptions.html#CaptchaException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.exceptions.CaptchaException" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#TikTokApi.exceptions.TikTokException" title="TikTokApi.exceptions.TikTokException"><code class="xref py py-class docutils literal notranslate"><span class="pre">TikTokException</span></code></a></p>
+<p>TikTok is showing captcha</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="TikTokApi.exceptions.EmptyResponseException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.exceptions.</span></span><span class="sig-name descname"><span class="pre">EmptyResponseException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/exceptions.html#EmptyResponseException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.exceptions.EmptyResponseException" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#TikTokApi.exceptions.TikTokException" title="TikTokApi.exceptions.TikTokException"><code class="xref py py-class docutils literal notranslate"><span class="pre">TikTokException</span></code></a></p>
+<p>TikTok sent back an empty response.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="TikTokApi.exceptions.InvalidJSONException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.exceptions.</span></span><span class="sig-name descname"><span class="pre">InvalidJSONException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/exceptions.html#InvalidJSONException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.exceptions.InvalidJSONException" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#TikTokApi.exceptions.TikTokException" title="TikTokApi.exceptions.TikTokException"><code class="xref py py-class docutils literal notranslate"><span class="pre">TikTokException</span></code></a></p>
+<p>TikTok returned invalid JSON.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="TikTokApi.exceptions.InvalidResponseException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.exceptions.</span></span><span class="sig-name descname"><span class="pre">InvalidResponseException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/exceptions.html#InvalidResponseException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.exceptions.InvalidResponseException" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#TikTokApi.exceptions.TikTokException" title="TikTokApi.exceptions.TikTokException"><code class="xref py py-class docutils literal notranslate"><span class="pre">TikTokException</span></code></a></p>
+<p>The response from TikTok was invalid.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="TikTokApi.exceptions.NotFoundException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.exceptions.</span></span><span class="sig-name descname"><span class="pre">NotFoundException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/exceptions.html#NotFoundException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.exceptions.NotFoundException" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#TikTokApi.exceptions.TikTokException" title="TikTokApi.exceptions.TikTokException"><code class="xref py py-class docutils literal notranslate"><span class="pre">TikTokException</span></code></a></p>
+<p>TikTok indicated that this object does not exist.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="TikTokApi.exceptions.SoundRemovedException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.exceptions.</span></span><span class="sig-name descname"><span class="pre">SoundRemovedException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/exceptions.html#SoundRemovedException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.exceptions.SoundRemovedException" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#TikTokApi.exceptions.TikTokException" title="TikTokApi.exceptions.TikTokException"><code class="xref py py-class docutils literal notranslate"><span class="pre">TikTokException</span></code></a></p>
+<p>This TikTok sound has no id from being removed by TikTok.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="TikTokApi.exceptions.TikTokException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.exceptions.</span></span><span class="sig-name descname"><span class="pre">TikTokException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/exceptions.html#TikTokException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.exceptions.TikTokException" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Generic exception that all other TikTok errors are children of.</p>
+</dd></dl>
+
 </section>
-<section id="tiktokapi-helpers-module">
-<h1>TikTokApi.helpers module<a class="headerlink" href="#tiktokapi-helpers-module" title="Permalink to this heading"></a></h1>
+<section id="module-TikTokApi.helpers">
+<span id="tiktokapi-helpers-module"></span><h1>TikTokApi.helpers module<a class="headerlink" href="#module-TikTokApi.helpers" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="TikTokApi.helpers.extract_video_id_from_url">
+<span class="sig-prename descclassname"><span class="pre">TikTokApi.helpers.</span></span><span class="sig-name descname"><span class="pre">extract_video_id_from_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/helpers.html#extract_video_id_from_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.helpers.extract_video_id_from_url" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="TikTokApi.helpers.random_choice">
+<span class="sig-prename descclassname"><span class="pre">TikTokApi.helpers.</span></span><span class="sig-name descname"><span class="pre">random_choice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">choices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/helpers.html#random_choice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.helpers.random_choice" title="Permalink to this definition"></a></dt>
+<dd><p>Return a random choice from a list, or None if the list is empty</p>
+</dd></dl>
+
 </section>
 
 
