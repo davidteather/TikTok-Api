@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTokApi.stealth package &mdash; TikTokAPI v6.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            TikTokAPI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">TikTokApi.stealth package</a></li>
+<li><a class="reference internal" href="#module-TikTokApi.stealth.stealth">TikTokApi.stealth.stealth</a><ul>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig"><code class="docutils literal notranslate"><span class="pre">StealthConfig</span></code></a><ul>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.chrome_app"><code class="docutils literal notranslate"><span class="pre">StealthConfig.chrome_app</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.chrome_csi"><code class="docutils literal notranslate"><span class="pre">StealthConfig.chrome_csi</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.chrome_load_times"><code class="docutils literal notranslate"><span class="pre">StealthConfig.chrome_load_times</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.chrome_runtime"><code class="docutils literal notranslate"><span class="pre">StealthConfig.chrome_runtime</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.enabled_scripts"><code class="docutils literal notranslate"><span class="pre">StealthConfig.enabled_scripts</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.hairline"><code class="docutils literal notranslate"><span class="pre">StealthConfig.hairline</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.iframe_content_window"><code class="docutils literal notranslate"><span class="pre">StealthConfig.iframe_content_window</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.languages"><code class="docutils literal notranslate"><span class="pre">StealthConfig.languages</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.media_codecs"><code class="docutils literal notranslate"><span class="pre">StealthConfig.media_codecs</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.nav_platform"><code class="docutils literal notranslate"><span class="pre">StealthConfig.nav_platform</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.nav_user_agent"><code class="docutils literal notranslate"><span class="pre">StealthConfig.nav_user_agent</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.nav_vendor"><code class="docutils literal notranslate"><span class="pre">StealthConfig.nav_vendor</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.navigator_hardware_concurrency"><code class="docutils literal notranslate"><span class="pre">StealthConfig.navigator_hardware_concurrency</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.navigator_languages"><code class="docutils literal notranslate"><span class="pre">StealthConfig.navigator_languages</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.navigator_permissions"><code class="docutils literal notranslate"><span class="pre">StealthConfig.navigator_permissions</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.navigator_platform"><code class="docutils literal notranslate"><span class="pre">StealthConfig.navigator_platform</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.navigator_plugins"><code class="docutils literal notranslate"><span class="pre">StealthConfig.navigator_plugins</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.navigator_user_agent"><code class="docutils literal notranslate"><span class="pre">StealthConfig.navigator_user_agent</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.navigator_vendor"><code class="docutils literal notranslate"><span class="pre">StealthConfig.navigator_vendor</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.outerdimensions"><code class="docutils literal notranslate"><span class="pre">StealthConfig.outerdimensions</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.renderer"><code class="docutils literal notranslate"><span class="pre">StealthConfig.renderer</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.runOnInsecureOrigins"><code class="docutils literal notranslate"><span class="pre">StealthConfig.runOnInsecureOrigins</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.vendor"><code class="docutils literal notranslate"><span class="pre">StealthConfig.vendor</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.webdriver"><code class="docutils literal notranslate"><span class="pre">StealthConfig.webdriver</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig.webgl_vendor"><code class="docutils literal notranslate"><span class="pre">StealthConfig.webgl_vendor</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.from_file"><code class="docutils literal notranslate"><span class="pre">from_file()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.stealth.stealth.stealth_async"><code class="docutils literal notranslate"><span class="pre">stealth_async()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TikTokAPI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">TikTokApi.stealth package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/TikTokApi.stealth.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tiktokapi-stealth-package">
+<h1>TikTokApi.stealth package<a class="headerlink" href="#tiktokapi-stealth-package" title="Permalink to this heading"></a></h1>
+<p>This package is a modified version of <a class="reference external" href="https://github.com/AtuboDad/playwright_stealth">playwright_stealth</a>, used to mask the browser as a real browser.</p>
+<p>This package is used to prevent TikTok from detecting that you are using a bot.</p>
+<p>You probably shouldn’t be interacting with this package directly, but rather through the <code class="xref py py-class docutils literal notranslate"><span class="pre">TikTokApi</span></code> class.</p>
+<p>Here’s some stealth resources that I always keep forgetting, so I’m putting them here:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bot.sannysoft.com/">SannySoft Bot Detector</a></p></li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://arh.antoinevastel.com/bots/areyouheadless">Are you headless?</a></dt><dd><ul>
+<li><p><a class="reference external" href="https://antoinevastel.com/bots/datadome">DataDome Detector</a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><a class="reference external" href="https://amiunique.org/">Am I Unique?</a> (cool because they split up the distribution of each field, I don’t really use much)</p></li>
+</ul>
+<p>Bot Detection Resources:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/fingerprintjs/fingerprintjs">FingerprintJS on GitHub</a></p></li>
+</ul>
+</section>
+<section id="module-TikTokApi.stealth.stealth">
+<span id="tiktokapi-stealth-stealth"></span><h1>TikTokApi.stealth.stealth<a class="headerlink" href="#module-TikTokApi.stealth.stealth" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.stealth.stealth.</span></span><span class="sig-name descname"><span class="pre">StealthConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">webdriver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">webgl_vendor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chrome_app</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chrome_csi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chrome_load_times</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chrome_runtime</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iframe_content_window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">media_codecs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">navigator_hardware_concurrency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">navigator_languages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">navigator_permissions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">navigator_platform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">navigator_plugins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">navigator_user_agent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">navigator_vendor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outerdimensions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hairline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vendor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Intel</span> <span class="pre">Inc.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">renderer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Intel</span> <span class="pre">Iris</span> <span class="pre">OpenGL</span> <span class="pre">Engine'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nav_vendor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Google</span> <span class="pre">Inc.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nav_user_agent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nav_platform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">languages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('en-US',</span> <span class="pre">'en')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runOnInsecureOrigins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/stealth/stealth.html#StealthConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Playwright stealth configuration that applies stealth strategies to playwright page objects.
+The stealth strategies are contained in ./js package and are basic javascript scripts that are executed
+on every page.goto() called.
+.. note:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>All init scripts are combined by playwright into one script and then executed this means
+the scripts should not have conflicting constants/variables etc. !
+This also means scripts can be extended by overriding enabled_scripts generator:
+```
+@property
+def enabled_scripts():
+    yield &#39;console.log(&quot;first script&quot;)&#39;
+    yield from super().enabled_scripts()
+    yield &#39;console.log(&quot;last script&quot;)&#39;
+```
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.chrome_app">
+<span class="sig-name descname"><span class="pre">chrome_app</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.chrome_app" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.chrome_csi">
+<span class="sig-name descname"><span class="pre">chrome_csi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.chrome_csi" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.chrome_load_times">
+<span class="sig-name descname"><span class="pre">chrome_load_times</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.chrome_load_times" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.chrome_runtime">
+<span class="sig-name descname"><span class="pre">chrome_runtime</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.chrome_runtime" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.enabled_scripts">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enabled_scripts</span></span><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.enabled_scripts" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.hairline">
+<span class="sig-name descname"><span class="pre">hairline</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.hairline" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.iframe_content_window">
+<span class="sig-name descname"><span class="pre">iframe_content_window</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.iframe_content_window" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.languages">
+<span class="sig-name descname"><span class="pre">languages</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('en-US',</span> <span class="pre">'en')</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.languages" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.media_codecs">
+<span class="sig-name descname"><span class="pre">media_codecs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.media_codecs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.nav_platform">
+<span class="sig-name descname"><span class="pre">nav_platform</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.nav_platform" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.nav_user_agent">
+<span class="sig-name descname"><span class="pre">nav_user_agent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.nav_user_agent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.nav_vendor">
+<span class="sig-name descname"><span class="pre">nav_vendor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Google</span> <span class="pre">Inc.'</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.nav_vendor" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.navigator_hardware_concurrency">
+<span class="sig-name descname"><span class="pre">navigator_hardware_concurrency</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.navigator_hardware_concurrency" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.navigator_languages">
+<span class="sig-name descname"><span class="pre">navigator_languages</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.navigator_languages" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.navigator_permissions">
+<span class="sig-name descname"><span class="pre">navigator_permissions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.navigator_permissions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.navigator_platform">
+<span class="sig-name descname"><span class="pre">navigator_platform</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.navigator_platform" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.navigator_plugins">
+<span class="sig-name descname"><span class="pre">navigator_plugins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.navigator_plugins" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.navigator_user_agent">
+<span class="sig-name descname"><span class="pre">navigator_user_agent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.navigator_user_agent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.navigator_vendor">
+<span class="sig-name descname"><span class="pre">navigator_vendor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.navigator_vendor" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.outerdimensions">
+<span class="sig-name descname"><span class="pre">outerdimensions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.outerdimensions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.renderer">
+<span class="sig-name descname"><span class="pre">renderer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Intel</span> <span class="pre">Iris</span> <span class="pre">OpenGL</span> <span class="pre">Engine'</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.renderer" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.runOnInsecureOrigins">
+<span class="sig-name descname"><span class="pre">runOnInsecureOrigins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.runOnInsecureOrigins" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.vendor">
+<span class="sig-name descname"><span class="pre">vendor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Intel</span> <span class="pre">Inc.'</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.vendor" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.webdriver">
+<span class="sig-name descname"><span class="pre">webdriver</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.webdriver" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.StealthConfig.webgl_vendor">
+<span class="sig-name descname"><span class="pre">webgl_vendor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#TikTokApi.stealth.stealth.StealthConfig.webgl_vendor" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.from_file">
+<span class="sig-prename descclassname"><span class="pre">TikTokApi.stealth.stealth.</span></span><span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/stealth/stealth.html#from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.stealth.stealth.from_file" title="Permalink to this definition"></a></dt>
+<dd><p>Read script from ./js directory</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="TikTokApi.stealth.stealth.stealth_async">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.stealth.stealth.</span></span><span class="sig-name descname"><span class="pre">stealth_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Page</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#TikTokApi.stealth.stealth.StealthConfig" title="TikTokApi.stealth.stealth.StealthConfig"><span class="pre">StealthConfig</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/stealth/stealth.html#stealth_async"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.stealth.stealth.stealth_async" title="Permalink to this definition"></a></dt>
+<dd><p>stealth the page</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, David Teather.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

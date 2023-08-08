@@ -1,0 +1,5 @@
+{
+    "name": "TikTokAPI",
+    "image": "mcr.microsoft.com/devcontainers/universal",
+    "postStartCommand": "python3 -m pip install -r requirements.txt && python3 -m playwright install",
+}

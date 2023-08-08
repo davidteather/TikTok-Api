@@ -1,24 +1,19 @@
 from TikTokApi import TikTokApi
 import os
+import pytest
 
-video_id = 7107272719166901550
+video_id = 7248300636498890011
+ms_token = os.environ.get("ms_token", None)
 
-def test_comment_page():
-    with TikTokApi(custom_verify_fp=os.environ.get("verifyFp", None)) as api:
+
+@pytest.mark.asyncio
+async def test_comment_page():
+    api = TikTokApi()
+    async with api:
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
         video = api.video(id=video_id)
-
         count = 0
-        for comment in video.comments():
+        async for comment in video.comments(count=100):
             count += 1
 
-        assert count >= 0
-
-def test_comment_paging():
-    with TikTokApi(custom_verify_fp=os.environ.get("verifyFp", None)) as api:
-        video = api.video(id=video_id)
-
-        count = 0
-        for comment in video.comments(count=50):
-            count += 1
-
-        assert count >= 50
+        assert count >= 100

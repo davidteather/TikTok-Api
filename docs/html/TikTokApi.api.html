@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTokApi.api package &mdash; TikTokAPI v6.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            TikTokAPI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">TikTokApi.api package</a></li>
+<li><a class="reference internal" href="#comment">Comment</a><ul>
+<li><a class="reference internal" href="#module-TikTokApi.api.comment">TikTokApi.api.comment module</a><ul>
+<li><a class="reference internal" href="#TikTokApi.api.comment.Comment"><code class="docutils literal notranslate"><span class="pre">Comment</span></code></a><ul>
+<li><a class="reference internal" href="#TikTokApi.api.comment.Comment.as_dict"><code class="docutils literal notranslate"><span class="pre">Comment.as_dict</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.comment.Comment.author"><code class="docutils literal notranslate"><span class="pre">Comment.author</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.comment.Comment.id"><code class="docutils literal notranslate"><span class="pre">Comment.id</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.comment.Comment.likes_count"><code class="docutils literal notranslate"><span class="pre">Comment.likes_count</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.comment.Comment.parent"><code class="docutils literal notranslate"><span class="pre">Comment.parent</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.comment.Comment.text"><code class="docutils literal notranslate"><span class="pre">Comment.text</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#user">User</a><ul>
+<li><a class="reference internal" href="#module-TikTokApi.api.user">TikTokApi.api.user module</a><ul>
+<li><a class="reference internal" href="#TikTokApi.api.user.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a><ul>
+<li><a class="reference internal" href="#TikTokApi.api.user.User.as_dict"><code class="docutils literal notranslate"><span class="pre">User.as_dict</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.user.User.info"><code class="docutils literal notranslate"><span class="pre">User.info()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.user.User.liked"><code class="docutils literal notranslate"><span class="pre">User.liked()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.user.User.parent"><code class="docutils literal notranslate"><span class="pre">User.parent</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.user.User.sec_uid"><code class="docutils literal notranslate"><span class="pre">User.sec_uid</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.user.User.user_id"><code class="docutils literal notranslate"><span class="pre">User.user_id</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.user.User.username"><code class="docutils literal notranslate"><span class="pre">User.username</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.user.User.videos"><code class="docutils literal notranslate"><span class="pre">User.videos()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#trending">Trending</a><ul>
+<li><a class="reference internal" href="#module-TikTokApi.api.trending">TikTokApi.api.trending module</a><ul>
+<li><a class="reference internal" href="#TikTokApi.api.trending.Trending"><code class="docutils literal notranslate"><span class="pre">Trending</span></code></a><ul>
+<li><a class="reference internal" href="#TikTokApi.api.trending.Trending.parent"><code class="docutils literal notranslate"><span class="pre">Trending.parent</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.trending.Trending.videos"><code class="docutils literal notranslate"><span class="pre">Trending.videos()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#search">Search</a><ul>
+<li><a class="reference internal" href="#module-TikTokApi.api.search">TikTokApi.api.search module</a><ul>
+<li><a class="reference internal" href="#TikTokApi.api.search.Search"><code class="docutils literal notranslate"><span class="pre">Search</span></code></a><ul>
+<li><a class="reference internal" href="#TikTokApi.api.search.Search.parent"><code class="docutils literal notranslate"><span class="pre">Search.parent</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.search.Search.search_type"><code class="docutils literal notranslate"><span class="pre">Search.search_type()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.search.Search.users"><code class="docutils literal notranslate"><span class="pre">Search.users()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hashtags">Hashtags</a><ul>
+<li><a class="reference internal" href="#module-TikTokApi.api.hashtag">TikTokApi.api.hashtag module</a><ul>
+<li><a class="reference internal" href="#TikTokApi.api.hashtag.Hashtag"><code class="docutils literal notranslate"><span class="pre">Hashtag</span></code></a><ul>
+<li><a class="reference internal" href="#TikTokApi.api.hashtag.Hashtag.as_dict"><code class="docutils literal notranslate"><span class="pre">Hashtag.as_dict</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.hashtag.Hashtag.id"><code class="docutils literal notranslate"><span class="pre">Hashtag.id</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.hashtag.Hashtag.info"><code class="docutils literal notranslate"><span class="pre">Hashtag.info()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.hashtag.Hashtag.name"><code class="docutils literal notranslate"><span class="pre">Hashtag.name</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.hashtag.Hashtag.parent"><code class="docutils literal notranslate"><span class="pre">Hashtag.parent</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.hashtag.Hashtag.videos"><code class="docutils literal notranslate"><span class="pre">Hashtag.videos()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sound">Sound</a><ul>
+<li><a class="reference internal" href="#module-TikTokApi.api.sound">TikTokApi.api.sound module</a><ul>
+<li><a class="reference internal" href="#TikTokApi.api.sound.Sound"><code class="docutils literal notranslate"><span class="pre">Sound</span></code></a><ul>
+<li><a class="reference internal" href="#TikTokApi.api.sound.Sound.author"><code class="docutils literal notranslate"><span class="pre">Sound.author</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.sound.Sound.duration"><code class="docutils literal notranslate"><span class="pre">Sound.duration</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.sound.Sound.id"><code class="docutils literal notranslate"><span class="pre">Sound.id</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.sound.Sound.info"><code class="docutils literal notranslate"><span class="pre">Sound.info()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.sound.Sound.original"><code class="docutils literal notranslate"><span class="pre">Sound.original</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.sound.Sound.parent"><code class="docutils literal notranslate"><span class="pre">Sound.parent</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.sound.Sound.title"><code class="docutils literal notranslate"><span class="pre">Sound.title</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.sound.Sound.videos"><code class="docutils literal notranslate"><span class="pre">Sound.videos()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#video">Video</a><ul>
+<li><a class="reference internal" href="#module-TikTokApi.api.video">TikTokApi.api.video module</a><ul>
+<li><a class="reference internal" href="#TikTokApi.api.video.Video"><code class="docutils literal notranslate"><span class="pre">Video</span></code></a><ul>
+<li><a class="reference internal" href="#TikTokApi.api.video.Video.as_dict"><code class="docutils literal notranslate"><span class="pre">Video.as_dict</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.video.Video.author"><code class="docutils literal notranslate"><span class="pre">Video.author</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.video.Video.bytes"><code class="docutils literal notranslate"><span class="pre">Video.bytes()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.video.Video.comments"><code class="docutils literal notranslate"><span class="pre">Video.comments()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.video.Video.create_time"><code class="docutils literal notranslate"><span class="pre">Video.create_time</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.video.Video.hashtags"><code class="docutils literal notranslate"><span class="pre">Video.hashtags</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.video.Video.id"><code class="docutils literal notranslate"><span class="pre">Video.id</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.video.Video.info"><code class="docutils literal notranslate"><span class="pre">Video.info()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.video.Video.parent"><code class="docutils literal notranslate"><span class="pre">Video.parent</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.video.Video.related_videos"><code class="docutils literal notranslate"><span class="pre">Video.related_videos()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.video.Video.sound"><code class="docutils literal notranslate"><span class="pre">Video.sound</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.video.Video.stats"><code class="docutils literal notranslate"><span class="pre">Video.stats</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.video.Video.url"><code class="docutils literal notranslate"><span class="pre">Video.url</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TikTokAPI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">TikTokApi.api package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/TikTokApi.api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tiktokapi-api-package">
+<h1>TikTokApi.api package<a class="headerlink" href="#tiktokapi-api-package" title="Permalink to this heading"></a></h1>
+<p>This package wraps each entity from TikTok into a class with high-level methods to interact with the TikTok object.</p>
+</section>
+<section id="comment">
+<h1>Comment<a class="headerlink" href="#comment" title="Permalink to this heading"></a></h1>
+<section id="module-TikTokApi.api.comment">
+<span id="tiktokapi-api-comment-module"></span><h2>TikTokApi.api.comment module<a class="headerlink" href="#module-TikTokApi.api.comment" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TikTokApi.api.comment.Comment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.api.comment.</span></span><span class="sig-name descname"><span class="pre">Comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/api/comment.html#Comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.comment.Comment" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A TikTok Comment.</p>
+<dl>
+<dt>Example Usage</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">comment</span> <span class="ow">in</span> <span class="n">video</span><span class="o">.</span><span class="n">comments</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">comment</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">comment</span><span class="o">.</span><span class="n">as_dict</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.comment.Comment.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.as_dict" title="Permalink to this definition"></a></dt>
+<dd><p>The raw data associated with this comment</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.comment.Comment.author">
+<span class="sig-name descname"><span class="pre">author</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#TikTokApi.api.user.User" title="TikTokApi.api.user.User"><span class="pre">User</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.author" title="Permalink to this definition"></a></dt>
+<dd><p>The author of the comment</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.comment.Comment.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.id" title="Permalink to this definition"></a></dt>
+<dd><p>The id of the comment</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.comment.Comment.likes_count">
+<span class="sig-name descname"><span class="pre">likes_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.likes_count" title="Permalink to this definition"></a></dt>
+<dd><p>The amount of likes of the comment</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.comment.Comment.parent">
+<span class="sig-name descname"><span class="pre">parent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="TikTokApi.html#TikTokApi.tiktok.TikTokApi" title="TikTokApi.tiktok.TikTokApi"><span class="pre">TikTokApi</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.parent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.comment.Comment.text">
+<span class="sig-name descname"><span class="pre">text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.text" title="Permalink to this definition"></a></dt>
+<dd><p>The contents of the comment</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="user">
+<h1>User<a class="headerlink" href="#user" title="Permalink to this heading"></a></h1>
+<section id="module-TikTokApi.api.user">
+<span id="tiktokapi-api-user-module"></span><h2>TikTokApi.api.user module<a class="headerlink" href="#module-TikTokApi.api.user" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TikTokApi.api.user.User">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.api.user.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sec_uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/api/user.html#User"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.user.User" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A TikTok User.</p>
+<dl>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">user</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;therock&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.user.User.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#TikTokApi.api.user.User.as_dict" title="Permalink to this definition"></a></dt>
+<dd><p>The raw data associated with this user.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.user.User.info">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/TikTokApi/api/user.html#User.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.user.User.info" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a dictionary of information associated with this User.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary of information associated with this User.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="TikTokApi.html#TikTokApi.exceptions.InvalidResponseException" title="TikTokApi.exceptions.InvalidResponseException"><strong>InvalidResponseException</strong></a> – If TikTok returns an invalid response, or one we don’t understand.</p>
+</dd>
+</dl>
+<dl>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">user_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;therock&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.user.User.liked">
+<span class="sig-name descname"><span class="pre">liked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="api/video.html#TikTokApi.api.video.Video" title="TikTokApi.api.video.Video"><span class="pre">Video</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/TikTokApi/api/user.html#User.liked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.user.User.liked" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a dictionary listing TikToks that a given a user has liked.</p>
+<p>TODO: Not currently implemented</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.user.User.parent">
+<span class="sig-name descname"><span class="pre">parent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="TikTokApi.html#TikTokApi.tiktok.TikTokApi" title="TikTokApi.tiktok.TikTokApi"><span class="pre">TikTokApi</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#TikTokApi.api.user.User.parent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.user.User.sec_uid">
+<span class="sig-name descname"><span class="pre">sec_uid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#TikTokApi.api.user.User.sec_uid" title="Permalink to this definition"></a></dt>
+<dd><p>The sec UID of the user.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.user.User.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#TikTokApi.api.user.User.user_id" title="Permalink to this definition"></a></dt>
+<dd><p>The  ID of the user.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.user.User.username">
+<span class="sig-name descname"><span class="pre">username</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#TikTokApi.api.user.User.username" title="Permalink to this definition"></a></dt>
+<dd><p>The username of the user.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.user.User.videos">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="api/video.html#TikTokApi.api.video.Video" title="TikTokApi.api.video.Video"><span class="pre">Video</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/TikTokApi/api/user.html#User.videos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.user.User.videos" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a user’s videos.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> (<em>int</em>) – The amount of videos you want returned.</p></li>
+<li><p><strong>cursor</strong> (<em>int</em>) – The the offset of videos from 0 you want to get.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Yields TikTokApi.video objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>async iterator/generator</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="TikTokApi.html#TikTokApi.exceptions.InvalidResponseException" title="TikTokApi.exceptions.InvalidResponseException"><strong>InvalidResponseException</strong></a> – If TikTok returns an invalid response, or one we don’t understand.</p>
+</dd>
+</dl>
+<dl>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;davidteathercodes&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
+    <span class="c1"># do something</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="trending">
+<h1>Trending<a class="headerlink" href="#trending" title="Permalink to this heading"></a></h1>
+<section id="module-TikTokApi.api.trending">
+<span id="tiktokapi-api-trending-module"></span><h2>TikTokApi.api.trending module<a class="headerlink" href="#module-TikTokApi.api.trending" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TikTokApi.api.trending.Trending">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.api.trending.</span></span><span class="sig-name descname"><span class="pre">Trending</span></span><a class="reference internal" href="_modules/TikTokApi/api/trending.html#Trending"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.trending.Trending" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Contains static methods related to trending objects on TikTok.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.trending.Trending.parent">
+<span class="sig-name descname"><span class="pre">parent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="TikTokApi.html#TikTokApi.tiktok.TikTokApi" title="TikTokApi.tiktok.TikTokApi"><span class="pre">TikTokApi</span></a></em><a class="headerlink" href="#TikTokApi.api.trending.Trending.parent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.trending.Trending.videos">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="api/video.html#TikTokApi.api.video.Video" title="TikTokApi.api.video.Video"><span class="pre">Video</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/TikTokApi/api/trending.html#Trending.videos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.trending.Trending.videos" title="Permalink to this definition"></a></dt>
+<dd><p>Returns Videos that are trending on TikTok.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>count</strong> (<em>int</em>) – The amount of videos you want returned.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Yields TikTokApi.video objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>async iterator/generator</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="TikTokApi.html#TikTokApi.exceptions.InvalidResponseException" title="TikTokApi.exceptions.InvalidResponseException"><strong>InvalidResponseException</strong></a> – If TikTok returns an invalid response, or one we don’t understand.</p>
+</dd>
+</dl>
+<dl>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">trending</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
+    <span class="c1"># do something</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="search">
+<h1>Search<a class="headerlink" href="#search" title="Permalink to this heading"></a></h1>
+<section id="module-TikTokApi.api.search">
+<span id="tiktokapi-api-search-module"></span><h2>TikTokApi.api.search module<a class="headerlink" href="#module-TikTokApi.api.search" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TikTokApi.api.search.Search">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.api.search.</span></span><span class="sig-name descname"><span class="pre">Search</span></span><a class="reference internal" href="_modules/TikTokApi/api/search.html#Search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.search.Search" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Contains static methods about searching TikTok for a phrase.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.search.Search.parent">
+<span class="sig-name descname"><span class="pre">parent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="TikTokApi.html#TikTokApi.tiktok.TikTokApi" title="TikTokApi.tiktok.TikTokApi"><span class="pre">TikTokApi</span></a></em><a class="headerlink" href="#TikTokApi.api.search.Search.parent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.search.Search.search_type">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">search_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_term</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span></span></span><a class="reference internal" href="_modules/TikTokApi/api/search.html#Search.search_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.search.Search.search_type" title="Permalink to this definition"></a></dt>
+<dd><p>Searches for a specific type of object. But you shouldn’t use this directly, use the other methods.</p>
+<p>Note: Your ms_token needs to have done a search before for this to work.
+Note: Currently only supports searching for users, other endpoints require auth.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>search_term</strong> (<em>str</em>) – The phrase you want to search for.</p></li>
+<li><p><strong>obj_type</strong> (<em>str</em>) – The type of object you want to search for (user)</p></li>
+<li><p><strong>count</strong> (<em>int</em>) – The amount of users you want returned.</p></li>
+<li><p><strong>cursor</strong> (<em>int</em>) – The the offset of users from 0 you want to get.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Yields TikTokApi.video objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>async iterator/generator</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="TikTokApi.html#TikTokApi.exceptions.InvalidResponseException" title="TikTokApi.exceptions.InvalidResponseException"><strong>InvalidResponseException</strong></a> – If TikTok returns an invalid response, or one we don’t understand.</p>
+</dd>
+</dl>
+<dl>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">search</span><span class="o">.</span><span class="n">search_type</span><span class="p">(</span><span class="s1">&#39;david teather&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">):</span>
+    <span class="c1"># do something</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.search.Search.users">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">users</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_term</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#TikTokApi.api.user.User" title="TikTokApi.api.user.User"><span class="pre">User</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/TikTokApi/api/search.html#Search.users"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.search.Search.users" title="Permalink to this definition"></a></dt>
+<dd><p>Searches for users.</p>
+<p>Note: Your ms_token needs to have done a search before for this to work.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>search_term</strong> (<em>str</em>) – The phrase you want to search for.</p></li>
+<li><p><strong>count</strong> (<em>int</em>) – The amount of users you want returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Yields TikTokApi.user objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>async iterator/generator</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="TikTokApi.html#TikTokApi.exceptions.InvalidResponseException" title="TikTokApi.exceptions.InvalidResponseException"><strong>InvalidResponseException</strong></a> – If TikTok returns an invalid response, or one we don’t understand.</p>
+</dd>
+</dl>
+<dl>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">search</span><span class="o">.</span><span class="n">users</span><span class="p">(</span><span class="s1">&#39;david teather&#39;</span><span class="p">):</span>
+    <span class="c1"># do something</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="hashtags">
+<h1>Hashtags<a class="headerlink" href="#hashtags" title="Permalink to this heading"></a></h1>
+<section id="module-TikTokApi.api.hashtag">
+<span id="tiktokapi-api-hashtag-module"></span><h2>TikTokApi.api.hashtag module<a class="headerlink" href="#module-TikTokApi.api.hashtag" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TikTokApi.api.hashtag.Hashtag">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.api.hashtag.</span></span><span class="sig-name descname"><span class="pre">Hashtag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/api/hashtag.html#Hashtag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.hashtag.Hashtag" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A TikTok Hashtag/Challenge.</p>
+<dl>
+<dt>Example Usage</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hashtag</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;funny&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">hashtag</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">video</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.hashtag.Hashtag.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#TikTokApi.api.hashtag.Hashtag.as_dict" title="Permalink to this definition"></a></dt>
+<dd><p>The raw data associated with this hashtag.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.hashtag.Hashtag.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.api.hashtag.Hashtag.id" title="Permalink to this definition"></a></dt>
+<dd><p>The ID of the hashtag</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.hashtag.Hashtag.info">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/TikTokApi/api/hashtag.html#Hashtag.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.hashtag.Hashtag.info" title="Permalink to this definition"></a></dt>
+<dd><p>Returns all information sent by TikTok related to this hashtag.</p>
+<dl>
+<dt>Example Usage</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hashtag</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;funny&#39;</span><span class="p">)</span>
+<span class="n">hashtag_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">hashtag</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.hashtag.Hashtag.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.api.hashtag.Hashtag.name" title="Permalink to this definition"></a></dt>
+<dd><p>The name of the hashtag (omiting the #)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.hashtag.Hashtag.parent">
+<span class="sig-name descname"><span class="pre">parent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="TikTokApi.html#TikTokApi.tiktok.TikTokApi" title="TikTokApi.tiktok.TikTokApi"><span class="pre">TikTokApi</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#TikTokApi.api.hashtag.Hashtag.parent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.hashtag.Hashtag.videos">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="api/video.html#TikTokApi.api.video.Video" title="TikTokApi.api.video.Video"><span class="pre">Video</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/TikTokApi/api/hashtag.html#Hashtag.videos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.hashtag.Hashtag.videos" title="Permalink to this definition"></a></dt>
+<dd><p>Returns TikTok videos that have this hashtag in the caption.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> (<em>int</em>) – The amount of videos you want returned.</p></li>
+<li><p><strong>cursor</strong> (<em>int</em>) – The the offset of videos from 0 you want to get.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Yields TikTokApi.video objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>async iterator/generator</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="TikTokApi.html#TikTokApi.exceptions.InvalidResponseException" title="TikTokApi.exceptions.InvalidResponseException"><strong>InvalidResponseException</strong></a> – If TikTok returns an invalid response, or one we don’t understand.</p>
+</dd>
+</dl>
+<dl>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;funny&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
+    <span class="c1"># do something</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="sound">
+<h1>Sound<a class="headerlink" href="#sound" title="Permalink to this heading"></a></h1>
+<section id="module-TikTokApi.api.sound">
+<span id="tiktokapi-api-sound-module"></span><h2>TikTokApi.api.sound module<a class="headerlink" href="#module-TikTokApi.api.sound" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TikTokApi.api.sound.Sound">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.api.sound.</span></span><span class="sig-name descname"><span class="pre">Sound</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/api/sound.html#Sound"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.sound.Sound" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A TikTok Sound/Music/Song.</p>
+<dl>
+<dt>Example Usage</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">song</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">song</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;7016547803243022337&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.sound.Sound.author">
+<span class="sig-name descname"><span class="pre">author</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#TikTokApi.api.user.User" title="TikTokApi.api.user.User"><span class="pre">User</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.api.sound.Sound.author" title="Permalink to this definition"></a></dt>
+<dd><p>The author of the song (if it exists)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.sound.Sound.duration">
+<span class="sig-name descname"><span class="pre">duration</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.api.sound.Sound.duration" title="Permalink to this definition"></a></dt>
+<dd><p>The duration of the song in seconds.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.sound.Sound.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#TikTokApi.api.sound.Sound.id" title="Permalink to this definition"></a></dt>
+<dd><p>TikTok’s ID for the sound</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.sound.Sound.info">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/TikTokApi/api/sound.html#Sound.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.sound.Sound.info" title="Permalink to this definition"></a></dt>
+<dd><p>Returns all information sent by TikTok related to this sound.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The raw data returned by TikTok.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="TikTokApi.html#TikTokApi.exceptions.InvalidResponseException" title="TikTokApi.exceptions.InvalidResponseException"><strong>InvalidResponseException</strong></a> – If TikTok returns an invalid response, or one we don’t understand.</p>
+</dd>
+</dl>
+<dl>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sound_info</span> <span class="o">=</span> <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">sound</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;7016547803243022337&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.sound.Sound.original">
+<span class="sig-name descname"><span class="pre">original</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.api.sound.Sound.original" title="Permalink to this definition"></a></dt>
+<dd><p>Whether the song is original or not.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.sound.Sound.parent">
+<span class="sig-name descname"><span class="pre">parent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="TikTokApi.html#TikTokApi.tiktok.TikTokApi" title="TikTokApi.tiktok.TikTokApi"><span class="pre">TikTokApi</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#TikTokApi.api.sound.Sound.parent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.sound.Sound.title">
+<span class="sig-name descname"><span class="pre">title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.api.sound.Sound.title" title="Permalink to this definition"></a></dt>
+<dd><p>The title of the song.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.sound.Sound.videos">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="api/video.html#TikTokApi.api.video.Video" title="TikTokApi.api.video.Video"><span class="pre">Video</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/TikTokApi/api/sound.html#Sound.videos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.sound.Sound.videos" title="Permalink to this definition"></a></dt>
+<dd><p>Returns Video objects of videos created with this sound.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> (<em>int</em>) – The amount of videos you want returned.</p></li>
+<li><p><strong>cursor</strong> (<em>int</em>) – The the offset of videos from 0 you want to get.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Yields TikTokApi.video objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>async iterator/generator</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="TikTokApi.html#TikTokApi.exceptions.InvalidResponseException" title="TikTokApi.exceptions.InvalidResponseException"><strong>InvalidResponseException</strong></a> – If TikTok returns an invalid response, or one we don’t understand.</p>
+</dd>
+</dl>
+<dl>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">sound</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;7016547803243022337&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
+    <span class="c1"># do something</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="video">
+<h1>Video<a class="headerlink" href="#video" title="Permalink to this heading"></a></h1>
+<section id="module-TikTokApi.api.video">
+<span id="tiktokapi-api-video-module"></span><h2>TikTokApi.api.video module<a class="headerlink" href="#module-TikTokApi.api.video" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TikTokApi.api.video.Video">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.api.video.</span></span><span class="sig-name descname"><span class="pre">Video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/api/video.html#Video"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.video.Video" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A TikTok Video class</p>
+<p>Example Usage
+<code class="docutils literal notranslate"><span class="pre">`py</span>
+<span class="pre">video</span> <span class="pre">=</span> <span class="pre">api.video(id='7041997751718137094')</span>
+<span class="pre">`</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.video.Video.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#TikTokApi.api.video.Video.as_dict" title="Permalink to this definition"></a></dt>
+<dd><p>The raw data associated with this Video.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.video.Video.author">
+<span class="sig-name descname"><span class="pre">author</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#TikTokApi.api.user.User" title="TikTokApi.api.user.User"><span class="pre">User</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.api.video.Video.author" title="Permalink to this definition"></a></dt>
+<dd><p>The User who created the Video</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.video.Video.bytes">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="_modules/TikTokApi/api/video.html#Video.bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.video.Video.bytes" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the bytes of a TikTok Video.</p>
+<dl>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">video_bytes</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;7041997751718137094&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">bytes</span><span class="p">()</span>
+
+<span class="c1"># Saving The Video</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;saved_video.mp4&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output</span><span class="p">:</span>
+    <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">video_bytes</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.video.Video.comments">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">comments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#TikTokApi.api.comment.Comment" title="TikTokApi.api.comment.Comment"><span class="pre">Comment</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/TikTokApi/api/video.html#Video.comments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.video.Video.comments" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the comments of a TikTok Video.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> (<em>int</em>) – The amount of comments you want returned.</p></li>
+<li><p><strong>cursor</strong> (<em>int</em>) – The the offset of comments from 0 you want to get.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Yields TikTokApi.comment objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>async iterator/generator</p>
+</dd>
+</dl>
+<p>Example Usage
+.. code-block:: python</p>
+<blockquote>
+<div><dl class="simple">
+<dt>async for comment in api.video(id=’7041997751718137094’).comments():</dt><dd><p># do something</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id2"><span class="problematic" id="id3">``</span></a><a href="#id4"><span class="problematic" id="id5">`</span></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.video.Video.create_time">
+<span class="sig-name descname"><span class="pre">create_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.api.video.Video.create_time" title="Permalink to this definition"></a></dt>
+<dd><p>The creation time of the Video</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.video.Video.hashtags">
+<span class="sig-name descname"><span class="pre">hashtags</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#TikTokApi.api.hashtag.Hashtag" title="TikTokApi.api.hashtag.Hashtag"><span class="pre">Hashtag</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.api.video.Video.hashtags" title="Permalink to this definition"></a></dt>
+<dd><p>A List of Hashtags on the Video</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.video.Video.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.api.video.Video.id" title="Permalink to this definition"></a></dt>
+<dd><p>TikTok’s ID of the Video</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.video.Video.info">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/TikTokApi/api/video.html#Video.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.video.Video.info" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a dictionary of all data associated with a TikTok Video.</p>
+<p>Note: This is slow since it requires an HTTP request, avoid using this if possible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary of all data associated with a TikTok Video.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="TikTokApi.html#TikTokApi.exceptions.InvalidResponseException" title="TikTokApi.exceptions.InvalidResponseException"><strong>InvalidResponseException</strong></a> – If TikTok returns an invalid response, or one we don’t understand.</p>
+</dd>
+</dl>
+<dl>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://www.tiktok.com/@davidteathercodes/video/7106686413101468970&quot;</span>
+<span class="n">video_info</span> <span class="o">=</span> <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.video.Video.parent">
+<span class="sig-name descname"><span class="pre">parent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="TikTokApi.html#TikTokApi.tiktok.TikTokApi" title="TikTokApi.tiktok.TikTokApi"><span class="pre">TikTokApi</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#TikTokApi.api.video.Video.parent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.video.Video.related_videos">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">related_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="api/video.html#TikTokApi.api.video.Video" title="TikTokApi.api.video.Video"><span class="pre">Video</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/TikTokApi/api/video.html#Video.related_videos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.video.Video.related_videos" title="Permalink to this definition"></a></dt>
+<dd><p>Returns related videos of a TikTok Video.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> (<em>int</em>) – The amount of comments you want returned.</p></li>
+<li><p><strong>cursor</strong> (<em>int</em>) – The the offset of comments from 0 you want to get.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Yields TikTokApi.video objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>async iterator/generator</p>
+</dd>
+</dl>
+<p>Example Usage
+.. code-block:: python</p>
+<blockquote>
+<div><dl class="simple">
+<dt>async for related_videos in api.video(id=’7041997751718137094’).related_videos():</dt><dd><p># do something</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id6"><span class="problematic" id="id7">``</span></a><a href="#id8"><span class="problematic" id="id9">`</span></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.video.Video.sound">
+<span class="sig-name descname"><span class="pre">sound</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#TikTokApi.api.sound.Sound" title="TikTokApi.api.sound.Sound"><span class="pre">Sound</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.api.video.Video.sound" title="Permalink to this definition"></a></dt>
+<dd><p>The Sound that is associated with the Video</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.video.Video.stats">
+<span class="sig-name descname"><span class="pre">stats</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.api.video.Video.stats" title="Permalink to this definition"></a></dt>
+<dd><p>TikTok’s stats of the Video</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="TikTokApi.api.video.Video.url">
+<span class="sig-name descname"><span class="pre">url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#TikTokApi.api.video.Video.url" title="Permalink to this definition"></a></dt>
+<dd><p>The URL of the Video</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, David Teather.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

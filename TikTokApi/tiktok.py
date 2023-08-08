@@ -1,643 +1,458 @@
 import asyncio
-import json
 import logging
-import os
+import dataclasses
+from typing import Any
 import random
-import string
-import threading
 import time
-from dataclasses import dataclass
-from typing import Optional
-from urllib.parse import urlencode
+import json
 
-import requests
+from playwright.async_api import async_playwright
+from urllib.parse import urlencode, quote, urlparse
+from .stealth import stealth_async
+from .helpers import random_choice
 
-from .api.comment import Comment
-from .api.hashtag import Hashtag
-from .api.search import Search
-from .api.sound import Sound
-from .api.trending import Trending
 from .api.user import User
 from .api.video import Video
-from .browser_utilities.browser import browser
-from .exceptions import *
-from .utilities import LOGGER_NAME
+from .api.sound import Sound
+from .api.hashtag import Hashtag
+from .api.comment import Comment
+from .api.trending import Trending
+from .api.search import Search
 
-os.environ["no_proxy"] = "127.0.0.1,localhost"
+from .exceptions import (
+    InvalidJSONException,
+    EmptyResponseException,
+)
 
-BASE_URL = "https://m.tiktok.com/"
-DESKTOP_BASE_URL = "https://www.tiktok.com/"
 
-_thread_lock = threading.Lock()
+@dataclasses.dataclass
+class TikTokPlaywrightSession:
+    """A TikTok session using Playwright"""
 
-ERROR_CODES = {
-    "0": "OK",
-    "450": "CLIENT_PAGE_ERROR",
-    "10000": "VERIFY_CODE",
-    "10101": "SERVER_ERROR_NOT_500",
-    "10102": "USER_NOT_LOGIN",
-    "10111": "NET_ERROR",
-    "10113": "SHARK_SLIDE",
-    "10114": "SHARK_BLOCK",
-    "10119": "LIVE_NEED_LOGIN",
-    "10202": "USER_NOT_EXIST",
-    "10203": "MUSIC_NOT_EXIST",
-    "10204": "VIDEO_NOT_EXIST",
-    "10205": "HASHTAG_NOT_EXIST",
-    "10208": "EFFECT_NOT_EXIST",
-    "10209": "HASHTAG_BLACK_LIST",
-    "10210": "LIVE_NOT_EXIST",
-    "10211": "HASHTAG_SENSITIVITY_WORD",
-    "10212": "HASHTAG_UNSHELVE",
-    "10213": "VIDEO_LOW_AGE_M",
-    "10214": "VIDEO_LOW_AGE_T",
-    "10215": "VIDEO_ABNORMAL",
-    "10216": "VIDEO_PRIVATE_BY_USER",
-    "10217": "VIDEO_FIRST_REVIEW_UNSHELVE",
-    "10218": "MUSIC_UNSHELVE",
-    "10219": "MUSIC_NO_COPYRIGHT",
-    "10220": "VIDEO_UNSHELVE_BY_MUSIC",
-    "10221": "USER_BAN",
-    "10222": "USER_PRIVATE",
-    "10223": "USER_FTC",
-    "10224": "GAME_NOT_EXIST",
-    "10225": "USER_UNIQUE_SENSITIVITY",
-    "10227": "VIDEO_NEED_RECHECK",
-    "10228": "VIDEO_RISK",
-    "10229": "VIDEO_R_MASK",
-    "10230": "VIDEO_RISK_MASK",
-    "10231": "VIDEO_GEOFENCE_BLOCK",
-    "10404": "FYP_VIDEO_LIST_LIMIT",
-    "undefined": "MEDIA_ERROR",
-}
+    context: Any
+    page: Any
+    proxy: str = None
+    params: dict = None
+    headers: dict = None
+    ms_token: str = None
+    base_url: str = "https://www.tiktok.com"
 
 
 class TikTokApi:
-    _is_context_manager = False
+    """The main TikTokApi class that contains all the endpoints.
+
+    Import With:
+        .. code-block:: python
+
+            from TikTokApi import TikTokApi
+            api = TikTokApi()
+    """
+
     user = User
-    search = Search
+    video = Video
     sound = Sound
     hashtag = Hashtag
-    video = Video
-    trending = Trending
     comment = Comment
-    logger = logging.getLogger(LOGGER_NAME)
+    trending = Trending
+    search = Search
 
-    def __init__(
-            self,
-            logging_level: int = logging.WARNING,
-            request_delay: Optional[int] = None,
-            custom_device_id: Optional[str] = None,
-            generate_static_device_id: Optional[bool] = False,
-            custom_verify_fp: Optional[str] = None,
-            use_test_endpoints: Optional[bool] = False,
-            proxy: Optional[str] = None,
-            executable_path: Optional[str] = None,
-            *args,
-            **kwargs,
-    ):
-        """The TikTokApi class. Used to interact with TikTok. This is a singleton
-            class to prevent issues from arising with playwright
-
-        ##### Parameters
-        * logging_level: The logging level you want the program to run at, optional
-            These are the standard python logging module's levels.
-
-        * request_delay: The amount of time in seconds to wait before making a request, optional
-            This is used to throttle your own requests as you may end up making too
-            many requests to TikTok for your IP.
-
-        * custom_device_id: A TikTok parameter needed to download videos, optional
-            The code generates these and handles these pretty well itself, however
-            for some things such as video download you will need to set a consistent
-            one of these. All the methods take this as a optional parameter, however
-            it's cleaner code to store this at the instance level. You can override
-            this at the specific methods.
-
-        * generate_static_device_id: A parameter that generates a custom_device_id at the instance level
-            Use this if you want to download videos from a script but don't want to generate
-            your own custom_device_id parameter.
-
-        * custom_verify_fp: A TikTok parameter needed to work most of the time, optional
-            To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
-            I recommend watching the entire thing, as it will help setup this package. All
-            the methods take this as a optional parameter, however it's cleaner code
-            to store this at the instance level. You can override this at the specific
-            methods.
-
-            You can use the following to generate `"".join(random.choice(string.digits)
-            for num in range(19))`
-
-        * use_test_endpoints: Send requests to TikTok's test endpoints, optional
-            This parameter when set to true will make requests to TikTok's testing
-            endpoints instead of the live site. I can't guarantee this will work
-            in the future, however currently basically any custom_verify_fp will
-            work here which is helpful.
-
-        * proxy: A string containing your proxy address, optional
-            If you want to do a lot of scraping of TikTok endpoints you'll likely
-            need a proxy.
-
-            Ex: "https://0.0.0.0:8080"
-
-            All the methods take this as a optional parameter, however it's cleaner code
-            to store this at the instance level. You can override this at the specific
-            methods.
-
-        * executable_path: The location of the driver, optional
-            This shouldn't be needed if you're using playwright
-
-        * **kwargs
-            Parameters that are passed on to basically every module and methods
-            that interact with this main class. These may or may not be documented
-            in other places.
+    def __init__(self, logging_level: int = logging.WARN, logger_name: str = None):
         """
+        Create a TikTokApi object.
 
-        self.logger.setLevel(logging_level)
+        Args:
+            logging_level (int): The logging level you want to use.
+            logger_name (str): The name of the logger you want to use.
+        """
+        self.sessions = []
 
-        with _thread_lock:
-            self._initialize(
-                request_delay=request_delay,
-                custom_device_id=custom_device_id,
-                generate_static_device_id=generate_static_device_id,
-                custom_verify_fp=custom_verify_fp,
-                use_test_endpoints=use_test_endpoints,
-                proxy=proxy,
-                executable_path=executable_path,
-                *args,
-                **kwargs,
-            )
+        if logger_name is None:
+            logger_name = __name__
+        self.__create_logger(logger_name, logging_level)
 
-    def _initialize(self, **kwargs):
-        # Add classes from the api folder
         User.parent = self
-        Search.parent = self
+        Video.parent = self
         Sound.parent = self
         Hashtag.parent = self
-        Video.parent = self
-        Trending.parent = self
         Comment.parent = self
+        Trending.parent = self
+        Search.parent = self
 
-        # Some Instance Vars
-        self._executable_path = kwargs.get("executable_path", None)
-        self.cookie_jar = None
+    def __create_logger(self, name: str, level: int = logging.DEBUG):
+        """Create a logger for the class."""
+        self.logger: logging.Logger = logging.getLogger(name)
+        self.logger.setLevel(level)
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
+        handler.setFormatter(formatter)
+        self.logger.addHandler(handler)
 
-        if kwargs.get("custom_did") != None:
-            raise Exception("Please use 'custom_device_id' instead of 'custom_did'")
-        self._custom_device_id = kwargs.get("custom_device_id", None)
-        self._user_agent = "5.0 (iPhone; CPU iPhone OS 14_8 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1"  # TODO: Randomly generate agents
-        self._proxy = kwargs.get("proxy", None)
-        self._custom_verify_fp = kwargs.get("custom_verify_fp")
-        self._signer_url = kwargs.get("external_signer", None)
-        self._request_delay = kwargs.get("request_delay", None)
-        self._requests_extra_kwargs = kwargs.get("requests_extra_kwargs", {})
-
-        if kwargs.get("use_test_endpoints", False):
-            global BASE_URL
-            BASE_URL = "https://t.tiktok.com/"
-
-        if kwargs.get("generate_static_device_id", False):
-            self._custom_device_id = "".join(
-                random.choice(string.digits) for num in range(19)
-            )
-
-        if self._signer_url is None:
-            self._browser = asyncio.get_event_loop().run_until_complete(
-                asyncio.gather(browser.create(**kwargs))
-            )[0]
-
-            self._user_agent = self._browser.user_agent
-
-        try:
-            self._timezone_name = self._browser.timezone_name
-            self._browser_language = self._browser.browser_language
-            self._width = self._browser.width
-            self._height = self._browser.height
-            self._region = self._browser.region
-            self._language = self._browser.language
-        except Exception as e:
-            self.logger.exception(
-                "An error occurred while opening your browser, but it was ignored\n",
-                "Are you sure you ran python -m playwright install?",
-            )
-
-            self._timezone_name = ""
-            self._browser_language = ""
-            self._width = "1920"
-            self._height = "1080"
-            self._region = "US"
-            self._language = "en"
-            raise e from e
-
-    def get_data(self, path, subdomain="m", **kwargs) -> dict:
-        """Makes requests to TikTok and returns their JSON.
-
-        This is all handled by the package so it's unlikely
-        you will need to use this.
-        """
-        processed = self._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = processed.device_id
-        if self._request_delay is not None:
-            time.sleep(self._request_delay)
-
-        if self._proxy is not None:
-            proxy = self._proxy
-
-        if kwargs.get("custom_verify_fp") == None:
-            if self._custom_verify_fp != None:
-                verifyFp = self._custom_verify_fp
-            else:
-                verifyFp = "verify_khr3jabg_V7ucdslq_Vrw9_4KPb_AJ1b_Ks706M8zIJTq"
-        else:
-            verifyFp = kwargs.get("custom_verify_fp")
-
-        tt_params = None
-        send_tt_params = kwargs.get("send_tt_params", False)
-
-        full_url = f"https://{subdomain}.tiktok.com/" + path
-
-        if self._signer_url is None:
-            kwargs["custom_verify_fp"] = verifyFp
-            (
-                verify_fp,
-                device_id,
-                signature,
-                tt_params,
-            ) = asyncio.get_event_loop().run_until_complete(
-                asyncio.gather(
-                    self._browser.sign_url(
-                        full_url, calc_tt_params=send_tt_params, **kwargs
-                    )
-                )
-            )[
-                0
-            ]
-
-            user_agent = self._browser.user_agent
-            referrer = self._browser.referrer
-        else:
-            (
-                verify_fp,
-                device_id,
-                signature,
-                user_agent,
-                referrer,
-            ) = self.external_signer(
-                full_url,
-                custom_device_id=kwargs.get("custom_device_id"),
-                verifyFp=kwargs.get("custom_verify_fp", verifyFp),
-            )
-
-        if not kwargs.get("send_tt_params", False):
-            tt_params = None
-
-        query = {"verifyFp": verify_fp, "device_id": device_id, "_signature": signature}
-        url = "{}&{}".format(full_url, urlencode(query))
-
-        h = requests.head(
-            url,
-            headers={"x-secsdk-csrf-version": "1.2.5", "x-secsdk-csrf-request": "1"},
-            proxies=self._format_proxy(processed.proxy),
-            **self._requests_extra_kwargs,
+    async def __set_session_params(self, session: TikTokPlaywrightSession):
+        """Set the session params for a TikTokPlaywrightSession"""
+        user_agent = await session.page.evaluate("() => navigator.userAgent")
+        language = await session.page.evaluate(
+            "() => navigator.language || navigator.userLanguage"
+        )
+        platform = await session.page.evaluate("() => navigator.platform")
+        device_id = str(random.randint(10**18, 10**19 - 1))  # Random device id
+        history_len = str(random.randint(1, 10))  # Random history length
+        screen_height = str(random.randint(600, 1080))  # Random screen height
+        screen_width = str(random.randint(800, 1920))  # Random screen width
+        timezone = await session.page.evaluate(
+            "() => Intl.DateTimeFormat().resolvedOptions().timeZone"
         )
 
-        csrf_token = None
-        if subdomain == "m":
-            csrf_session_id = h.cookies["csrf_session_id"]
-            csrf_token = h.headers["X-Ware-Csrf-Token"].split(",")[1]
-            kwargs["csrf_session_id"] = csrf_session_id
-
-        headers = {
-            "authority": "m.tiktok.com",
-            "method": "GET",
-            "path": url.split("tiktok.com")[1],
-            "scheme": "https",
-            "accept": "application/json, text/plain, */*",
-            "accept-encoding": "gzip",
-            "accept-language": "en-US,en;q=0.9",
-            "origin": referrer,
-            "referer": referrer,
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "none",
-            "sec-gpc": "1",
-            "user-agent": user_agent,
-            "x-secsdk-csrf-token": csrf_token,
-            "x-tt-params": tt_params,
-        }
-
-        self.logger.debug(f"GET: %s\n\theaders: %s", url, headers)
-        r = requests.get(
-            url,
-            headers=headers,
-            cookies=self._get_cookies(**kwargs),
-            proxies=self._format_proxy(processed.proxy),
-            **self._requests_extra_kwargs,
-        )
-
-        self.cookie_jar = r.cookies
-
-        try:
-            parsed_data = r.json()
-            if (
-                    parsed_data.get("type") == "verify"
-                    or parsed_data.get("verifyConfig", {}).get("type", "") == "verify"
-            ):
-                self.logger.error(
-                    "Tiktok wants to display a captcha.\nResponse:\n%s\nCookies:\n%s\nURL:\n%s",
-                    r.text,
-                    self._get_cookies(**kwargs),
-                    url,
-                )
-                raise CaptchaException(0, None,
-                    "TikTok blocks this request displaying a Captcha \nTip: Consider using a proxy or a custom_verify_fp as method parameters"
-                )
-
-            # statusCode from props->pageProps->statusCode thanks @adiantek on #403
-
-            statusCode = parsed_data.get("statusCode", 0)
-            self.logger.debug(f"TikTok Returned: %s", json)
-            if statusCode == 10201:
-                # Invalid Entity
-                raise NotFoundException(10201, r,
-                                        "TikTok returned a response indicating the entity is invalid"
-                                        )
-            elif statusCode == 10219:
-                # Not available in this region
-                raise NotAvailableException(10219, r, "Content not available for this region")
-            elif statusCode != 0 and statusCode != -1:
-                raise TikTokException(statusCode, r,
-                                      ERROR_CODES.get(statusCode, f"TikTok sent an unknown StatusCode of {statusCode}")
-                                      )
-
-            return r.json()
-        except ValueError as e:
-            text = r.text
-            self.logger.debug("TikTok response: %s", text)
-            if len(text) == 0:
-                raise EmptyResponseException(0, None,
-                    "Empty response from Tiktok to " + url
-                ) from None
-            else:
-                raise InvalidJSONException(0, r, "TikTok sent invalid JSON") from e
-
-    def get_data_no_sig(self, path, subdomain="m", **kwargs) -> dict:
-        processed = self._process_kwargs(kwargs)
-        full_url = f"https://{subdomain}.tiktok.com/" + path
-        referrer = self._browser.referrer
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:101.0) Gecko/20100101 Firefox/101.0",
-            "authority": "m.tiktok.com",
-            "method": "GET",
-            "path": full_url.split("tiktok.com")[1],
-            "scheme": "https",
-            "accept": "application/json, text/plain, */*",
-            "accept-encoding": "gzip",
-            "accept-language": "en-US,en;q=0.9",
-            "origin": referrer,
-            "referer": referrer,
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "none",
-            "sec-gpc": "1",
-        }
-        self.logger.debug(f"GET: %s\n\theaders: %s", full_url, headers)
-
-        r = requests.get(
-            full_url,
-            headers=headers,
-            cookies=self._get_cookies(**kwargs),
-            proxies=self._format_proxy(processed.proxy),
-            **self._requests_extra_kwargs,
-        )
-        return r.json()
-
-    def __del__(self):
-        """A basic cleanup method, called automatically from the code"""
-        if not self._is_context_manager:
-            self.logger.debug(
-                "TikTokAPI was shutdown improperlly. Ensure the instance is terminated with .shutdown()"
-            )
-            self.shutdown()
-        return
-
-    def external_signer(self, url, custom_device_id=None, verifyFp=None):
-        """Makes requests to an external signer instead of using a browser.
-
-        ##### Parameters
-        * url: The server to make requests to
-            This server is designed to sign requests. You can find an example
-            of this signature server in the examples folder.
-
-        * custom_device_id: A TikTok parameter needed to download videos
-            The code generates these and handles these pretty well itself, however
-            for some things such as video download you will need to set a consistent
-            one of these.
-
-        * custom_verify_fp: A TikTok parameter needed to work most of the time,
-            To get this parameter look at [this video](https://youtu.be/zwLmLfVI-VQ?t=117)
-            I recommend watching the entire thing, as it will help setup this package.
-        """
-        if custom_device_id is not None:
-            query = {
-                "url": url,
-                "custom_device_id": custom_device_id,
-                "verifyFp": verifyFp,
-            }
-        else:
-            query = {"url": url, "verifyFp": verifyFp}
-        data = requests.get(
-            self._signer_url + "?{}".format(urlencode(query)),
-            **self._requests_extra_kwargs,
-        )
-        parsed_data = data.json()
-
-        return (
-            parsed_data["verifyFp"],
-            parsed_data["device_id"],
-            parsed_data["_signature"],
-            parsed_data["user_agent"],
-            parsed_data["referrer"],
-        )
-
-    def _get_cookies(self, **kwargs):
-        """Extracts cookies from the kwargs passed to the function for get_data"""
-        device_id = kwargs.get(
-            "custom_device_id",
-            "".join(random.choice(string.digits) for num in range(19)),
-        )
-        if kwargs.get("custom_verify_fp") is None:
-            if self._custom_verify_fp is not None:
-                verifyFp = self._custom_verify_fp
-            else:
-                verifyFp = None
-        else:
-            verifyFp = kwargs.get("custom_verify_fp")
-
-        if kwargs.get("force_verify_fp_on_cookie_header", False):
-            return {
-                "tt_webid": device_id,
-                "tt_webid_v2": device_id,
-                "csrf_session_id": kwargs.get("csrf_session_id"),
-                "tt_csrf_token": "".join(
-                    random.choice(string.ascii_uppercase + string.ascii_lowercase)
-                    for i in range(16)
-                ),
-                "s_v_web_id": verifyFp,
-                "ttwid": kwargs.get("ttwid"),
-            }
-        else:
-            return {
-                "tt_webid": device_id,
-                "tt_webid_v2": device_id,
-                "csrf_session_id": kwargs.get("csrf_session_id"),
-                "tt_csrf_token": "".join(
-                    random.choice(string.ascii_uppercase + string.ascii_lowercase)
-                    for i in range(16)
-                ),
-                "ttwid": kwargs.get("ttwid"),
-            }
-
-    def get_bytes(self, **kwargs) -> bytes:
-        """Returns TikTok's response as bytes, similar to get_data"""
-        processed = self._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = processed.device_id
-        if self._signer_url is None:
-            (
-                verify_fp,
-                device_id,
-                signature,
-                _,
-            ) = asyncio.get_event_loop().run_until_complete(
-                asyncio.gather(self._browser.sign_url(calc_tt_params=False, **kwargs))
-            )[
-                0
-            ]
-            user_agent = self._browser.user_agent
-            referrer = self._browser.referrer
-        else:
-            (
-                verify_fp,
-                device_id,
-                signature,
-                user_agent,
-                referrer,
-            ) = self.external_signer(
-                kwargs["url"], custom_device_id=kwargs.get("custom_device_id", None)
-            )
-        query = {"verifyFp": verify_fp, "_signature": signature}
-        url = "{}&{}".format(kwargs["url"], urlencode(query))
-        r = requests.get(
-            url,
-            headers={
-                "Accept": "*/*",
-                "Accept-Encoding": "identity;q=1, *;q=0",
-                "Accept-Language": "en-US;en;q=0.9",
-                "Cache-Control": "no-cache",
-                "Connection": "keep-alive",
-                "Host": url.split("/")[2],
-                "Pragma": "no-cache",
-                "Range": "bytes=0-",
-                "Referer": "https://www.tiktok.com/",
-                "User-Agent": user_agent,
-            },
-            proxies=self._format_proxy(processed.proxy),
-            cookies=self._get_cookies(**kwargs),
-        )
-        return r.content
-
-    @staticmethod
-    def generate_device_id():
-        """Generates a valid device_id for other methods. Pass this as the custom_device_id field to download videos"""
-        return "".join([random.choice(string.digits) for num in range(19)])
-
-    #
-    # PRIVATE METHODS
-    #
-
-    def _format_proxy(self, proxy) -> Optional[dict]:
-        """
-        Formats the proxy object
-        """
-        if proxy is None and self._proxy is not None:
-            proxy = self._proxy
-        if proxy is not None:
-            return {"http": proxy, "https": proxy}
-        else:
-            return None
-
-    # Process the kwargs
-    def _process_kwargs(self, kwargs):
-        region = kwargs.get("region", "US")
-        language = kwargs.get("language", "en")
-        proxy = kwargs.get("proxy", None)
-
-        if kwargs.get("custom_device_id", None) != None:
-            device_id = kwargs.get("custom_device_id")
-        else:
-            if self._custom_device_id != None:
-                device_id = self._custom_device_id
-            else:
-                device_id = "".join(random.choice(string.digits) for num in range(19))
-
-        @dataclass
-        class ProcessedKwargs:
-            region: str
-            language: str
-            proxy: str
-            device_id: str
-
-        return ProcessedKwargs(
-            region=region, language=language, proxy=proxy, device_id=device_id
-        )
-
-    def _add_url_params(self) -> str:
-        try:
-            region = self._region
-            browser_language = self._browser_language.lower()
-            timezone = self._timezone_name
-            language = self._language
-        except AttributeError as e:
-            self.logger.debug("Attribute Error on add_url_params", exc_info=e)
-            region = "US"
-            browser_language = "en-us"
-            timezone = "America/Chicago"
-            language = "en"
-        query = {
-            "aid": 1988,
+        session_params = {
+            "aid": "1988",
+            "app_language": language,
             "app_name": "tiktok_web",
-            "device_platform": "web_mobile",
-            "region": region,
-            "priority_region": "",
-            "os": "ios",
-            "referer": "",
-            "cookie_enabled": "true",
-            "screen_width": self._width,
-            "screen_height": self._height,
-            "browser_language": browser_language,
-            "browser_platform": "iPhone",
+            "browser_language": language,
             "browser_name": "Mozilla",
-            "browser_version": self._user_agent,
             "browser_online": "true",
-            "timezone_name": timezone,
-            "is_page_visible": "true",
+            "browser_platform": platform,
+            "browser_version": user_agent,
+            "channel": "tiktok_web",
+            "cookie_enabled": "true",
+            "device_id": device_id,
+            "device_platform": "web_pc",
             "focus_state": "true",
+            "from_page": "user",
+            "history_len": history_len,
             "is_fullscreen": "false",
-            "history_len": random.randint(1, 5),
+            "is_page_visible": "true",
             "language": language,
+            "os": platform,
+            "priority_region": "",
+            "referer": "",
+            "region": "US",  # TODO: TikTokAPI option
+            "screen_height": screen_height,
+            "screen_width": screen_width,
+            "tz_name": timezone,
+            "webcast_language": language,
         }
+        session.params = session_params
 
-        return urlencode(query)
+    async def __create_session(
+        self,
+        url: str = "https://www.tiktok.com",
+        ms_token: str = None,
+        proxy: str = None,
+        context_options: dict = {},
+        sleep_after: int = 1,
+        cookies: dict = None,
+    ):
+        """Create a TikTokPlaywrightSession"""
+        if ms_token is not None:
+            if cookies is None:
+                cookies = {}
+            cookies["msToken"] = ms_token
 
-    def shutdown(self) -> None:
-        with _thread_lock:
-            self.logger.debug("Shutting down Playwright")
-            asyncio.get_event_loop().run_until_complete(self._browser._clean_up())
+        context = await self.browser.new_context(proxy=proxy, **context_options)
+        if cookies is not None:
+            formatted_cookies = [
+                {"name": k, "value": v, "domain": urlparse(url).netloc, "path": "/"}
+                for k, v in cookies.items()
+                if v is not None
+            ]
+            await context.add_cookies(formatted_cookies)
+        page = await context.new_page()
+        await stealth_async(page)
 
-    def __enter__(self):
-        with _thread_lock:
-            self._is_context_manager = True
-            return self
+        # Get the request headers to the url
+        request_headers = None
 
-    def __exit__(self, type, value, traceback):
-        self.shutdown()
+        def handle_request(request):
+            nonlocal request_headers
+            request_headers = request.headers
+
+        page.once("request", handle_request)
+        await page.goto(url)
+
+        session = TikTokPlaywrightSession(
+            context,
+            page,
+            ms_token=ms_token,
+            proxy=proxy,
+            headers=request_headers,
+            base_url=url,
+        )
+        if ms_token is None:
+            time.sleep(sleep_after)  # TODO: Find a better way to wait for msToken
+            cookies = await self.get_session_cookies(session)
+            ms_token = cookies.get("msToken")
+            session.ms_token = ms_token
+            if ms_token is None:
+                self.logger.info(
+                    f"Failed to get msToken on session index {len(self.sessions)}, you should consider specifying ms_tokens"
+                )
+        self.sessions.append(session)
+        await self.__set_session_params(session)
+
+    async def create_sessions(
+        self,
+        num_sessions=5,
+        headless=True,
+        ms_tokens: list[str] = None,
+        proxies: list = None,
+        sleep_after=1,
+        starting_url="https://www.tiktok.com",
+        context_options: dict = {},
+        override_browser_args: list[dict] = None,
+        cookies: list[dict] = None,
+    ):
+        """
+        Create sessions for use within the TikTokApi class.
+
+        These sessions are what will carry out requesting your data from TikTok.
+
+        Args:
+            num_sessions (int): The amount of sessions you want to create.
+            headless (bool): Whether or not you want the browser to be headless.
+            ms_tokens (list[str]): A list of msTokens to use for the sessions, you can get these from your cookies after visiting TikTok.
+                                   If you don't provide any, the sessions will try to get them themselves, but this is not guaranteed to work.
+            proxies (list): A list of proxies to use for the sessions
+            sleep_after (int): The amount of time to sleep after creating a session, this is to allow the msToken to be generated.
+            starting_url (str): The url to start the sessions on, this is usually https://www.tiktok.com.
+            context_options (dict): Options to pass to the playwright context.
+            override_browser_args (list[dict]): A list of dictionaries containing arguments to pass to the browser.
+            cookies (list[dict]): A list of cookies to use for the sessions, you can get these from your cookies after visiting TikTok.
+
+        Example Usage:
+            .. code-block:: python
+
+                from TikTokApi import TikTokApi
+                with TikTokApi() as api:
+                    await api.create_sessions(num_sessions=5, ms_tokens=['msToken1', 'msToken2'])
+        """
+        self.playwright = await async_playwright().start()
+        if headless and override_browser_args is None:
+            override_browser_args = ["--headless=new"]
+            headless = False  # managed by the arg
+        self.browser = await self.playwright.chromium.launch(
+            headless=headless, args=override_browser_args
+        )
+
+        await asyncio.gather(
+            *(
+                self.__create_session(
+                    proxy=random_choice(proxies),
+                    ms_token=random_choice(ms_tokens),
+                    url=starting_url,
+                    context_options=context_options,
+                    sleep_after=sleep_after,
+                    cookies=random_choice(cookies),
+                )
+                for _ in range(num_sessions)
+            )
+        )
+        self.num_sessions = len(self.sessions)
+
+    async def close_sessions(self):
+        """
+        Close all the sessions. Should be called when you're done with the TikTokApi object
+
+        This is called automatically when using the TikTokApi with "with"
+        """
+        for session in self.sessions:
+            await session.page.close()
+            await session.context.close()
+        self.sessions.clear()
+
+        await self.browser.close()
+        await self.playwright.stop()
+
+    def generate_js_fetch(self, method: str, url: str, headers: dict) -> str:
+        """Generate a javascript fetch function for use in playwright"""
+        headers_js = json.dumps(headers)
+        return f"""
+            () => {{
+                return new Promise((resolve, reject) => {{
+                    fetch('{url}', {{ method: '{method}', headers: {headers_js} }})
+                        .then(response => response.text())
+                        .then(data => resolve(data))
+                        .catch(error => reject(error.message));
+                }});
+            }}
+        """
+
+    def _get_session(self, **kwargs):
+        """Get a random session
+
+        Args:
+            session_index (int): The index of the session you want to use, if not provided a random session will be used.
+
+        Returns:
+            int: The index of the session.
+            TikTokPlaywrightSession: The session.
+        """
+        if kwargs.get("session_index") is not None:
+            i = kwargs["session_index"]
+        else:
+            i = random.randint(0, self.num_sessions - 1)
+        return i, self.sessions[i]
+
+    async def get_session_cookies(self, session):
+        """
+        Get the cookies for a session
+
+        Args:
+            session (TikTokPlaywrightSession): The session to get the cookies for.
+
+        Returns:
+            dict: The cookies for the session.
+        """
+        cookies = await session.context.cookies()
+        return {cookie["name"]: cookie["value"] for cookie in cookies}
+
+    async def run_fetch_script(self, url: str, headers: dict, **kwargs):
+        """
+        Execute a javascript fetch function in a session
+
+        Args:
+            url (str): The url to fetch.
+            headers (dict): The headers to use for the fetch.
+
+        Returns:
+            any: The result of the fetch. Seems to be a string or dict
+        """
+        js_script = self.generate_js_fetch("GET", url, headers)
+        _, session = self._get_session(**kwargs)
+        result = await session.page.evaluate(js_script)
+        return result
+
+    async def generate_x_bogus(self, url: str, **kwargs):
+        """Generate the X-Bogus header for a url"""
+        _, session = self._get_session(**kwargs)
+        result = await session.page.evaluate(
+            f'() => {{ return window.byted_acrawler.frontierSign("{url}") }}'
+        )
+        return result
+
+    async def sign_url(self, url: str, **kwargs):
+        """Sign a url"""
+        i, session = self._get_session(**kwargs)
+
+        # TODO: Would be nice to generate msToken here
+
+        # Add X-Bogus to url
+        x_bogus = (await self.generate_x_bogus(url, session_index=i)).get("X-Bogus")
+        if x_bogus is None:
+            raise Exception("Failed to generate X-Bogus")
+
+        if "?" in url:
+            url += "&"
+        else:
+            url += "?"
+        url += f"X-Bogus={x_bogus}"
+
+        return url
+
+    async def make_request(
+        self,
+        url: str,
+        headers: dict = None,
+        params: dict = None,
+        retries: int = 3,
+        exponential_backoff: bool = True,
+        **kwargs,
+    ):
+        """
+        Makes a request to TikTok through a session.
+
+        Args:
+            url (str): The url to make the request to.
+            headers (dict): The headers to use for the request.
+            params (dict): The params to use for the request.
+            retries (int): The amount of times to retry the request if it fails.
+            exponential_backoff (bool): Whether or not to use exponential backoff when retrying the request.
+            session_index (int): The index of the session you want to use, if not provided a random session will be used.
+
+        Returns:
+            dict: The json response from TikTok.
+
+        Raises:
+            Exception: If the request fails.
+        """
+        i, session = self._get_session(**kwargs)
+        if session.params is not None:
+            params = {**session.params, **params}
+
+        if headers is not None:
+            headers = {**session.headers, **headers}
+        else:
+            headers = session.headers
+
+        # get msToken
+        if params.get("msToken") is None:
+            # try to get msToken from session
+            if session.ms_token is not None:
+                params["msToken"] = session.ms_token
+            else:
+                # we'll try to read it from cookies
+                cookies = await self.get_session_cookies(session)
+                ms_token = cookies.get("msToken")
+                if ms_token is None:
+                    self.logger.warn(
+                        "Failed to get msToken from cookies, trying to make the request anyway (probably will fail)"
+                    )
+                params["msToken"] = ms_token
+
+        encoded_params = f"{url}?{urlencode(params, quote_via=quote)}"
+        signed_url = await self.sign_url(encoded_params, session_index=i)
+
+        retry_count = 0
+        while i < retries:
+            retry_count += 1
+            result = await self.run_fetch_script(
+                signed_url, headers=headers, session_index=i
+            )
+
+            if result is None:
+                raise Exception("TikTokApi.run_fetch_script returned None")
+
+            if result == "":
+                raise EmptyResponseException()
+
+            try:
+                data = json.loads(result)
+                if data.get("status_code") != 0:
+                    self.logger.error(f"Got an unexpected status code: {data}")
+                return data
+            except json.decoder.JSONDecodeError:
+                if retry_count == retries:
+                    self.logger.error(f"Failed to decode json response: {result}")
+                    raise InvalidJSONException()
+
+                self.logger.info(
+                    f"Failed a request, retrying ({retry_count}/{retries})"
+                )
+                if exponential_backoff:
+                    await asyncio.sleep(2**retry_count)
+                else:
+                    await asyncio.sleep(1)
+
+    async def close_sessions(self):
+        """Close all the sessions. Should be called when you're done with the TikTokApi object"""
+        for session in self.sessions:
+            await session.page.close()
+            await session.context.close()
+        self.sessions.clear()
+
+    async def stop_playwright(self):
+        """Stop the playwright browser"""
+        await self.browser.close()
+        await self.playwright.stop()
+
+    async def get_session_content(self, url: str, **kwargs):
+        """Get the content of a url"""
+        _, session = self._get_session(**kwargs)
+        return await session.page.content()
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.close_sessions()
+        await self.stop_playwright()

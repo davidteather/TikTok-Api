@@ -1,12 +1,18 @@
 from TikTokApi import TikTokApi
 import os
+import pytest
+
+ms_token = os.environ.get("ms_token", None)
 
 
-def test_video_attributes():
-    with TikTokApi(custom_verify_fp=os.environ.get("verifyFp", None)) as api:
+@pytest.mark.asyncio
+async def test_hashtag_videos():
+    async with TikTokApi() as api:
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
         tag_name = "funny"
-        for video in api.hashtag(name=tag_name).videos():
-            # Test hashtags on video.
+        count = 0
+        async for video in api.hashtag(name=tag_name).videos(count=1):
+            count += 1
             tag_included = False
             for tag in video.hashtags:
                 if tag.name == tag_name:
@@ -22,3 +28,5 @@ def test_video_attributes():
             assert video.author is not None
             assert video.author.user_id is not None
             assert video.author.sec_uid is not None
+
+        assert count > 0

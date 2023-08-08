@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import ClassVar, Optional
-from typing import TYPE_CHECKING, ClassVar, Iterator, Optional
+from typing import TYPE_CHECKING, ClassVar, Optional
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -13,10 +13,11 @@ class Comment:
     A TikTok Comment.
 
     Example Usage
-    ```py
-    for comment in video.comments:
-        print(comment.text)
-    ```
+        .. code-block:: python
+
+            for comment in video.comments:
+                print(comment.text)
+                print(comment.as_dict)
     """
 
     parent: ClassVar[TikTokApi]
@@ -38,6 +39,7 @@ class Comment:
             self.__extract_from_data()
 
     def __extract_from_data(self):
+        data = self.as_dict
         self.id = self.as_dict["cid"]
         self.text = self.as_dict["text"]
 
@@ -51,12 +53,6 @@ class Comment:
         return self.__str__()
 
     def __str__(self):
-        return f"TikTokApi.comment(comment_id='{self.id}', text='{self.text}')"
-
-    def __getattr__(self, name):
-        if name in ["as_dict"]:
-            self.as_dict = self.info()
-            self.__extract_from_data()
-            return self.__getattribute__(name)
-
-        raise AttributeError(f"{name} doesn't exist on TikTokApi.api.Comment")
+        id = getattr(self, "id", None)
+        text = getattr(self, "text", None)
+        return f"TikTokApi.comment(comment_id='{id}', text='{text}')"

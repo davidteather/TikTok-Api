@@ -1,14 +1,6 @@
 from __future__ import annotations
-
-import json
-import requests
-
-from urllib.parse import quote, urlencode
-
-from ..exceptions import *
-from ..helpers import extract_tag_contents
-
 from typing import TYPE_CHECKING, ClassVar, Iterator, Optional
+from ..exceptions import InvalidResponseException
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -19,21 +11,16 @@ class User:
     """
     A TikTok User.
 
-    Example Usage
-    ```py
-    user = api.user(username='therock')
-    # or
-    user_id = '5831967'
-    sec_uid = 'MS4wLjABAAAA-VASjiXTh7wDDyXvjk10VFhMWUAoxr8bgfO1kAL1-9s'
-    user = api.user(user_id=user_id, sec_uid=sec_uid)
-    ```
+    Example Usage:
+        .. code-block:: python
 
+            user = api.user(username='therock')
     """
 
     parent: ClassVar[TikTokApi]
 
     user_id: str
-    """The user ID of the user."""
+    """The  ID of the user."""
     sec_uid: str
     """The sec UID of the user."""
     username: str
@@ -57,213 +44,125 @@ class User:
             self.as_dict = data
             self.__extract_from_data()
 
-    def info(self, **kwargs):
-        """
-        Returns a dictionary of TikTok's User object
-
-        Example Usage
-        ```py
-        user_data = api.user(username='therock').info()
-        ```
-        """
-        return self.info_full(**kwargs)["user"]
-
-    def info_full(self, **kwargs) -> dict:
+    async def info(self, **kwargs) -> dict:
         """
         Returns a dictionary of information associated with this User.
-        Includes statistics about this user.
 
-        Example Usage
-        ```py
-        user_data = api.user(username='therock').info_full()
-        ```
+        Returns:
+            dict: A dictionary of information associated with this User.
+
+        Raises:
+            InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.
+
+        Example Usage:
+            .. code-block:: python
+
+                user_data = await api.user(username='therock').info()
         """
 
-        # TODO: Find the one using only user_id & sec_uid
-        if not self.username:
+        username = getattr(self, "username", None)
+        if not username:
             raise TypeError(
                 "You must provide the username when creating this class to use this method."
             )
 
-        quoted_username = quote(self.username)
-        r = requests.get(
-            "https://tiktok.com/@{}?lang=en".format(quoted_username),
-            headers={
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "path": "/@{}".format(quoted_username),
-                "Accept-Encoding": "gzip, deflate",
-                "Connection": "keep-alive",
-                "User-Agent": self.parent._user_agent,
-            },
-            proxies=User.parent._format_proxy(kwargs.get("proxy", None)),
-            cookies=User.parent._get_cookies(**kwargs),
-            **User.parent._requests_extra_kwargs,
-        )
-
-        data = extract_tag_contents(r.text)
-        user = json.loads(data)
-
-        user_props = user["props"]["pageProps"]
-        if user_props["statusCode"] == 404:
-            raise NotFoundException(
-                "TikTok user with username {} does not exist".format(self.username)
-            )
-
-        return user_props["userInfo"]
-
-        """
-        TODO: There is a route for user info, but uses msToken :\
-        processed = self.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = processed.device_id
-
-        query = {
-            "uniqueId": "therock",
-            "secUid": "",
-            "msToken": User.parent._get_cookies()["msToken"]
+        sec_uid = getattr(self, "sec_uid", None)
+        url_params = {
+            "secUid": sec_uid if sec_uid is not None else "",
+            "uniqueId": username,
+            "msToken": kwargs.get("ms_token"),
         }
 
-        path = "api/user/detail/?{}&{}".format(
-            User.parent._add_url_params(), urlencode(query)
+        resp = await self.parent.make_request(
+            url="https://www.tiktok.com/api/user/detail/",
+            params=url_params,
+            headers=kwargs.get("headers"),
+            session_index=kwargs.get("session_index"),
         )
 
-        res = User.parent.get_data(path, subdomain="m", **kwargs)
-        print(res)
+        if resp is None:
+            raise InvalidResponseException(resp, "TikTok returned an invalid response.")
 
-        return res["userInfo"]"""
+        self.as_dict = resp
+        self.__extract_from_data()
+        return resp
 
-    def videos(self, count=30, cursor=0, **kwargs) -> Iterator[Video]:
+    async def videos(self, count=30, cursor=0, **kwargs) -> Iterator[Video]:
         """
-        Returns an iterator yielding Video objects.
+        Returns a user's videos.
 
-        - Parameters:
-            - count (int): The amount of videos you want returned.
-            - cursor (int): The unix epoch to get uploaded videos since.
+        Args:
+            count (int): The amount of videos you want returned.
+            cursor (int): The the offset of videos from 0 you want to get.
 
-        Example Usage
-        ```py
-        user = api.user(username='therock')
-        for video in user.videos(count=100):
-            # do something
-        ```
+        Returns:
+            async iterator/generator: Yields TikTokApi.video objects.
+
+        Raises:
+            InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.
+
+        Example Usage:
+            .. code-block:: python
+
+                async for video in api.user(username="davidteathercodes").videos():
+                    # do something
         """
-        processed = User.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = processed.device_id
+        sec_uid = getattr(self, "sec_uid", None)
+        if sec_uid is None or sec_uid == "":
+            await self.info(**kwargs)
 
-        if not self.user_id and not self.sec_uid:
-            self.__find_attributes()
-
-        first = True
-        amount_yielded = 0
-
-        while amount_yielded < count:
-            query = {
-                "count": 30,
-                "id": self.user_id,
-                "cursor": cursor,
-                "type": 1,
+        found = 0
+        while found < count:
+            params = {
                 "secUid": self.sec_uid,
-                "sourceType": 8,
-                "appId": 1233,
-                "region": processed.region,
-                "priority_region": processed.region,
-                "language": processed.language,
+                "count": 35,
+                "cursor": cursor,
             }
-            path = "api/post/item_list/?{}&{}".format(
-                User.parent._add_url_params(), urlencode(query)
+
+            resp = await self.parent.make_request(
+                url="https://www.tiktok.com/api/post/item_list/",
+                params=params,
+                headers=kwargs.get("headers"),
+                session_index=kwargs.get("session_index"),
             )
 
-            res = User.parent.get_data(path, send_tt_params=True, **kwargs)
-
-            videos = res.get("itemList", [])
-            for video in videos:
-                amount_yielded += 1
-                yield self.parent.video(data=video)
-
-            if not res.get("hasMore", False) and not first:
-                User.parent.logger.info(
-                    "TikTok isn't sending more TikToks beyond this point."
+            if resp is None:
+                raise InvalidResponseException(
+                    resp, "TikTok returned an invalid response."
                 )
+
+            for video in resp.get("itemList", []):
+                yield self.parent.video(data=video)
+                found += 1
+
+            if not resp.get("hasMore", False):
                 return
 
-            cursor = res["cursor"]
-            first = False
+            cursor = resp.get("cursor")
 
     def liked(self, count: int = 30, cursor: int = 0, **kwargs) -> Iterator[Video]:
         """
         Returns a dictionary listing TikToks that a given a user has liked.
 
-        **Note**: The user's likes must be **public** (which is not the default option)
-
-        - Parameters:
-            - count (int): The amount of videos you want returned.
-            - cursor (int): The unix epoch to get uploaded videos since.
-
-        Example Usage
-        ```py
-        for liked_video in api.user(username='public_likes'):
-            # do something
-        ```
+        TODO: Not currently implemented
         """
-        processed = User.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = processed.device_id
-
-        amount_yielded = 0
-        first = True
-
-        if self.user_id is None and self.sec_uid is None:
-            self.__find_attributes()
-
-        while amount_yielded < count:
-            query = {
-                "count": 30,
-                "id": self.user_id,
-                "type": 2,
-                "secUid": self.sec_uid,
-                "cursor": cursor,
-                "sourceType": 9,
-                "appId": 1233,
-                "region": processed.region,
-                "priority_region": processed.region,
-                "language": processed.language,
-            }
-            path = "api/favorite/item_list/?{}&{}".format(
-                User.parent._add_url_params(), urlencode(query)
-            )
-
-            res = self.parent.get_data(path, **kwargs)
-
-            if "itemList" not in res.keys():
-                if first:
-                    User.parent.logger.error("User's likes are most likely private")
-                return
-
-            videos = res.get("itemList", [])
-            for video in videos:
-                amount_yielded += 1
-                yield self.parent.video(data=video)
-
-            if not res.get("hasMore", False) and not first:
-                User.parent.logger.info(
-                    "TikTok isn't sending more TikToks beyond this point."
-                )
-                return
-
-            cursor = res["cursor"]
-            first = False
+        raise NotImplementedError
 
     def __extract_from_data(self):
         data = self.as_dict
         keys = data.keys()
 
-        if "user_info" in keys:
+        if "userInfo" in keys:
             self.__update_id_sec_uid_username(
-                data["user_info"]["uid"],
-                data["user_info"]["sec_uid"],
-                data["user_info"]["unique_id"],
+                data["userInfo"]["user"]["id"],
+                data["userInfo"]["user"]["secUid"],
+                data["userInfo"]["user"]["uniqueId"],
             )
-        elif "uniqueId" in keys:
+        else:
             self.__update_id_sec_uid_username(
-                data["id"], data["secUid"], data["uniqueId"]
+                data["id"],
+                data["secUid"],
+                data["uniqueId"],
             )
 
         if None in (self.username, self.user_id, self.sec_uid):
@@ -276,31 +175,11 @@ class User:
         self.sec_uid = sec_uid
         self.username = username
 
-    def __find_attributes(self) -> None:
-        # It is more efficient to check search first, since self.user_object() makes HTML request.
-        found = False
-        for u in self.parent.search.users(self.username):
-            if u.username == self.username:
-                found = True
-                self.__update_id_sec_uid_username(u.user_id, u.sec_uid, u.username)
-                break
-
-        if not found:
-            user_object = self.info()
-            self.__update_id_sec_uid_username(
-                user_object["id"], user_object["secUid"], user_object["uniqueId"]
-            )
-
     def __repr__(self):
         return self.__str__()
 
     def __str__(self):
-        return f"TikTokApi.user(username='{self.username}', user_id='{self.user_id}', sec_uid='{self.sec_uid}')"
-
-    def __getattr__(self, name):
-        if name in ["as_dict"]:
-            self.as_dict = self.info()
-            self.__extract_from_data()
-            return self.__getattribute__(name)
-
-        raise AttributeError(f"{name} doesn't exist on TikTokApi.api.User")
+        username = getattr(self, "username", None)
+        user_id = getattr(self, "user_id", None)
+        sec_uid = getattr(self, "sec_uid", None)
+        return f"TikTokApi.user(username='{username}', user_id='{user_id}', sec_uid='{sec_uid}')"

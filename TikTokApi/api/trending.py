@@ -1,13 +1,6 @@
 from __future__ import annotations
-
-import logging
-import requests
-from urllib.parse import urlencode
-
+from ..exceptions import InvalidResponseException
 from .video import Video
-from .sound import Sound
-from .user import User
-from .hashtag import Hashtag
 
 from typing import TYPE_CHECKING, Iterator
 
@@ -16,55 +9,52 @@ if TYPE_CHECKING:
 
 
 class Trending:
-    """Contains static methods related to trending."""
+    """Contains static methods related to trending objects on TikTok."""
 
     parent: TikTokApi
 
     @staticmethod
-    def videos(count=30, **kwargs) -> Iterator[Video]:
+    async def videos(count=30, **kwargs) -> Iterator[Video]:
         """
         Returns Videos that are trending on TikTok.
 
-        - Parameters:
-            - count (int): The amount of videos you want returned.
+        Args:
+            count (int): The amount of videos you want returned.
+
+        Returns:
+            async iterator/generator: Yields TikTokApi.video objects.
+
+        Raises:
+            InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.
+
+        Example Usage:
+            .. code-block:: python
+
+                async for video in api.trending.videos():
+                    # do something
         """
-
-        processed = Trending.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = processed.device_id
-
-        spawn = requests.head(
-            "https://www.tiktok.com",
-            proxies=Trending.parent._format_proxy(processed.proxy),
-            **Trending.parent._requests_extra_kwargs,
-        )
-        ttwid = spawn.cookies["ttwid"]
-
-        first = True
-        amount_yielded = 0
-
-        while amount_yielded < count:
-            query = {
+        found = 0
+        while found < count:
+            params = {
+                "from_page": "fyp",
                 "count": 30,
-                "id": 1,
-                "sourceType": 12,
-                "itemID": 1,
-                "insertedItemID": "",
-                "region": processed.region,
-                "priority_region": processed.region,
-                "language": processed.language,
             }
-            path = "api/recommend/item_list/?{}&{}".format(
-                Trending.parent._add_url_params(), urlencode(query)
+
+            resp = await Trending.parent.make_request(
+                url="https://www.tiktok.com/api/recommend/item_list/",
+                params=params,
+                headers=kwargs.get("headers"),
+                session_index=kwargs.get("session_index"),
             )
-            res = Trending.parent.get_data(path, ttwid=ttwid, **kwargs)
-            for result in res.get("itemList", []):
-                yield Video(data=result)
-            amount_yielded += len(res.get("itemList", []))
 
-            if not res.get("hasMore", False) and not first:
-                Trending.parent.logger.info(
-                    "TikTok isn't sending more TikToks beyond this point."
+            if resp is None:
+                raise InvalidResponseException(
+                    resp, "TikTok returned an invalid response."
                 )
-                return
 
-            first = False
+            for video in resp.get("itemList", []):
+                yield Trending.parent.video(data=video)
+                found += 1
+
+            if not resp.get("hasMore", False):
+                return

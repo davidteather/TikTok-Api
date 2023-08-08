@@ -1,14 +1,14 @@
 class TikTokException(Exception):
     """Generic exception that all other TikTok errors are children of."""
 
-    def __init__(self, error_code, raw_response, message):
+    def __init__(self, raw_response, message, error_code=None):
         self.error_code = error_code
         self.raw_response = raw_response
         self.message = message
         super().__init__(self.message)
 
     def __str__(self):
-        return f'{self.error_code} -> {self.message}'
+        return f"{self.error_code} -> {self.message}"
 
 
 class CaptchaException(TikTokException):
@@ -28,8 +28,8 @@ class SoundRemovedException(TikTokException):
 
 
 class InvalidJSONException(TikTokException):
-    """TikTok returned invalid JSON."""
+    """TikTok returned invalid JSON.""" 
 
 
-class NotAvailableException(TikTokException):
-    """The requested object is not available in this region."""
+class InvalidResponseException(TikTokException):
+    """The response from TikTok was invalid."""

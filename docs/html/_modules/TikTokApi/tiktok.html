@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTokApi.tiktok &mdash; TikTokAPI v6.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            TikTokAPI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">TikTokAPI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">TikTokApi.tiktok</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for TikTokApi.tiktok</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">dataclasses</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">from</span> <span class="nn">playwright.async_api</span> <span class="kn">import</span> <span class="n">async_playwright</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlencode</span><span class="p">,</span> <span class="n">quote</span><span class="p">,</span> <span class="n">urlparse</span>
+<span class="kn">from</span> <span class="nn">.stealth</span> <span class="kn">import</span> <span class="n">stealth_async</span>
+<span class="kn">from</span> <span class="nn">.helpers</span> <span class="kn">import</span> <span class="n">random_choice</span>
+
+<span class="kn">from</span> <span class="nn">.api.user</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">.api.video</span> <span class="kn">import</span> <span class="n">Video</span>
+<span class="kn">from</span> <span class="nn">.api.sound</span> <span class="kn">import</span> <span class="n">Sound</span>
+<span class="kn">from</span> <span class="nn">.api.hashtag</span> <span class="kn">import</span> <span class="n">Hashtag</span>
+<span class="kn">from</span> <span class="nn">.api.comment</span> <span class="kn">import</span> <span class="n">Comment</span>
+<span class="kn">from</span> <span class="nn">.api.trending</span> <span class="kn">import</span> <span class="n">Trending</span>
+<span class="kn">from</span> <span class="nn">.api.search</span> <span class="kn">import</span> <span class="n">Search</span>
+
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">InvalidJSONException</span><span class="p">,</span>
+    <span class="n">EmptyResponseException</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="TikTokPlaywrightSession"><a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokPlaywrightSession">[docs]</a><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">TikTokPlaywrightSession</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A TikTok session using Playwright&quot;&quot;&quot;</span>
+
+    <span class="n">context</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">page</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">proxy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ms_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://www.tiktok.com&quot;</span></div>
+
+
+<div class="viewcode-block" id="TikTokApi"><a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi">[docs]</a><span class="k">class</span> <span class="nc">TikTokApi</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The main TikTokApi class that contains all the endpoints.</span>
+
+<span class="sd">    Import With:</span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            from TikTokApi import TikTokApi</span>
+<span class="sd">            api = TikTokApi()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="n">User</span>
+    <span class="n">video</span> <span class="o">=</span> <span class="n">Video</span>
+    <span class="n">sound</span> <span class="o">=</span> <span class="n">Sound</span>
+    <span class="n">hashtag</span> <span class="o">=</span> <span class="n">Hashtag</span>
+    <span class="n">comment</span> <span class="o">=</span> <span class="n">Comment</span>
+    <span class="n">trending</span> <span class="o">=</span> <span class="n">Trending</span>
+    <span class="n">search</span> <span class="o">=</span> <span class="n">Search</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logging_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">,</span> <span class="n">logger_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a TikTokApi object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logging_level (int): The logging level you want to use.</span>
+<span class="sd">            logger_name (str): The name of the logger you want to use.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">logger_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger_name</span> <span class="o">=</span> <span class="vm">__name__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__create_logger</span><span class="p">(</span><span class="n">logger_name</span><span class="p">,</span> <span class="n">logging_level</span><span class="p">)</span>
+
+        <span class="n">User</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">Video</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">Sound</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">Hashtag</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">Comment</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">Trending</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">Search</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__create_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a logger for the class.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+        <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(name)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">__set_session_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">TikTokPlaywrightSession</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the session params for a TikTokPlaywrightSession&quot;&quot;&quot;</span>
+        <span class="n">user_agent</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;() =&gt; navigator.userAgent&quot;</span><span class="p">)</span>
+        <span class="n">language</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="s2">&quot;() =&gt; navigator.language || navigator.userLanguage&quot;</span>
+        <span class="p">)</span>
+        <span class="n">platform</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;() =&gt; navigator.platform&quot;</span><span class="p">)</span>
+        <span class="n">device_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="mi">18</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">19</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># Random device id</span>
+        <span class="n">history_len</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>  <span class="c1"># Random history length</span>
+        <span class="n">screen_height</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">1080</span><span class="p">))</span>  <span class="c1"># Random screen height</span>
+        <span class="n">screen_width</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">1920</span><span class="p">))</span>  <span class="c1"># Random screen width</span>
+        <span class="n">timezone</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="s2">&quot;() =&gt; Intl.DateTimeFormat().resolvedOptions().timeZone&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">session_params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;aid&quot;</span><span class="p">:</span> <span class="s2">&quot;1988&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;app_language&quot;</span><span class="p">:</span> <span class="n">language</span><span class="p">,</span>
+            <span class="s2">&quot;app_name&quot;</span><span class="p">:</span> <span class="s2">&quot;tiktok_web&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;browser_language&quot;</span><span class="p">:</span> <span class="n">language</span><span class="p">,</span>
+            <span class="s2">&quot;browser_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Mozilla&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;browser_online&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;browser_platform&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="p">,</span>
+            <span class="s2">&quot;browser_version&quot;</span><span class="p">:</span> <span class="n">user_agent</span><span class="p">,</span>
+            <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="s2">&quot;tiktok_web&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cookie_enabled&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;device_id&quot;</span><span class="p">:</span> <span class="n">device_id</span><span class="p">,</span>
+            <span class="s2">&quot;device_platform&quot;</span><span class="p">:</span> <span class="s2">&quot;web_pc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;focus_state&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;from_page&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;history_len&quot;</span><span class="p">:</span> <span class="n">history_len</span><span class="p">,</span>
+            <span class="s2">&quot;is_fullscreen&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;is_page_visible&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="n">language</span><span class="p">,</span>
+            <span class="s2">&quot;os&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="p">,</span>
+            <span class="s2">&quot;priority_region&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;referer&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span>  <span class="c1"># TODO: TikTokAPI option</span>
+            <span class="s2">&quot;screen_height&quot;</span><span class="p">:</span> <span class="n">screen_height</span><span class="p">,</span>
+            <span class="s2">&quot;screen_width&quot;</span><span class="p">:</span> <span class="n">screen_width</span><span class="p">,</span>
+            <span class="s2">&quot;tz_name&quot;</span><span class="p">:</span> <span class="n">timezone</span><span class="p">,</span>
+            <span class="s2">&quot;webcast_language&quot;</span><span class="p">:</span> <span class="n">language</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">session_params</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">__create_session</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://www.tiktok.com&quot;</span><span class="p">,</span>
+        <span class="n">ms_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">proxy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">context_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">sleep_after</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">cookies</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a TikTokPlaywrightSession&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ms_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cookies</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cookies</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">cookies</span><span class="p">[</span><span class="s2">&quot;msToken&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ms_token</span>
+
+        <span class="n">context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">(</span><span class="n">proxy</span><span class="o">=</span><span class="n">proxy</span><span class="p">,</span> <span class="o">**</span><span class="n">context_options</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cookies</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">formatted_cookies</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span> <span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/&quot;</span><span class="p">}</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cookies</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="p">]</span>
+            <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">add_cookies</span><span class="p">(</span><span class="n">formatted_cookies</span><span class="p">)</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">stealth_async</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+
+        <span class="c1"># Get the request headers to the url</span>
+        <span class="n">request_headers</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">def</span> <span class="nf">handle_request</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+            <span class="k">nonlocal</span> <span class="n">request_headers</span>
+            <span class="n">request_headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span>
+
+        <span class="n">page</span><span class="o">.</span><span class="n">once</span><span class="p">(</span><span class="s2">&quot;request&quot;</span><span class="p">,</span> <span class="n">handle_request</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="n">session</span> <span class="o">=</span> <span class="n">TikTokPlaywrightSession</span><span class="p">(</span>
+            <span class="n">context</span><span class="p">,</span>
+            <span class="n">page</span><span class="p">,</span>
+            <span class="n">ms_token</span><span class="o">=</span><span class="n">ms_token</span><span class="p">,</span>
+            <span class="n">proxy</span><span class="o">=</span><span class="n">proxy</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">request_headers</span><span class="p">,</span>
+            <span class="n">base_url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">ms_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">sleep_after</span><span class="p">)</span>  <span class="c1"># TODO: Find a better way to wait for msToken</span>
+            <span class="n">cookies</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_session_cookies</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+            <span class="n">ms_token</span> <span class="o">=</span> <span class="n">cookies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;msToken&quot;</span><span class="p">)</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">ms_token</span> <span class="o">=</span> <span class="n">ms_token</span>
+            <span class="k">if</span> <span class="n">ms_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to get msToken on session index </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span><span class="si">}</span><span class="s2">, you should consider specifying ms_tokens&quot;</span>
+                <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">__set_session_params</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TikTokApi.create_sessions"><a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.create_sessions">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">create_sessions</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">num_sessions</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">headless</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">ms_tokens</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">proxies</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sleep_after</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">starting_url</span><span class="o">=</span><span class="s2">&quot;https://www.tiktok.com&quot;</span><span class="p">,</span>
+        <span class="n">context_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">override_browser_args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cookies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create sessions for use within the TikTokApi class.</span>
+
+<span class="sd">        These sessions are what will carry out requesting your data from TikTok.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            num_sessions (int): The amount of sessions you want to create.</span>
+<span class="sd">            headless (bool): Whether or not you want the browser to be headless.</span>
+<span class="sd">            ms_tokens (list[str]): A list of msTokens to use for the sessions, you can get these from your cookies after visiting TikTok.</span>
+<span class="sd">                                   If you don&#39;t provide any, the sessions will try to get them themselves, but this is not guaranteed to work.</span>
+<span class="sd">            proxies (list): A list of proxies to use for the sessions</span>
+<span class="sd">            sleep_after (int): The amount of time to sleep after creating a session, this is to allow the msToken to be generated.</span>
+<span class="sd">            starting_url (str): The url to start the sessions on, this is usually https://www.tiktok.com.</span>
+<span class="sd">            context_options (dict): Options to pass to the playwright context.</span>
+<span class="sd">            override_browser_args (list[dict]): A list of dictionaries containing arguments to pass to the browser.</span>
+<span class="sd">            cookies (list[dict]): A list of cookies to use for the sessions, you can get these from your cookies after visiting TikTok.</span>
+
+<span class="sd">        Example Usage:</span>
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                from TikTokApi import TikTokApi</span>
+<span class="sd">                with TikTokApi() as api:</span>
+<span class="sd">                    await api.create_sessions(num_sessions=5, ms_tokens=[&#39;msToken1&#39;, &#39;msToken2&#39;])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_playwright</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">headless</span> <span class="ow">and</span> <span class="n">override_browser_args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">override_browser_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;--headless=new&quot;</span><span class="p">]</span>
+            <span class="n">headless</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># managed by the arg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">chromium</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
+            <span class="n">headless</span><span class="o">=</span><span class="n">headless</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">override_browser_args</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="o">*</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__create_session</span><span class="p">(</span>
+                    <span class="n">proxy</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">proxies</span><span class="p">),</span>
+                    <span class="n">ms_token</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">ms_tokens</span><span class="p">),</span>
+                    <span class="n">url</span><span class="o">=</span><span class="n">starting_url</span><span class="p">,</span>
+                    <span class="n">context_options</span><span class="o">=</span><span class="n">context_options</span><span class="p">,</span>
+                    <span class="n">sleep_after</span><span class="o">=</span><span class="n">sleep_after</span><span class="p">,</span>
+                    <span class="n">cookies</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">cookies</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_sessions</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_sessions</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span></div>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">close_sessions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close all the sessions. Should be called when you&#39;re done with the TikTokApi object</span>
+
+<span class="sd">        This is called automatically when using the TikTokApi with &quot;with&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TikTokApi.generate_js_fetch"><a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.generate_js_fetch">[docs]</a>    <span class="k">def</span> <span class="nf">generate_js_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a javascript fetch function for use in playwright&quot;&quot;&quot;</span>
+        <span class="n">headers_js</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            () =&gt; </span><span class="se">{{</span>
+<span class="s2">                return new Promise((resolve, reject) =&gt; </span><span class="se">{{</span>
+<span class="s2">                    fetch(&#39;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&#39;, </span><span class="se">{{</span><span class="s2"> method: &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39;, headers: </span><span class="si">{</span><span class="n">headers_js</span><span class="si">}</span><span class="s2"> </span><span class="se">}}</span><span class="s2">)</span>
+<span class="s2">                        .then(response =&gt; response.text())</span>
+<span class="s2">                        .then(data =&gt; resolve(data))</span>
+<span class="s2">                        .catch(error =&gt; reject(error.message));</span>
+<span class="s2">                </span><span class="se">}}</span><span class="s2">);</span>
+<span class="s2">            </span><span class="se">}}</span>
+<span class="s2">        &quot;&quot;&quot;</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a random session</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            session_index (int): The index of the session you want to use, if not provided a random session will be used.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The index of the session.</span>
+<span class="sd">            TikTokPlaywrightSession: The session.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_index&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;session_index&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_sessions</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+<div class="viewcode-block" id="TikTokApi.get_session_cookies"><a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.get_session_cookies">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_session_cookies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the cookies for a session</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            session (TikTokPlaywrightSession): The session to get the cookies for.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The cookies for the session.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cookies</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">cookie</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]:</span> <span class="n">cookie</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">cookie</span> <span class="ow">in</span> <span class="n">cookies</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="TikTokApi.run_fetch_script"><a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.run_fetch_script">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">run_fetch_script</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a javascript fetch function in a session</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str): The url to fetch.</span>
+<span class="sd">            headers (dict): The headers to use for the fetch.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            any: The result of the fetch. Seems to be a string or dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">js_script</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_js_fetch</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">js_script</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="TikTokApi.generate_x_bogus"><a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.generate_x_bogus">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">generate_x_bogus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate the X-Bogus header for a url&quot;&quot;&quot;</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;() =&gt; </span><span class="se">{{</span><span class="s1"> return window.byted_acrawler.frontierSign(&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1">&quot;) </span><span class="se">}}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="TikTokApi.sign_url"><a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.sign_url">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">sign_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sign a url&quot;&quot;&quot;</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># TODO: Would be nice to generate msToken here</span>
+
+        <span class="c1"># Add X-Bogus to url</span>
+        <span class="n">x_bogus</span> <span class="o">=</span> <span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_x_bogus</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">session_index</span><span class="o">=</span><span class="n">i</span><span class="p">))</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X-Bogus&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">x_bogus</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Failed to generate X-Bogus&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;?&quot;</span> <span class="ow">in</span> <span class="n">url</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;&amp;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;?&quot;</span>
+        <span class="n">url</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;X-Bogus=</span><span class="si">{</span><span class="n">x_bogus</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">url</span></div>
+
+<div class="viewcode-block" id="TikTokApi.make_request"><a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.make_request">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">make_request</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">exponential_backoff</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Makes a request to TikTok through a session.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str): The url to make the request to.</span>
+<span class="sd">            headers (dict): The headers to use for the request.</span>
+<span class="sd">            params (dict): The params to use for the request.</span>
+<span class="sd">            retries (int): The amount of times to retry the request if it fails.</span>
+<span class="sd">            exponential_backoff (bool): Whether or not to use exponential backoff when retrying the request.</span>
+<span class="sd">            session_index (int): The index of the session you want to use, if not provided a random session will be used.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The json response from TikTok.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the request fails.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">session</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">headers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="o">**</span><span class="n">headers</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">headers</span>
+
+        <span class="c1"># get msToken</span>
+        <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;msToken&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># try to get msToken from session</span>
+            <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">ms_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;msToken&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">ms_token</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># we&#39;ll try to read it from cookies</span>
+                <span class="n">cookies</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_session_cookies</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+                <span class="n">ms_token</span> <span class="o">=</span> <span class="n">cookies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;msToken&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ms_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="s2">&quot;Failed to get msToken from cookies, trying to make the request anyway (probably will fail)&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;msToken&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ms_token</span>
+
+        <span class="n">encoded_params</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">?</span><span class="si">{</span><span class="n">urlencode</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="n">quote_via</span><span class="o">=</span><span class="n">quote</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">signed_url</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">sign_url</span><span class="p">(</span><span class="n">encoded_params</span><span class="p">,</span> <span class="n">session_index</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+
+        <span class="n">retry_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">retries</span><span class="p">:</span>
+            <span class="n">retry_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_fetch_script</span><span class="p">(</span>
+                <span class="n">signed_url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">session_index</span><span class="o">=</span><span class="n">i</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;TikTokApi.run_fetch_script returned None&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">EmptyResponseException</span><span class="p">()</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status_code&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Got an unexpected status code: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">data</span>
+            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">retry_count</span> <span class="o">==</span> <span class="n">retries</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to decode json response: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">InvalidJSONException</span><span class="p">()</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed a request, retrying (</span><span class="si">{</span><span class="n">retry_count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">retries</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">exponential_backoff</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">retry_count</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TikTokApi.close_sessions"><a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.close_sessions">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">close_sessions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close all the sessions. Should be called when you&#39;re done with the TikTokApi object&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TikTokApi.stop_playwright"><a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.stop_playwright">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">stop_playwright</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the playwright browser&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TikTokApi.get_session_content"><a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.get_session_content">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_session_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the content of a url&quot;&quot;&quot;</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">content</span><span class="p">()</span></div>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc</span><span class="p">,</span> <span class="n">tb</span><span class="p">):</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_sessions</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_playwright</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, David Teather.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
