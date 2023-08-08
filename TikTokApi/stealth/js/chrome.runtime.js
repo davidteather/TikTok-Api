@@ -83,7 +83,7 @@ if (!(existsAlready || (isNotSecure && !opts.runOnInsecureOrigins))) {
     })
 
     // Valid Extension IDs are 32 characters in length and use the letter `a` to `p`:
-    // https://source.chromium.org/chromium/chromium/src/+/master:components/crx_file/id_util.cc;drc=14a055ccb17e8c8d5d437fe080faba4c6f07beac;l=90
+    // https://source.chromium.org/chromium/chromium/src/+/main:components/crx_file/id_util.cc;drc=14a055ccb17e8c8d5d437fe080faba4c6f07beac;l=90
     const isValidExtensionID = str =>
         str.length === 32 && str.toLowerCase().match(/^[a-p]+$/)
 

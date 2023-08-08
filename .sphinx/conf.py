@@ -1,10 +1,10 @@
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+# https://www.sphinx-doc.org/en/main/usage/configuration.html
 
 # -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+# https://www.sphinx-doc.org/en/main/usage/configuration.html#project-information
 
 import sys
 import os
@@ -19,7 +19,7 @@ author = "David Teather"
 release = "v6.0.0"
 
 # -- General configuration ---------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+# https://www.sphinx-doc.org/en/main/usage/configuration.html#general-configuration
 
 extensions = [
     "sphinx.ext.autodoc",
@@ -37,8 +37,9 @@ napoleon_google_docstring = True
 
 
 # -- Options for HTML output -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+# https://www.sphinx-doc.org/en/main/usage/configuration.html#options-for-html-output
 
 html_theme = "sphinx_rtd_theme"
+html_baseurl = "https://davidteather.github.io/TikTok-Api/"
 
 source_suffix = {".rst": "restructuredtext", ".md": "markdown"}

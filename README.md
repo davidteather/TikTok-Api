@@ -3,7 +3,7 @@
 
 This is an unofficial api wrapper for TikTok.com in python. With this api you are able to call most trending and fetch specific user information as well as much more.
 
- [![DOI](https://zenodo.org/badge/188710490.svg)](https://zenodo.org/badge/latestdoi/188710490) [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white&style=flat-square)](https://www.linkedin.com/in/davidteather/) [![Sponsor Me](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub)](https://github.com/sponsors/davidteather)  [![GitHub release (latest by date)](https://img.shields.io/github/v/release/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/releases) [![GitHub](https://img.shields.io/github/license/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/tiktokapi)](https://pypi.org/project/TikTokApi/) ![](https://visitor-badge.laobi.icu/badge?page_id=davidteather.TikTok-Api) [![Support Server](https://img.shields.io/discord/783108952111579166.svg?color=7289da&logo=discord&style=flat-square)](https://discord.gg/yyPhbfma6f)
+ [![DOI](https://zenodo.org/badge/188710490.svg)](https://zenodo.org/badge/latestdoi/188710490) [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white&style=flat-square)](https://www.linkedin.com/in/davidteather/) [![Sponsor Me](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub)](https://github.com/sponsors/davidteather)  [![GitHub release (latest by date)](https://img.shields.io/github/v/release/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/releases) [![GitHub](https://img.shields.io/github/license/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/blob/main/LICENSE) [![Downloads](https://pepy.tech/badge/tiktokapi)](https://pypi.org/project/TikTokApi/) ![](https://visitor-badge.laobi.icu/badge?page_id=davidteather.TikTok-Api) [![Support Server](https://img.shields.io/discord/783108952111579166.svg?color=7289da&logo=discord&style=flat-square)](https://discord.gg/yyPhbfma6f)
 
 This api is designed to **retrieve data** TikTok. It **can not be used post or upload** content to TikTok on the behalf of a user. It has **no support any user-authenticated routes**, if you can't access it while being logged out on their website you can't access it here.
 
@@ -12,14 +12,14 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
 
 <div align="center">
     <a href="https://tikapi.io/?ref=davidteather" target="_blank">
-        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/master/imgs/tikapi.png" width="100" alt="TikApi">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/tikapi.png" width="100" alt="TikApi">
         <div>
             <b>TikAPI</b> is a paid TikTok API service providing a full out-of-the-box solution, making life easier for developers — trusted by 500+ companies.
         </div>
     </a>
     <br>
     <a href="https://www.ensembledata.com/?utm_source=github&utm_medium=githubpage&utm_campaign=david_thea_github&utm_id=david_thea_github" target="_blank">
-        <img src="https://raw.githubusercontent.com/andrearama/TikTok-Api/master/imgs/EnsembleData.png" width="100" alt="Ensemble Data">
+        <img src="https://raw.githubusercontent.com/andrearama/TikTok-Api/main/imgs/EnsembleData.png" width="100" alt="Ensemble Data">
         <b></b>
         <div>
             <b>Ensemble Data</b> is the leading API provider for scraping all the major Social Media. <br> We provide 100+ Million posts / day to the largest Marketing and Social listening platforms.
@@ -34,7 +34,7 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
     - [Installing](#installing)
     - [Common Issues](#common-issues)
 - [Quick Start Guide](#quick-start-guide)
-    - [Examples](https://github.com/davidteather/TikTok-Api/tree/master/examples)
+    - [Examples](https://github.com/davidteather/TikTok-Api/tree/main/examples)
 
 [**Upgrading from V5 to V6**](#upgrading-from-v5-to-v6)
 
@@ -85,7 +85,7 @@ Please don't open an issue if you're experiencing one of these just comment if t
 
 ## Quick Start Guide
 
-Here's a quick bit of code to get the most recent trending videos on TikTok. There's more examples in the [examples](https://github.com/davidteather/TikTok-Api/tree/master/examples) directory.
+Here's a quick bit of code to get the most recent trending videos on TikTok. There's more examples in the [examples](https://github.com/davidteather/TikTok-Api/tree/main/examples) directory.
 
 **Note:** If you want to learn how to web scrape websites check my [free and open-source course for web scraping](https://github.com/davidteather/web-scraping-with-reverse-engineering)
 
