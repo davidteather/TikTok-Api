@@ -19,7 +19,7 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
     </a>
     <br>
     <a href="https://www.ensembledata.com/?utm_source=github&utm_medium=githubpage&utm_campaign=david_thea_github&utm_id=david_thea_github" target="_blank">
-        <img src="https://raw.githubusercontent.com/andrearama/TikTok-Api/main/imgs/EnsembleData.png" width="100" alt="Ensemble Data">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/EnsembleData.png" width="100" alt="Ensemble Data">
         <b></b>
         <div>
             <b>Ensemble Data</b> is the leading API provider for scraping all the major Social Media. <br> We provide 100+ Million posts / day to the largest Marketing and Social listening platforms.
