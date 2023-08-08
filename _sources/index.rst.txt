@@ -14,8 +14,8 @@ View the above tree for detailed documentation on the package.
 
 TikTokAPI Full Documentation
 ==================
-* `TikTokAPI </TikTokAPI.html#TikTokApi.tiktok.TikTokApi>`_ (main parent class)
-* `TikTokAPI.api </TikTokAPI.api.html#TikTokApi.tiktok.TikTokApi>`_ (classes for each TikTok entity)
+* `TikTokApi <TikTokApi.html#TikTokApi.tiktok.TikTokApi>`_ (main parent class)
+* `TikTokApi.api <TikTokApi.api.html#TikTokApi.tiktok.TikTokApi>`_ (classes for each TikTok entity)
 
 * :ref:`modindex`
 * :ref:`search`
