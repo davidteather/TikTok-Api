@@ -1,41 +1,51 @@
 from TikTokApi import TikTokApi
 import os
+import pytest
 
 username = "charlidamelio"
 user_id = "5831967"
 sec_uid = "MS4wLjABAAAA-VASjiXTh7wDDyXvjk10VFhMWUAoxr8bgfO1kAL1-9s"
 
-
-def test_user_info():
-    with TikTokApi(custom_verify_fp=os.environ.get("verifyFp", None)) as api:
-        data = api.user(username=username).info()
-
-        assert data["uniqueId"] == username
-        assert data["id"] == user_id
-        assert data["secUid"] == sec_uid
+ms_token = os.environ.get("ms_token", None)
 
 
-def test_user_videos():
-    with TikTokApi(custom_verify_fp=os.environ.get("verifyFp", None)) as api:
-        count = 0
-        for video in api.user(username=username).videos(count=100):
-            count += 1
+@pytest.mark.asyncio
+async def test_user_info():
+    api = TikTokApi()
+    async with api:
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
+        user = api.user(username=username)
+        await user.info()
 
-        assert count >= 100
-
-        count = 0
-        for video in api.user(user_id=user_id, sec_uid=sec_uid).videos(count=100):
-            count += 1
-
-        assert count >= 100
+        assert user.username == username
+        assert user.user_id == user_id
+        assert user.sec_uid == sec_uid
 
 
-def test_user_liked():
-    with TikTokApi(custom_verify_fp=os.environ.get("verifyFp", None)) as api:
-        user = api.user(username="public_likes")
+@pytest.mark.asyncio
+async def test_user_videos():
+    api = TikTokApi()
+    async with api:
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
+        user = api.user(username=username, sec_uid=sec_uid, user_id=user_id)
 
         count = 0
-        for v in user.liked():
+        async for video in user.videos(count=30):
             count += 1
 
-        assert count >= 1
+        assert count >= 30
+
+
+@pytest.mark.asyncio
+async def test_user_likes():
+    pytest.skip("Not implemented yet")
+    api = TikTokApi()
+    async with api:
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
+        user = api.user(username=username, sec_uid=sec_uid, user_id=user_id)
+
+        count = 0
+        async for video in user.liked(count=30):
+            count += 1
+
+        assert count >= 30

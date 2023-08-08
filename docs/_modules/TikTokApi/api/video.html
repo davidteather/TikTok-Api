@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTokApi.api.video &mdash; TikTokAPI v6.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            TikTokAPI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">TikTokAPI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">TikTokApi.api.video</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for TikTokApi.api.video</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span> <span class="nn">..helpers</span> <span class="kn">import</span> <span class="n">extract_video_id_from_url</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="kn">import</span> <span class="n">InvalidResponseException</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">..tiktok</span> <span class="kn">import</span> <span class="n">TikTokApi</span>
+    <span class="kn">from</span> <span class="nn">.user</span> <span class="kn">import</span> <span class="n">User</span>
+    <span class="kn">from</span> <span class="nn">.sound</span> <span class="kn">import</span> <span class="n">Sound</span>
+    <span class="kn">from</span> <span class="nn">.hashtag</span> <span class="kn">import</span> <span class="n">Hashtag</span>
+    <span class="kn">from</span> <span class="nn">.comment</span> <span class="kn">import</span> <span class="n">Comment</span>
+
+
+<div class="viewcode-block" id="Video"><a class="viewcode-back" href="../../../api/video.html#TikTokApi.api.video.Video">[docs]</a><span class="k">class</span> <span class="nc">Video</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A TikTok Video class</span>
+
+<span class="sd">    Example Usage</span>
+<span class="sd">    ```py</span>
+<span class="sd">    video = api.video(id=&#39;7041997751718137094&#39;)</span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">parent</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">TikTokApi</span><span class="p">]</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;TikTok&#39;s ID of the Video&quot;&quot;&quot;</span>
+    <span class="n">url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The URL of the Video&quot;&quot;&quot;</span>
+    <span class="n">create_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The creation time of the Video&quot;&quot;&quot;</span>
+    <span class="n">stats</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;TikTok&#39;s stats of the Video&quot;&quot;&quot;</span>
+    <span class="n">author</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The User who created the Video&quot;&quot;&quot;</span>
+    <span class="n">sound</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sound</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Sound that is associated with the Video&quot;&quot;&quot;</span>
+    <span class="n">hashtags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Hashtag</span><span class="p">]]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A List of Hashtags on the Video&quot;&quot;&quot;</span>
+    <span class="n">as_dict</span><span class="p">:</span> <span class="nb">dict</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The raw data associated with this Video.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="nb">id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        You must provide the id or a valid url, else this will fail.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__extract_from_data</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">i</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">extract_video_id_from_url</span><span class="p">(</span>
+                <span class="n">url</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span>
+                <span class="n">proxy</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;proxy&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;proxy&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="n">session</span><span class="o">.</span><span class="n">proxy</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;You must provide id or url parameter.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Video.info"><a class="viewcode-back" href="../../../api/video.html#TikTokApi.api.video.Video.info">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dictionary of all data associated with a TikTok Video.</span>
+
+<span class="sd">        Note: This is slow since it requires an HTTP request, avoid using this if possible.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary of all data associated with a TikTok Video.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidResponseException: If TikTok returns an invalid response, or one we don&#39;t understand.</span>
+
+<span class="sd">        Example Usage:</span>
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                url = &quot;https://www.tiktok.com/@davidteathercodes/video/7106686413101468970&quot;</span>
+<span class="sd">                video_info = await api.video(url=url).info()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">proxy</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;proxy&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;proxy&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">session</span><span class="o">.</span><span class="n">proxy</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;To call video.info() you need to set the video&#39;s url.&quot;</span><span class="p">)</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="n">proxies</span><span class="o">=</span><span class="n">proxy</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidResponseException</span><span class="p">(</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s2">&quot;TikTok returned an invalid response.&quot;</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span>
+            <span class="p">)</span>
+
+        <span class="c1"># extract tag &lt;script id=&quot;SIGI_STATE&quot; type=&quot;application/json&quot;&gt;{..}&lt;/script&gt;</span>
+        <span class="c1"># extract json in the middle</span>
+
+        <span class="n">start</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;&lt;script id=&quot;SIGI_STATE&quot; type=&quot;application/json&quot;&gt;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">start</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidResponseException</span><span class="p">(</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s2">&quot;TikTok returned an invalid response.&quot;</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span>
+            <span class="p">)</span>
+
+        <span class="n">start</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="s1">&#39;&lt;script id=&quot;SIGI_STATE&quot; type=&quot;application/json&quot;&gt;&#39;</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;&lt;/script&gt;&quot;</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">end</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidResponseException</span><span class="p">(</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s2">&quot;TikTok returned an invalid response.&quot;</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span>
+            <span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">])</span>
+        <span class="n">video_info</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ItemModule&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span> <span class="o">=</span> <span class="n">video_info</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__extract_from_data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">video_info</span></div>
+
+<div class="viewcode-block" id="Video.bytes"><a class="viewcode-back" href="../../../api/video.html#TikTokApi.api.video.Video.bytes">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the bytes of a TikTok Video.</span>
+
+<span class="sd">        TODO:</span>
+<span class="sd">            Not implemented yet.</span>
+
+<span class="sd">        Example Usage:</span>
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                video_bytes = api.video(id=&#39;7041997751718137094&#39;).bytes()</span>
+
+<span class="sd">                # Saving The Video</span>
+<span class="sd">                with open(&#39;saved_video.mp4&#39;, &#39;wb&#39;) as output:</span>
+<span class="sd">                    output.write(video_bytes)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">downloadAddr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span><span class="p">[</span><span class="s2">&quot;video&quot;</span><span class="p">][</span><span class="s2">&quot;downloadAddr&quot;</span><span class="p">]</span>
+
+        <span class="n">cookies</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_session_cookies</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+        <span class="n">cookie_str</span> <span class="o">=</span> <span class="s2">&quot;; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cookies</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+
+        <span class="n">h</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">headers</span>
+        <span class="n">h</span><span class="p">[</span><span class="s2">&quot;cookie&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cookie_str</span>
+
+        <span class="c1"># Fetching the video bytes using a browser fetch within the page context</span>
+        <span class="n">file_bytes</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        async (url, headers) =&gt; {</span>
+<span class="sd">            const response = await fetch(url, { headers });</span>
+<span class="sd">            if (response.ok) {</span>
+<span class="sd">                const buffer = await response.arrayBuffer();</span>
+<span class="sd">                return new Uint8Array(buffer);</span>
+<span class="sd">            } else {</span>
+<span class="sd">                return `Error: ${response.statusText}`;  // Return an error message if the fetch fails</span>
+<span class="sd">            }</span>
+<span class="sd">        }</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">downloadAddr</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">byte_values</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">value</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">file_bytes</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">byte_values</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__extract_from_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;createTime&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">timestamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;stats&quot;</span><span class="p">]</span>
+
+        <span class="n">author</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">author</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">author</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">author</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sound</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">sound</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hashtags</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">hashtag</span><span class="p">)</span> <span class="k">for</span> <span class="n">hashtag</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;challenges&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Video</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to create Video with data: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="se">\n</span><span class="s2">which has keys </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="Video.comments"><a class="viewcode-back" href="../../../api/video.html#TikTokApi.api.video.Video.comments">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">comments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Comment</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the comments of a TikTok Video.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            count (int): The amount of comments you want returned.</span>
+<span class="sd">            cursor (int): The the offset of comments from 0 you want to get.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            async iterator/generator: Yields TikTokApi.comment objects.</span>
+
+<span class="sd">        Example Usage</span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            async for comment in api.video(id=&#39;7041997751718137094&#39;).comments():</span>
+<span class="sd">                # do something</span>
+<span class="sd">        ```</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">found</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;aweme_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+                <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
+                <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://www.tiktok.com/api/comment/list/&quot;</span><span class="p">,</span>
+                <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">),</span>
+                <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_index&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">resp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">InvalidResponseException</span><span class="p">(</span>
+                    <span class="n">resp</span><span class="p">,</span> <span class="s2">&quot;TikTok returned an invalid response.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;comments&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">video</span><span class="p">)</span>
+                <span class="n">found</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;has_more&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="k">return</span>
+
+            <span class="n">cursor</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cursor&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Video.related_videos"><a class="viewcode-back" href="../../../api/video.html#TikTokApi.api.video.Video.related_videos">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">related_videos</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span> <span class="n">cursor</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Video</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns related videos of a TikTok Video.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            count (int): The amount of comments you want returned.</span>
+<span class="sd">            cursor (int): The the offset of comments from 0 you want to get.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            async iterator/generator: Yields TikTokApi.video objects.</span>
+
+<span class="sd">        Example Usage</span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            async for related_videos in api.video(id=&#39;7041997751718137094&#39;).related_videos():</span>
+<span class="sd">                # do something</span>
+<span class="sd">        ```</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">found</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;itemID&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
+                <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://www.tiktok.com/api/related/item_list/&quot;</span><span class="p">,</span>
+                <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">),</span>
+                <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_index&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">resp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">InvalidResponseException</span><span class="p">(</span>
+                    <span class="n">resp</span><span class="p">,</span> <span class="s2">&quot;TikTok returned an invalid response.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">video</span><span class="p">)</span>
+                <span class="n">found</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;TikTokApi.video(id=&#39;</span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="w"> </span><span class="kc">None</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;)&quot;</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, David Teather.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

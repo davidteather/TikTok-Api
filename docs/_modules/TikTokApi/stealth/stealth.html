@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTokApi.stealth.stealth &mdash; TikTokAPI v6.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            TikTokAPI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">TikTokAPI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">TikTokApi.stealth.stealth</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for TikTokApi.stealth.stealth</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
+<span class="kn">from</span> <span class="nn">playwright.async_api</span> <span class="kn">import</span> <span class="n">Page</span> <span class="k">as</span> <span class="n">AsyncPage</span>
+
+
+<div class="viewcode-block" id="from_file"><a class="viewcode-back" href="../../../TikTokApi.stealth.html#TikTokApi.stealth.stealth.from_file">[docs]</a><span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read script from ./js directory&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_string</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;js/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+
+<span class="n">SCRIPTS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;chrome_csi&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;chrome.csi.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;chrome_app&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;chrome.app.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;chrome_runtime&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;chrome.runtime.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;chrome_load_times&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;chrome.load.times.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;chrome_hairline&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;chrome.hairline.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;generate_magic_arrays&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;generate.magic.arrays.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;iframe_content_window&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;iframe.contentWindow.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;media_codecs&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;media.codecs.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;navigator_vendor&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;navigator.vendor.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;navigator_plugins&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;navigator.plugins.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;navigator_permissions&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;navigator.permissions.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;navigator_languages&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;navigator.languages.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;navigator_platform&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;navigator.platform.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;navigator_user_agent&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;navigator.userAgent.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;navigator_hardware_concurrency&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;navigator.hardwareConcurrency.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;outerdimensions&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;window.outerdimensions.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;utils&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;utils.js&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;webdriver&quot;</span><span class="p">:</span> <span class="s2">&quot;delete Object.getPrototypeOf(navigator).webdriver&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;webgl_vendor&quot;</span><span class="p">:</span> <span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;webgl.vendor.js&quot;</span><span class="p">),</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="StealthConfig"><a class="viewcode-back" href="../../../TikTokApi.stealth.html#TikTokApi.stealth.stealth.StealthConfig">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">StealthConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Playwright stealth configuration that applies stealth strategies to playwright page objects.</span>
+<span class="sd">    The stealth strategies are contained in ./js package and are basic javascript scripts that are executed</span>
+<span class="sd">    on every page.goto() called.</span>
+<span class="sd">    Note:</span>
+<span class="sd">        All init scripts are combined by playwright into one script and then executed this means</span>
+<span class="sd">        the scripts should not have conflicting constants/variables etc. !</span>
+<span class="sd">        This also means scripts can be extended by overriding enabled_scripts generator:</span>
+<span class="sd">        ```</span>
+<span class="sd">        @property</span>
+<span class="sd">        def enabled_scripts():</span>
+<span class="sd">            yield &#39;console.log(&quot;first script&quot;)&#39;</span>
+<span class="sd">            yield from super().enabled_scripts()</span>
+<span class="sd">            yield &#39;console.log(&quot;last script&quot;)&#39;</span>
+<span class="sd">        ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># load script options</span>
+    <span class="n">webdriver</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">webgl_vendor</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">chrome_app</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">chrome_csi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">chrome_load_times</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">chrome_runtime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">iframe_content_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">media_codecs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">navigator_hardware_concurrency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">navigator_languages</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">navigator_permissions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">navigator_platform</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">navigator_plugins</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">navigator_user_agent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">navigator_vendor</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">outerdimensions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">hairline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># options</span>
+    <span class="n">vendor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Intel Inc.&quot;</span>
+    <span class="n">renderer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Intel Iris OpenGL Engine&quot;</span>
+    <span class="n">nav_vendor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Google Inc.&quot;</span>
+    <span class="n">nav_user_agent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">nav_platform</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">languages</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;en-US&quot;</span><span class="p">,</span> <span class="s2">&quot;en&quot;</span><span class="p">)</span>
+    <span class="n">runOnInsecureOrigins</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">enabled_scripts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">opts</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;webgl_vendor&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span>
+                <span class="s2">&quot;webgl_renderer&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="p">,</span>
+                <span class="s2">&quot;navigator_vendor&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nav_vendor</span><span class="p">,</span>
+                <span class="s2">&quot;navigator_platform&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nav_platform</span><span class="p">,</span>
+                <span class="s2">&quot;navigator_user_agent&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nav_user_agent</span><span class="p">,</span>
+                <span class="s2">&quot;languages&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">languages</span><span class="p">),</span>
+                <span class="s2">&quot;runOnInsecureOrigins&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">runOnInsecureOrigins</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="c1"># defined options constant</span>
+        <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;const opts = </span><span class="si">{</span><span class="n">opts</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="c1"># init utils and generate_magic_arrays helper</span>
+        <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;utils&quot;</span><span class="p">]</span>
+        <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;generate_magic_arrays&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chrome_app</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;chrome_app&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chrome_csi</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;chrome_csi&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hairline</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;chrome_hairline&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chrome_load_times</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;chrome_load_times&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chrome_runtime</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;chrome_runtime&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iframe_content_window</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;iframe_content_window&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">media_codecs</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;media_codecs&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">navigator_languages</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;navigator_languages&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">navigator_permissions</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;navigator_permissions&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">navigator_platform</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;navigator_platform&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">navigator_plugins</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;navigator_plugins&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">navigator_user_agent</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;navigator_user_agent&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">navigator_vendor</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;navigator_vendor&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">webdriver</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;webdriver&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outerdimensions</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;outerdimensions&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">webgl_vendor</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SCRIPTS</span><span class="p">[</span><span class="s2">&quot;webgl_vendor&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="stealth_async"><a class="viewcode-back" href="../../../TikTokApi.stealth.html#TikTokApi.stealth.stealth.stealth_async">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">stealth_async</span><span class="p">(</span><span class="n">page</span><span class="p">:</span> <span class="n">AsyncPage</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">StealthConfig</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;stealth the page&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="p">(</span><span class="n">config</span> <span class="ow">or</span> <span class="n">StealthConfig</span><span class="p">())</span><span class="o">.</span><span class="n">enabled_scripts</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">add_init_script</span><span class="p">(</span><span class="n">script</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, David Teather.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

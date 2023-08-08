@@ -1,14 +1,5 @@
 from __future__ import annotations
-from os import path
-
-import requests
-import json
-
-from urllib.parse import quote, urlencode
-
-from ..helpers import extract_tag_contents
 from ..exceptions import *
-
 from typing import TYPE_CHECKING, ClassVar, Iterator, Optional
 
 if TYPE_CHECKING:
@@ -22,9 +13,9 @@ class Sound:
     A TikTok Sound/Music/Song.
 
     Example Usage
-    ```py
-    song = api.song(id='7016547803243022337')
-    ```
+        .. code-block:: python
+
+            song = api.song(id='7016547803243022337')
     """
 
     parent: ClassVar[TikTokApi]
@@ -35,6 +26,10 @@ class Sound:
     """The title of the song."""
     author: Optional[User]
     """The author of the song (if it exists)"""
+    duration: Optional[int]
+    """The duration of the song in seconds."""
+    original: Optional[bool]
+    """Whether the song is original or not."""
 
     def __init__(self, id: Optional[str] = None, data: Optional[str] = None):
         """
@@ -48,144 +43,137 @@ class Sound:
         else:
             self.id = id
 
-    def info(self, use_html=False, **kwargs) -> dict:
+    async def info(self, **kwargs) -> dict:
         """
-        Returns a dictionary of TikTok's Sound/Music object.
+        Returns all information sent by TikTok related to this sound.
 
-        - Parameters:
-            - use_html (bool): If you want to perform an HTML request or not.
-                Defaults to False to use an API call, which shouldn't get detected
-                as often as an HTML request.
+        Returns:
+            dict: The raw data returned by TikTok.
 
+        Raises:
+            InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.
 
-        Example Usage
-        ```py
-        sound_data = api.sound(id='7016547803243022337').info()
-        ```
+        Example Usage:
+            .. code-block:: python
+
+                sound_info = await api.sound(id='7016547803243022337').info()
         """
-        self.__ensure_valid()
-        if use_html:
-            return self.info_full(**kwargs)["musicInfo"]
 
-        processed = self.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = processed.device_id
+        id = getattr(self, "id", None)
+        if not id:
+            raise TypeError(
+                "You must provide the id when creating this class to use this method."
+            )
 
-        path = "node/share/music/-{}?{}".format(self.id, self.parent._add_url_params())
-        res = self.parent.get_data(path, **kwargs)
+        url_params = {
+            "msToken": kwargs.get("ms_token"),
+            "musicId": id,
+        }
 
-        if res.get("statusCode", 200) == 10203:
-            raise NotFoundException()
-
-        return res["musicInfo"]["music"]
-
-    def info_full(self, **kwargs) -> dict:
-        """
-        Returns all the data associated with a TikTok Sound.
-
-        This makes an API request, there is no HTML request option, as such
-        with Sound.info()
-
-        Example Usage
-        ```py
-        sound_data = api.sound(id='7016547803243022337').info_full()
-        ```
-        """
-        self.__ensure_valid()
-        r = requests.get(
-            "https://www.tiktok.com/music/-{}".format(self.id),
-            headers={
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "Accept-Encoding": "gzip, deflate",
-                "Connection": "keep-alive",
-                "User-Agent": self.parent._user_agent,
-            },
-            proxies=self.parent._format_proxy(kwargs.get("proxy", None)),
-            cookies=self.parent._get_cookies(**kwargs),
-            **self.parent._requests_extra_kwargs,
+        resp = await self.parent.make_request(
+            url="https://www.tiktok.com/api/music/detail/",
+            params=url_params,
+            headers=kwargs.get("headers"),
+            session_index=kwargs.get("session_index"),
         )
 
-        data = extract_tag_contents(r.text)
-        return json.loads(data)["props"]["pageProps"]["musicInfo"]
+        if resp is None:
+            raise InvalidResponseException(resp, "TikTok returned an invalid response.")
 
-    def videos(self, count=30, offset=0, **kwargs) -> Iterator[Video]:
+        self.as_dict = resp
+        self.__extract_from_data()
+        return resp
+
+    async def videos(self, count=30, cursor=0, **kwargs) -> Iterator[Video]:
         """
         Returns Video objects of videos created with this sound.
 
-        - Parameters:
-            - count (int): The amount of videos you want returned.
-            - offset (int): The offset of videos you want returned.
+        Args:
+            count (int): The amount of videos you want returned.
+            cursor (int): The the offset of videos from 0 you want to get.
 
-        Example Usage
-        ```py
-        for video in api.sound(id='7016547803243022337').videos():
-            # do something
-        ```
+        Returns:
+            async iterator/generator: Yields TikTokApi.video objects.
+
+        Raises:
+            InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.
+
+        Example Usage:
+            .. code-block:: python
+
+                async for video in api.sound(id='7016547803243022337').videos():
+                    # do something
         """
-        self.__ensure_valid()
-        processed = self.parent._process_kwargs(kwargs)
-        kwargs["custom_device_id"] = processed.device_id
-
-        cursor = offset
-        page_size = 30
-
-        while cursor - offset < count:
-            query = {
-                "secUid": "",
-                "musicID": self.id,
-                "cursor": cursor,
-                "shareUid": "",
-                "count": page_size,
-            }
-            path = "api/music/item_list/?{}&{}".format(
-                self.parent._add_url_params(), urlencode(query)
+        id = getattr(self, "id", None)
+        if id is None:
+            raise TypeError(
+                "You must provide the id when creating this class to use this method."
             )
 
-            res = self.parent.get_data(path, send_tt_params=True, **kwargs)
+        found = 0
+        while found < count:
+            params = {
+                "musicID": id,
+                "count": 30,
+                "cursor": cursor,
+            }
 
-            for result in res.get("itemList", []):
-                yield self.parent.video(data=result)
+            resp = await self.parent.make_request(
+                url="https://www.tiktok.com/api/music/item_list/",
+                params=params,
+                headers=kwargs.get("headers"),
+                session_index=kwargs.get("session_index"),
+            )
 
-            if not res.get("hasMore", False):
-                self.parent.logger.info(
-                    "TikTok isn't sending more TikToks beyond this point."
+            if resp is None:
+                raise InvalidResponseException(
+                    resp, "TikTok returned an invalid response."
                 )
+
+            for video in resp.get("itemList", []):
+                yield self.parent.video(data=video)
+                found += 1
+
+            if not resp.get("hasMore", False):
                 return
 
-            cursor = int(res["cursor"])
+            cursor = resp.get("cursor")
 
     def __extract_from_data(self):
         data = self.as_dict
         keys = data.keys()
 
-        if data.get("id") == "":
-            self.id = ""
+        if "musicInfo" in keys:
+            author = data.get("musicInfo").get("author")
+            if isinstance(author, dict):
+                self.author = self.parent.user(data=author)
+            elif isinstance(author, str):
+                self.author = self.parent.user(username=author)
 
-        if "authorName" in keys:
-            self.id = data["id"]
-            self.title = data["title"]
+            if data.get("musicInfo").get("music"):
+                self.title = data.get("musicInfo").get("music").get("title")
+                self.id = data.get("musicInfo").get("music").get("id")
+                self.original = data.get("musicInfo").get("music").get("original")
+                self.play_url = data.get("musicInfo").get("music").get("playUrl")
+                self.cover_large = data.get("musicInfo").get("music").get("coverLarge")
+                self.duration = data.get("musicInfo").get("music").get("duration")
 
-            if data.get("authorName") is not None:
-                self.author = self.parent.user(username=data["authorName"])
+        if "music" in keys:
+            self.title = data.get("music").get("title")
+            self.id = data.get("music").get("id")
+            self.original = data.get("music").get("original")
+            self.play_url = data.get("music").get("playUrl")
+            self.cover_large = data.get("music").get("coverLarge")
+            self.duration = data.get("music").get("duration")
 
-        if self.id is None:
-            Sound.parent.logger.error(
-                f"Failed to create Sound with data: {data}\nwhich has keys {data.keys()}"
-            )
+        if "stats" in keys:
+            self.stats = data.get("stats")
 
-    def __ensure_valid(self):
-        if self.id == "":
-            raise SoundRemovedException(0, None, "This sound has been removed!")
+        if getattr(self, "id", None) is None:
+            Sound.parent.logger.error(f"Failed to create Sound with data: {data}\n")
 
     def __repr__(self):
         return self.__str__()
 
     def __str__(self):
-        return f"TikTokApi.sound(id='{self.id}')"
-
-    def __getattr__(self, name):
-        if name in ["title", "author", "as_dict"]:
-            self.as_dict = self.info()
-            self.__extract_from_data()
-            return self.__getattribute__(name)
-
-        raise AttributeError(f"{name} doesn't exist on TikTokApi.api.Sound")
+        return f"TikTokApi.sound(id='{getattr(self, 'id', None)}')"
