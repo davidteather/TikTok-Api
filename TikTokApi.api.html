@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTokApi.api package &mdash; TikTokAPI v6.0.1 documentation</title>
+  <title>TikTokApi.api package &mdash; TikTokAPI v6.1.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="canonical" href="https://davidteather.github.io/TikTok-Api/TikTokApi.api.html" />
@@ -285,9 +285,32 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="TikTokApi.api.user.User.liked">
-<span class="sig-name descname"><span class="pre">liked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="api/video.html#TikTokApi.api.video.Video" title="TikTokApi.api.video.Video"><span class="pre">Video</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/TikTokApi/api/user.html#User.liked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.user.User.liked" title="Permalink to this definition"></a></dt>
-<dd><p>Returns a dictionary listing TikToks that a given a user has liked.</p>
-<p>TODO: Not currently implemented</p>
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">liked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="api/video.html#TikTokApi.api.video.Video" title="TikTokApi.api.video.Video"><span class="pre">Video</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/TikTokApi/api/user.html#User.liked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.user.User.liked" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a user’s liked posts if public.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> (<em>int</em>) – The amount of recent likes you want returned.</p></li>
+<li><p><strong>cursor</strong> (<em>int</em>) – The the offset of likes from 0 you want to get.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Yields TikTokApi.video objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>async iterator/generator</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="TikTokApi.html#TikTokApi.exceptions.InvalidResponseException" title="TikTokApi.exceptions.InvalidResponseException"><strong>InvalidResponseException</strong></a> – If TikTok returns an invalid response, the user’s likes are private, or one we don’t understand.</p>
+</dd>
+</dl>
+<dl>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">like</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;davidteathercodes&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">liked</span><span class="p">():</span>
+    <span class="c1"># do something</span>
+</pre></div>
+</div>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
