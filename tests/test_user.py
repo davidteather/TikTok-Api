@@ -38,11 +38,10 @@ async def test_user_videos():
 
 @pytest.mark.asyncio
 async def test_user_likes():
-    pytest.skip("Not implemented yet")
     api = TikTokApi()
     async with api:
         await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
-        user = api.user(username=username, sec_uid=sec_uid, user_id=user_id)
+        user = api.user(username="publicliketest", sec_uid="MS4wLjABAAAAHjhwCIwmvzVZfRrDAZ2aZy74LciLnoyaPfM2rrX9N7bwbWMFuwTFG4YrByYvsH5c")
 
         count = 0
         async for video in user.liked(count=30):
