@@ -20,7 +20,7 @@ setuptools.setup(
     keywords=["tiktok", "python3", "api", "unofficial", "tiktok-api", "tiktok api"],
     install_requires=["requests", "playwright"],
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 6.1.0",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Build Tools",
         "License :: OSI Approved :: MIT License",
@@ -28,4 +28,5 @@ setuptools.setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
     ],
+    python_requires='>=3.9',
 )
