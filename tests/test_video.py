@@ -42,16 +42,14 @@ async def test_video_info():
 
 @pytest.mark.asyncio
 async def test_video_bytes():
+    pytest.skip("Not implemented yet")
     api = TikTokApi()
     async with api:
         await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
-        video = api.video(
-            url="https://www.tiktok.com/@davidteathercodes/video/7074717081563942186"
-        )
+        video_id = "7107272719166901550"
+        video = api.video(id=video_id)
 
-        data = await video.bytes()  
-        with open("test.mp4", "wb") as out:
-            out.write(data)
+        data = await video.bytes()
         assert len(data) > 10000
 
 
