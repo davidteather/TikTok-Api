@@ -140,13 +140,59 @@ class User:
 
             cursor = resp.get("cursor")
 
-    def liked(self, count: int = 30, cursor: int = 0, **kwargs) -> Iterator[Video]:
+    async def liked(self, count: int = 30, cursor: int = 0, **kwargs) -> Iterator[Video]:
         """
-        Returns a dictionary listing TikToks that a given a user has liked.
+        Returns a user's liked posts if public.
 
-        TODO: Not currently implemented
+        Args:
+            count (int): The amount of recent likes you want returned.
+            cursor (int): The the offset of likes from 0 you want to get.
+
+        Returns:
+            async iterator/generator: Yields TikTokApi.video objects.
+
+        Raises:
+            InvalidResponseException: If TikTok returns an invalid response, the user's likes are private, or one we don't understand.
+
+        Example Usage:
+            .. code-block:: python
+
+                async for like in api.user(username="davidteathercodes").liked():
+                    # do something
         """
-        raise NotImplementedError
+        sec_uid = getattr(self, "sec_uid", None)
+        if sec_uid is None or sec_uid == "":
+            await self.info(**kwargs)
+
+        found = 0
+        while found < count:
+            params = {
+                "secUid": self.sec_uid,
+                "count": 35,
+                "cursor": cursor,
+            }
+
+            resp = await self.parent.make_request(
+                url="https://www.tiktok.com/api/favorite/item_list",
+                params=params,
+                headers=kwargs.get("headers"),
+                session_index=kwargs.get("session_index"),
+            )
+
+            if resp is None:
+                raise InvalidResponseException(
+                    resp, "TikTok returned an invalid response."
+                )
+
+            for video in resp.get("itemList", []):
+                yield self.parent.video(data=video)
+                found += 1
+
+            if not resp.get("hasMore", False):
+                return
+
+            cursor = resp.get("cursor")
+    
 
     def __extract_from_data(self):
         data = self.as_dict
