@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTokApi.tiktok &mdash; TikTokAPI v6.1.0 documentation</title>
+  <title>TikTokApi.tiktok &mdash; TikTokAPI v6.1.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="canonical" href="https://davidteather.github.io/TikTok-Api/_modules/TikTokApi/tiktok.html" />
@@ -211,6 +211,7 @@
         <span class="n">context_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
         <span class="n">sleep_after</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">cookies</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">suppress_resource_load_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a TikTokPlaywrightSession&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">ms_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -237,6 +238,15 @@
             <span class="n">request_headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span>
 
         <span class="n">page</span><span class="o">.</span><span class="n">once</span><span class="p">(</span><span class="s2">&quot;request&quot;</span><span class="p">,</span> <span class="n">handle_request</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">suppress_resource_load_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span>
+                <span class="s2">&quot;**/*&quot;</span><span class="p">,</span>
+                <span class="k">lambda</span> <span class="n">route</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">route</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">resource_type</span> <span class="ow">in</span> <span class="n">suppress_resource_load_types</span>
+                <span class="k">else</span> <span class="n">route</span><span class="o">.</span><span class="n">continue_</span><span class="p">(),</span>
+            <span class="p">)</span>
+
         <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 
         <span class="n">session</span> <span class="o">=</span> <span class="n">TikTokPlaywrightSession</span><span class="p">(</span>
@@ -270,6 +280,7 @@
         <span class="n">context_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
         <span class="n">override_browser_args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cookies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">suppress_resource_load_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create sessions for use within the TikTokApi class.</span>
@@ -287,6 +298,7 @@
 <span class="sd">            context_options (dict): Options to pass to the playwright context.</span>
 <span class="sd">            override_browser_args (list[dict]): A list of dictionaries containing arguments to pass to the browser.</span>
 <span class="sd">            cookies (list[dict]): A list of cookies to use for the sessions, you can get these from your cookies after visiting TikTok.</span>
+<span class="sd">            suppress_resource_load_types (list[str]): Types of resources to suppress playwright from loading, excluding more types will make playwright faster.. Types: document, stylesheet, image, media, font, script, textrack, xhr, fetch, eventsource, websocket, manifest, other.</span>
 
 <span class="sd">        Example Usage:</span>
 <span class="sd">            .. code-block:: python</span>
@@ -312,6 +324,7 @@
                     <span class="n">context_options</span><span class="o">=</span><span class="n">context_options</span><span class="p">,</span>
                     <span class="n">sleep_after</span><span class="o">=</span><span class="n">sleep_after</span><span class="p">,</span>
                     <span class="n">cookies</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">cookies</span><span class="p">),</span>
+                    <span class="n">suppress_resource_load_types</span><span class="o">=</span><span class="n">suppress_resource_load_types</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_sessions</span><span class="p">)</span>
             <span class="p">)</span>
