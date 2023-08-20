@@ -140,7 +140,9 @@ class User:
 
             cursor = resp.get("cursor")
 
-    async def liked(self, count: int = 30, cursor: int = 0, **kwargs) -> Iterator[Video]:
+    async def liked(
+        self, count: int = 30, cursor: int = 0, **kwargs
+    ) -> Iterator[Video]:
         """
         Returns a user's liked posts if public.
 
@@ -192,7 +194,6 @@ class User:
                 return
 
             cursor = resp.get("cursor")
-    
 
     def __extract_from_data(self):
         data = self.as_dict
