@@ -142,7 +142,7 @@ class TikTokApi:
         context_options: dict = {},
         sleep_after: int = 1,
         cookies: dict = None,
-        load_images: bool = True,
+        suppress_resource_load_types: list[str] = None,
     ):
         """Create a TikTokPlaywrightSession"""
         if ms_token is not None:
@@ -170,8 +170,13 @@ class TikTokApi:
 
         page.once("request", handle_request)
 
-        if not load_images:
-            await page.route("**/*", lambda route: route.abort() if route.request.resource_type == "image"  else route.continue_())
+        if suppress_resource_load_types is not None:
+            await page.route(
+                "**/*",
+                lambda route, request: route.abort()
+                if request.resource_type in suppress_resource_load_types
+                else route.continue_(),
+            )
 
         await page.goto(url)
 
@@ -206,7 +211,7 @@ class TikTokApi:
         context_options: dict = {},
         override_browser_args: list[dict] = None,
         cookies: list[dict] = None,
-        load_images = True,
+        suppress_resource_load_types: list[str] = None,
     ):
         """
         Create sessions for use within the TikTokApi class.
@@ -224,7 +229,7 @@ class TikTokApi:
             context_options (dict): Options to pass to the playwright context.
             override_browser_args (list[dict]): A list of dictionaries containing arguments to pass to the browser.
             cookies (list[dict]): A list of cookies to use for the sessions, you can get these from your cookies after visiting TikTok.
-            load_images (bool): Whether you want the browser to load the images.
+            suppress_resource_load_types (list[str]): Types of resources to suppress playwright from loading, excluding more types will make playwright faster.. Types: document, stylesheet, image, media, font, script, textrack, xhr, fetch, eventsource, websocket, manifest, other.
 
         Example Usage:
             .. code-block:: python
@@ -250,7 +255,7 @@ class TikTokApi:
                     context_options=context_options,
                     sleep_after=sleep_after,
                     cookies=random_choice(cookies),
-                    load_images=load_images,
+                    suppress_resource_load_types=suppress_resource_load_types,
                 )
                 for _ in range(num_sessions)
             )

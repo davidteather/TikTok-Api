@@ -28,7 +28,7 @@ class SoundRemovedException(TikTokException):
 
 
 class InvalidJSONException(TikTokException):
-    """TikTok returned invalid JSON.""" 
+    """TikTok returned invalid JSON."""
 
 
 class InvalidResponseException(TikTokException):
