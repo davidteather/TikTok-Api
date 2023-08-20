@@ -142,6 +142,7 @@ class TikTokApi:
         context_options: dict = {},
         sleep_after: int = 1,
         cookies: dict = None,
+        load_images: bool = True,
     ):
         """Create a TikTokPlaywrightSession"""
         if ms_token is not None:
@@ -168,6 +169,10 @@ class TikTokApi:
             request_headers = request.headers
 
         page.once("request", handle_request)
+
+        if not load_images:
+            await page.route("**/*", lambda route: route.abort() if route.request.resource_type == "image"  else route.continue_())
+
         await page.goto(url)
 
         session = TikTokPlaywrightSession(
@@ -201,6 +206,7 @@ class TikTokApi:
         context_options: dict = {},
         override_browser_args: list[dict] = None,
         cookies: list[dict] = None,
+        load_images = True,
     ):
         """
         Create sessions for use within the TikTokApi class.
@@ -218,6 +224,7 @@ class TikTokApi:
             context_options (dict): Options to pass to the playwright context.
             override_browser_args (list[dict]): A list of dictionaries containing arguments to pass to the browser.
             cookies (list[dict]): A list of cookies to use for the sessions, you can get these from your cookies after visiting TikTok.
+            load_images (bool): Whether you want the browser to load the images.
 
         Example Usage:
             .. code-block:: python
@@ -243,6 +250,7 @@ class TikTokApi:
                     context_options=context_options,
                     sleep_after=sleep_after,
                     cookies=random_choice(cookies),
+                    load_images=load_images,
                 )
                 for _ in range(num_sessions)
             )
