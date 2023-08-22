@@ -85,6 +85,8 @@ Please don't open an issue if you're experiencing one of these just comment if t
 
 * **Browser Has no Attribute** - make sure you ran `python3 -m playwright install`, if your error persists try the [playwright-python](https://github.com/microsoft/playwright-python) quickstart guide and diagnose issues from there.
 
+* **API methods returning Coroutine** - Remember many of the API's methods are async so your program needs to await them for proper functionality.
+
 ## Quick Start Guide
 
 Here's a quick bit of code to get the most recent trending videos on TikTok. There's more examples in the [examples](https://github.com/davidteather/TikTok-Api/tree/main/examples) directory.
