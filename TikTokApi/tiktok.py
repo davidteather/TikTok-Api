@@ -243,7 +243,7 @@ class TikTokApi:
             override_browser_args = ["--headless=new"]
             headless = False  # managed by the arg
         self.browser = await self.playwright.chromium.launch(
-            headless=headless, args=override_browser_args
+            headless=headless, args=override_browser_args, proxy=random_choice(proxies)
         )
 
         await asyncio.gather(
