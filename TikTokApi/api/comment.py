@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from typing import ClassVar, Optional
+from typing import ClassVar, Iterator, Optional
 from typing import TYPE_CHECKING, ClassVar, Optional
+
+from TikTokApi.exceptions import InvalidResponseException
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -48,6 +50,38 @@ class Comment:
             user_id=usr["uid"], username=usr["unique_id"], sec_uid=usr["sec_uid"]
         )
         self.likes_count = self.as_dict["digg_count"]
+
+    async def replies(self, count=20, cursor=0, **kwargs) -> Iterator[Comment]:
+        found = 0
+
+        while found < count:
+            params = {
+                "count": 20,
+                "cursor": cursor,
+                "item_id": self.author.user_id,
+                "comment_id": self.id,
+            }
+
+            resp = await self.parent.make_request(
+                url="https://www.tiktok.com/api/comment/list/reply/",
+                params=params,
+                headers=kwargs.get("headers"),
+                session_index=kwargs.get("session_index"),
+            )
+
+            if resp is None:
+                raise InvalidResponseException(
+                    resp, "TikTok returned an invalid response."
+                )
+
+            for comment in resp.get("comments", []):
+                yield self.parent.comment(data=comment)
+                found += 1
+
+            if not resp.get("has_more", False):
+                return
+
+            cursor = resp.get("cursor")
 
     def __repr__(self):
         return self.__str__()
