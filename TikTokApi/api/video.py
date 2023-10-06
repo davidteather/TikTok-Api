@@ -1,9 +1,9 @@
 from __future__ import annotations
-from ..helpers import extract_video_id_from_url
+from TikTokApi.helpers import extract_video_id_from_url
 from typing import TYPE_CHECKING, ClassVar, Iterator, Optional
 from datetime import datetime
 import requests
-from ..exceptions import InvalidResponseException
+from TikTokApi.exceptions import InvalidResponseException
 import json
 
 if TYPE_CHECKING:
@@ -233,6 +233,44 @@ class Video:
             Video.parent.logger.error(
                 f"Failed to create Video with data: {data}\nwhich has keys {data.keys()}"
             )
+            
+    async def all_comments(self, cursor=0, **kwargs) -> Iterator[Comment]:
+        """
+        Returns all the comments of a TikTok Video.
+
+        Parameters:
+            kwargs: Additional keyword arguments.
+
+        Returns:
+            async iterator/generator: Yields TikTokApi.comment objects.
+        """
+        cursor = cursor
+        while True:
+            params = {
+                "aweme_id": self.id,
+                "count": 20,
+                "cursor": cursor,
+            }
+
+            resp = await self.parent.make_request(
+                url="https://www.tiktok.com/api/comment/list/",
+                params=params,
+                headers=kwargs.get("headers"),
+                session_index=kwargs.get("session_index"),
+            )
+
+            if resp is None:
+                raise InvalidResponseException(
+                    resp, "TikTok returned an invalid response."
+                )
+
+            for video in resp.get("comments", []):
+                yield self.parent.comment(data=video)
+
+            if not resp.get("has_more", False):
+                break
+
+            cursor = resp.get("cursor")
 
     async def comments(self, count=20, cursor=0, **kwargs) -> Iterator[Comment]:
         """
@@ -272,9 +310,11 @@ class Video:
                     resp, "TikTok returned an invalid response."
                 )
 
-            for video in resp.get("comments", []):
-                yield self.parent.comment(data=video)
-                found += 1
+            comments = resp.get("comments")
+            if comments is not None:
+                for video in comments:
+                    yield self.parent.comment(data=video)
+                    found += 1
 
             if not resp.get("has_more", False):
                 return

@@ -1,0 +1,62 @@
+{
+  "extra": {
+    "fatal_item_ids": [],
+    "logid": "20230902134102B7DB6BB8D7731CB0D631",
+    "now": 1693662063000
+  },
+  "log_pb": {
+    "impr_id": "20230902134102B7DB6BB8D7731CB0D631"
+  },
+  "shareMeta": {
+    "desc": "@jinguji_ai_ 15.7k Followers, 12 Following, 165.0k Likes - Watch awesome short videos created by \u795e\u5bae\u5bfa \u85cd",
+    "title": "\u795e\u5bae\u5bfa \u85cd on TikTok"
+  },
+  "statusCode": 0,
+  "status_code": 0,
+  "userInfo": {
+    "stats": {
+      "diggCount": 0,
+      "followerCount": 15700,
+      "followingCount": 12,
+      "heart": 165000,
+      "heartCount": 165000,
+      "videoCount": 14
+    },
+    "user": {
+      "avatarLarger": "https://p16-sign-sg.tiktokcdn.com/aweme/1080x1080/tos-alisg-avt-0068/91eb9c86ea80983cb71a4e50ffc39223.jpeg?x-expires=1693832400&x-signature=9RgNf%2BSW%2BKML5qq8UMu4QRkjUEM%3D",
+      "avatarMedium": "https://p77-sign-sg.tiktokcdn.com/aweme/720x720/tos-alisg-avt-0068/91eb9c86ea80983cb71a4e50ffc39223.jpeg?x-expires=1693832400&x-signature=uUW1XzcadkO6H5ScbTjMiaLDTOw%3D",
+      "avatarThumb": "https://p16-sign-sg.tiktokcdn.com/aweme/100x100/tos-alisg-avt-0068/91eb9c86ea80983cb71a4e50ffc39223.jpeg?x-expires=1693832400&x-signature=WdcTx6ruF7NLqkGGcr5M8Z2kGqs%3D",
+      "bioLink": {
+        "link": "https://instagram.com/jinguji_ai",
+        "risk": 0
+      },
+      "canExpPlaylist": true,
+      "commentSetting": 0,
+      "commerceUserInfo": {
+        "commerceUser": false
+      },
+      "duetSetting": 0,
+      "followingVisibility": 2,
+      "ftc": false,
+      "id": "7232706906488439810",
+      "isADVirtual": false,
+      "isEmbedBanned": false,
+      "nickNameModifyTime": 1684938048,
+      "nickname": "\u795e\u5bae\u5bfa \u85cd",
+      "openFavorite": false,
+      "privateAccount": false,
+      "profileEmbedPermission": 1,
+      "profileTab": {
+        "showPlayListTab": false
+      },
+      "relation": 0,
+      "secUid": "MS4wLjABAAAAlL2G-2VybuN3XXQwDBmqY-ZwOL0LXbcUW-eeeGFpdxhyxjzc9h05b3PuUfwhYYwk",
+      "secret": false,
+      "signature": "\u3010X AI Agent\u3011\n\u672c\u696d\u30b0\u30e9\u30d3\u30a2\u30a2\u30a4\u30c9\u30eb\ud83e\udd0d\n\u526f\u696d\u30ae\u30e3\u30e9\u98f2\u307f\u2755\u2755\n\u6f22\u65b9\u3068\u304b\u5546\u54c1\u7d39\u4ecb\u3057\u306a\u3044\u3088\u2755\n\u3010\u58ee\u5927\u306a\u793e\u4f1a\u5b9f\u9a13\u306b\u3054\u53c2\u52a0\u3042\u308a\u304c\u3068\u3046\ud83e\ude75\u2728\u3011",
+      "stitchSetting": 0,
+      "ttSeller": false,
+      "uniqueId": "jinguji_ai_",
+      "verified": false
+    }
+  }
+}

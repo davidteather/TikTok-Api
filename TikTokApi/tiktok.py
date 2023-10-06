@@ -8,18 +8,18 @@ import json
 
 from playwright.async_api import async_playwright
 from urllib.parse import urlencode, quote, urlparse
-from .stealth import stealth_async
-from .helpers import random_choice
+from stealth.stealth import stealth_async
+from helpers import random_choice
 
-from .api.user import User
-from .api.video import Video
-from .api.sound import Sound
-from .api.hashtag import Hashtag
-from .api.comment import Comment
-from .api.trending import Trending
-from .api.search import Search
+from api.user import User
+from api.video import Video
+from api.sound import Sound
+from api.hashtag import Hashtag
+from api.comment import Comment
+from api.trending import Trending
+from api.search import Search
 
-from .exceptions import (
+from exceptions import (
     InvalidJSONException,
     EmptyResponseException,
 )

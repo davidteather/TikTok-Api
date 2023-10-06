@@ -1,4 +1,4 @@
-from .exceptions import *
+from exceptions import *
 
 import requests
 import random

@@ -1,8 +1,8 @@
 from __future__ import annotations
 from urllib.parse import urlencode
 from typing import TYPE_CHECKING, Iterator
-from .user import User
-from ..exceptions import InvalidResponseException
+from api.user import User
+from TikTokApi.exceptions import InvalidResponseException
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi

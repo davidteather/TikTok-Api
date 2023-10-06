@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ..exceptions import *
+from TikTokApi.exceptions import *
 from typing import TYPE_CHECKING, ClassVar, Iterator, Optional
 
 if TYPE_CHECKING:
