@@ -120,6 +120,10 @@ class Video:
             )
 
         data = json.loads(r.text[start:end])
+        if data["__DEFAULT_SCOPE__"]["webapp.video-detail"]["statusCode"] != 0:
+            raise InvalidResponseException(
+                r.text, "TikTok returned an invalid response.", error_code=r.status_code
+            )
         video_info = data["__DEFAULT_SCOPE__"]["webapp.video-detail"]["itemInfo"]["itemStruct"]
         self.as_dict = video_info
         self.__extract_from_data()
