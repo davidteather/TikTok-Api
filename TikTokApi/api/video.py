@@ -102,16 +102,16 @@ class Video:
                 r.text, "TikTok returned an invalid response.", error_code=r.status_code
             )
 
-        # extract tag <script id="SIGI_STATE" type="application/json">{..}</script>
+        # extract tag <script id="__UNIVERSAL_DATA_FOR_REHYDRATION__" type="application/json">{..}</script>
         # extract json in the middle
 
-        start = r.text.find('<script id="SIGI_STATE" type="application/json">')
+        start = r.text.find('<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__" type="application/json">')
         if start == -1:
             raise InvalidResponseException(
                 r.text, "TikTok returned an invalid response.", error_code=r.status_code
             )
 
-        start += len('<script id="SIGI_STATE" type="application/json">')
+        start += len('<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__" type="application/json">')
         end = r.text.find("</script>", start)
 
         if end == -1:
@@ -120,7 +120,7 @@ class Video:
             )
 
         data = json.loads(r.text[start:end])
-        video_info = data["ItemModule"][self.id]
+        video_info = data["__DEFAULT_SCOPE__"]["webapp.video-detail"]["itemInfo"]["itemStruct"]
         self.as_dict = video_info
         self.__extract_from_data()
         return video_info
