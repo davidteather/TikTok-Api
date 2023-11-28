@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTokApi.api.comment module &mdash; TikTokAPI v6.1.1 documentation</title>
+  <title>TikTokApi.api.comment module &mdash; TikTokAPI v6.2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="canonical" href="https://davidteather.github.io/TikTok-Api/api/comment.html" />
@@ -12,11 +12,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=0a8bfab4"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -50,6 +50,7 @@
 <li><a class="reference internal" href="#TikTokApi.api.comment.Comment.id"><code class="docutils literal notranslate"><span class="pre">Comment.id</span></code></a></li>
 <li><a class="reference internal" href="#TikTokApi.api.comment.Comment.likes_count"><code class="docutils literal notranslate"><span class="pre">Comment.likes_count</span></code></a></li>
 <li><a class="reference internal" href="#TikTokApi.api.comment.Comment.parent"><code class="docutils literal notranslate"><span class="pre">Comment.parent</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.api.comment.Comment.replies"><code class="docutils literal notranslate"><span class="pre">Comment.replies()</span></code></a></li>
 <li><a class="reference internal" href="#TikTokApi.api.comment.Comment.text"><code class="docutils literal notranslate"><span class="pre">Comment.text</span></code></a></li>
 </ul>
 </li>
@@ -82,10 +83,10 @@
            <div itemprop="articleBody">
              
   <section id="module-TikTokApi.api.comment">
-<span id="tiktokapi-api-comment-module"></span><h1>TikTokApi.api.comment module<a class="headerlink" href="#module-TikTokApi.api.comment" title="Permalink to this heading"></a></h1>
+<span id="tiktokapi-api-comment-module"></span><h1>TikTokApi.api.comment module<a class="headerlink" href="#module-TikTokApi.api.comment" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="TikTokApi.api.comment.Comment">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.api.comment.</span></span><span class="sig-name descname"><span class="pre">Comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/TikTokApi/api/comment.html#Comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.comment.Comment" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">TikTokApi.api.comment.</span></span><span class="sig-name descname"><span class="pre">Comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/TikTokApi/api/comment.html#Comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.comment.Comment" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A TikTok Comment.</p>
 <dl>
@@ -98,36 +99,41 @@
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="TikTokApi.api.comment.Comment.as_dict">
-<span class="sig-name descname"><span class="pre">as_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.as_dict" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">as_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.as_dict" title="Link to this definition"></a></dt>
 <dd><p>The raw data associated with this comment</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="TikTokApi.api.comment.Comment.author">
-<span class="sig-name descname"><span class="pre">author</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="user.html#TikTokApi.api.user.User" title="TikTokApi.api.user.User"><span class="pre">User</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.author" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">author</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="user.html#TikTokApi.api.user.User" title="TikTokApi.api.user.User"><span class="pre">User</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.author" title="Link to this definition"></a></dt>
 <dd><p>The author of the comment</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="TikTokApi.api.comment.Comment.id">
-<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.id" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.id" title="Link to this definition"></a></dt>
 <dd><p>The id of the comment</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="TikTokApi.api.comment.Comment.likes_count">
-<span class="sig-name descname"><span class="pre">likes_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.likes_count" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">likes_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.likes_count" title="Link to this definition"></a></dt>
 <dd><p>The amount of likes of the comment</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="TikTokApi.api.comment.Comment.parent">
-<span class="sig-name descname"><span class="pre">parent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../TikTokApi.html#TikTokApi.tiktok.TikTokApi" title="TikTokApi.tiktok.TikTokApi"><span class="pre">TikTokApi</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.parent" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">parent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../TikTokApi.html#TikTokApi.tiktok.TikTokApi" title="TikTokApi.tiktok.TikTokApi"><span class="pre">TikTokApi</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.parent" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.api.comment.Comment.replies">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">replies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#TikTokApi.api.comment.Comment" title="TikTokApi.api.comment.Comment"><span class="pre">Comment</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/TikTokApi/api/comment.html#Comment.replies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.comment.Comment.replies" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="TikTokApi.api.comment.Comment.text">
-<span class="sig-name descname"><span class="pre">text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.text" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#TikTokApi.api.comment.Comment.text" title="Link to this definition"></a></dt>
 <dd><p>The contents of the comment</p>
 </dd></dl>
 
