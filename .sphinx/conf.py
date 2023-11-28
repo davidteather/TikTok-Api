@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.abspath("../.."))
 project = "TikTokAPI"
 copyright = "2023, David Teather"
 author = "David Teather"
-release = "v6.1.1"
+release = "v6.2.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/main/usage/configuration.html#general-configuration
