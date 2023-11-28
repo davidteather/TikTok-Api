@@ -339,7 +339,6 @@ class TikTokApi:
         """Generate the X-Bogus header for a url"""
         _, session = self._get_session(**kwargs)
         await session.page.wait_for_function("window.byted_acrawler !== undefined")
-        print('finished waiting')
         result = await session.page.evaluate(
             f'() => {{ return window.byted_acrawler.frontierSign("{url}") }}'
         )
