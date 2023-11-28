@@ -426,7 +426,7 @@ class TikTokApi:
                 raise Exception("TikTokApi.run_fetch_script returned None")
 
             if result == "":
-                raise EmptyResponseException()
+                raise EmptyResponseException(result, "TikTok returned an empty response")
 
             try:
                 data = json.loads(result)
