@@ -113,7 +113,7 @@ if __name__ == "__main__":
 
 To directly run the example scripts from the repository root, use the `-m` option on python.
 ```sh
-python -m examples.get_trending
+python -m examples.trending_example
 ```
 
 You can access the full data dictionary the object was created from with `.as_dict`. On a video this may look like
