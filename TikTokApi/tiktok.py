@@ -243,7 +243,7 @@ class TikTokApi:
             override_browser_args = ["--headless=new"]
             headless = False  # managed by the arg
         self.browser = await self.playwright.chromium.launch(
-            headless=headless, args=override_browser_args
+            headless=headless, args=override_browser_args, proxy=random_choice(proxies)
         )
 
         await asyncio.gather(
@@ -338,6 +338,7 @@ class TikTokApi:
     async def generate_x_bogus(self, url: str, **kwargs):
         """Generate the X-Bogus header for a url"""
         _, session = self._get_session(**kwargs)
+        await session.page.wait_for_function("window.byted_acrawler !== undefined")
         result = await session.page.evaluate(
             f'() => {{ return window.byted_acrawler.frontierSign("{url}") }}'
         )
@@ -426,7 +427,7 @@ class TikTokApi:
                 raise Exception("TikTokApi.run_fetch_script returned None")
 
             if result == "":
-                raise EmptyResponseException()
+                raise EmptyResponseException(result, "TikTok returned an empty response")
 
             try:
                 data = json.loads(result)
