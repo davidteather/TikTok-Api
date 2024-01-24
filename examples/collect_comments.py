@@ -25,7 +25,6 @@ def clean_comment(c):
         'commentDate': c.get('create_time'),
         'replyToId': c.get('reply_id'),
     }
-    # print(unescape_unicode(c.get("text")))
     if c['reply_comment'] != None:
         reply_count = c.get('reply_comment_total')
         comment['replyCount'] = reply_count
@@ -41,15 +40,22 @@ def clean_comment(c):
         
     return comments
 
-async def get_comments(video_info, ms_token, i):
+async def get_comments(video_info, ms_token):
     async with TikTokApi() as api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=1)
-        
+        # await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, headless=True, override_browser_args=["--incognito"])
+        await api.close_sessions()
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
         comments = []
         try:
             video = api.video(video_info['videoId'])
             commentCount = video_info['commentCount']
             print(f"コメント数：{commentCount}")
+        except Exception as e:
+            print(e)
+            print("動画の取得に失敗しました")
+            await api.close_sessions()
+            return False
+        try:
             async for comment in video.comments(count=commentCount):
                 c = comment.as_dict
                 comments.extend(clean_comment(c))
@@ -58,23 +64,47 @@ async def get_comments(video_info, ms_token, i):
         except Exception as e:
             print(e)
             print("コメントの取得に失敗しました")
+            await api.close_sessions()
+            return False
 
         await api.close_sessions()
+        print(f"コメントの取得に成功しました：{len(comments)}")
         return comments
 
 if __name__ == "__main__":
     tracemalloc.start()
-    ms_token = "nvUOkAnO1TLLSx8MJcpFGsx_su5bgsxe3oiEwwVVdtqDJUq0Dqfv37YjVSp1xPgekNFAOmrpFvlHLrVJ0XNUtQ33Tnk_cZYmDrh78ThklZBIP8lcTXk5P7B4ZgzsAKUc1KCcGB_sP8QVDNQT"  # set your own ms_token
-    # channel = "taro_koho"
-    while True:
-        comments = []
-        channel = input("Enter channel name:")
-        if channel == "q":
-            break
-        destination_folder = f'data/{channel}'
+    # ms_token = "nvUOkAnO1TLLSx8MJcpFGsx_su5bgsxe3oiEwwVVdtqDJUq0Dqfv37YjVSp1xPgekNFAOmrpFvlHLrVJ0XNUtQ33Tnk_cZYmDrh78ThklZBIP8lcTXk5P7B4ZgzsAKUc1KCcGB_sP8QVDNQT"  # set your own ms_token
+    
+    # フォルダ名を取得
+    folder_path = "data/Hashtag"
+    files = glob.glob(f"{folder_path}/*")
+    files = [os.path.basename(f) for f in files]
 
+    for file_name in files:
+        comments = []
+        error_ids = []
+
+        print(f"ファイル：{file_name}")
+        destination_folder = f'{folder_path}/{file_name}'
+    
+        #     file_name = input("Enter channel name:")
+        #     if channel == "q":
+        #         break
+        #     destination_folder = f'data/{file_name}'
+
+        files = glob.glob(f"{destination_folder}/*")
+        break_flag = False
+        for file in files:
+            file = os.path.basename(file)
+            if "comments" in file:
+                print("コメントのJSONファイルが存在します")
+                break_flag = True
+                break
+        if break_flag:
+            continue
+        
         try:
-            file = glob.glob(f"{destination_folder}/{channel}_videos.json")[0]
+            file = glob.glob(f"{destination_folder}/{file_name}_videos.json")[0]
             with open(file, 'r', encoding='utf-8') as f:
                 videos = json.load(f)
         except:
@@ -85,15 +115,34 @@ if __name__ == "__main__":
 
         for i, video_info in enumerate(videos):
             if video_info['commentCount'] == 0:
-                print(f"{i+1}/{len(videos)}番目の動画のコメントはありません：{video_info['title']}")
+                print(f"{i+1}/{len(videos)}番目の動画のコメントはありません：\n{video_info['title'][:min(100, len(video_info['title']))]}")
                 continue
-            print(f"{i+1}/{len(videos)}番目の動画のコメントを取得します：{video_info['title']}")
-            tmp_c = asyncio.run(get_comments(video_info, ms_token, i)) 
-            comments.extend(tmp_c)
 
-        comments_file_path = os.path.join(destination_folder, f'{channel}_comments.json')  # ファイル名は適宜変更してください
-        with open(comments_file_path, 'w') as json_file:
-            json.dump(comments, json_file, indent=2)
+            print(f"{file_name}{i+1}/{len(videos)}番目の動画のコメントを取得します：{video_info['title'][:min(30, len(video_info['title']))]}")
+            ms_token = os.environ.get("ms_token", None)
+            tmp_c = asyncio.run(get_comments(video_info, ms_token))
+            time.sleep(3)
+            if tmp_c == False:
+                error_ids.append(video_info)
+                continue
+            comments.extend(tmp_c)
+            
+            if (i+1)%100 == 0:
+                comments_file_path = os.path.join(destination_folder, f'{file_name}_comments{i+1}.json')
+                with open(comments_file_path, 'w', encoding='UTF-8') as json_file:
+                    json.dump(comments, json_file, indent=2, ensure_ascii=False)
+                error_ids.append(videos[i+1:])
+                error_ids_file_path = os.path.join(destination_folder, f'{file_name}_error_ids.json')
+                with open(error_ids_file_path, 'w', encoding='UTF-8') as json_file:
+                    json.dump(error_ids, json_file, indent=2, ensure_ascii=False)
+
+        comments_file_path = os.path.join(destination_folder, f'{file_name}_comments.json')
+        with open(comments_file_path, 'w', encoding='UTF-8') as json_file:
+            json.dump(comments, json_file, indent=2, ensure_ascii=False)
+        if error_ids != []:
+            error_ids_file_path = os.path.join(destination_folder, f'{file_name}_error_ids.json')
+            with open(error_ids_file_path, 'w', encoding='UTF-8') as json_file:
+                json.dump(error_ids, json_file, indent=2, ensure_ascii=False)
 
         print(f"コメント数：{len(comments)}")
         print(f"コメントを保存しました：{comments_file_path}")

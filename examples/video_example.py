@@ -20,7 +20,7 @@ async def get_video_example():
             #print(related_video.as_dict)
 
         video_info = await video.info()  # is HTML request, so avoid using this too much
-        #print(video_info)
+        print(video_info)
 
         return video_info, related_videos_data
 
@@ -29,10 +29,10 @@ if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     video_info, related_videos = loop.run_until_complete(get_video_example())
 
-    # Save video_info as JSON
-    with open("video_info.json", "w") as json_file:
-        json.dump(video_info, json_file, indent=4)
+    # # Save video_info as JSON
+    # with open("video_info.json", "w") as json_file:
+    #     json.dump(video_info, json_file, indent=4)
 
-    # Save related_videos as JSON
-    with open("related_videos.json", "w") as json_file:
-        json.dump(related_videos, json_file, indent=4)
+    # # Save related_videos as JSON
+    # with open("related_videos.json", "w") as json_file:
+    #     json.dump(related_videos, json_file, indent=4)

@@ -30,3 +30,6 @@ src
 .env
 /.idea/
 /TikTok-Api.iml
+.ipynb_checkpoints
+
+data/
