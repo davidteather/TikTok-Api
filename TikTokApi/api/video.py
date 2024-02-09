@@ -218,7 +218,7 @@ class Video:
         self.create_time = datetime.fromtimestamp(timestamp)
         self.stats = data["stats"]
 
-        author = data["author"]
+        author = data.get("author")
         if isinstance(author, str):
             self.author = self.parent.user(username=author)
         else:
