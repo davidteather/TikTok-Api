@@ -413,7 +413,7 @@ class TikTokApi:
                     )
                 params["msToken"] = ms_token
 
-        encoded_params = f"{url}?{urlencode(params, quote_via=quote)}"
+        encoded_params = f"{url}?{urlencode(params, safe='=', quote_via=quote)}"
         signed_url = await self.sign_url(encoded_params, session_index=i)
 
         retry_count = 0
