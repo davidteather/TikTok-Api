@@ -17,6 +17,14 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
             <b>TikAPI</b> is a paid TikTok API service providing a full out-of-the-box solution, making life easier for developers — trusted by 500+ companies.
         </div>
     </a>
+    <br>
+    <a href="https://www.ensembledata.com/?utm_source=github&utm_medium=githubpage&utm_campaign=david_thea_github&utm_id=david_thea_github" target="_blank">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/EnsembleData.png" width="100" alt="Ensemble Data">
+        <b></b>
+        <div>
+         <b>EnsembleData</b> is the leading API provider for scraping Tiktok, Instagram, Youtube, and more. <br> Trusted by the major influencer marketing and social media listening platforms.
+        </div>
+    </a>
 </div>
 
 ## Table of Contents
