@@ -22,8 +22,7 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
         <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/EnsembleData.png" width="100" alt="Ensemble Data">
         <b></b>
         <div>
-         <b>Ensemble Data</b> is the leading API provider for scraping Tiktok, Instagram, Youtube, and more.
-With more than 20TB+ monthly offer, we are trusted by the major influencer marketing and social media listening platforms.
+         <b>Ensemble Data</b> is the leading API provider for scraping Tiktok, Instagram, Youtube, and more. Trusted by the major influencer marketing and social media listening platforms
         </div>
     </a>
 </div>
