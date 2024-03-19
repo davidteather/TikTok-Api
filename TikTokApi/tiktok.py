@@ -253,7 +253,7 @@ class TikTokApi:
                 headless=headless, args=override_browser_args, proxy=random_choice(proxies)
             )
         else:
-            raise ValueError("Invalid browser argument passes")
+            raise ValueError("Invalid browser argument passed")
 
         await asyncio.gather(
             *(
