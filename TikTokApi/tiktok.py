@@ -212,6 +212,7 @@ class TikTokApi:
         override_browser_args: list[dict] = None,
         cookies: list[dict] = None,
         suppress_resource_load_types: list[str] = None,
+        browser: str = "chromium"
     ):
         """
         Create sessions for use within the TikTokApi class.
@@ -230,6 +231,7 @@ class TikTokApi:
             override_browser_args (list[dict]): A list of dictionaries containing arguments to pass to the browser.
             cookies (list[dict]): A list of cookies to use for the sessions, you can get these from your cookies after visiting TikTok.
             suppress_resource_load_types (list[str]): Types of resources to suppress playwright from loading, excluding more types will make playwright faster.. Types: document, stylesheet, image, media, font, script, textrack, xhr, fetch, eventsource, websocket, manifest, other.
+            browser (str): specify either firefox or chromium, default is chromium
 
         Example Usage:
             .. code-block:: python
@@ -239,12 +241,19 @@ class TikTokApi:
                     await api.create_sessions(num_sessions=5, ms_tokens=['msToken1', 'msToken2'])
         """
         self.playwright = await async_playwright().start()
-        if headless and override_browser_args is None:
-            override_browser_args = ["--headless=new"]
-            headless = False  # managed by the arg
-        self.browser = await self.playwright.chromium.launch(
-            headless=headless, args=override_browser_args, proxy=random_choice(proxies)
-        )
+        if browser == "chromium":
+            if headless and override_browser_args is None:
+                override_browser_args = ["--headless=new"]
+                headless = False  # managed by the arg
+            self.browser = await self.playwright.chromium.launch(
+                headless=headless, args=override_browser_args, proxy=random_choice(proxies)
+            )
+        elif browser == "firefox":
+            self.browser = await self.playwright.firefox.launch(
+                headless=headless, args=override_browser_args, proxy=random_choice(proxies)
+            )
+        else:
+            raise ValueError("Invalid browser argument passes")
 
         await asyncio.gather(
             *(
