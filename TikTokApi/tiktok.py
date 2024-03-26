@@ -417,7 +417,7 @@ class TikTokApi:
         signed_url = await self.sign_url(encoded_params, session_index=i)
 
         retry_count = 0
-        while i < retries:
+        while retry_count < retries:
             retry_count += 1
             result = await self.run_fetch_script(
                 signed_url, headers=headers, session_index=i
