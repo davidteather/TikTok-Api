@@ -212,6 +212,7 @@ class TikTokApi:
         override_browser_args: list[dict] = None,
         cookies: list[dict] = None,
         suppress_resource_load_types: list[str] = None,
+        executable_path: str = None
     ):
         """
         Create sessions for use within the TikTokApi class.
@@ -243,7 +244,10 @@ class TikTokApi:
             override_browser_args = ["--headless=new"]
             headless = False  # managed by the arg
         self.browser = await self.playwright.chromium.launch(
-            headless=headless, args=override_browser_args, proxy=random_choice(proxies)
+            headless=headless,
+            args=override_browser_args,
+            proxy=random_choice(proxies),
+            executable_path=executable_path
         )
 
         await asyncio.gather(
