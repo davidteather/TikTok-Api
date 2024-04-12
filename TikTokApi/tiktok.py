@@ -212,7 +212,8 @@ class TikTokApi:
         override_browser_args: list[dict] = None,
         cookies: list[dict] = None,
         suppress_resource_load_types: list[str] = None,
-        browser: str = "chromium"
+        browser: str = "chromium",
+        executable_path: str = None
     ):
         """
         Create sessions for use within the TikTokApi class.
@@ -246,11 +247,11 @@ class TikTokApi:
                 override_browser_args = ["--headless=new"]
                 headless = False  # managed by the arg
             self.browser = await self.playwright.chromium.launch(
-                headless=headless, args=override_browser_args, proxy=random_choice(proxies)
+                headless=headless, args=override_browser_args, proxy=random_choice(proxies), executable_path=executable_path
             )
         elif browser == "firefox":
             self.browser = await self.playwright.firefox.launch(
-                headless=headless, args=override_browser_args, proxy=random_choice(proxies)
+                headless=headless, args=override_browser_args, proxy=random_choice(proxies), executable_path=executable_path
             )
         else:
             raise ValueError("Invalid browser argument passed")
@@ -426,7 +427,7 @@ class TikTokApi:
         signed_url = await self.sign_url(encoded_params, session_index=i)
 
         retry_count = 0
-        while i < retries:
+        while retry_count < retries:
             retry_count += 1
             result = await self.run_fetch_script(
                 signed_url, headers=headers, session_index=i
