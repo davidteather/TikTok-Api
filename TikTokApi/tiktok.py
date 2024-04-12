@@ -233,6 +233,7 @@ class TikTokApi:
             cookies (list[dict]): A list of cookies to use for the sessions, you can get these from your cookies after visiting TikTok.
             suppress_resource_load_types (list[str]): Types of resources to suppress playwright from loading, excluding more types will make playwright faster.. Types: document, stylesheet, image, media, font, script, textrack, xhr, fetch, eventsource, websocket, manifest, other.
             browser (str): specify either firefox or chromium, default is chromium
+            executable_path (str): Path to the browser executable
 
         Example Usage:
             .. code-block:: python
