@@ -25,6 +25,13 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
          <b>EnsembleData</b> is the leading API provider for scraping Tiktok, Instagram, Youtube, and more. <br> Trusted by the major influencer marketing and social media listening platforms.
         </div>
     </a>
+ <a href="https://www.ensembledata.com/?utm_source=github&utm_medium=githubpage&utm_campaign=david_thea_github&utm_id=david_thea_github" target="_blank">
+        <img src="https://i.imgur.com/DiZloRH.png" width="100" alt="Sadcaptcha">
+        <b></b>
+        <div>
+         <b>SadCaptcha</b> empowers automation developers to blast through TikTok Rotate, Puzzle, and 3D Shapes Captcha's in a single line of code. <br> Trusted by the major influencer marketing and social media listening platforms.
+        </div>
+    </a>
 </div>
 
 ## Table of Contents
