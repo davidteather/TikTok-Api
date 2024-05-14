@@ -30,7 +30,7 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
         <b></b>
          <br>
         <div>
-         <b>SadCaptcha</b> empowers automation developers to blast through TikTok Rotate, Puzzle, and 3D Shapes Captcha's in a single line of code.
+         <b>SadCaptcha</b> is a TikTok Captcha Solver for developers who need to beat the Puzzle, Rotate, <br> and 3D Shapes challenges. Trusted by 300+ automation developers and businesses.
         </div>
     </a>
 </div>
