@@ -27,7 +27,7 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
     </a>
  <br>
  <a href="https://www.sadcaptcha.com/?ref=davidteather" target="_blank">
-        <img src="https://i.imgur.com/DiZloRH.png" width="100" alt="Sadcaptcha">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/sadcaptcha.png" width="100" alt="Sadcaptcha">
         <b></b>
          <br>
         <div>
