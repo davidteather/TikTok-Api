@@ -25,6 +25,15 @@ These sponsors have paid to be placed here and beyond that I do not have any aff
          <b>EnsembleData</b> is the leading API provider for scraping Tiktok, Instagram, Youtube, and more. <br> Trusted by the major influencer marketing and social media listening platforms.
         </div>
     </a>
+ <br>
+ <a href="https://www.sadcaptcha.com/?ref=davidteather" target="_blank">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/sadcaptcha.png" width="100" alt="Sadcaptcha">
+        <b></b>
+         <br>
+        <div>
+         <b>SadCaptcha</b> is a TikTok Captcha Solver for developers who need a fast and easy way to bypass<br> any TikTok Captcha. Trusted by 300+ automation developers and businesses.
+        </div>
+    </a>
 </div>
 
 ## Table of Contents
