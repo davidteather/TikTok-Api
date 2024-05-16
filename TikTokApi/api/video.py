@@ -216,7 +216,7 @@ class Video:
                 pass
 
         self.create_time = datetime.fromtimestamp(timestamp)
-        self.stats = data["stats"]
+        self.stats = data.get('statsV2') or data.get('stats')
 
         author = data.get("author")
         if isinstance(author, str):
