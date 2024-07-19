@@ -317,6 +317,16 @@ class TikTokApi:
             i = random.randint(0, self.num_sessions - 1)
         return i, self.sessions[i]
 
+    async def set_session_cookies(self, session, cookies):
+        """
+        Set the cookies for a session
+
+        Args:
+            session (TikTokPlaywrightSession): The session to set the cookies for.
+            cookies (dict): The cookies to set for the session.
+        """
+        await session.context.add_cookies(cookies)
+
     async def get_session_cookies(self, session):
         """
         Get the cookies for a session
