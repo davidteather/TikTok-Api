@@ -86,6 +86,54 @@ class User:
         self.as_dict = resp
         self.__extract_from_data()
         return resp
+    
+    async def playlists(self, count=20, cursor=0, **kwargs) -> Iterator[dict]:
+        """
+        Returns a dictionary of information associated with this User's playlist.
+
+        Returns:
+            dict: A dictionary of information associated with this User's playlist.
+
+        Raises:
+            InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.
+
+        Example Usage:
+            .. code-block:: python
+
+                user_data = await api.user(username='therock').playlist()
+        """
+
+        sec_uid = getattr(self, "sec_uid", None)
+        if sec_uid is None or sec_uid == "":
+            await self.info(**kwargs)
+        found = 0
+
+        while found < count:
+          params = {
+              "secUid": sec_uid,
+              "count": count,
+              "cursor": cursor,
+          }
+
+          resp = await self.parent.make_request(
+              url="https://www.tiktok.com/api/user/playlist",
+              params=params,
+              headers=kwargs.get("headers"),
+              session_index=kwargs.get("session_index"),
+          )
+
+          if resp is None:
+              raise InvalidResponseException(resp, "TikTok returned an invalid response.")
+          
+          for playlist in resp.get("playList", []):
+              yield playlist
+              found += 1
+          
+          if not resp.get("hasMore", False):
+              return
+          
+          cursor = resp.get("cursor")
+        
 
     async def videos(self, count=30, cursor=0, **kwargs) -> Iterator[Video]:
         """
