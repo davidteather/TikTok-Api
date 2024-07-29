@@ -51,3 +51,16 @@ async def test_user_likes():
             count += 1
 
         assert count >= 30
+
+@pytest.mark.asyncio
+async def test_user_playlists():
+    api = TikTokApi()
+    async with api:
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
+        user = api.user(username="mrbeast")
+
+        count = 0
+        async for playlist in user.playlists(count=5):
+            count += 1
+        
+        assert count >= 5

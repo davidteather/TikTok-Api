@@ -18,6 +18,9 @@ async def user_example():
             print(video)
             print(video.as_dict)
 
+        async for playlist in user.playlists():
+            print(playlist)
+
 
 if __name__ == "__main__":
     asyncio.run(user_example())
