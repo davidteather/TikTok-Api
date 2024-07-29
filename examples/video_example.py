@@ -20,6 +20,9 @@ async def get_video_example():
 
         video_info = await video.info()  # is HTML request, so avoid using this too much
         print(video_info)
+        video_bytes = await video.bytes()
+        with open("video.mp4", "wb") as f:
+            f.write(video_bytes)
 
 
 if __name__ == "__main__":
