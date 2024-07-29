@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTokApi package &mdash; TikTokAPI v6.3.0 documentation</title>
+  <title>TikTokApi package &mdash; TikTokAPI v6.4.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=7b5eb0ed"></script>
+        <script src="_static/documentation_options.js?v=f5054123"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -60,6 +60,7 @@
 <li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.make_request"><code class="docutils literal notranslate"><span class="pre">TikTokApi.make_request()</span></code></a></li>
 <li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.run_fetch_script"><code class="docutils literal notranslate"><span class="pre">TikTokApi.run_fetch_script()</span></code></a></li>
 <li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.search"><code class="docutils literal notranslate"><span class="pre">TikTokApi.search</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.set_session_cookies"><code class="docutils literal notranslate"><span class="pre">TikTokApi.set_session_cookies()</span></code></a></li>
 <li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.sign_url"><code class="docutils literal notranslate"><span class="pre">TikTokApi.sign_url()</span></code></a></li>
 <li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.sound"><code class="docutils literal notranslate"><span class="pre">TikTokApi.sound</span></code></a></li>
 <li><a class="reference internal" href="#TikTokApi.tiktok.TikTokApi.stop_playwright"><code class="docutils literal notranslate"><span class="pre">TikTokApi.stop_playwright()</span></code></a></li>
@@ -93,6 +94,7 @@
 <li><a class="reference internal" href="#module-TikTokApi.helpers">TikTokApi.helpers module</a><ul>
 <li><a class="reference internal" href="#TikTokApi.helpers.extract_video_id_from_url"><code class="docutils literal notranslate"><span class="pre">extract_video_id_from_url()</span></code></a></li>
 <li><a class="reference internal" href="#TikTokApi.helpers.random_choice"><code class="docutils literal notranslate"><span class="pre">random_choice()</span></code></a></li>
+<li><a class="reference internal" href="#TikTokApi.helpers.requests_cookie_to_playwright_cookie"><code class="docutils literal notranslate"><span class="pre">requests_cookie_to_playwright_cookie()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -296,6 +298,20 @@ If you don’t provide any, the sessions will try to get them themselves, but th
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.set_session_cookies">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_session_cookies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cookies</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/tiktok.html#TikTokApi.set_session_cookies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.set_session_cookies" title="Link to this definition"></a></dt>
+<dd><p>Set the cookies for a session</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session</strong> (<a class="reference internal" href="#TikTokApi.tiktok.TikTokPlaywrightSession" title="TikTokApi.tiktok.TikTokPlaywrightSession"><em>TikTokPlaywrightSession</em></a>) – The session to set the cookies for.</p></li>
+<li><p><strong>cookies</strong> (<em>dict</em>) – The cookies to set for the session.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="TikTokApi.tiktok.TikTokApi.sign_url">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sign_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/tiktok.html#TikTokApi.sign_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.tiktok.TikTokApi.sign_url" title="Link to this definition"></a></dt>
 <dd><p>Sign a url</p>
@@ -440,6 +456,11 @@ If you don’t provide any, the sessions will try to get them themselves, but th
 <span class="sig-prename descclassname"><span class="pre">TikTokApi.helpers.</span></span><span class="sig-name descname"><span class="pre">random_choice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">choices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/helpers.html#random_choice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.helpers.random_choice" title="Link to this definition"></a></dt>
 <dd><p>Return a random choice from a list, or None if the list is empty</p>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="TikTokApi.helpers.requests_cookie_to_playwright_cookie">
+<span class="sig-prename descclassname"><span class="pre">TikTokApi.helpers.</span></span><span class="sig-name descname"><span class="pre">requests_cookie_to_playwright_cookie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req_c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TikTokApi/helpers.html#requests_cookie_to_playwright_cookie"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.helpers.requests_cookie_to_playwright_cookie" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </section>
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTokApi.tiktok &mdash; TikTokAPI v6.3.0 documentation</title>
+  <title>TikTokApi.tiktok &mdash; TikTokAPI v6.4.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=7b5eb0ed"></script>
+        <script src="../../_static/documentation_options.js?v=f5054123"></script>
         <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -398,6 +398,19 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">i</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_sessions</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+<div class="viewcode-block" id="TikTokApi.set_session_cookies">
+<a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.set_session_cookies">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_session_cookies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">cookies</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the cookies for a session</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            session (TikTokPlaywrightSession): The session to set the cookies for.</span>
+<span class="sd">            cookies (dict): The cookies to set for the session.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">add_cookies</span><span class="p">(</span><span class="n">cookies</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="TikTokApi.get_session_cookies">
 <a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.get_session_cookies">[docs]</a>
