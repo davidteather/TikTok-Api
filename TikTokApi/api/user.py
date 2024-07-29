@@ -87,7 +87,7 @@ class User:
         self.__extract_from_data()
         return resp
     
-    async def playlist(self, count=20, cursor=0, **kwargs) -> Iterator[dict]:
+    async def playlists(self, count=20, cursor=0, **kwargs) -> Iterator[dict]:
         """
         Returns a dictionary of information associated with this User's playlist.
 
