@@ -56,7 +56,7 @@ class Comment:
 
         while found < count:
             params = {
-                "count": 20,
+                "count": count,
                 "cursor": cursor,
                 "item_id": self.author.user_id,
                 "comment_id": self.id,

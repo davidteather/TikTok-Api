@@ -244,7 +244,7 @@ class Video:
         while found < count:
             params = {
                 "aweme_id": self.id,
-                "count": 20,
+                "count": count,
                 "cursor": cursor,
             }
 
@@ -293,7 +293,7 @@ class Video:
         while found < count:
             params = {
                 "itemID": self.id,
-                "count": 16,
+                "count": count,
             }
 
             resp = await self.parent.make_request(

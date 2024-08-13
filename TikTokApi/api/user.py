@@ -111,7 +111,7 @@ class User:
         while found < count:
           params = {
               "secUid": sec_uid,
-              "count": 20,
+              "count": count,
               "cursor": cursor,
           }
 
@@ -163,7 +163,7 @@ class User:
         while found < count:
             params = {
                 "secUid": self.sec_uid,
-                "count": 35,
+                "count": count,
                 "cursor": cursor,
             }
 
@@ -218,7 +218,7 @@ class User:
         while found < count:
             params = {
                 "secUid": self.sec_uid,
-                "count": 35,
+                "count": count,
                 "cursor": cursor,
             }
 

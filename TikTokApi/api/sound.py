@@ -114,7 +114,7 @@ class Sound:
         while found < count:
             params = {
                 "musicID": id,
-                "count": 30,
+                "count": count,
                 "cursor": cursor,
             }
 
