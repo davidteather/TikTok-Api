@@ -5,6 +5,8 @@ from datetime import datetime
 import requests
 from ..exceptions import InvalidResponseException
 import json
+import httpx
+from typing import Union, AsyncIterator
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -162,7 +164,7 @@ class Video:
         )
         return video_info
 
-    async def bytes(self, **kwargs) -> bytes:
+    async def bytes(self, stream: bool = False, **kwargs) -> Union[bytes, AsyncIterator[bytes]]:
         """
         Returns the bytes of a TikTok Video.
 
@@ -172,13 +174,16 @@ class Video:
         Example Usage:
             .. code-block:: python
 
-                video_bytes = api.video(id='7041997751718137094').bytes()
+                video_bytes = await api.video(id='7041997751718137094').bytes()
 
                 # Saving The Video
                 with open('saved_video.mp4', 'wb') as output:
                     output.write(video_bytes)
-        """
 
+                # Streaming (if stream=True)
+                async for chunk in api.video(id='7041997751718137094').bytes(stream=True):
+                    # Process or upload chunk
+        """
         i, session = self.parent._get_session(**kwargs)
         downloadAddr = self.as_dict["video"]["downloadAddr"]
 
@@ -189,8 +194,16 @@ class Video:
         h["accept-encoding"] = 'identity;q=1, *;q=0'
         h["referer"] = 'https://www.tiktok.com/'
 
-        resp = requests.get(downloadAddr, headers=h, cookies=cookies)
-        return resp.content
+        if stream:
+            async def stream_bytes():
+                async with httpx.AsyncClient() as client:
+                    async with client.stream('GET', downloadAddr, headers=h, cookies=cookies) as response:
+                        async for chunk in response.aiter_bytes():
+                            yield chunk
+            return stream_bytes()
+        else:
+            resp = requests.get(downloadAddr, headers=h, cookies=cookies)
+            return resp.content
 
     def __extract_from_data(self) -> None:
         data = self.as_dict

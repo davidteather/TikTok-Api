@@ -18,7 +18,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     download_url="https://github.com/davidteather/TikTok-Api/tarball/main",
     keywords=["tiktok", "python3", "api", "unofficial", "tiktok-api", "tiktok api"],
-    install_requires=["requests", "playwright"],
+    install_requires=["requests", "playwright", "httpx"],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
