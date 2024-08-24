@@ -21,7 +21,6 @@ async def test_user_info():
         assert user.user_id == user_id
         assert user.sec_uid == sec_uid
 
-
 @pytest.mark.asyncio
 async def test_user_videos():
     api = TikTokApi()
@@ -34,7 +33,6 @@ async def test_user_videos():
             count += 1
 
         assert count >= 30
-
 
 @pytest.mark.asyncio
 async def test_user_likes():

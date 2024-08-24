@@ -91,6 +91,7 @@ class TikTokApi:
 
     async def __set_session_params(self, session: TikTokPlaywrightSession):
         """Set the session params for a TikTokPlaywrightSession"""
+        print(await session.page.evaluate('navigator.userAgent'))
         user_agent = await session.page.evaluate("() => navigator.userAgent")
         language = await session.page.evaluate(
             "() => navigator.language || navigator.userLanguage"
@@ -252,6 +253,10 @@ class TikTokApi:
             )
         elif browser == "firefox":
             self.browser = await self.playwright.firefox.launch(
+                headless=headless, args=override_browser_args, proxy=random_choice(proxies), executable_path=executable_path
+            )
+        elif browser == "webkit":
+            self.browser = await self.playwright.webkit.launch(
                 headless=headless, args=override_browser_args, proxy=random_choice(proxies), executable_path=executable_path
             )
         else:
