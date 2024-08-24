@@ -76,6 +76,8 @@
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">from</span> <span class="nn">..exceptions</span> <span class="kn">import</span> <span class="n">InvalidResponseException</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">httpx</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">AsyncIterator</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">..tiktok</span> <span class="kn">import</span> <span class="n">TikTokApi</span>
@@ -240,7 +242,7 @@
 
 <div class="viewcode-block" id="Video.bytes">
 <a class="viewcode-back" href="../../../api/video.html#TikTokApi.api.video.Video.bytes">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the bytes of a TikTok Video.</span>
 
@@ -250,13 +252,16 @@
 <span class="sd">        Example Usage:</span>
 <span class="sd">            .. code-block:: python</span>
 
-<span class="sd">                video_bytes = api.video(id=&#39;7041997751718137094&#39;).bytes()</span>
+<span class="sd">                video_bytes = await api.video(id=&#39;7041997751718137094&#39;).bytes()</span>
 
 <span class="sd">                # Saving The Video</span>
 <span class="sd">                with open(&#39;saved_video.mp4&#39;, &#39;wb&#39;) as output:</span>
 <span class="sd">                    output.write(video_bytes)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
 
+<span class="sd">                # Streaming (if stream=True)</span>
+<span class="sd">                async for chunk in api.video(id=&#39;7041997751718137094&#39;).bytes(stream=True):</span>
+<span class="sd">                    # Process or upload chunk</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">i</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">downloadAddr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span><span class="p">[</span><span class="s2">&quot;video&quot;</span><span class="p">][</span><span class="s2">&quot;downloadAddr&quot;</span><span class="p">]</span>
 
@@ -267,8 +272,16 @@
         <span class="n">h</span><span class="p">[</span><span class="s2">&quot;accept-encoding&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;identity;q=1, *;q=0&#39;</span>
         <span class="n">h</span><span class="p">[</span><span class="s2">&quot;referer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;https://www.tiktok.com/&#39;</span>
 
-        <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">downloadAddr</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">cookies</span><span class="o">=</span><span class="n">cookies</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">content</span></div>
+        <span class="k">if</span> <span class="n">stream</span><span class="p">:</span>
+            <span class="k">async</span> <span class="k">def</span> <span class="nf">stream_bytes</span><span class="p">():</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+                    <span class="k">async</span> <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="n">downloadAddr</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">cookies</span><span class="o">=</span><span class="n">cookies</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+                        <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">aiter_bytes</span><span class="p">():</span>
+                            <span class="k">yield</span> <span class="n">chunk</span>
+            <span class="k">return</span> <span class="n">stream_bytes</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">downloadAddr</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">cookies</span><span class="o">=</span><span class="n">cookies</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">content</span></div>
 
 
     <span class="k">def</span> <span class="nf">__extract_from_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
