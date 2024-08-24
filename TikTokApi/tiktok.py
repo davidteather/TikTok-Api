@@ -91,7 +91,6 @@ class TikTokApi:
 
     async def __set_session_params(self, session: TikTokPlaywrightSession):
         """Set the session params for a TikTokPlaywrightSession"""
-        print(await session.page.evaluate('navigator.userAgent'))
         user_agent = await session.page.evaluate("() => navigator.userAgent")
         language = await session.page.evaluate(
             "() => navigator.language || navigator.userLanguage"
