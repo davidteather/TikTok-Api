@@ -179,6 +179,11 @@ class TikTokApi:
             )
 
         await page.goto(url)
+        
+        # by doing this, we are simulate scroll event using mouse to `avoid` bot detection
+        time.sleep(10)
+        await page.mouse.move(0,0)
+        await page.mouse.move(0,100)
 
         session = TikTokPlaywrightSession(
             context,
