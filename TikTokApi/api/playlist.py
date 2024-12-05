@@ -5,6 +5,7 @@ from ..exceptions import InvalidResponseException
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
     from .video import Video
+    from .user import User
 
 
 class Playlist:
@@ -21,6 +22,14 @@ class Playlist:
 
     playlist_id: str
     """The ID of the playlist."""
+    name: Optional[str]
+    """The name of the playlist."""
+    video_count: Optional[int]
+    """The video count of the playlist."""
+    creator: Optional[User]
+    """The creator of the playlist."""
+    cover_url: Optional[str]
+    """The cover URL of the playlist."""
     as_dict: dict
     """The raw data associated with this Playlist."""
 
@@ -33,12 +42,13 @@ class Playlist:
         You must provide the playlist id or playlist data otherwise this
         will not function correctly.
         """
+        if id is None:
+            raise TypeError("You must provide playlist_id parameter.")
+        
+        self.playlist_id = id
         if data is not None:
             self.as_dict = data
-        elif id is None:
-            raise TypeError("You must provide playlist_id parameter.")
-        else:
-            self.playlist_id = id
+            self.__extract_from_data()
 
     async def info(self, **kwargs) -> dict:
         """
@@ -128,6 +138,24 @@ class Playlist:
 
             cursor = resp.get("cursor")
 
+    def __extract_from_data(self):
+        data = self.as_dict
+        keys = data.keys()
+
+        if "mixInfo" in keys:
+            data = data["mixInfo"]
+
+        self.playlist_id = data.get("id", None) or data.get("mixId", None)
+        self.name = data.get("name", None) or data.get("mixName", None)
+        self.video_count = data.get("videoCount", None)
+        self.creator = self.parent.user(data=data.get("author", {}))
+        self.cover_url = data.get("cover", None)
+
+        if None in [self.playlist_id, self.name, self.video_count, self.creator, self.cover_url]:
+            User.parent.logger.error(
+                f"Failed to create Playlist with data: {data}\nwhich has keys {data.keys()}"
+            )
+    
     def __repr__(self):
         return self.__str__()
 
