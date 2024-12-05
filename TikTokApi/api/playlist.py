@@ -148,7 +148,7 @@ class Playlist:
         self.playlist_id = data.get("id", None) or data.get("mixId", None)
         self.name = data.get("name", None) or data.get("mixName", None)
         self.video_count = data.get("videoCount", None)
-        self.creator = self.parent.user(data=data.get("author", {}))
+        self.creator = self.parent.user(data=data.get("creator", {}))
         self.cover_url = data.get("cover", None)
 
         if None in [self.playlist_id, self.name, self.video_count, self.creator, self.cover_url]:
