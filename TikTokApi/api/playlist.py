@@ -161,4 +161,4 @@ class Playlist:
 
     def __str__(self):
         playlist_id = getattr(self, "playlist_id", None)
-        return f"TikTokApi.playlist(_id='{playlist_id}'')"
+        return f"TikTokApi.playlist(playlist_id='{playlist_id}'')"
