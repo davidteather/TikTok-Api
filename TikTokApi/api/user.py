@@ -1,10 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar, Iterator, Optional
+
 from ..exceptions import InvalidResponseException
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
     from .video import Video
+    from .playlist import Playlist
 
 
 class User:
@@ -87,12 +89,12 @@ class User:
         self.__extract_from_data()
         return resp
     
-    async def playlists(self, count=20, cursor=0, **kwargs) -> Iterator[dict]:
+    async def playlists(self, count=20, cursor=0, **kwargs) -> Iterator[Playlist]:
         """
-        Returns a dictionary of information associated with this User's playlist.
+        Returns a user's playlists.
 
         Returns:
-            dict: A dictionary of information associated with this User's playlist.
+            async iterator/generator: Yields TikTokApi.playlist objects.
 
         Raises:
             InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.
@@ -100,7 +102,8 @@ class User:
         Example Usage:
             .. code-block:: python
 
-                user_data = await api.user(username='therock').playlist()
+                async for playlist in await api.user(username='therock').playlists():
+                    # do something
         """
 
         sec_uid = getattr(self, "sec_uid", None)
@@ -126,7 +129,7 @@ class User:
               raise InvalidResponseException(resp, "TikTok returned an invalid response.")
           
           for playlist in resp.get("playList", []):
-              yield playlist
+              yield self.parent.playlist(data=playlist)
               found += 1
           
           if not resp.get("hasMore", False):
