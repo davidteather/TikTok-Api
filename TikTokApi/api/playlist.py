@@ -20,7 +20,7 @@ class Playlist:
 
     parent: ClassVar[TikTokApi]
 
-    playlist_id: str
+    playlist_id: Optional[str]
     """The ID of the playlist."""
     name: Optional[str]
     """The name of the playlist."""
@@ -35,17 +35,19 @@ class Playlist:
 
     def __init__(
         self,
-        id: str = None,
+        id: Optional[str] = None,
         data: Optional[dict] = None,
     ):
         """
         You must provide the playlist id or playlist data otherwise this
         will not function correctly.
         """
-        if id is None:
+
+        if id is None and data.get("id") is None:
             raise TypeError("You must provide playlist_id parameter.")
         
         self.playlist_id = id
+
         if data is not None:
             self.as_dict = data
             self.__extract_from_data()
