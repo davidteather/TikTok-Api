@@ -216,6 +216,7 @@ class TikTokApi:
         executable_path: str = None
     ):
         """
+        Its MIneeeeeeeeeeeeee
         Create sessions for use within the TikTokApi class.
 
         These sessions are what will carry out requesting your data from TikTok.
