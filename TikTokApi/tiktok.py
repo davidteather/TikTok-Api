@@ -91,18 +91,14 @@ class TikTokApi:
 
     async def __set_session_params(self, session: TikTokPlaywrightSession):
         """Set the session params for a TikTokPlaywrightSession"""
-        user_agent = await session.page.evaluate("() => navigator.userAgent")
-        language = await session.page.evaluate(
-            "() => navigator.language || navigator.userLanguage"
-        )
-        platform = await session.page.evaluate("() => navigator.platform")
+        user_agent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36"
+        language = "ja-JP"
+        platform = "web_pc"
         device_id = str(random.randint(10**18, 10**19 - 1))  # Random device id
         history_len = str(random.randint(1, 10))  # Random history length
         screen_height = str(random.randint(600, 1080))  # Random screen height
         screen_width = str(random.randint(800, 1920))  # Random screen width
-        timezone = await session.page.evaluate(
-            "() => Intl.DateTimeFormat().resolvedOptions().timeZone"
-        )
+        timezone = "Asia/Tokyo"
 
         session_params = {
             "aid": "1988",
@@ -207,7 +203,7 @@ class TikTokApi:
         ms_tokens: list[str] = None,
         proxies: list = None,
         sleep_after=1,
-        starting_url="https://www.tiktok.com",
+        starting_url="https://www.tiktok.com/@test",
         context_options: dict = {},
         override_browser_args: list[dict] = None,
         cookies: list[dict] = None,
