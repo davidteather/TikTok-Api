@@ -203,7 +203,7 @@ class TikTokApi:
         ms_tokens: list[str] = None,
         proxies: list = None,
         sleep_after=1,
-        starting_url="https://www.tiktok.com/@test",
+        starting_url="https://www.tiktok.com/login",
         context_options: dict = {},
         override_browser_args: list[dict] = None,
         cookies: list[dict] = None,
