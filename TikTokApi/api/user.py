@@ -112,30 +112,30 @@ class User:
         found = 0
 
         while found < count:
-          params = {
-              "secUid": sec_uid,
-              "count": 20,
-              "cursor": cursor,
-          }
+            params = {
+                "secUid": sec_uid,
+                "count": 20,
+                "cursor": cursor,
+            }
 
-          resp = await self.parent.make_request(
-              url="https://www.tiktok.com/api/user/playlist",
-              params=params,
-              headers=kwargs.get("headers"),
-              session_index=kwargs.get("session_index"),
-          )
+            resp = await self.parent.make_request(
+                url="https://www.tiktok.com/api/user/playlist",
+                params=params,
+                headers=kwargs.get("headers"),
+                session_index=kwargs.get("session_index"),
+            )
 
-          if resp is None:
-              raise InvalidResponseException(resp, "TikTok returned an invalid response.")
-          
-          for playlist in resp.get("playList", []):
-              yield self.parent.playlist(data=playlist)
-              found += 1
-          
-          if not resp.get("hasMore", False):
-              return
-          
-          cursor = resp.get("cursor")
+            if resp is None:
+                raise InvalidResponseException(resp, "TikTok returned an invalid response.")
+            
+            for playlist in resp.get("playList", []):
+                yield self.parent.playlist(data=playlist)
+                found += 1
+            
+            if not resp.get("hasMore", False):
+                return
+            
+            cursor = resp.get("cursor")
         
 
     async def videos(self, count=30, cursor=0, **kwargs) -> Iterator[Video]:
