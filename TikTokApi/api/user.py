@@ -114,7 +114,7 @@ class User:
         while found < count:
             params = {
                 "secUid": self.sec_uid,
-                "count": 20,
+                "count": min(count, 20),
                 "cursor": cursor,
             }
 
