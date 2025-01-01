@@ -20,7 +20,7 @@ class Playlist:
 
     parent: ClassVar[TikTokApi]
 
-    playlist_id: Optional[str]
+    id: Optional[str]
     """The ID of the playlist."""
     name: Optional[str]
     """The name of the playlist."""
@@ -44,9 +44,9 @@ class Playlist:
         """
 
         if id is None and data.get("id") is None:
-            raise TypeError("You must provide playlist_id parameter.")
+            raise TypeError("You must provide id parameter.")
         
-        self.playlist_id = id
+        self.id = id
 
         if data is not None:
             self.as_dict = data
@@ -65,17 +65,17 @@ class Playlist:
         Example Usage:
             .. code-block:: python
 
-                user_data = await api.playlist(playlist_id='7426714779919797038').info()
+                user_data = await api.playlist(id='7426714779919797038').info()
         """
 
-        playlist_id = getattr(self, "playlist_id", None)
-        if not playlist_id:
+        id = getattr(self, "id", None)
+        if not id:
             raise TypeError(
                 "You must provide the playlist id when creating this class to use this method."
             )
 
         url_params = {
-            "mixId": playlist_id,
+            "mixId": id,
             "msToken": kwargs.get("ms_token"),
         }
 
@@ -90,6 +90,7 @@ class Playlist:
             raise InvalidResponseException(resp, "TikTok returned an invalid response.")
 
         self.as_dict = resp["mixInfo"]
+        self.__extract_from_data()
         return resp
     
     async def videos(self, count=30, cursor=0, **kwargs) -> Iterator[Video]:
@@ -107,14 +108,14 @@ class Playlist:
 
                 playlist_videos = await api.playlist(id='7426714779919797038').videos()
         """
-        playlist_id = getattr(self, "playlist_id", None)
-        if playlist_id is None or playlist_id == "":
+        id = getattr(self, "id", None)
+        if id is None or id == "":
             await self.info(**kwargs)
 
         found = 0
         while found < count:
             params = {
-              "mixId": playlist_id,
+              "mixId": id,
               "count": count,
               "cursor": cursor,
           }
@@ -147,13 +148,13 @@ class Playlist:
         if "mixInfo" in keys:
             data = data["mixInfo"]
 
-        self.playlist_id = data.get("id", None) or data.get("mixId", None)
+        self.id = data.get("id", None) or data.get("mixId", None)
         self.name = data.get("name", None) or data.get("mixName", None)
         self.video_count = data.get("videoCount", None)
         self.creator = self.parent.user(data=data.get("creator", {}))
         self.cover_url = data.get("cover", None)
 
-        if None in [self.playlist_id, self.name, self.video_count, self.creator, self.cover_url]:
+        if None in [self.id, self.name, self.video_count, self.creator, self.cover_url]:
             User.parent.logger.error(
                 f"Failed to create Playlist with data: {data}\nwhich has keys {data.keys()}"
             )
@@ -162,5 +163,5 @@ class Playlist:
         return self.__str__()
 
     def __str__(self):
-        playlist_id = getattr(self, "playlist_id", None)
-        return f"TikTokApi.playlist(playlist_id='{playlist_id}'')"
+        id = getattr(self, "id", None)
+        return f"TikTokApi.playlist(id='{id}'')"
