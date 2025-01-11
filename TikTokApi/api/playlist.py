@@ -116,7 +116,7 @@ class Playlist:
         while found < count:
             params = {
               "mixId": id,
-              "count": count,
+              "count": min(count, 30),
               "cursor": cursor,
           }
 
