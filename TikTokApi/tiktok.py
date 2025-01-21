@@ -143,6 +143,7 @@ class TikTokApi:
         sleep_after: int = 1,
         cookies: dict = None,
         suppress_resource_load_types: list[str] = None,
+        timeout: int = 300000,
     ):
         """Create a TikTokPlaywrightSession"""
         if ms_token is not None:
@@ -177,6 +178,9 @@ class TikTokApi:
                 if request.resource_type in suppress_resource_load_types
                 else route.continue_(),
             )
+        
+        # Set the navigation timeout
+        page.set_default_navigation_timeout(timeout)
 
         await page.goto(url)
         await page.goto(url) # hack: tiktok blocks first request not sure why
@@ -214,7 +218,8 @@ class TikTokApi:
         cookies: list[dict] = None,
         suppress_resource_load_types: list[str] = None,
         browser: str = "chromium",
-        executable_path: str = None
+        executable_path: str = None,
+        timeout: int = 300000,
     ):
         """
         Create sessions for use within the TikTokApi class.
@@ -235,6 +240,7 @@ class TikTokApi:
             suppress_resource_load_types (list[str]): Types of resources to suppress playwright from loading, excluding more types will make playwright faster.. Types: document, stylesheet, image, media, font, script, textrack, xhr, fetch, eventsource, websocket, manifest, other.
             browser (str): specify either firefox or chromium, default is chromium
             executable_path (str): Path to the browser executable
+            timeout (int): The timeout in milliseconds for page navigation
 
         Example Usage:
             .. code-block:: python
@@ -272,6 +278,7 @@ class TikTokApi:
                     sleep_after=sleep_after,
                     cookies=random_choice(cookies),
                     suppress_resource_load_types=suppress_resource_load_types,
+                    timeout=timeout,
                 )
                 for _ in range(num_sessions)
             )
