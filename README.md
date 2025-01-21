@@ -123,7 +123,7 @@ ms_token = os.environ.get("ms_token", None) # get your own ms_token from your co
 
 async def trending_videos():
     async with TikTokApi() as api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", None))
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"))
         async for video in api.trending.videos(count=30):
             print(video)
             print(video.as_dict)
