@@ -9,7 +9,7 @@ ms_token = os.environ.get(
 
 async def get_video_example():
     async with TikTokApi() as api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"))
         video = api.video(
             url="https://www.tiktok.com/@davidteathercodes/video/7074717081563942186"
         )
