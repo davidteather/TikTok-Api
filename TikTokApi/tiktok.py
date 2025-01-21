@@ -6,7 +6,7 @@ import random
 import time
 import json
 
-from playwright.async_api import async_playwright
+from playwright.async_api import async_playwright, TimeoutError
 from urllib.parse import urlencode, quote, urlparse
 from .stealth import stealth_async
 from .helpers import random_choice
@@ -143,6 +143,7 @@ class TikTokApi:
         sleep_after: int = 1,
         cookies: dict = None,
         suppress_resource_load_types: list[str] = None,
+        timeout: int = 30000,
     ):
         """Create a TikTokPlaywrightSession"""
         if ms_token is not None:
@@ -177,13 +178,20 @@ class TikTokApi:
                 if request.resource_type in suppress_resource_load_types
                 else route.continue_(),
             )
+        
+        # Set the navigation timeout
+        page.set_default_navigation_timeout(timeout)
 
         await page.goto(url)
+        await page.goto(url) # hack: tiktok blocks first request not sure why, likely bot detection
         
         # by doing this, we are simulate scroll event using mouse to `avoid` bot detection
-        time.sleep(10)
-        await page.mouse.move(0,0)
-        await page.mouse.move(0,100)
+        await page.wait_for_load_state("networkidle")
+        x, y = random.randint(0, 50), random.randint(0, 50)
+        a, b = random.randint(1, 50), random.randint(100, 200)
+
+        await page.mouse.move(x, y)
+        await page.mouse.move(a, b)
 
         session = TikTokPlaywrightSession(
             context,
@@ -218,7 +226,8 @@ class TikTokApi:
         cookies: list[dict] = None,
         suppress_resource_load_types: list[str] = None,
         browser: str = "chromium",
-        executable_path: str = None
+        executable_path: str = None,
+        timeout: int = 30000,
     ):
         """
         Create sessions for use within the TikTokApi class.
@@ -239,6 +248,7 @@ class TikTokApi:
             suppress_resource_load_types (list[str]): Types of resources to suppress playwright from loading, excluding more types will make playwright faster.. Types: document, stylesheet, image, media, font, script, textrack, xhr, fetch, eventsource, websocket, manifest, other.
             browser (str): specify either firefox or chromium, default is chromium
             executable_path (str): Path to the browser executable
+            timeout (int): The timeout in milliseconds for page navigation
 
         Example Usage:
             .. code-block:: python
@@ -276,6 +286,7 @@ class TikTokApi:
                     sleep_after=sleep_after,
                     cookies=random_choice(cookies),
                     suppress_resource_load_types=suppress_resource_load_types,
+                    timeout=timeout,
                 )
                 for _ in range(num_sessions)
             )
@@ -368,7 +379,23 @@ class TikTokApi:
     async def generate_x_bogus(self, url: str, **kwargs):
         """Generate the X-Bogus header for a url"""
         _, session = self._get_session(**kwargs)
-        await session.page.wait_for_function("window.byted_acrawler !== undefined")
+
+        max_attempts = 5
+        attempts = 0
+        while attempts < max_attempts:
+            attempts += 1
+            try:
+                timeout_time = random.randint(5000, 20000)
+                await session.page.wait_for_function("window.byted_acrawler !== undefined", timeout=timeout_time)
+                break
+            except TimeoutError as e:
+                if attempts == max_attempts:
+                    raise TimeoutError(f"Failed to load tiktok after {max_attempts} attempts, consider using a proxy")
+                
+                try_urls = ["https://www.tiktok.com/foryou", "https://www.tiktok.com", "https://www.tiktok.com/@tiktok", "https://www.tiktok.com/foryou"]
+
+                await session.page.goto(random.choice(try_urls))
+        
         result = await session.page.evaluate(
             f'() => {{ return window.byted_acrawler.frontierSign("{url}") }}'
         )
@@ -457,7 +484,7 @@ class TikTokApi:
                 raise Exception("TikTokApi.run_fetch_script returned None")
 
             if result == "":
-                raise EmptyResponseException(result, "TikTok returned an empty response")
+                raise EmptyResponseException(result, "TikTok returned an empty response. They are detecting you're a bot, try some of these: headless=False, browser='webkit', consider using a proxy")
 
             try:
                 data = json.loads(result)
