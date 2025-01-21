@@ -143,7 +143,7 @@ class TikTokApi:
         sleep_after: int = 1,
         cookies: dict = None,
         suppress_resource_load_types: list[str] = None,
-        timeout: int = 300000,
+        timeout: int = 30000,
     ):
         """Create a TikTokPlaywrightSession"""
         if ms_token is not None:
@@ -219,7 +219,7 @@ class TikTokApi:
         suppress_resource_load_types: list[str] = None,
         browser: str = "chromium",
         executable_path: str = None,
-        timeout: int = 300000,
+        timeout: int = 30000,
     ):
         """
         Create sessions for use within the TikTokApi class.
