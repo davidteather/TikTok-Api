@@ -6,7 +6,7 @@ import random
 import time
 import json
 
-from playwright.async_api import async_playwright
+from playwright.async_api import async_playwright, TimeoutError
 from urllib.parse import urlencode, quote, urlparse
 from .stealth import stealth_async
 from .helpers import random_choice
@@ -179,6 +179,7 @@ class TikTokApi:
             )
 
         await page.goto(url)
+        await page.goto(url) # hack: tiktok blocks first request not sure why
 
         session = TikTokPlaywrightSession(
             context,
@@ -363,7 +364,23 @@ class TikTokApi:
     async def generate_x_bogus(self, url: str, **kwargs):
         """Generate the X-Bogus header for a url"""
         _, session = self._get_session(**kwargs)
-        await session.page.wait_for_function("window.byted_acrawler !== undefined")
+
+        max_attempts = 5
+        attempts = 0
+        while attempts < max_attempts:
+            attempts += 1
+            try:
+                timeout_time = random.randint(5000, 20000)
+                await session.page.wait_for_function("window.byted_acrawler !== undefined", timeout=timeout_time)
+                break
+            except TimeoutError as e:
+                if attempts == max_attempts:
+                    raise TimeoutError(f"Failed to load tiktok after {max_attempts} attempts, consider using a proxy")
+                
+                try_urls = ["https://www.tiktok.com/foryou", "https://www.tiktok.com", "https://www.tiktok.com/@tiktok", "https://www.tiktok.com/foryou"]
+
+                await session.page.goto(random.choice(try_urls))
+        
         result = await session.page.evaluate(
             f'() => {{ return window.byted_acrawler.frontierSign("{url}") }}'
         )
@@ -452,7 +469,7 @@ class TikTokApi:
                 raise Exception("TikTokApi.run_fetch_script returned None")
 
             if result == "":
-                raise EmptyResponseException(result, "TikTok returned an empty response")
+                raise EmptyResponseException(result, "TikTok returned an empty response. They are detecting you're a bot, try some of these: headless=False, browser='webkit', consider using a proxy")
 
             try:
                 data = json.loads(result)
