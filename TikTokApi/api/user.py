@@ -5,6 +5,7 @@ from ..exceptions import InvalidResponseException
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
     from .video import Video
+    from .playlist import Playlist
 
 
 class User:
@@ -87,12 +88,12 @@ class User:
         self.__extract_from_data()
         return resp
     
-    async def playlists(self, count=20, cursor=0, **kwargs) -> Iterator[dict]:
+    async def playlists(self, count=20, cursor=0, **kwargs) -> Iterator[Playlist]:
         """
-        Returns a dictionary of information associated with this User's playlist.
+        Returns a user's playlists.
 
         Returns:
-            dict: A dictionary of information associated with this User's playlist.
+            async iterator/generator: Yields TikTokApi.playlist objects.
 
         Raises:
             InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.
@@ -100,7 +101,8 @@ class User:
         Example Usage:
             .. code-block:: python
 
-                user_data = await api.user(username='therock').playlist()
+                async for playlist in await api.user(username='therock').playlists():
+                    # do something
         """
 
         sec_uid = getattr(self, "sec_uid", None)
@@ -109,30 +111,30 @@ class User:
         found = 0
 
         while found < count:
-          params = {
-              "secUid": sec_uid,
-              "count": 20,
-              "cursor": cursor,
-          }
+            params = {
+                "secUid": self.sec_uid,
+                "count": min(count, 20),
+                "cursor": cursor,
+            }
 
-          resp = await self.parent.make_request(
-              url="https://www.tiktok.com/api/user/playlist",
-              params=params,
-              headers=kwargs.get("headers"),
-              session_index=kwargs.get("session_index"),
-          )
+            resp = await self.parent.make_request(
+                url="https://www.tiktok.com/api/user/playlist",
+                params=params,
+                headers=kwargs.get("headers"),
+                session_index=kwargs.get("session_index"),
+            )
 
-          if resp is None:
-              raise InvalidResponseException(resp, "TikTok returned an invalid response.")
-          
-          for playlist in resp.get("playList", []):
-              yield playlist
-              found += 1
-          
-          if not resp.get("hasMore", False):
-              return
-          
-          cursor = resp.get("cursor")
+            if resp is None:
+                raise InvalidResponseException(resp, "TikTok returned an invalid response.")
+            
+            for playlist in resp.get("playList", []):
+                yield self.parent.playlist(data=playlist)
+                found += 1
+            
+            if not resp.get("hasMore", False):
+                return
+            
+            cursor = resp.get("cursor")
         
 
     async def videos(self, count=30, cursor=0, **kwargs) -> Iterator[Video]:

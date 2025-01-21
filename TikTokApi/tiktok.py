@@ -18,6 +18,7 @@ from .api.hashtag import Hashtag
 from .api.comment import Comment
 from .api.trending import Trending
 from .api.search import Search
+from .api.playlist import Playlist
 
 from .exceptions import (
     InvalidJSONException,
@@ -55,6 +56,7 @@ class TikTokApi:
     comment = Comment
     trending = Trending
     search = Search
+    playlist = Playlist
 
     def __init__(self, logging_level: int = logging.WARN, logger_name: str = None):
         """
@@ -77,6 +79,7 @@ class TikTokApi:
         Comment.parent = self
         Trending.parent = self
         Search.parent = self
+        Playlist.parent = self
 
     def __create_logger(self, name: str, level: int = logging.DEBUG):
         """Create a logger for the class."""
