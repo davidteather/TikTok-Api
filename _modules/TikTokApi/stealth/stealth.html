@@ -1,23 +1,21 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTokApi.stealth.stealth &mdash; TikTokAPI v6.5.2 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+  <title>TikTokApi.stealth.stealth &mdash; TikTokAPI v7.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
     <link rel="canonical" href="https://davidteather.github.io/TikTok-Api/_modules/TikTokApi/stealth/stealth.html" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=17500509"></script>
-        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=14515140"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -70,30 +68,30 @@
              
   <h1>Source code for TikTokApi.stealth.stealth</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
 
-<span class="kn">from</span> <span class="nn">playwright.async_api</span> <span class="kn">import</span> <span class="n">Page</span> <span class="k">as</span> <span class="n">AsyncPage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">playwright.async_api</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span> <span class="k">as</span> <span class="n">AsyncPage</span>
 
-<span class="kn">from</span> <span class="nn">.js.chrome_app</span> <span class="kn">import</span> <span class="n">chrome_app</span>
-<span class="kn">from</span> <span class="nn">.js.chrome_csi</span> <span class="kn">import</span> <span class="n">chrome_csi</span>
-<span class="kn">from</span> <span class="nn">.js.chrome_hairline</span> <span class="kn">import</span> <span class="n">chrome_hairline</span>
-<span class="kn">from</span> <span class="nn">.js.chrome_load_times</span> <span class="kn">import</span> <span class="n">chrome_load_times</span>
-<span class="kn">from</span> <span class="nn">.js.chrome_runtime</span> <span class="kn">import</span> <span class="n">chrome_runtime</span>
-<span class="kn">from</span> <span class="nn">.js.generate_magic_arrays</span> <span class="kn">import</span> <span class="n">generate_magic_arrays</span>
-<span class="kn">from</span> <span class="nn">.js.iframe_contentWindow</span> <span class="kn">import</span> <span class="n">iframe_contentWindow</span>
-<span class="kn">from</span> <span class="nn">.js.media_codecs</span> <span class="kn">import</span> <span class="n">media_codecs</span>
-<span class="kn">from</span> <span class="nn">.js.navigator_hardwareConcurrency</span> <span class="kn">import</span> <span class="n">navigator_hardwareConcurrency</span>
-<span class="kn">from</span> <span class="nn">.js.navigator_languages</span> <span class="kn">import</span> <span class="n">navigator_languages</span>
-<span class="kn">from</span> <span class="nn">.js.navigator_permissions</span> <span class="kn">import</span> <span class="n">navigator_permissions</span>
-<span class="kn">from</span> <span class="nn">.js.navigator_platform</span> <span class="kn">import</span> <span class="n">navigator_platform</span>
-<span class="kn">from</span> <span class="nn">.js.navigator_plugins</span> <span class="kn">import</span> <span class="n">navigator_plugins</span>
-<span class="kn">from</span> <span class="nn">.js.navigator_userAgent</span> <span class="kn">import</span> <span class="n">navigator_userAgent</span>
-<span class="kn">from</span> <span class="nn">.js.navigator_vendor</span> <span class="kn">import</span> <span class="n">navigator_vendor</span>
-<span class="kn">from</span> <span class="nn">.js.webgl_vendor</span> <span class="kn">import</span> <span class="n">webgl_vendor</span>
-<span class="kn">from</span> <span class="nn">.js.window_outerdimensions</span> <span class="kn">import</span> <span class="n">window_outerdimensions</span>
-<span class="kn">from</span> <span class="nn">.js.utils</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.chrome_app</span><span class="w"> </span><span class="kn">import</span> <span class="n">chrome_app</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.chrome_csi</span><span class="w"> </span><span class="kn">import</span> <span class="n">chrome_csi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.chrome_hairline</span><span class="w"> </span><span class="kn">import</span> <span class="n">chrome_hairline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.chrome_load_times</span><span class="w"> </span><span class="kn">import</span> <span class="n">chrome_load_times</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.chrome_runtime</span><span class="w"> </span><span class="kn">import</span> <span class="n">chrome_runtime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.generate_magic_arrays</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_magic_arrays</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.iframe_contentWindow</span><span class="w"> </span><span class="kn">import</span> <span class="n">iframe_contentWindow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.media_codecs</span><span class="w"> </span><span class="kn">import</span> <span class="n">media_codecs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.navigator_hardwareConcurrency</span><span class="w"> </span><span class="kn">import</span> <span class="n">navigator_hardwareConcurrency</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.navigator_languages</span><span class="w"> </span><span class="kn">import</span> <span class="n">navigator_languages</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.navigator_permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">navigator_permissions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.navigator_platform</span><span class="w"> </span><span class="kn">import</span> <span class="n">navigator_platform</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.navigator_plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">navigator_plugins</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.navigator_userAgent</span><span class="w"> </span><span class="kn">import</span> <span class="n">navigator_userAgent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.navigator_vendor</span><span class="w"> </span><span class="kn">import</span> <span class="n">navigator_vendor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.webgl_vendor</span><span class="w"> </span><span class="kn">import</span> <span class="n">webgl_vendor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.window_outerdimensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">window_outerdimensions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.js.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
 
 <span class="n">SCRIPTS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;chrome_csi&quot;</span><span class="p">:</span> <span class="n">chrome_csi</span><span class="p">,</span>
@@ -121,7 +119,7 @@
 <div class="viewcode-block" id="StealthConfig">
 <a class="viewcode-back" href="../../../TikTokApi.stealth.html#TikTokApi.stealth.stealth.StealthConfig">[docs]</a>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">StealthConfig</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StealthConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Playwright stealth configuration that applies stealth strategies to playwright page objects.</span>
 <span class="sd">    The stealth strategies are contained in ./js package and are basic javascript scripts that are executed</span>
@@ -168,7 +166,7 @@
     <span class="n">runOnInsecureOrigins</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">enabled_scripts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">enabled_scripts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">opts</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
             <span class="p">{</span>
                 <span class="s2">&quot;webgl_vendor&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span>
@@ -223,7 +221,7 @@
 
 <div class="viewcode-block" id="stealth_async">
 <a class="viewcode-back" href="../../../TikTokApi.stealth.html#TikTokApi.stealth.stealth.stealth_async">[docs]</a>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">stealth_async</span><span class="p">(</span><span class="n">page</span><span class="p">:</span> <span class="n">AsyncPage</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">StealthConfig</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stealth_async</span><span class="p">(</span><span class="n">page</span><span class="p">:</span> <span class="n">AsyncPage</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">StealthConfig</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;stealth the page&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="p">(</span><span class="n">config</span> <span class="ow">or</span> <span class="n">StealthConfig</span><span class="p">())</span><span class="o">.</span><span class="n">enabled_scripts</span><span class="p">:</span>
         <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">add_init_script</span><span class="p">(</span><span class="n">script</span><span class="p">)</span></div>
