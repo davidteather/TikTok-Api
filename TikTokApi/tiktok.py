@@ -205,7 +205,7 @@ class TikTokApi:
             base_url=url,
         )
         if ms_token is None:
-            time.sleep(sleep_after)  # TODO: Find a better way to wait for msToken
+            await asyncio.sleep(sleep_after)
             cookies = await self.get_session_cookies(session)
             ms_token = cookies.get("msToken")
             session.ms_token = ms_token
