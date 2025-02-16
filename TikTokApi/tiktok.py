@@ -216,49 +216,79 @@ class TikTokApi:
         self.sessions.append(session)
         await self.__set_session_params(session)
 
-    async def create_sessions(
+    async def __create_authenticated_session(
         self,
+        auth_cookies: str,
+        url: str = "https://www.tiktok.com",
+        proxy: str = None,
+        context_options: dict = {},
+        sleep_after: int = 1,
+        suppress_resource_load_types: list[str] = None,
+        timeout: int = 30000,
+    ):
+        """Create an authenticated TikTokPlaywrightSession using provided cookies
+
+        Args:
+            auth_cookies (str): Authentication cookies string from TikTok in the format "key1=value1;key2=value2"
+            url (str): The url to start the session on
+            proxy (str): Proxy to use for the session
+            context_options (dict): Additional options for the playwright context
+            sleep_after (int): Time to sleep after creating the session
+            suppress_resource_load_types (list[str]): Types of resources to suppress
+            timeout (int): Navigation timeout in milliseconds
+
+        Returns:
+            None
+        """
+        # Parse cookies string into a dictionary
+        cookies = {}
+        for cookie in auth_cookies.split(';'):
+            if '=' in cookie:
+                name, value = cookie.strip().split('=', 1)
+                cookies[name] = value
+
+        # Create session with parsed cookies
+        await self.__create_session(
+            url=url,
+            proxy=proxy,
+            context_options=context_options,
+            sleep_after=sleep_after,
+            cookies=cookies,
+            suppress_resource_load_types=suppress_resource_load_types,
+            timeout=timeout
+        )
+
+    async def create_authenticated_sessions(
+        self,
+        auth_cookies: str,
         num_sessions=5,
         headless=True,
-        ms_tokens: list[str] = None,
         proxies: list = None,
         sleep_after=1,
         starting_url="https://www.tiktok.com",
         context_options: dict = {},
         override_browser_args: list[dict] = None,
-        cookies: list[dict] = None,
         suppress_resource_load_types: list[str] = None,
         browser: str = "chromium",
         executable_path: str = None,
         timeout: int = 30000,
     ):
         """
-        Create sessions for use within the TikTokApi class.
-
-        These sessions are what will carry out requesting your data from TikTok.
+        Create authenticated sessions for use within the TikTokApi class.
 
         Args:
-            num_sessions (int): The amount of sessions you want to create.
-            headless (bool): Whether or not you want the browser to be headless.
-            ms_tokens (list[str]): A list of msTokens to use for the sessions, you can get these from your cookies after visiting TikTok.
-                                   If you don't provide any, the sessions will try to get them themselves, but this is not guaranteed to work.
-            proxies (list): A list of proxies to use for the sessions
-            sleep_after (int): The amount of time to sleep after creating a session, this is to allow the msToken to be generated.
-            starting_url (str): The url to start the sessions on, this is usually https://www.tiktok.com.
-            context_options (dict): Options to pass to the playwright context.
-            override_browser_args (list[dict]): A list of dictionaries containing arguments to pass to the browser.
-            cookies (list[dict]): A list of cookies to use for the sessions, you can get these from your cookies after visiting TikTok.
-            suppress_resource_load_types (list[str]): Types of resources to suppress playwright from loading, excluding more types will make playwright faster.. Types: document, stylesheet, image, media, font, script, textrack, xhr, fetch, eventsource, websocket, manifest, other.
-            browser (str): firefox, chromium, or webkit; default is chromium
-            executable_path (str): Path to the browser executable
-            timeout (int): The timeout in milliseconds for page navigation
-
-        Example Usage:
-            .. code-block:: python
-
-                from TikTokApi import TikTokApi
-                with TikTokApi() as api:
-                    await api.create_sessions(num_sessions=5, ms_tokens=['msToken1', 'msToken2'])
+            auth_cookies (str): Authentication cookies string from TikTok in the format "key1=value1;key2=value2"
+            num_sessions (int): The amount of sessions to create
+            headless (bool): Whether to run the browser in headless mode
+            proxies (list): List of proxies to use
+            sleep_after (int): Time to sleep after creating each session
+            starting_url (str): The initial URL to navigate to
+            context_options (dict): Additional options for the playwright context
+            override_browser_args (list[dict]): Browser arguments to override
+            suppress_resource_load_types (list[str]): Types of resources to suppress
+            browser (str): Browser to use (chromium, firefox, or webkit)
+            executable_path (str): Path to browser executable
+            timeout (int): Navigation timeout in milliseconds
         """
         self.playwright = await async_playwright().start()
         if browser == "chromium":
@@ -281,13 +311,12 @@ class TikTokApi:
 
         await asyncio.gather(
             *(
-                self.__create_session(
+                self.__create_authenticated_session(
+                    auth_cookies=auth_cookies,
                     proxy=random_choice(proxies),
-                    ms_token=random_choice(ms_tokens),
                     url=starting_url,
                     context_options=context_options,
                     sleep_after=sleep_after,
-                    cookies=random_choice(cookies),
                     suppress_resource_load_types=suppress_resource_load_types,
                     timeout=timeout,
                 )
