@@ -2,7 +2,7 @@ from __future__ import annotations
 from ..exceptions import InvalidResponseException
 from .video import Video
 
-from typing import TYPE_CHECKING, Iterator
+from typing import TYPE_CHECKING, AsyncIterator
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -14,7 +14,7 @@ class Trending:
     parent: TikTokApi
 
     @staticmethod
-    async def videos(count=30, **kwargs) -> Iterator[Video]:
+    async def videos(count=30, **kwargs) -> AsyncIterator[Video]:
         """
         Returns Videos that are trending on TikTok.
 

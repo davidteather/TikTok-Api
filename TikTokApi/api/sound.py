@@ -84,7 +84,7 @@ class Sound:
         self.__extract_from_data()
         return resp
 
-    async def videos(self, count=30, cursor=0, **kwargs) -> Iterator[Video]:
+    async def videos(self, count=30, cursor=0, **kwargs) -> AsyncIterator[Video]:
         """
         Returns Video objects of videos created with this sound.
 

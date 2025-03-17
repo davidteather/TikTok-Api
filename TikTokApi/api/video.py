@@ -1,6 +1,6 @@
 from __future__ import annotations
 from ..helpers import extract_video_id_from_url, requests_cookie_to_playwright_cookie
-from typing import TYPE_CHECKING, ClassVar, Iterator, Optional
+from typing import TYPE_CHECKING, ClassVar, AsyncIterator, Optional
 from datetime import datetime
 import requests
 from ..exceptions import InvalidResponseException
@@ -152,14 +152,14 @@ class Video:
                 raise InvalidResponseException(
                     r.text, "TikTok returned an invalid response structure.", error_code=r.status_code
                 )
-            
+
         self.as_dict = video_info
         self.__extract_from_data()
 
         cookies = [requests_cookie_to_playwright_cookie(c) for c in r.cookies]
 
         await self.parent.set_session_cookies(
-            session, 
+            session,
             cookies
         )
         return video_info
@@ -235,7 +235,7 @@ class Video:
                 f"Failed to create Video with data: {data}\nwhich has keys {data.keys()}"
             )
 
-    async def comments(self, count=20, cursor=0, **kwargs) -> Iterator[Comment]:
+    async def comments(self, count=20, cursor=0, **kwargs) -> AsyncIterator[Comment]:
         """
         Returns the comments of a TikTok Video.
 
@@ -284,7 +284,7 @@ class Video:
 
     async def related_videos(
         self, count: int = 30, cursor: int = 0, **kwargs
-    ) -> Iterator[Video]:
+    ) -> AsyncIterator[Video]:
         """
         Returns related videos of a TikTok Video.
 
