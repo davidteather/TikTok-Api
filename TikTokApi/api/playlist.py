@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, ClassVar, Iterator, Optional
+from typing import TYPE_CHECKING, ClassVar, AsyncIterator, Optional
 from ..exceptions import InvalidResponseException
 
 if TYPE_CHECKING:
@@ -45,7 +45,7 @@ class Playlist:
 
         if id is None and data.get("id") is None:
             raise TypeError("You must provide id parameter.")
-        
+
         self.id = id
 
         if data is not None:
@@ -92,8 +92,8 @@ class Playlist:
         self.as_dict = resp["mixInfo"]
         self.__extract_from_data()
         return resp
-    
-    async def videos(self, count=30, cursor=0, **kwargs) -> Iterator[Video]:
+
+    async def videos(self, count=30, cursor=0, **kwargs) -> AsyncIterator[Video]:
         """
         Returns an iterator of videos in this User's playlist.
 
@@ -158,7 +158,7 @@ class Playlist:
             User.parent.logger.error(
                 f"Failed to create Playlist with data: {data}\nwhich has keys {data.keys()}"
             )
-    
+
     def __repr__(self):
         return self.__str__()
 
