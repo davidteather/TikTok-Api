@@ -294,7 +294,6 @@ class TikTokApi:
                 for _ in range(num_sessions)
             )
         )
-        self.num_sessions = len(self.sessions)
 
     async def close_sessions(self):
         """
@@ -334,10 +333,13 @@ class TikTokApi:
             int: The index of the session.
             TikTokPlaywrightSession: The session.
         """
+        if len(self.sessions) == 0:
+            raise Exception("No sessions created, please create sessions first")
+
         if kwargs.get("session_index") is not None:
             i = kwargs["session_index"]
         else:
-            i = random.randint(0, self.num_sessions - 1)
+            i = random.randint(0, self.len(self.sessions) - 1)
         return i, self.sessions[i]
 
     async def set_session_cookies(self, session, cookies):
