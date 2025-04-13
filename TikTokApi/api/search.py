@@ -1,6 +1,6 @@
 from __future__ import annotations
 from urllib.parse import urlencode
-from typing import TYPE_CHECKING, Iterator
+from typing import TYPE_CHECKING, AsyncIterator
 from .user import User
 from ..exceptions import InvalidResponseException
 
@@ -14,7 +14,7 @@ class Search:
     parent: TikTokApi
 
     @staticmethod
-    async def users(search_term, count=10, cursor=0, **kwargs) -> Iterator[User]:
+    async def users(search_term, count=10, cursor=0, **kwargs) -> AsyncIterator[User]:
         """
         Searches for users.
 
@@ -44,7 +44,7 @@ class Search:
     @staticmethod
     async def search_type(
         search_term, obj_type, count=10, cursor=0, **kwargs
-    ) -> Iterator:
+    ) -> AsyncIterator:
         """
         Searches for a specific type of object. But you shouldn't use this directly, use the other methods.
 

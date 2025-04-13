@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, Iterator, Optional
+from typing import ClassVar, AsyncIterator, Optional
 from typing import TYPE_CHECKING, ClassVar, Optional
 
 from TikTokApi.exceptions import InvalidResponseException
@@ -51,7 +51,7 @@ class Comment:
         )
         self.likes_count = self.as_dict["digg_count"]
 
-    async def replies(self, count=20, cursor=0, **kwargs) -> Iterator[Comment]:
+    async def replies(self, count=20, cursor=0, **kwargs) -> AsyncIterator[Comment]:
         found = 0
 
         while found < count:

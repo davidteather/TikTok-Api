@@ -1,7 +1,7 @@
 from __future__ import annotations
 from ..exceptions import *
 
-from typing import TYPE_CHECKING, ClassVar, Iterator, Optional
+from typing import TYPE_CHECKING, ClassVar, AsyncIterator, Optional
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -82,7 +82,7 @@ class Hashtag:
         self.__extract_from_data()
         return resp
 
-    async def videos(self, count=30, cursor=0, **kwargs) -> Iterator[Video]:
+    async def videos(self, count=30, cursor=0, **kwargs) -> AsyncIterator[Video]:
         """
         Returns TikTok videos that have this hashtag in the caption.
 
