@@ -7,13 +7,14 @@ playlist_name="Doctor Who"
 playlist_creator="bbc"
 
 ms_token = os.environ.get("ms_token", None)
+headless = os.environ.get("headless", "True").lower() == "true"
 
 
 @pytest.mark.asyncio
 async def test_playlist_info():
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, headless=headless)
         playlist = api.playlist(id=playlist_id)
         await playlist.info()
 
@@ -28,7 +29,7 @@ async def test_playlist_info():
 async def test_playlist_videos():
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3)
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, headless=headless)
         playlist = api.playlist(id=playlist_id)
 
         count = 0

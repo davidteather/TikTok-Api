@@ -350,7 +350,7 @@ class TikTokApi:
         if kwargs.get("session_index") is not None:
             i = kwargs["session_index"]
         else:
-            i = random.randint(0, self.len(self.sessions) - 1)
+            i = random.randint(0, len(self.sessions) - 1)
         return i, self.sessions[i]
 
     async def set_session_cookies(self, session, cookies):
