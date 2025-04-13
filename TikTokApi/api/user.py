@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, ClassVar, Iterator, Optional
+from typing import TYPE_CHECKING, ClassVar, AsyncIterator, Optional
 from ..exceptions import InvalidResponseException
 
 if TYPE_CHECKING:
@@ -87,8 +87,8 @@ class User:
         self.as_dict = resp
         self.__extract_from_data()
         return resp
-    
-    async def playlists(self, count=20, cursor=0, **kwargs) -> Iterator[Playlist]:
+
+    async def playlists(self, count=20, cursor=0, **kwargs) -> AsyncIterator[Playlist]:
         """
         Returns a user's playlists.
 
@@ -126,18 +126,18 @@ class User:
 
             if resp is None:
                 raise InvalidResponseException(resp, "TikTok returned an invalid response.")
-            
+
             for playlist in resp.get("playList", []):
                 yield self.parent.playlist(data=playlist)
                 found += 1
-            
+
             if not resp.get("hasMore", False):
                 return
-            
-            cursor = resp.get("cursor")
-        
 
-    async def videos(self, count=30, cursor=0, **kwargs) -> Iterator[Video]:
+            cursor = resp.get("cursor")
+
+
+    async def videos(self, count=30, cursor=0, **kwargs) -> AsyncIterator[Video]:
         """
         Returns a user's videos.
 
@@ -192,7 +192,7 @@ class User:
 
     async def liked(
         self, count: int = 30, cursor: int = 0, **kwargs
-    ) -> Iterator[Video]:
+    ) -> AsyncIterator[Video]:
         """
         Returns a user's liked posts if public.
 

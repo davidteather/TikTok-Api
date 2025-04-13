@@ -140,25 +140,3 @@ python -m examples.trending_example
 
 You can access the full data dictionary the object was created from with `.as_dict`. On a video this may look like
 [this](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d). TikTok changes their structure from time to time so it's worth investigating the structure of the dictionary when you use this package.
-
-## Upgrading from V5 to V6
-
-All changes will be noted on [V6.0.0](https://github.com/davidteather/TikTok-Api/releases/tag/V6.0.0) if you want more information.
-
-### Changes & Motivations
-
-- Maintainability
-  - Was getting difficult to maintain with how TikTok was directly detecting HTTP requests.
-  - Switched to using a pool of **async** playwright pages to make it more difficult to detect, and hopefully easier to maintain in the future
-- Async
-  - It's been asked for a lot, and now fully async needed especially since the package is using a pool of playwright instances
-- User Flexibility
-  - Added a lot of function argument options that should be much more explicit than what was done previously.
-  - Hopefully if something is broken there's a workaround without having to modify the package itself (although if you do notice an issue please open an issue or submit a PR)
-- Documentation
-  - Goes with user flexibility a little bit but switched over to sphinx documentation for more explicit content
-  - If you run into an issue or are confused please open a github issue or submit a PR to fix documentation, it's always welcome! 🤠
-
-### Upgrading Examples
-
-The biggest change is that everything is now async. You can see above how you might want to call an async function in python as well as the examples directory for more examples.

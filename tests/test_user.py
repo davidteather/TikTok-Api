@@ -7,13 +7,14 @@ user_id = "5831967"
 sec_uid = "MS4wLjABAAAA-VASjiXTh7wDDyXvjk10VFhMWUAoxr8bgfO1kAL1-9s"
 
 ms_token = os.environ.get("ms_token", None)
+headless = os.environ.get("headless", "True").lower() == "true"
 
 
 @pytest.mark.asyncio
 async def test_user_info():
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"))
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
         user = api.user(username=username)
         await user.info()
 
@@ -25,7 +26,7 @@ async def test_user_info():
 async def test_user_videos():
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"))
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
         user = api.user(username=username, sec_uid=sec_uid, user_id=user_id)
 
         count = 0
@@ -38,7 +39,7 @@ async def test_user_videos():
 async def test_user_likes():
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"))
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
         user = api.user(
             username="publicliketest",
             sec_uid="MS4wLjABAAAAHjhwCIwmvzVZfRrDAZ2aZy74LciLnoyaPfM2rrX9N7bwbWMFuwTFG4YrByYvsH5c",
@@ -54,7 +55,7 @@ async def test_user_likes():
 async def test_user_playlists():
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"))
+        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
         user = api.user(username="mrbeast")
 
         count = 0
