@@ -30,3 +30,4 @@ src
 .env
 /.idea/
 /TikTok-Api.iml
+venv/**
