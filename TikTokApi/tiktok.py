@@ -1,12 +1,12 @@
 import asyncio
 import logging
 import dataclasses
-from typing import Any
+from typing import Any, Awaitable, Callable
 import random
 import time
 import json
 
-from playwright.async_api import async_playwright, TimeoutError
+from playwright.async_api import Browser, BrowserContext, Page, Playwright, ProxySettings, async_playwright, TimeoutError
 from urllib.parse import urlencode, quote, urlparse
 from .stealth import stealth_async
 from .helpers import random_choice
@@ -81,6 +81,8 @@ class TikTokApi:
         Search.parent = self
         Playlist.parent = self
 
+        self.browser: Browser
+
     def __create_logger(self, name: str, level: int = logging.DEBUG):
         """Create a logger for the class."""
         self.logger: logging.Logger = logging.getLogger(name)
@@ -140,13 +142,15 @@ class TikTokApi:
     async def __create_session(
         self,
         url: str = "https://www.tiktok.com",
-        ms_token: str = None,
-        proxy: str = None,
-        context_options: dict = {},
+        ms_token: str | None = None,
+        proxy: dict[str, Any] | ProxySettings | None = None,
+        context_options: dict[str, Any] = {},
         sleep_after: int = 1,
-        cookies: dict = None,
+        cookies: dict[str, Any] | None = None,
         suppress_resource_load_types: list[str] = None,
         timeout: int = 30000,
+        page_factory: Callable[[BrowserContext], Awaitable[Page]] | None = None,
+        browser_context_factory: Callable[[Playwright], Awaitable[BrowserContext]] | None = None,
     ):
         try:
             """Create a TikTokPlaywrightSession"""
@@ -155,7 +159,10 @@ class TikTokApi:
                     cookies = {}
                 cookies["msToken"] = ms_token
     
-            context = await self.browser.new_context(proxy=proxy, **context_options)
+            if browser_context_factory is not None:
+                context = self.browser
+            else:
+                context = await self.browser.new_context(proxy=proxy, **context_options)
             if cookies is not None:
                 formatted_cookies = [
                     {"name": k, "value": v, "domain": urlparse(url).netloc, "path": "/"}
@@ -163,8 +170,16 @@ class TikTokApi:
                     if v is not None
                 ]
                 await context.add_cookies(formatted_cookies)
-            page = await context.new_page()
-            await stealth_async(page)
+
+            if page_factory:
+                page = await page_factory(context)
+            else:
+                page = await context.new_page()
+                await stealth_async(page)
+                _ = await page.goto(url)
+
+            if "tiktok" not in page.url:
+                _ = await page.goto("https://www.tiktok.com")
     
             # Get the request headers to the url
             request_headers = None
@@ -185,9 +200,6 @@ class TikTokApi:
             
             # Set the navigation timeout
             page.set_default_navigation_timeout(timeout)
-    
-            await page.goto(url)
-            await page.goto(url) # hack: tiktok blocks first request not sure why, likely bot detection
             
             # by doing this, we are simulate scroll event using mouse to `avoid` bot detection
             x, y = random.randint(0, 50), random.randint(0, 50)
@@ -229,18 +241,20 @@ class TikTokApi:
 
     async def create_sessions(
         self,
-        num_sessions=5,
-        headless=True,
-        ms_tokens: list[str] = None,
-        proxies: list = None,
-        sleep_after=1,
-        starting_url="https://www.tiktok.com",
-        context_options: dict = {},
-        override_browser_args: list[dict] = None,
-        cookies: list[dict] = None,
-        suppress_resource_load_types: list[str] = None,
+        num_sessions: int =5,
+        headless: bool =True,
+        ms_tokens: list[str] | None = None,
+        proxies: list[dict[str, Any] | ProxySettings] | None = None,
+        sleep_after: int = 1,
+        starting_url: str ="https://www.tiktok.com",
+        context_options: dict[str, Any] = {},
+        override_browser_args: list[str] | None = None,
+        cookies: list[dict[str, Any]] | None = None,
+        suppress_resource_load_types: list[str] | None = None,
         browser: str = "chromium",
-        executable_path: str = None,
+        executable_path: str | None = None,
+        page_factory: Callable[[BrowserContext], Awaitable[Page]] | None = None,
+        browser_context_factory: Callable[[Playwright], Awaitable[BrowserContext]] | None = None,
         timeout: int = 30000,
     ):
         """
@@ -262,6 +276,7 @@ class TikTokApi:
             suppress_resource_load_types (list[str]): Types of resources to suppress playwright from loading, excluding more types will make playwright faster.. Types: document, stylesheet, image, media, font, script, textrack, xhr, fetch, eventsource, websocket, manifest, other.
             browser (str): firefox, chromium, or webkit; default is chromium
             executable_path (str): Path to the browser executable
+            page_factory (Callable[[], Awaitable[Page]]) | None: Optional async function for instantiating pages.
             timeout (int): The timeout in milliseconds for page navigation
 
         Example Usage:
@@ -272,6 +287,8 @@ class TikTokApi:
                     await api.create_sessions(num_sessions=5, ms_tokens=['msToken1', 'msToken2'])
         """
         self.playwright = await async_playwright().start()
+        if browser_context_factory is not None:
+            self.browser = await browser_context_factory(self.playwright)
         if browser == "chromium":
             if headless and override_browser_args is None:
                 override_browser_args = ["--headless=new"]
@@ -301,6 +318,8 @@ class TikTokApi:
                     cookies=random_choice(cookies),
                     suppress_resource_load_types=suppress_resource_load_types,
                     timeout=timeout,
+                    page_factory=page_factory,
+                    browser_context_factory=browser_context_factory
                 )
                 for _ in range(num_sessions)
             )
