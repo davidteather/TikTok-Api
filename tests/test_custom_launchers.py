@@ -9,48 +9,48 @@ from TikTokApi.stealth.stealth import stealth_async
 
 
 
-# @pytest.mark.asyncio
-# async def test_browser_context_factory():
-#
-#     context_created_in_factory = [False]
-#
-#     async def browser_context_factory(p: Playwright) -> BrowserContext:
-#         user_data_dir_tempdir = tempfile.TemporaryDirectory()
-#         user_data_dir = user_data_dir_tempdir.name
-#         ctx = await p.chromium.launch_persistent_context(user_data_dir, headless=False)
-#         context_created_in_factory[0] = True
-#         return ctx
-#
-#     async with TikTokApi() as api:
-#         await api.create_sessions(
-#             num_sessions=1,
-#             sleep_after=3,
-#             browser=os.getenv("TIKTOK_BROWSER", "chromium"),
-#             headless=False,
-#             browser_context_factory=browser_context_factory
-#         )
-#         assert context_created_in_factory[0] == True
-#
-# @pytest.mark.asyncio
-# async def test_page_factory():
-#
-#     page_created_in_factory = [False]
-#
-#     async def page_factory(ctx: BrowserContext) -> Page:
-#         page = await ctx.new_page()
-#         _ = await page.goto("https://tiktok.com")
-#         page_created_in_factory[0] = True
-#         return page
-#
-#     async with TikTokApi() as api:
-#         await api.create_sessions(
-#             num_sessions=1,
-#             sleep_after=3,
-#             browser=os.getenv("TIKTOK_BROWSER", "chromium"),
-#             headless=False,
-#             page_factory=page_factory
-#         )
-#         assert page_created_in_factory[0] == True
+@pytest.mark.asyncio
+async def test_browser_context_factory():
+
+    context_created_in_factory = [False]
+
+    async def browser_context_factory(p: Playwright) -> BrowserContext:
+        user_data_dir_tempdir = tempfile.TemporaryDirectory()
+        user_data_dir = user_data_dir_tempdir.name
+        ctx = await p.chromium.launch_persistent_context(user_data_dir, headless=False)
+        context_created_in_factory[0] = True
+        return ctx
+
+    async with TikTokApi() as api:
+        await api.create_sessions(
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=False,
+            browser_context_factory=browser_context_factory
+        )
+        assert context_created_in_factory[0] == True
+
+@pytest.mark.asyncio
+async def test_page_factory():
+
+    page_created_in_factory = [False]
+
+    async def page_factory(ctx: BrowserContext) -> Page:
+        page = await ctx.new_page()
+        _ = await page.goto("https://tiktok.com")
+        page_created_in_factory[0] = True
+        return page
+
+    async with TikTokApi() as api:
+        await api.create_sessions(
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=False,
+            page_factory=page_factory
+        )
+        assert page_created_in_factory[0] == True
 
 @pytest.mark.asyncio
 async def test_custom_login_flow_with_captcha_solve():
