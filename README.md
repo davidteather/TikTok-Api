@@ -138,12 +138,12 @@ To directly run the example scripts from the repository root, use the `-m` optio
 python -m examples.trending_example
 ```
 
+You can access the full data dictionary the object was created from with `.as_dict`. On a video this may look like
+[this](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d). TikTok changes their structure from time to time so it's worth investigating the structure of the dictionary when you use this package.
+
 ## Custom launchers
 When you call `TikTokApi.create_sessions()`, the program creates a browser context and a page, visits TikTok and extracts the cookies from the page.
 To implement custom functionality, such as login or captcha solving, when the session is being created, you may use the keyword arguments `browser_context_factory` and `page_factory`.
 These arguments are callable functions that TikTok-Api will use to launch your browser and pages, and allow you to perform custom actions on the page before the session is created.
 You can find examples [here](https://github.com/davidteather/TikTok-Api/blob/main/tests/test_custom_launchers.py).
      
-
-You can access the full data dictionary the object was created from with `.as_dict`. On a video this may look like
-[this](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d). TikTok changes their structure from time to time so it's worth investigating the structure of the dictionary when you use this package.
