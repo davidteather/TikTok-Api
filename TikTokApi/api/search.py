@@ -100,6 +100,10 @@ class Search:
                     )
                     found += 1
 
+            if obj_type == "item":
+                for video in resp.get("item_list", []):
+                    yield Search.parent.video(data=video)
+
             if not resp.get("has_more", False):
                 return
 
