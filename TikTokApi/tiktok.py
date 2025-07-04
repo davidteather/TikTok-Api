@@ -303,7 +303,8 @@ class TikTokApi:
                     timeout=timeout,
                 )
                 for _ in range(num_sessions)
-            )
+            ),
+            return_exceptions=True
         )
 
     async def close_sessions(self):
