@@ -98,7 +98,8 @@ class Video:
         if self.url is None:
             raise TypeError("To call video.info() you need to set the video's url.")
 
-        r = requests.get(self.url, headers=session.headers, proxies=proxy)
+        #r = requests.get(self.url, headers=session.headers, proxies=proxy)
+        r = requests.get(self.url)
         if r.status_code != 200:
             raise InvalidResponseException(
                 r.text, "TikTok returned an invalid response.", error_code=r.status_code
