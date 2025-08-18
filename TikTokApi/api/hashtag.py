@@ -72,6 +72,7 @@ class Hashtag:
             url="https://www.tiktok.com/api/challenge/detail/",
             params=url_params,
             headers=kwargs.get("headers"),
+            session=kwargs.get("session"),
             session_index=kwargs.get("session_index"),
         )
 
@@ -119,6 +120,7 @@ class Hashtag:
                 url="https://www.tiktok.com/api/challenge/item_list/",
                 params=params,
                 headers=kwargs.get("headers"),
+                session=kwargs.get("session"),
                 session_index=kwargs.get("session_index"),
             )
 

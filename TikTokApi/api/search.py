@@ -1,8 +1,10 @@
 from __future__ import annotations
-from urllib.parse import urlencode
+
 from typing import TYPE_CHECKING, AsyncIterator
-from .user import User
+from urllib.parse import urlencode
+
 from ..exceptions import InvalidResponseException
+from .user import User
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -83,6 +85,7 @@ class Search:
                 params=params,
                 headers=kwargs.get("headers"),
                 session_index=kwargs.get("session_index"),
+                session=kwargs.get("session"),
             )
 
             if resp is None:

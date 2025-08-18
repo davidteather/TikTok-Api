@@ -1,19 +1,22 @@
 from __future__ import annotations
-from ..helpers import extract_video_id_from_url, requests_cookie_to_playwright_cookie
-from typing import TYPE_CHECKING, ClassVar, AsyncIterator, Optional
-from datetime import datetime
-import requests
-from ..exceptions import InvalidResponseException
+
 import json
+from datetime import datetime
+from typing import TYPE_CHECKING, AsyncIterator, ClassVar, Optional, Union
+
 import httpx
-from typing import Union, AsyncIterator
+import requests
+
+from ..exceptions import InvalidResponseException
+from ..helpers import (extract_video_id_from_url,
+                       requests_cookie_to_playwright_cookie)
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
-    from .user import User
-    from .sound import Sound
-    from .hashtag import Hashtag
     from .comment import Comment
+    from .hashtag import Hashtag
+    from .sound import Sound
+    from .user import User
 
 
 class Video:
@@ -143,7 +146,7 @@ class Video:
             data = json.loads(r.text[start:end])
             default_scope = data.get("__DEFAULT_SCOPE__", {})
             video_detail = default_scope.get("webapp.video-detail", {})
-            if video_detail.get("statusCode", 0) != 0: # assume 0 if not present
+            if video_detail.get("statusCode", 0) != 0:  # assume 0 if not present
                 raise InvalidResponseException(
                     r.text, "TikTok returned an invalid response structure.", error_code=r.status_code
                 )
@@ -265,6 +268,7 @@ class Video:
                 url="https://www.tiktok.com/api/comment/list/",
                 params=params,
                 headers=kwargs.get("headers"),
+                session=kwargs.get("session"),
                 session_index=kwargs.get("session_index"),
             )
 
@@ -313,6 +317,7 @@ class Video:
                 url="https://www.tiktok.com/api/related/item_list/",
                 params=params,
                 headers=kwargs.get("headers"),
+                session=kwargs.get("session"),
                 session_index=kwargs.get("session_index"),
             )
 

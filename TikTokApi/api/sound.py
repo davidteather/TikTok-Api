@@ -74,6 +74,7 @@ class Sound:
             url="https://www.tiktok.com/api/music/detail/",
             params=url_params,
             headers=kwargs.get("headers"),
+            session=kwargs.get("session"),
             session_index=kwargs.get("session_index"),
         )
 
@@ -122,6 +123,7 @@ class Sound:
                 url="https://www.tiktok.com/api/music/item_list/",
                 params=params,
                 headers=kwargs.get("headers"),
+                session=kwargs.get("session"),
                 session_index=kwargs.get("session_index"),
             )
 

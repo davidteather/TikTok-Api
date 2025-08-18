@@ -83,6 +83,7 @@ class Playlist:
             url="https://www.tiktok.com/api/mix/detail/",
             params=url_params,
             headers=kwargs.get("headers"),
+            session=kwargs.get("session"),
             session_index=kwargs.get("session_index"),
         )
 
@@ -124,6 +125,7 @@ class Playlist:
                 url="https://www.tiktok.com/api/mix/item_list/",
                 params=params,
                 headers=kwargs.get("headers"),
+                session=kwargs.get("session"),
                 session_index=kwargs.get("session_index"),
             )
 

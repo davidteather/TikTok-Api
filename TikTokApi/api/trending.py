@@ -44,6 +44,7 @@ class Trending:
                 url="https://www.tiktok.com/api/recommend/item_list/",
                 params=params,
                 headers=kwargs.get("headers"),
+                session=kwargs.get("session"),
                 session_index=kwargs.get("session_index"),
             )
 

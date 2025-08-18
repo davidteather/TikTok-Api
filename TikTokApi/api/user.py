@@ -78,6 +78,7 @@ class User:
             url="https://www.tiktok.com/api/user/detail/",
             params=url_params,
             headers=kwargs.get("headers"),
+            session=kwargs.get("session"),
             session_index=kwargs.get("session_index"),
         )
 
@@ -121,6 +122,7 @@ class User:
                 url="https://www.tiktok.com/api/user/playlist",
                 params=params,
                 headers=kwargs.get("headers"),
+                session=kwargs.get("session"),
                 session_index=kwargs.get("session_index"),
             )
 
@@ -173,6 +175,7 @@ class User:
                 url="https://www.tiktok.com/api/post/item_list/",
                 params=params,
                 headers=kwargs.get("headers"),
+                session=kwargs.get("session"),
                 session_index=kwargs.get("session_index"),
             )
 
@@ -228,6 +231,7 @@ class User:
                 url="https://www.tiktok.com/api/favorite/item_list",
                 params=params,
                 headers=kwargs.get("headers"),
+                session=kwargs.get("session"),
                 session_index=kwargs.get("session_index"),
             )
 

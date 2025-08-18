@@ -1,0 +1,15 @@
+[build-system]
+requires = ["poetry-core>=1.8.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "TikTokApi"
+version = "0.0.0"
+description = "Local fork of TikTokApi with Playwright session injection fixes"
+authors = ["MegaEvolution Team <devnull@example.com>"]
+readme = "README.md"
+packages = [{ include = "TikTokApi" }]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+playwright = ">=1.39,<2.0"

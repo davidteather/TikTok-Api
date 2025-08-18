@@ -1,29 +1,25 @@
 import asyncio
-import logging
 import dataclasses
-from typing import Any
+import json
+import logging
 import random
 import time
-import json
+from typing import Any
+from urllib.parse import quote, urlencode, urlparse
 
-from playwright.async_api import async_playwright, TimeoutError
-from urllib.parse import urlencode, quote, urlparse
-from .stealth import stealth_async
-from .helpers import random_choice
+from playwright.async_api import TimeoutError, async_playwright
 
+from .api.comment import Comment
+from .api.hashtag import Hashtag
+from .api.playlist import Playlist
+from .api.search import Search
+from .api.sound import Sound
+from .api.trending import Trending
 from .api.user import User
 from .api.video import Video
-from .api.sound import Sound
-from .api.hashtag import Hashtag
-from .api.comment import Comment
-from .api.trending import Trending
-from .api.search import Search
-from .api.playlist import Playlist
-
-from .exceptions import (
-    InvalidJSONException,
-    EmptyResponseException,
-)
+from .exceptions import EmptyResponseException, InvalidJSONException
+from .helpers import random_choice
+from .stealth import stealth_async
 
 
 @dataclasses.dataclass
@@ -154,7 +150,7 @@ class TikTokApi:
                 if cookies is None:
                     cookies = {}
                 cookies["msToken"] = ms_token
-    
+
             context = await self.browser.new_context(proxy=proxy, **context_options)
             if cookies is not None:
                 formatted_cookies = [
@@ -165,16 +161,16 @@ class TikTokApi:
                 await context.add_cookies(formatted_cookies)
             page = await context.new_page()
             await stealth_async(page)
-    
+
             # Get the request headers to the url
             request_headers = None
-    
+
             def handle_request(request):
                 nonlocal request_headers
                 request_headers = request.headers
-    
+
             page.once("request", handle_request)
-    
+
             if suppress_resource_load_types is not None:
                 await page.route(
                     "**/*",
@@ -182,21 +178,21 @@ class TikTokApi:
                     if request.resource_type in suppress_resource_load_types
                     else route.continue_(),
                 )
-            
+
             # Set the navigation timeout
             page.set_default_navigation_timeout(timeout)
-    
+
             await page.goto(url)
-            await page.goto(url) # hack: tiktok blocks first request not sure why, likely bot detection
-            
+            await page.goto(url)  # hack: tiktok blocks first request not sure why, likely bot detection
+
             # by doing this, we are simulate scroll event using mouse to `avoid` bot detection
             x, y = random.randint(0, 50), random.randint(0, 50)
             a, b = random.randint(1, 50), random.randint(100, 200)
-    
+
             await page.mouse.move(x, y)
             await page.wait_for_load_state("networkidle")
             await page.mouse.move(a, b)
-    
+
             session = TikTokPlaywrightSession(
                 context,
                 page,
@@ -345,8 +341,23 @@ class TikTokApi:
             int: The index of the session.
             TikTokPlaywrightSession: The session.
         """
+        if kwargs.get("session") is not None:
+            return 0, kwargs["session"]
+
         if len(self.sessions) == 0:
             raise Exception("No sessions created, please create sessions first")
+
+        # Prefer an explicit session object if provided
+        if kwargs.get("session") is not None:
+            provided = kwargs.get("session")
+            try:
+                # Unwrap wrapper with .session attribute
+                candidate = getattr(provided, "session", provided)
+                idx = self.sessions.index(candidate)
+                return idx, candidate
+            except ValueError:
+                # Not a member of our pool; fall back to index if provided
+                pass
 
         if kwargs.get("session_index") is not None:
             i = kwargs["session_index"]
@@ -408,11 +419,12 @@ class TikTokApi:
             except TimeoutError as e:
                 if attempts == max_attempts:
                     raise TimeoutError(f"Failed to load tiktok after {max_attempts} attempts, consider using a proxy")
-                
-                try_urls = ["https://www.tiktok.com/foryou", "https://www.tiktok.com", "https://www.tiktok.com/@tiktok", "https://www.tiktok.com/foryou"]
+
+                try_urls = ["https://www.tiktok.com/foryou", "https://www.tiktok.com",
+                            "https://www.tiktok.com/@tiktok", "https://www.tiktok.com/foryou"]
 
                 await session.page.goto(random.choice(try_urls))
-        
+
         result = await session.page.evaluate(
             f'() => {{ return window.byted_acrawler.frontierSign("{url}") }}'
         )
@@ -464,13 +476,16 @@ class TikTokApi:
             Exception: If the request fails.
         """
         i, session = self._get_session(**kwargs)
-        if session.params is not None:
-            params = {**session.params, **params}
+        # Normalize params/headers to dicts
+        params = params or {}
+        base_params = session.params or {}
+        params = {**base_params, **params}
 
+        base_headers = session.headers or {}
         if headers is not None:
-            headers = {**session.headers, **headers}
+            headers = {**base_headers, **headers}
         else:
-            headers = session.headers
+            headers = base_headers
 
         # get msToken
         if params.get("msToken") is None:
@@ -482,7 +497,7 @@ class TikTokApi:
                 cookies = await self.get_session_cookies(session)
                 ms_token = cookies.get("msToken")
                 if ms_token is None:
-                    self.logger.warn(
+                    self.logger.warning(
                         "Failed to get msToken from cookies, trying to make the request anyway (probably will fail)"
                     )
                 params["msToken"] = ms_token
@@ -501,7 +516,9 @@ class TikTokApi:
                 raise Exception("TikTokApi.run_fetch_script returned None")
 
             if result == "":
-                raise EmptyResponseException(result, "TikTok returned an empty response. They are detecting you're a bot, try some of these: headless=False, browser='webkit', consider using a proxy")
+                raise EmptyResponseException(
+                    result,
+                    "TikTok returned an empty response. They are detecting you're a bot, try some of these: headless=False, browser='webkit', consider using a proxy")
 
             try:
                 data = json.loads(result)
