@@ -101,11 +101,13 @@ async def test_proxy_actually_used():
             num_sessions=1,
             proxy_provider=provider,
             ms_tokens=[ms_token] if ms_token else None,
-            headless=True,
-            starting_url="https://httpbin.org/ip"
+            headless=True
         )
 
         session = api.sessions[0]
+
+        await session.page.goto("https://httpbin.org/ip")
         page_content = await session.page.content()
 
+        assert "httpbin.org" in page_content.lower() or "origin" in page_content.lower(), "Page didn't load httpbin.org"
         assert our_ip not in page_content, f"Proxy not being used - detected our own IP: {our_ip}"
