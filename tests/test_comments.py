@@ -11,7 +11,13 @@ headless = os.environ.get("headless", "True").lower() == "true"
 async def test_comment_page():
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
+        await api.create_sessions(
+            ms_tokens=[ms_token],
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=headless,
+        )
         video = api.video(id=video_id)
         count = 0
         async for comment in video.comments(count=100):

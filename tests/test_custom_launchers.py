@@ -8,7 +8,6 @@ import pytest
 from TikTokApi.stealth.stealth import stealth_async
 
 
-
 @pytest.mark.asyncio
 async def test_browser_context_factory():
 
@@ -27,9 +26,10 @@ async def test_browser_context_factory():
             sleep_after=3,
             browser=os.getenv("TIKTOK_BROWSER", "chromium"),
             headless=False,
-            browser_context_factory=browser_context_factory
+            browser_context_factory=browser_context_factory,
         )
         assert context_created_in_factory[0] == True
+
 
 @pytest.mark.asyncio
 async def test_page_factory():
@@ -48,9 +48,10 @@ async def test_page_factory():
             sleep_after=3,
             browser=os.getenv("TIKTOK_BROWSER", "chromium"),
             headless=False,
-            page_factory=page_factory
+            page_factory=page_factory,
         )
         assert page_created_in_factory[0] == True
+
 
 @pytest.mark.asyncio
 @pytest.mark.skip(reason="not enabled for TikTokAPI CI/CD")
@@ -63,9 +64,7 @@ async def test_custom_login_flow_with_captcha_solve():
 
     async def captcha_solver_context_factory(p: Playwright) -> BrowserContext:
         ctx = await make_async_playwright_solver_context(
-            p,
-            os.environ["API_KEY"], # SadCaptcha key
-            headless=False
+            p, os.environ["API_KEY"], headless=False  # SadCaptcha key
         )
         return ctx
 
@@ -74,12 +73,14 @@ async def test_custom_login_flow_with_captcha_solve():
         await stealth_async(page)
         _ = await page.goto("https://www.tiktok.com/login/phone-or-email/email")
         await asyncio.sleep(5)
-        await page.locator('xpath=//input[contains(@name,"username")]').type(os.environ["TIKTOK_USERNAME"])
+        await page.locator('xpath=//input[contains(@name,"username")]').type(
+            os.environ["TIKTOK_USERNAME"]
+        )
         await asyncio.sleep(2)
-        await page.get_by_placeholder('Password').type(os.environ["TIKTOK_PASSWORD"]);
+        await page.get_by_placeholder("Password").type(os.environ["TIKTOK_PASSWORD"])
         await asyncio.sleep(2)
-        await page.locator('//button[contains(@data-e2e,"login-button")]').click();
-        await asyncio.sleep(5) # wait for captcha to be solved
+        await page.locator('//button[contains(@data-e2e,"login-button")]').click()
+        await asyncio.sleep(5)  # wait for captcha to be solved
         return page
 
     async with TikTokApi() as api:
@@ -89,6 +90,5 @@ async def test_custom_login_flow_with_captcha_solve():
             browser=os.getenv("TIKTOK_BROWSER", "chromium"),
             headless=False,
             page_factory=login_page_factory,
-            browser_context_factory=captcha_solver_context_factory
+            browser_context_factory=captcha_solver_context_factory,
         )
-

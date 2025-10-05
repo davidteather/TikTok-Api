@@ -33,7 +33,7 @@ async def basic_proxy_provider_example():
             num_sessions=5,
             proxy_provider=provider,
             ms_tokens=[ms_token] if ms_token else None,
-            headless=True
+            headless=True,
         )
 
         async for video in api.trending.videos(count=10):
@@ -58,7 +58,7 @@ async def custom_algorithm_example():
             proxy_provider=provider,
             proxy_algorithm=USPreferredAlgorithm(),
             ms_tokens=[ms_token] if ms_token else None,
-            headless=True
+            headless=True,
         )
 
         async for video in api.search.videos("python", count=5):
@@ -75,19 +75,21 @@ async def random_algorithm_example():
             proxy_provider=provider,
             proxy_algorithm=Random(),
             ms_tokens=[ms_token] if ms_token else None,
-            headless=True
+            headless=True,
         )
 
         user = api.user(username="tiktok")
         user_data = await user.info()
-        print(f"User: {user_data['uniqueId']}, Followers: {user_data['stats']['followerCount']}")
+        print(
+            f"User: {user_data['uniqueId']}, Followers: {user_data['stats']['followerCount']}"
+        )
 
 
 async def brightdata_example():
     """Example using BrightData proxy provider"""
     provider = BrightData(
         api_key=os.environ.get("BRIGHTDATA_API_KEY"),
-        zone=os.environ.get("BRIGHTDATA_ZONE")
+        zone=os.environ.get("BRIGHTDATA_ZONE"),
     )
 
     async with TikTokApi() as api:
@@ -96,7 +98,7 @@ async def brightdata_example():
             proxy_provider=provider,
             proxy_algorithm=RoundRobin(),
             ms_tokens=[ms_token] if ms_token else None,
-            headless=True
+            headless=True,
         )
 
         async for video in api.trending.videos(count=5):
@@ -114,7 +116,7 @@ async def partial_sessions_with_provider():
             allow_partial_sessions=True,
             min_sessions=3,
             ms_tokens=[ms_token] if ms_token else None,
-            headless=True
+            headless=True,
         )
 
         print(f"Created {len(api.sessions)} sessions successfully")
@@ -128,15 +130,23 @@ async def legacy_vs_new_comparison():
 
     async with TikTokApi() as api:
         proxies = [
-            {"server": "http://proxy1.example.com:8080", "username": "user", "password": "pass"},
-            {"server": "http://proxy2.example.com:8080", "username": "user", "password": "pass"},
+            {
+                "server": "http://proxy1.example.com:8080",
+                "username": "user",
+                "password": "pass",
+            },
+            {
+                "server": "http://proxy2.example.com:8080",
+                "username": "user",
+                "password": "pass",
+            },
         ]
 
         await api.create_sessions(
             num_sessions=2,
             proxies=proxies,
             ms_tokens=[ms_token] if ms_token else None,
-            headless=True
+            headless=True,
         )
 
     provider = Webshare(api_key=os.environ.get("WEBSHARE_API_KEY"))
@@ -147,7 +157,7 @@ async def legacy_vs_new_comparison():
             proxy_provider=provider,
             proxy_algorithm=RoundRobin(),
             ms_tokens=[ms_token] if ms_token else None,
-            headless=True
+            headless=True,
         )
 
 

@@ -115,10 +115,10 @@ class Playlist:
         found = 0
         while found < count:
             params = {
-              "mixId": id,
-              "count": min(count, 30),
-              "cursor": cursor,
-          }
+                "mixId": id,
+                "count": min(count, 30),
+                "cursor": cursor,
+            }
 
             resp = await self.parent.make_request(
                 url="https://www.tiktok.com/api/mix/item_list/",

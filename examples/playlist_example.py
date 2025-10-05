@@ -20,5 +20,6 @@ async def user_example():
                 print(video)
                 print(video.url)
 
+
 if __name__ == "__main__":
     asyncio.run(user_example())

@@ -125,7 +125,9 @@ class User:
             )
 
             if resp is None:
-                raise InvalidResponseException(resp, "TikTok returned an invalid response.")
+                raise InvalidResponseException(
+                    resp, "TikTok returned an invalid response."
+                )
 
             for playlist in resp.get("playList", []):
                 yield self.parent.playlist(data=playlist)
@@ -135,7 +137,6 @@ class User:
                 return
 
             cursor = resp.get("cursor")
-
 
     async def videos(self, count=30, cursor=0, **kwargs) -> AsyncIterator[Video]:
         """

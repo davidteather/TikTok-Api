@@ -11,7 +11,13 @@ headless = os.environ.get("headless", "True").lower() == "true"
 async def test_hashtag_videos():
     api = TikTokApi(logging_level=logging.INFO)
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
+        await api.create_sessions(
+            ms_tokens=[ms_token],
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=headless,
+        )
         tag = api.hashtag(name="funny")
         video_count = 0
         async for video in tag.videos(count=30):
@@ -24,7 +30,13 @@ async def test_hashtag_videos():
 async def test_hashtag_videos_multi_page():
     api = TikTokApi(logging_level=logging.INFO)
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
+        await api.create_sessions(
+            ms_tokens=[ms_token],
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=headless,
+        )
         tag = api.hashtag(name="funny", id="5424")
         video_count = 0
         async for video in tag.videos(count=100):
@@ -37,7 +49,13 @@ async def test_hashtag_videos_multi_page():
 async def test_hashtag_info():
     api = TikTokApi(logging_level=logging.INFO)
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
+        await api.create_sessions(
+            ms_tokens=[ms_token],
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=headless,
+        )
         tag = api.hashtag(name="funny")
         await tag.info()
 
@@ -49,7 +67,13 @@ async def test_hashtag_info():
 async def test_non_latin1():
     api = TikTokApi(logging_level=logging.INFO)
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
+        await api.create_sessions(
+            ms_tokens=[ms_token],
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=headless,
+        )
         tag = api.hashtag(name="селфи")
         await tag.info()
 
