@@ -1,13 +1,17 @@
 import asyncio
 import logging
 import dataclasses
-from typing import Any, Awaitable, Callable
+from typing import Any, Awaitable, Callable, Optional
 import random
 import time
 import json
 
 from playwright.async_api import Browser, BrowserContext, Page, Playwright, ProxySettings, async_playwright, TimeoutError, Error as PlaywrightError
 from urllib.parse import urlencode, quote, urlparse
+from proxyproviders import ProxyProvider
+from proxyproviders.algorithms import Algorithm
+from proxyproviders.models.proxy import ProxyFormat
+
 from .stealth import stealth_async
 from .helpers import random_choice
 
@@ -68,11 +72,13 @@ class TikTokApi:
             logger_name (str): The name of the logger you want to use.
         """
         self.sessions = []
-        self._session_recovery_enabled = True 
+        self._session_recovery_enabled = True
         self._session_creation_lock = asyncio.Lock()
         self._cleanup_called = False
         self._auto_cleanup_dead_sessions = True
-        
+        self._proxy_provider: Optional[ProxyProvider] = None
+        self._proxy_algorithm: Optional[Algorithm] = None
+
         if logger_name is None:
             logger_name = __name__
         self.__create_logger(logger_name, logging_level)
@@ -303,7 +309,11 @@ class TikTokApi:
                 if cookies is None:
                     cookies = {}
                 cookies["msToken"] = ms_token
-    
+
+            if self._proxy_provider is not None:
+                proxy_obj = self._proxy_provider.get_proxy(self._proxy_algorithm)
+                proxy = proxy_obj.format(ProxyFormat.PLAYWRIGHT)
+
             if browser_context_factory is not None:
                 context = self.browser
             else:
@@ -393,12 +403,14 @@ class TikTokApi:
 
     async def create_sessions(
         self,
-        num_sessions: int =5,
-        headless: bool =True,
+        num_sessions: int = 5,
+        headless: bool = True,
         ms_tokens: list[str] | None = None,
         proxies: list[dict[str, Any] | ProxySettings] | None = None,
+        proxy_provider: Optional[ProxyProvider] = None,
+        proxy_algorithm: Optional[Algorithm] = None,
         sleep_after: int = 1,
-        starting_url: str ="https://www.tiktok.com",
+        starting_url: str = "https://www.tiktok.com",
         context_options: dict[str, Any] = {},
         override_browser_args: list[str] | None = None,
         cookies: list[dict[str, Any]] | None = None,
@@ -422,7 +434,12 @@ class TikTokApi:
             headless (bool): Whether or not you want the browser to be headless.
             ms_tokens (list[str]): A list of msTokens to use for the sessions, you can get these from your cookies after visiting TikTok.
                                    If you don't provide any, the sessions will try to get them themselves, but this is not guaranteed to work.
-            proxies (list): A list of proxies to use for the sessions
+            proxies (list): **DEPRECATED - Use proxy_provider instead.** A list of proxies to use for the sessions.
+                           This parameter is maintained for backwards compatibility but will be removed in a future version.
+            proxy_provider (ProxyProvider | None): A ProxyProvider instance for smart proxy rotation.
+                                                   See examples/proxy_provider_example.py for usage examples. Full documentation: https://davidteather.github.io/proxyproviders/
+            proxy_algorithm (Algorithm | None): Algorithm for proxy selection (RoundRobin, Random, First, or custom) per session.
+                                               Only used with proxy_provider. Defaults to RoundRobin if not specified.
             sleep_after (int): The amount of time to sleep after creating a session, this is to allow the msToken to be generated.
             starting_url (str): The url to start the sessions on, this is usually https://www.tiktok.com.
             context_options (dict): Options to pass to the playwright context.
@@ -442,29 +459,31 @@ class TikTokApi:
             .. code-block:: python
 
                 from TikTokApi import TikTokApi
-                with TikTokApi() as api:
+
+                async with TikTokApi() as api:
                     await api.create_sessions(num_sessions=5, ms_tokens=['msToken1', 'msToken2'])
 
-        Partial Sessions (Advanced):
-            .. code-block:: python
-
-                # Allow partial success - useful with unreliable proxies
-                await api.create_sessions(
-                    num_sessions=10,
-                    proxies=proxy_list,  # Some might be dead
-                    allow_partial_sessions=True,
-                    min_sessions=5  # Need at least 5 working
-                )
+        Proxy Provider Usage:
+            For proxy provider examples with different algorithms and configurations,
+            see examples/proxy_provider_example.py
 
         Custom Launchers:
-            To implement custom functionality, such as login or captcha solving, when the session is being created, 
+            To implement custom functionality, such as login or captcha solving, when the session is being created,
             you may use the keyword arguments `browser_context_factory` and `page_factory`.
-            These arguments are callable functions that TikTok-Api will use to launch your browser and pages, 
+            These arguments are callable functions that TikTok-Api will use to launch your browser and pages,
             and allow you to perform custom actions on the page before the session is created.
             You can find examples in the test file: tests/test_custom_launchers.py
         """
         self._session_recovery_enabled = enable_session_recovery
-        
+        self._proxy_provider = proxy_provider
+        self._proxy_algorithm = proxy_algorithm
+
+        if proxies is not None and proxy_provider is not None:
+            raise ValueError(
+                "Cannot use both 'proxies' and 'proxy_provider' parameters. "
+                "Please use 'proxy_provider' (recommended) or 'proxies' (deprecated)."
+            )
+
         self.playwright = await async_playwright().start()
         if browser_context_factory is not None:
             self.browser = await browser_context_factory(self.playwright)
@@ -492,7 +511,7 @@ class TikTokApi:
             results = await asyncio.gather(
                 *(
                     self.__create_session(
-                        proxy=random_choice(proxies),
+                        proxy=random_choice(proxies) if proxy_provider is None else None,
                         ms_token=random_choice(ms_tokens),
                         url=starting_url,
                         context_options=context_options,
@@ -505,7 +524,7 @@ class TikTokApi:
                     )
                     for _ in range(num_sessions)
                 ),
-                return_exceptions=True  # Allow partial success
+                return_exceptions=True
             )
             
             # Count failures and provide feedback
@@ -532,11 +551,10 @@ class TikTokApi:
                     if isinstance(result, Exception):
                         self.logger.debug(f"Session {i} creation failed: {result}")
         else:
-            # Original behavior: fail-fast if any session fails
             await asyncio.gather(
                 *(
                     self.__create_session(
-                        proxy=random_choice(proxies),
+                        proxy=random_choice(proxies) if proxy_provider is None else None,
                         ms_token=random_choice(ms_tokens),
                         url=starting_url,
                         context_options=context_options,
@@ -549,7 +567,6 @@ class TikTokApi:
                     )
                     for _ in range(num_sessions)
                 )
-                # No return_exceptions - will raise on first failure (backwards compatible)
             )
 
     async def close_sessions(self):
