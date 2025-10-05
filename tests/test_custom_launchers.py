@@ -53,7 +53,12 @@ async def test_page_factory():
         assert page_created_in_factory[0] == True
 
 @pytest.mark.asyncio
+@pytest.mark.skip(reason="not enabled for TikTokAPI CI/CD")
 async def test_custom_login_flow_with_captcha_solve():
+    # NOTE: This example test uses tiktok_captcha_solver library from SadCaptcha.
+    # The test is skipped in CI/CD to avoid import errors since the library is not included in requirements.
+    # This serves as an example of how to implement custom captcha solving functionality, you are not required to use this library.
+    # And you can create your own login page factories and logic for your situation.
     from tiktok_captcha_solver import make_async_playwright_solver_context
 
     async def captcha_solver_context_factory(p: Playwright) -> BrowserContext:

@@ -276,7 +276,8 @@ class TikTokApi:
             suppress_resource_load_types (list[str]): Types of resources to suppress playwright from loading, excluding more types will make playwright faster.. Types: document, stylesheet, image, media, font, script, textrack, xhr, fetch, eventsource, websocket, manifest, other.
             browser (str): firefox, chromium, or webkit; default is chromium
             executable_path (str): Path to the browser executable
-            page_factory (Callable[[], Awaitable[Page]]) | None: Optional async function for instantiating pages.
+            page_factory (Callable[[BrowserContext], Awaitable[Page]]) | None: Optional async function for instantiating pages.
+            browser_context_factory (Callable[[Playwright], Awaitable[BrowserContext]]) | None: Optional async function for creating browser contexts.
             timeout (int): The timeout in milliseconds for page navigation
 
         Example Usage:
@@ -285,6 +286,13 @@ class TikTokApi:
                 from TikTokApi import TikTokApi
                 with TikTokApi() as api:
                     await api.create_sessions(num_sessions=5, ms_tokens=['msToken1', 'msToken2'])
+
+        Custom Launchers:
+            To implement custom functionality, such as login or captcha solving, when the session is being created, 
+            you may use the keyword arguments `browser_context_factory` and `page_factory`.
+            These arguments are callable functions that TikTok-Api will use to launch your browser and pages, 
+            and allow you to perform custom actions on the page before the session is created.
+            You can find examples in the test file: tests/test_custom_launchers.py
         """
         self.playwright = await async_playwright().start()
         if browser_context_factory is not None:
