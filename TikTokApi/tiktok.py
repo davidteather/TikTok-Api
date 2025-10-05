@@ -6,7 +6,7 @@ import random
 import time
 import json
 
-from playwright.async_api import Browser, BrowserContext, Page, Playwright, ProxySettings, async_playwright, TimeoutError
+from playwright.async_api import Browser, BrowserContext, Page, Playwright, ProxySettings, async_playwright, TimeoutError, Error as PlaywrightError
 from urllib.parse import urlencode, quote, urlparse
 from .stealth import stealth_async
 from .helpers import random_choice
@@ -37,6 +37,7 @@ class TikTokPlaywrightSession:
     headers: dict = None
     ms_token: str = None
     base_url: str = "https://www.tiktok.com"
+    is_valid: bool = True
 
 
 class TikTokApi:
@@ -67,7 +68,11 @@ class TikTokApi:
             logger_name (str): The name of the logger you want to use.
         """
         self.sessions = []
-
+        self._session_recovery_enabled = True 
+        self._session_creation_lock = asyncio.Lock()
+        self._cleanup_called = False
+        self._auto_cleanup_dead_sessions = True
+        
         if logger_name is None:
             logger_name = __name__
         self.__create_logger(logger_name, logging_level)
@@ -81,7 +86,8 @@ class TikTokApi:
         Search.parent = self
         Playlist.parent = self
 
-        self.browser: Browser
+        self.browser: Browser = None
+        self.playwright: Playwright = None
 
     def __create_logger(self, name: str, level: int = logging.DEBUG):
         """Create a logger for the class."""
@@ -93,6 +99,24 @@ class TikTokApi:
         )
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
+    
+    def __del__(self):
+        """
+        Destructor to ensure cleanup happens even if user forgets.
+        
+        Warning: This is a safety net. Users should still call close_sessions() explicitly
+        in async contexts. This will log a warning if cleanup wasn't called properly.
+        """
+        if not self._cleanup_called:
+            if self.sessions or self.browser or self.playwright:
+                self.logger.warning(
+                    "TikTokApi object is being destroyed but cleanup was not called. "
+                    "Please use 'async with TikTokApi()' or call 'await api.close_sessions()' and "
+                    "'await api.stop_playwright()' explicitly to avoid resource leaks. "
+                    f"Leaked resources: {len(self.sessions)} sessions, "
+                    f"browser={'exists' if self.browser else 'none'}, "
+                    f"playwright={'exists' if self.playwright else 'none'}"
+                )
 
     async def __set_session_params(self, session: TikTokPlaywrightSession):
         """Set the session params for a TikTokPlaywrightSession"""
@@ -138,6 +162,127 @@ class TikTokApi:
             "webcast_language": language,
         }
         session.params = session_params
+
+    async def _is_session_valid(self, session: TikTokPlaywrightSession) -> bool:
+        """
+        Check if a session is still valid/alive.
+        
+        Args:
+            session: The session to check
+            
+        Returns:
+            bool: True if session is valid, False otherwise
+        """
+        if not session.is_valid:
+            return False
+            
+        try:
+            # Quick validation - try to get page URL
+            # This will fail immediately if the page/context/browser is closed
+            _ = session.page.url
+            return True
+        except (PlaywrightError, AttributeError) as e:
+            self.logger.warning(f"Session validation failed: {e}")
+            session.is_valid = False
+            return False
+
+    async def _mark_session_invalid(self, session: TikTokPlaywrightSession):
+        """
+        Mark a session as invalid and attempt cleanup.
+        
+        Args:
+            session: The session to mark as invalid
+        """
+        session.is_valid = False
+        
+        # Attempt graceful cleanup
+        try:
+            if session.page:
+                await session.page.close()
+        except Exception as e:
+            self.logger.debug(f"Error closing page during invalidation: {e}")
+            
+        try:
+            if session.context:
+                await session.context.close()
+        except Exception as e:
+            self.logger.debug(f"Error closing context during invalidation: {e}")
+        
+        # Immediately remove from sessions list if auto-cleanup is enabled
+        # This prevents memory leaks from accumulating dead sessions
+        if self._auto_cleanup_dead_sessions and session in self.sessions:
+            try:
+                self.sessions.remove(session)
+                self.logger.debug(f"Automatically removed dead session from pool. Remaining: {len(self.sessions)}")
+            except ValueError:
+                pass  # Session already removed
+
+    async def _get_valid_session_index(self, **kwargs) -> tuple[int, TikTokPlaywrightSession]:
+        """
+        Get a valid session, with automatic recovery if needed.
+        
+        Args:
+            session_index (int, optional): Specific session index to use
+            
+        Returns:
+            tuple: (index, session)
+            
+        Raises:
+            Exception: If no valid sessions available and recovery fails
+        """
+        max_attempts = 3
+        
+        for attempt in range(max_attempts):
+            # First, try to get a valid session
+            if kwargs.get("session_index") is not None:
+                i = kwargs["session_index"]
+                if i < len(self.sessions):
+                    session = self.sessions[i]
+                    if await self._is_session_valid(session):
+                        return i, session
+                    else:
+                        self.logger.warning(f"Requested session {i} is invalid")
+            else:
+                # Try to find any valid session
+                valid_sessions = []
+                for idx, session in enumerate(self.sessions):
+                    if await self._is_session_valid(session):
+                        valid_sessions.append((idx, session))
+                
+                if valid_sessions:
+                    return random.choice(valid_sessions)
+            
+            # No valid sessions found - attempt recovery if enabled
+            if self._session_recovery_enabled and attempt < max_attempts - 1:
+                self.logger.warning(f"No valid sessions found, attempting recovery (attempt {attempt + 1}/{max_attempts})")
+                await self._recover_sessions()
+            else:
+                break
+        
+        raise Exception(
+            "No valid sessions available. All sessions appear to be dead. "
+            "Please call create_sessions() again or restart the API."
+        )
+
+    async def _recover_sessions(self):
+        """
+        Attempt to recover from session failures by cleaning up dead sessions
+        and potentially creating new ones if we have the necessary configuration.
+        """
+        async with self._session_creation_lock:
+            self.logger.info("Starting session recovery...")
+            
+            # Remove invalid sessions
+            initial_count = len(self.sessions)
+            self.sessions = [s for s in self.sessions if await self._is_session_valid(s)]
+            removed_count = initial_count - len(self.sessions)
+            
+            if removed_count > 0:
+                self.logger.info(f"Removed {removed_count} dead session(s)")
+            
+            # Note: We don't automatically create new sessions here because we'd need
+            # all the original parameters (proxies, ms_tokens, etc.)
+            # Users should call create_sessions() again if they need more sessions
 
     async def __create_session(
         self,
@@ -216,6 +361,7 @@ class TikTokApi:
                 proxy=proxy,
                 headers=request_headers,
                 base_url=url,
+                is_valid=True,
             )
 
             if ms_token is None:
@@ -234,9 +380,15 @@ class TikTokApi:
             self.logger.error(f"Failed to create session: {e}")
             # Cleanup resources if they were partially created
             if 'page' in locals():
-                await page.close()
+                try:
+                    await page.close()
+                except Exception:
+                    pass
             if 'context' in locals():
-                await context.close()
+                try:
+                    await context.close()
+                except Exception:
+                    pass
             raise  # Re-raise the exception after cleanup
 
     async def create_sessions(
@@ -256,6 +408,9 @@ class TikTokApi:
         page_factory: Callable[[BrowserContext], Awaitable[Page]] | None = None,
         browser_context_factory: Callable[[Playwright], Awaitable[BrowserContext]] | None = None,
         timeout: int = 30000,
+        enable_session_recovery: bool = True,
+        allow_partial_sessions: bool = False,
+        min_sessions: int | None = None,
     ):
         """
         Create sessions for use within the TikTokApi class.
@@ -277,8 +432,11 @@ class TikTokApi:
             browser (str): firefox, chromium, or webkit; default is chromium
             executable_path (str): Path to the browser executable
             page_factory (Callable[[BrowserContext], Awaitable[Page]]) | None: Optional async function for instantiating pages.
-            browser_context_factory (Callable[[Playwright], Awaitable[BrowserContext]]) | None: Optional async function for creating browser contexts.
+            browser_context_factory (Callable[[Playwright], Awaitable[BrowserContext]]) | None: Optional async function for creating browser contexts. When provided, you can choose any browser (chromium/firefox/webkit) inside the factory, and the 'browser' parameter is ignored.
             timeout (int): The timeout in milliseconds for page navigation
+            enable_session_recovery (bool): Enable automatic session recovery on failures (default: True)
+            allow_partial_sessions (bool): If True, succeed even if some sessions fail to create. If False (default), fail if any session fails
+            min_sessions (int | None): Minimum number of sessions required. Only used if allow_partial_sessions=True. If None, defaults to 1.
 
         Example Usage:
             .. code-block:: python
@@ -287,6 +445,17 @@ class TikTokApi:
                 with TikTokApi() as api:
                     await api.create_sessions(num_sessions=5, ms_tokens=['msToken1', 'msToken2'])
 
+        Partial Sessions (Advanced):
+            .. code-block:: python
+
+                # Allow partial success - useful with unreliable proxies
+                await api.create_sessions(
+                    num_sessions=10,
+                    proxies=proxy_list,  # Some might be dead
+                    allow_partial_sessions=True,
+                    min_sessions=5  # Need at least 5 working
+                )
+
         Custom Launchers:
             To implement custom functionality, such as login or captcha solving, when the session is being created, 
             you may use the keyword arguments `browser_context_factory` and `page_factory`.
@@ -294,10 +463,12 @@ class TikTokApi:
             and allow you to perform custom actions on the page before the session is created.
             You can find examples in the test file: tests/test_custom_launchers.py
         """
+        self._session_recovery_enabled = enable_session_recovery
+        
         self.playwright = await async_playwright().start()
         if browser_context_factory is not None:
             self.browser = await browser_context_factory(self.playwright)
-        if browser == "chromium":
+        elif browser == "chromium":
             if headless and override_browser_args is None:
                 override_browser_args = ["--headless=new"]
                 headless = False  # managed by the arg
@@ -315,23 +486,71 @@ class TikTokApi:
         else:
             raise ValueError("Invalid browser argument passed")
 
-        await asyncio.gather(
-            *(
-                self.__create_session(
-                    proxy=random_choice(proxies),
-                    ms_token=random_choice(ms_tokens),
-                    url=starting_url,
-                    context_options=context_options,
-                    sleep_after=sleep_after,
-                    cookies=random_choice(cookies),
-                    suppress_resource_load_types=suppress_resource_load_types,
-                    timeout=timeout,
-                    page_factory=page_factory,
-                    browser_context_factory=browser_context_factory
-                )
-                for _ in range(num_sessions)
+        # Create sessions concurrently
+        # Use return_exceptions only if partial sessions are allowed
+        if allow_partial_sessions:
+            results = await asyncio.gather(
+                *(
+                    self.__create_session(
+                        proxy=random_choice(proxies),
+                        ms_token=random_choice(ms_tokens),
+                        url=starting_url,
+                        context_options=context_options,
+                        sleep_after=sleep_after,
+                        cookies=random_choice(cookies),
+                        suppress_resource_load_types=suppress_resource_load_types,
+                        timeout=timeout,
+                        page_factory=page_factory,
+                        browser_context_factory=browser_context_factory
+                    )
+                    for _ in range(num_sessions)
+                ),
+                return_exceptions=True  # Allow partial success
             )
-        )
+            
+            # Count failures and provide feedback
+            failed_count = sum(1 for r in results if isinstance(r, Exception))
+            success_count = len(self.sessions)
+            minimum_required = min_sessions if min_sessions is not None else 1
+            
+            if success_count < minimum_required:
+                # Didn't meet minimum requirements
+                error_messages = [str(r) for r in results if isinstance(r, Exception)]
+                raise Exception(
+                    f"Failed to create minimum required sessions. "
+                    f"Created {success_count}/{num_sessions}, needed at least {minimum_required}.\n"
+                    f"Errors: {error_messages[:3]}"  # Show first 3 errors
+                )
+            elif failed_count > 0:
+                # Some sessions failed but we have enough - log warning and continue
+                self.logger.warning(
+                    f"Created {success_count}/{num_sessions} sessions successfully. "
+                    f"{failed_count} session(s) failed to create."
+                )
+                # Log individual errors at debug level
+                for i, result in enumerate(results):
+                    if isinstance(result, Exception):
+                        self.logger.debug(f"Session {i} creation failed: {result}")
+        else:
+            # Original behavior: fail-fast if any session fails
+            await asyncio.gather(
+                *(
+                    self.__create_session(
+                        proxy=random_choice(proxies),
+                        ms_token=random_choice(ms_tokens),
+                        url=starting_url,
+                        context_options=context_options,
+                        sleep_after=sleep_after,
+                        cookies=random_choice(cookies),
+                        suppress_resource_load_types=suppress_resource_load_types,
+                        timeout=timeout,
+                        page_factory=page_factory,
+                        browser_context_factory=browser_context_factory
+                    )
+                    for _ in range(num_sessions)
+                )
+                # No return_exceptions - will raise on first failure (backwards compatible)
+            )
 
     async def close_sessions(self):
         """
@@ -339,13 +558,39 @@ class TikTokApi:
 
         This is called automatically when using the TikTokApi with "with"
         """
+        self.logger.debug(f"Closing {len(self.sessions)} sessions...")
+        
         for session in self.sessions:
-            await session.page.close()
-            await session.context.close()
+            try:
+                if session.page:
+                    await session.page.close()
+            except Exception as e:
+                self.logger.debug(f"Error closing page: {e}")
+            
+            try:
+                if session.context:
+                    await session.context.close()
+            except Exception as e:
+                self.logger.debug(f"Error closing context: {e}")
+        
         self.sessions.clear()
 
-        await self.browser.close()
-        await self.playwright.stop()
+        try:
+            if self.browser:
+                await self.browser.close()
+                self.browser = None
+        except Exception as e:
+            self.logger.debug(f"Error closing browser: {e}")
+        
+        try:
+            if self.playwright:
+                await self.playwright.stop()
+                self.playwright = None
+        except Exception as e:
+            self.logger.debug(f"Error stopping playwright: {e}")
+        
+        self._cleanup_called = True
+        self.logger.debug("All sessions and browser resources closed successfully")
 
     def generate_js_fetch(self, method: str, url: str, headers: dict) -> str:
         """Generate a javascript fetch function for use in playwright"""
@@ -363,6 +608,8 @@ class TikTokApi:
 
     def _get_session(self, **kwargs):
         """Get a random session
+        
+        DEPRECATED: Use _get_valid_session_index() for better error handling
 
         Args:
             session_index (int): The index of the session you want to use, if not provided a random session will be used.
@@ -415,13 +662,29 @@ class TikTokApi:
             any: The result of the fetch. Seems to be a string or dict
         """
         js_script = self.generate_js_fetch("GET", url, headers)
-        _, session = self._get_session(**kwargs)
-        result = await session.page.evaluate(js_script)
-        return result
+        
+        try:
+            _, session = await self._get_valid_session_index(**kwargs)
+        except Exception:
+            # Fallback to old method for backwards compatibility
+            _, session = self._get_session(**kwargs)
+        
+        try:
+            result = await session.page.evaluate(js_script)
+            return result
+        except PlaywrightError as e:
+            # Session died during operation
+            self.logger.error(f"Session failed during fetch: {e}")
+            await self._mark_session_invalid(session)
+            raise
 
     async def generate_x_bogus(self, url: str, **kwargs):
         """Generate the X-Bogus header for a url"""
-        _, session = self._get_session(**kwargs)
+        try:
+            _, session = await self._get_valid_session_index(**kwargs)
+        except Exception:
+            # Fallback to old method for backwards compatibility
+            _, session = self._get_session(**kwargs)
 
         max_attempts = 5
         attempts = 0
@@ -438,15 +701,30 @@ class TikTokApi:
                 try_urls = ["https://www.tiktok.com/foryou", "https://www.tiktok.com", "https://www.tiktok.com/@tiktok", "https://www.tiktok.com/foryou"]
 
                 await session.page.goto(random.choice(try_urls))
+            except PlaywrightError as e:
+                # Session died
+                self.logger.error(f"Session died during x-bogus generation: {e}")
+                await self._mark_session_invalid(session)
+                raise
         
-        result = await session.page.evaluate(
-            f'() => {{ return window.byted_acrawler.frontierSign("{url}") }}'
-        )
-        return result
+        try:
+            result = await session.page.evaluate(
+                f'() => {{ return window.byted_acrawler.frontierSign("{url}") }}'
+            )
+            return result
+        except PlaywrightError as e:
+            # Session died during operation
+            self.logger.error(f"Session died during x-bogus evaluation: {e}")
+            await self._mark_session_invalid(session)
+            raise
 
     async def sign_url(self, url: str, **kwargs):
         """Sign a url"""
-        i, session = self._get_session(**kwargs)
+        try:
+            i, session = await self._get_valid_session_index(**kwargs)
+        except Exception:
+            # Fallback to old method for backwards compatibility
+            i, session = self._get_session(**kwargs)
 
         # TODO: Would be nice to generate msToken here
 
@@ -489,7 +767,12 @@ class TikTokApi:
         Raises:
             Exception: If the request fails.
         """
-        i, session = self._get_session(**kwargs)
+        try:
+            i, session = await self._get_valid_session_index(**kwargs)
+        except Exception:
+            # Fallback to old method for backwards compatibility
+            i, session = self._get_session(**kwargs)
+        
         if session.params is not None:
             params = {**session.params, **params}
 
@@ -519,54 +802,145 @@ class TikTokApi:
         retry_count = 0
         while retry_count < retries:
             retry_count += 1
-            result = await self.run_fetch_script(
-                signed_url, headers=headers, session_index=i
-            )
-
-            if result is None:
-                raise Exception("TikTokApi.run_fetch_script returned None")
-
-            if result == "":
-                raise EmptyResponseException(result, "TikTok returned an empty response. They are detecting you're a bot, try some of these: headless=False, browser='webkit', consider using a proxy")
-
             try:
-                data = json.loads(result)
-                if data.get("status_code") != 0:
-                    self.logger.error(f"Got an unexpected status code: {data}")
-                return data
-            except json.decoder.JSONDecodeError:
-                if retry_count == retries:
-                    self.logger.error(f"Failed to decode json response: {result}")
-                    raise InvalidJSONException()
-
-                self.logger.info(
-                    f"Failed a request, retrying ({retry_count}/{retries})"
+                result = await self.run_fetch_script(
+                    signed_url, headers=headers, session_index=i
                 )
-                if exponential_backoff:
-                    await asyncio.sleep(2**retry_count)
-                else:
-                    await asyncio.sleep(1)
 
-    async def close_sessions(self):
-        """Close all the sessions. Should be called when you're done with the TikTokApi object"""
-        for session in self.sessions:
-            await session.page.close()
-            await session.context.close()
-        self.sessions.clear()
+                if result is None:
+                    raise Exception("TikTokApi.run_fetch_script returned None")
+
+                if result == "":
+                    raise EmptyResponseException(result, "TikTok returned an empty response. They are detecting you're a bot, try some of these: headless=False, browser='webkit', consider using a proxy")
+
+                try:
+                    data = json.loads(result)
+                    if data.get("status_code") != 0:
+                        self.logger.error(f"Got an unexpected status code: {data}")
+                    return data
+                except json.decoder.JSONDecodeError:
+                    if retry_count == retries:
+                        self.logger.error(f"Failed to decode json response: {result}")
+                        raise InvalidJSONException()
+
+                    self.logger.info(
+                        f"Failed a request, retrying ({retry_count}/{retries})"
+                    )
+                    if exponential_backoff:
+                        await asyncio.sleep(2**retry_count)
+                    else:
+                        await asyncio.sleep(1)
+            except PlaywrightError as e:
+                # Session died during request
+                self.logger.error(f"Playwright error during request: {e}")
+                await self._mark_session_invalid(session)
+                
+                if retry_count < retries:
+                    self.logger.info(f"Retrying with a new session ({retry_count}/{retries})")
+                    # Get a new valid session for the retry
+                    try:
+                        i, session = await self._get_valid_session_index(**kwargs)
+                    except Exception as session_error:
+                        self.logger.error(f"Failed to get valid session: {session_error}")
+                        raise
+                else:
+                    raise
 
     async def stop_playwright(self):
-        """Stop the playwright browser"""
-        await self.browser.close()
-        await self.playwright.stop()
+        """
+        Stop the playwright browser.
+        
+        Note: It's better to use close_sessions() which calls this automatically.
+        """
+        try:
+            if self.browser:
+                await self.browser.close()
+                self.browser = None
+        except Exception as e:
+            self.logger.debug(f"Error closing browser: {e}")
+        
+        try:
+            if self.playwright:
+                await self.playwright.stop()
+                self.playwright = None
+        except Exception as e:
+            self.logger.debug(f"Error stopping playwright: {e}")
 
     async def get_session_content(self, url: str, **kwargs):
         """Get the content of a url"""
-        _, session = self._get_session(**kwargs)
-        return await session.page.content()
+        try:
+            _, session = await self._get_valid_session_index(**kwargs)
+        except Exception:
+            # Fallback to old method
+            _, session = self._get_session(**kwargs)
+        
+        try:
+            return await session.page.content()
+        except PlaywrightError as e:
+            self.logger.error(f"Session died during get_session_content: {e}")
+            await self._mark_session_invalid(session)
+            raise
+    
+    def get_resource_stats(self) -> dict:
+        """
+        Get statistics about current resource usage.
+        
+        Useful for monitoring and detecting potential memory leaks.
+        
+        Returns:
+            dict: Statistics including session count, browser status, etc.
+        """
+        valid_sessions = sum(1 for s in self.sessions if s.is_valid)
+        invalid_sessions = len(self.sessions) - valid_sessions
+        
+        return {
+            "total_sessions": len(self.sessions),
+            "valid_sessions": valid_sessions,
+            "invalid_sessions": invalid_sessions,
+            "has_browser": self.browser is not None,
+            "has_playwright": self.playwright is not None,
+            "cleanup_called": self._cleanup_called,
+            "auto_cleanup_enabled": self._auto_cleanup_dead_sessions,
+            "recovery_enabled": self._session_recovery_enabled,
+        }
+    
+    async def health_check(self) -> dict:
+        """
+        Perform a health check on all resources.
+        
+        This actively validates all sessions and returns detailed health info.
+        Useful for monitoring and debugging.
+        
+        Returns:
+            dict: Health check results
+        """
+        health = self.get_resource_stats()
+        
+        # Actively validate all sessions
+        session_health = []
+        for i, session in enumerate(self.sessions):
+            is_valid = await self._is_session_valid(session)
+            session_health.append({
+                "index": i,
+                "valid": is_valid,
+                "marked_valid": session.is_valid,
+            })
+        
+        health["session_details"] = session_health
+        health["healthy_sessions"] = sum(1 for s in session_health if s["valid"])
+        
+        # Check for potential leaks
+        if health["invalid_sessions"] > 0 and not self._auto_cleanup_dead_sessions:
+            health["warning"] = f"{health['invalid_sessions']} invalid sessions accumulating (auto-cleanup disabled)"
+        
+        return health
 
     async def __aenter__(self):
         return self
 
     async def __aexit__(self, exc_type, exc, tb):
+        """Ensure cleanup happens when exiting context manager"""
         await self.close_sessions()
-        await self.stop_playwright()
+        # stop_playwright is already called by close_sessions, but call it again for safety
+        if not self._cleanup_called:
+            await self.stop_playwright()
