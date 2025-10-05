@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTokApi.tiktok &mdash; TikTokAPI v7.1.0 documentation</title>
+  <title>TikTokApi.tiktok &mdash; TikTokAPI v7.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
@@ -13,7 +13,7 @@
     <link rel="canonical" href="https://davidteather.github.io/TikTok-Api/_modules/TikTokApi/tiktok.html" />
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=65841b19"></script>
+      <script src="../../_static/documentation_options.js?v=f7fbc5f2"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -67,16 +67,31 @@
            <div itemprop="articleBody">
              
   <h1>Source code for TikTokApi.tiktok</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Awaitable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">playwright.async_api</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_playwright</span><span class="p">,</span> <span class="ne">TimeoutError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">playwright.async_api</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Browser</span><span class="p">,</span>
+    <span class="n">BrowserContext</span><span class="p">,</span>
+    <span class="n">Page</span><span class="p">,</span>
+    <span class="n">Playwright</span><span class="p">,</span>
+    <span class="n">ProxySettings</span><span class="p">,</span>
+    <span class="n">async_playwright</span><span class="p">,</span>
+    <span class="ne">TimeoutError</span><span class="p">,</span>
+    <span class="n">Error</span> <span class="k">as</span> <span class="n">PlaywrightError</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlencode</span><span class="p">,</span> <span class="n">quote</span><span class="p">,</span> <span class="n">urlparse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">proxyproviders</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProxyProvider</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">proxyproviders.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">Algorithm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">proxyproviders.models.proxy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProxyFormat</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">.stealth</span><span class="w"> </span><span class="kn">import</span> <span class="n">stealth_async</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">random_choice</span>
 
@@ -107,7 +122,8 @@
     <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">ms_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://www.tiktok.com&quot;</span></div>
+    <span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://www.tiktok.com&quot;</span>
+    <span class="n">is_valid</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 
 
@@ -141,6 +157,12 @@
 <span class="sd">            logger_name (str): The name of the logger you want to use.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session_recovery_enabled</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session_creation_lock</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_called</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_auto_cleanup_dead_sessions</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_proxy_provider</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ProxyProvider</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_proxy_algorithm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Algorithm</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">logger_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger_name</span> <span class="o">=</span> <span class="vm">__name__</span>
@@ -155,6 +177,9 @@
         <span class="n">Search</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="n">Playlist</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="p">:</span> <span class="n">Browser</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="p">:</span> <span class="n">Playwright</span> <span class="o">=</span> <span class="kc">None</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">__create_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a logger for the class.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -165,6 +190,24 @@
         <span class="p">)</span>
         <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Destructor to ensure cleanup happens even if user forgets.</span>
+
+<span class="sd">        Warning: This is a safety net. Users should still call close_sessions() explicitly</span>
+<span class="sd">        in async contexts. This will log a warning if cleanup wasn&#39;t called properly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_called</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;TikTokApi object is being destroyed but cleanup was not called. &quot;</span>
+                    <span class="s2">&quot;Please use &#39;async with TikTokApi()&#39; or call &#39;await api.close_sessions()&#39; and &quot;</span>
+                    <span class="s2">&quot;&#39;await api.stop_playwright()&#39; explicitly to avoid resource leaks. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Leaked resources: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span><span class="si">}</span><span class="s2"> sessions, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;browser=</span><span class="si">{</span><span class="s1">&#39;exists&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;none&#39;</span><span class="si">}</span><span class="s2">, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;playwright=</span><span class="si">{</span><span class="s1">&#39;exists&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;none&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">__set_session_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">TikTokPlaywrightSession</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the session params for a TikTokPlaywrightSession&quot;&quot;&quot;</span>
@@ -211,16 +254,149 @@
         <span class="p">}</span>
         <span class="n">session</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">session_params</span>
 
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_is_session_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">TikTokPlaywrightSession</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if a session is still valid/alive.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            session: The session to check</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if session is valid, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">session</span><span class="o">.</span><span class="n">is_valid</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Quick validation - try to get page URL</span>
+            <span class="c1"># This will fail immediately if the page/context/browser is closed</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">url</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">PlaywrightError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Session validation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">is_valid</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_mark_session_invalid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">TikTokPlaywrightSession</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mark a session as invalid and attempt cleanup.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            session: The session to mark as invalid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">is_valid</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Attempt graceful cleanup</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error closing page during invalidation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">context</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error closing context during invalidation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Immediately remove from sessions list if auto-cleanup is enabled</span>
+        <span class="c1"># This prevents memory leaks from accumulating dead sessions</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auto_cleanup_dead_sessions</span> <span class="ow">and</span> <span class="n">session</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Automatically removed dead session from pool. Remaining: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">pass</span>  <span class="c1"># Session already removed</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_valid_session_index</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">TikTokPlaywrightSession</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a valid session, with automatic recovery if needed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            session_index (int, optional): Specific session index to use</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: (index, session)</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If no valid sessions available and recovery fails</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">max_attempts</span> <span class="o">=</span> <span class="mi">3</span>
+
+        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_attempts</span><span class="p">):</span>
+            <span class="c1"># First, try to get a valid session</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_index&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;session_index&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">):</span>
+                    <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_session_valid</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="n">i</span><span class="p">,</span> <span class="n">session</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested session </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> is invalid&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Try to find any valid session</span>
+                <span class="n">valid_sessions</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">session</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_session_valid</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+                        <span class="n">valid_sessions</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span> <span class="n">session</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">valid_sessions</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">valid_sessions</span><span class="p">)</span>
+
+            <span class="c1"># No valid sessions found - attempt recovery if enabled</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_recovery_enabled</span> <span class="ow">and</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">max_attempts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;No valid sessions found, attempting recovery (attempt </span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">max_attempts</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recover_sessions</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s2">&quot;No valid sessions available. All sessions appear to be dead. &quot;</span>
+            <span class="s2">&quot;Please call create_sessions() again or restart the API.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_recover_sessions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attempt to recover from session failures by cleaning up dead sessions</span>
+<span class="sd">        and potentially creating new ones if we have the necessary configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_creation_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting session recovery...&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Remove invalid sessions</span>
+            <span class="n">initial_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span> <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_session_valid</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="n">removed_count</span> <span class="o">=</span> <span class="n">initial_count</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">removed_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removed </span><span class="si">{</span><span class="n">removed_count</span><span class="si">}</span><span class="s2"> dead session(s)&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Note: We don&#39;t automatically create new sessions here because we&#39;d need</span>
+            <span class="c1"># all the original parameters (proxies, ms_tokens, etc.)</span>
+            <span class="c1"># Users should call create_sessions() again if they need more sessions</span>
+
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">__create_session</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://www.tiktok.com&quot;</span><span class="p">,</span>
-        <span class="n">ms_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">proxy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">context_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">ms_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">proxy</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">ProxySettings</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">context_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
         <span class="n">sleep_after</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">cookies</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cookies</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">suppress_resource_load_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30000</span><span class="p">,</span>
+        <span class="n">page_factory</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">BrowserContext</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">[</span><span class="n">Page</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">browser_context_factory</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">Callable</span><span class="p">[[</span><span class="n">Playwright</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">[</span><span class="n">BrowserContext</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Create a TikTokPlaywrightSession&quot;&quot;&quot;</span>
@@ -228,8 +404,15 @@
                 <span class="k">if</span> <span class="n">cookies</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">cookies</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="n">cookies</span><span class="p">[</span><span class="s2">&quot;msToken&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ms_token</span>
-    
-            <span class="n">context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">(</span><span class="n">proxy</span><span class="o">=</span><span class="n">proxy</span><span class="p">,</span> <span class="o">**</span><span class="n">context_options</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proxy_provider</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">proxy_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proxy_provider</span><span class="o">.</span><span class="n">get_proxy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_proxy_algorithm</span><span class="p">)</span>
+                <span class="n">proxy</span> <span class="o">=</span> <span class="n">proxy_obj</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ProxyFormat</span><span class="o">.</span><span class="n">PLAYWRIGHT</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">browser_context_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">new_context</span><span class="p">(</span><span class="n">proxy</span><span class="o">=</span><span class="n">proxy</span><span class="p">,</span> <span class="o">**</span><span class="n">context_options</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">cookies</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">formatted_cookies</span> <span class="o">=</span> <span class="p">[</span>
                     <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span> <span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/&quot;</span><span class="p">}</span>
@@ -237,40 +420,47 @@
                     <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                 <span class="p">]</span>
                 <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">add_cookies</span><span class="p">(</span><span class="n">formatted_cookies</span><span class="p">)</span>
-            <span class="n">page</span> <span class="o">=</span> <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
-            <span class="k">await</span> <span class="n">stealth_async</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
-    
+
+            <span class="k">if</span> <span class="n">page_factory</span><span class="p">:</span>
+                <span class="n">page</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page_factory</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">page</span> <span class="o">=</span> <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
+                <span class="k">await</span> <span class="n">stealth_async</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+                <span class="n">_</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;tiktok&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">page</span><span class="o">.</span><span class="n">url</span><span class="p">:</span>
+                <span class="n">_</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="s2">&quot;https://www.tiktok.com&quot;</span><span class="p">)</span>
+
             <span class="c1"># Get the request headers to the url</span>
             <span class="n">request_headers</span> <span class="o">=</span> <span class="kc">None</span>
-    
+
             <span class="k">def</span><span class="w"> </span><span class="nf">handle_request</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
                 <span class="k">nonlocal</span> <span class="n">request_headers</span>
                 <span class="n">request_headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span>
-    
+
             <span class="n">page</span><span class="o">.</span><span class="n">once</span><span class="p">(</span><span class="s2">&quot;request&quot;</span><span class="p">,</span> <span class="n">handle_request</span><span class="p">)</span>
-    
+
             <span class="k">if</span> <span class="n">suppress_resource_load_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span>
                     <span class="s2">&quot;**/*&quot;</span><span class="p">,</span>
-                    <span class="k">lambda</span> <span class="n">route</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">route</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">resource_type</span> <span class="ow">in</span> <span class="n">suppress_resource_load_types</span>
-                    <span class="k">else</span> <span class="n">route</span><span class="o">.</span><span class="n">continue_</span><span class="p">(),</span>
+                    <span class="k">lambda</span> <span class="n">route</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">route</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">resource_type</span> <span class="ow">in</span> <span class="n">suppress_resource_load_types</span>
+                        <span class="k">else</span> <span class="n">route</span><span class="o">.</span><span class="n">continue_</span><span class="p">()</span>
+                    <span class="p">),</span>
                 <span class="p">)</span>
-            
+
             <span class="c1"># Set the navigation timeout</span>
             <span class="n">page</span><span class="o">.</span><span class="n">set_default_navigation_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
-    
-            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-            <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="c1"># hack: tiktok blocks first request not sure why, likely bot detection</span>
-            
+
             <span class="c1"># by doing this, we are simulate scroll event using mouse to `avoid` bot detection</span>
             <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
             <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
-    
+
             <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">mouse</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
             <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">wait_for_load_state</span><span class="p">(</span><span class="s2">&quot;networkidle&quot;</span><span class="p">)</span>
             <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">mouse</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-    
+
             <span class="n">session</span> <span class="o">=</span> <span class="n">TikTokPlaywrightSession</span><span class="p">(</span>
                 <span class="n">context</span><span class="p">,</span>
                 <span class="n">page</span><span class="p">,</span>
@@ -278,10 +468,13 @@
                 <span class="n">proxy</span><span class="o">=</span><span class="n">proxy</span><span class="p">,</span>
                 <span class="n">headers</span><span class="o">=</span><span class="n">request_headers</span><span class="p">,</span>
                 <span class="n">base_url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+                <span class="n">is_valid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">ms_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">sleep_after</span><span class="p">)</span>  <span class="c1"># TODO: Find a better way to wait for msToken</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span>
+                    <span class="n">sleep_after</span>
+                <span class="p">)</span>  <span class="c1"># TODO: Find a better way to wait for msToken</span>
                 <span class="n">cookies</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_session_cookies</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
                 <span class="n">ms_token</span> <span class="o">=</span> <span class="n">cookies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;msToken&quot;</span><span class="p">)</span>
                 <span class="n">session</span><span class="o">.</span><span class="n">ms_token</span> <span class="o">=</span> <span class="n">ms_token</span>
@@ -295,29 +488,44 @@
             <span class="c1"># clean up</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create session: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="c1"># Cleanup resources if they were partially created</span>
-            <span class="k">if</span> <span class="s1">&#39;page&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
-                <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="k">if</span> <span class="s1">&#39;context&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
-                <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s2">&quot;page&quot;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">pass</span>
+            <span class="k">if</span> <span class="s2">&quot;context&quot;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">pass</span>
             <span class="k">raise</span>  <span class="c1"># Re-raise the exception after cleanup</span>
 
 <div class="viewcode-block" id="TikTokApi.create_sessions">
 <a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.create_sessions">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_sessions</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">num_sessions</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-        <span class="n">headless</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">ms_tokens</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">proxies</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">sleep_after</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">starting_url</span><span class="o">=</span><span class="s2">&quot;https://www.tiktok.com&quot;</span><span class="p">,</span>
-        <span class="n">context_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
-        <span class="n">override_browser_args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">cookies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">suppress_resource_load_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_sessions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">headless</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">ms_tokens</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">proxies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">ProxySettings</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">proxy_provider</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ProxyProvider</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">proxy_algorithm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Algorithm</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sleep_after</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">starting_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://www.tiktok.com&quot;</span><span class="p">,</span>
+        <span class="n">context_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">override_browser_args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cookies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">suppress_resource_load_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">browser</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;chromium&quot;</span><span class="p">,</span>
-        <span class="n">executable_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">executable_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">page_factory</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">BrowserContext</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">[</span><span class="n">Page</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">browser_context_factory</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">Callable</span><span class="p">[[</span><span class="n">Playwright</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">[</span><span class="n">BrowserContext</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30000</span><span class="p">,</span>
+        <span class="n">enable_session_recovery</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">allow_partial_sessions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">min_sessions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create sessions for use within the TikTokApi class.</span>
@@ -329,7 +537,12 @@
 <span class="sd">            headless (bool): Whether or not you want the browser to be headless.</span>
 <span class="sd">            ms_tokens (list[str]): A list of msTokens to use for the sessions, you can get these from your cookies after visiting TikTok.</span>
 <span class="sd">                                   If you don&#39;t provide any, the sessions will try to get them themselves, but this is not guaranteed to work.</span>
-<span class="sd">            proxies (list): A list of proxies to use for the sessions</span>
+<span class="sd">            proxies (list): **DEPRECATED - Use proxy_provider instead.** A list of proxies to use for the sessions.</span>
+<span class="sd">                           This parameter is maintained for backwards compatibility but will be removed in a future version.</span>
+<span class="sd">            proxy_provider (ProxyProvider | None): A ProxyProvider instance for smart proxy rotation.</span>
+<span class="sd">                                                   See examples/proxy_provider_example.py for usage examples. Full documentation: https://davidteather.github.io/proxyproviders/</span>
+<span class="sd">            proxy_algorithm (Algorithm | None): Algorithm for proxy selection (RoundRobin, Random, First, or custom) per session.</span>
+<span class="sd">                                               Only used with proxy_provider. Defaults to RoundRobin if not specified.</span>
 <span class="sd">            sleep_after (int): The amount of time to sleep after creating a session, this is to allow the msToken to be generated.</span>
 <span class="sd">            starting_url (str): The url to start the sessions on, this is usually https://www.tiktok.com.</span>
 <span class="sd">            context_options (dict): Options to pass to the playwright context.</span>
@@ -338,64 +551,183 @@
 <span class="sd">            suppress_resource_load_types (list[str]): Types of resources to suppress playwright from loading, excluding more types will make playwright faster.. Types: document, stylesheet, image, media, font, script, textrack, xhr, fetch, eventsource, websocket, manifest, other.</span>
 <span class="sd">            browser (str): firefox, chromium, or webkit; default is chromium</span>
 <span class="sd">            executable_path (str): Path to the browser executable</span>
+<span class="sd">            page_factory (Callable[[BrowserContext], Awaitable[Page]]) | None: Optional async function for instantiating pages.</span>
+<span class="sd">            browser_context_factory (Callable[[Playwright], Awaitable[BrowserContext]]) | None: Optional async function for creating browser contexts. When provided, you can choose any browser (chromium/firefox/webkit) inside the factory, and the &#39;browser&#39; parameter is ignored.</span>
 <span class="sd">            timeout (int): The timeout in milliseconds for page navigation</span>
+<span class="sd">            enable_session_recovery (bool): Enable automatic session recovery on failures (default: True)</span>
+<span class="sd">            allow_partial_sessions (bool): If True, succeed even if some sessions fail to create. If False (default), fail if any session fails</span>
+<span class="sd">            min_sessions (int | None): Minimum number of sessions required. Only used if allow_partial_sessions=True. If None, defaults to 1.</span>
 
 <span class="sd">        Example Usage:</span>
 <span class="sd">            .. code-block:: python</span>
 
 <span class="sd">                from TikTokApi import TikTokApi</span>
-<span class="sd">                with TikTokApi() as api:</span>
+
+<span class="sd">                async with TikTokApi() as api:</span>
 <span class="sd">                    await api.create_sessions(num_sessions=5, ms_tokens=[&#39;msToken1&#39;, &#39;msToken2&#39;])</span>
+
+<span class="sd">        Proxy Provider Usage:</span>
+<span class="sd">            For proxy provider examples with different algorithms and configurations,</span>
+<span class="sd">            see examples/proxy_provider_example.py</span>
+
+<span class="sd">        Custom Launchers:</span>
+<span class="sd">            To implement custom functionality, such as login or captcha solving, when the session is being created,</span>
+<span class="sd">            you may use the keyword arguments `browser_context_factory` and `page_factory`.</span>
+<span class="sd">            These arguments are callable functions that TikTok-Api will use to launch your browser and pages,</span>
+<span class="sd">            and allow you to perform custom actions on the page before the session is created.</span>
+<span class="sd">            You can find examples in the test file: tests/test_custom_launchers.py</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session_recovery_enabled</span> <span class="o">=</span> <span class="n">enable_session_recovery</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_proxy_provider</span> <span class="o">=</span> <span class="n">proxy_provider</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_proxy_algorithm</span> <span class="o">=</span> <span class="n">proxy_algorithm</span>
+
+        <span class="k">if</span> <span class="n">proxies</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">proxy_provider</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot use both &#39;proxies&#39; and &#39;proxy_provider&#39; parameters. &quot;</span>
+                <span class="s2">&quot;Please use &#39;proxy_provider&#39; (recommended) or &#39;proxies&#39; (deprecated).&quot;</span>
+            <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_playwright</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">browser</span> <span class="o">==</span> <span class="s2">&quot;chromium&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">browser_context_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="k">await</span> <span class="n">browser_context_factory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">browser</span> <span class="o">==</span> <span class="s2">&quot;chromium&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">headless</span> <span class="ow">and</span> <span class="n">override_browser_args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">override_browser_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;--headless=new&quot;</span><span class="p">]</span>
                 <span class="n">headless</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># managed by the arg</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">chromium</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-                <span class="n">headless</span><span class="o">=</span><span class="n">headless</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">override_browser_args</span><span class="p">,</span> <span class="n">proxy</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">proxies</span><span class="p">),</span> <span class="n">executable_path</span><span class="o">=</span><span class="n">executable_path</span>
+                <span class="n">headless</span><span class="o">=</span><span class="n">headless</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">=</span><span class="n">override_browser_args</span><span class="p">,</span>
+                <span class="n">proxy</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">proxies</span><span class="p">),</span>
+                <span class="n">executable_path</span><span class="o">=</span><span class="n">executable_path</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="n">browser</span> <span class="o">==</span> <span class="s2">&quot;firefox&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">firefox</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-                <span class="n">headless</span><span class="o">=</span><span class="n">headless</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">override_browser_args</span><span class="p">,</span> <span class="n">proxy</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">proxies</span><span class="p">),</span> <span class="n">executable_path</span><span class="o">=</span><span class="n">executable_path</span>
+                <span class="n">headless</span><span class="o">=</span><span class="n">headless</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">=</span><span class="n">override_browser_args</span><span class="p">,</span>
+                <span class="n">proxy</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">proxies</span><span class="p">),</span>
+                <span class="n">executable_path</span><span class="o">=</span><span class="n">executable_path</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="n">browser</span> <span class="o">==</span> <span class="s2">&quot;webkit&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">webkit</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-                <span class="n">headless</span><span class="o">=</span><span class="n">headless</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">override_browser_args</span><span class="p">,</span> <span class="n">proxy</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">proxies</span><span class="p">),</span> <span class="n">executable_path</span><span class="o">=</span><span class="n">executable_path</span>
+                <span class="n">headless</span><span class="o">=</span><span class="n">headless</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">=</span><span class="n">override_browser_args</span><span class="p">,</span>
+                <span class="n">proxy</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">proxies</span><span class="p">),</span>
+                <span class="n">executable_path</span><span class="o">=</span><span class="n">executable_path</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid browser argument passed&quot;</span><span class="p">)</span>
 
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="o">*</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__create_session</span><span class="p">(</span>
-                    <span class="n">proxy</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">proxies</span><span class="p">),</span>
-                    <span class="n">ms_token</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">ms_tokens</span><span class="p">),</span>
-                    <span class="n">url</span><span class="o">=</span><span class="n">starting_url</span><span class="p">,</span>
-                    <span class="n">context_options</span><span class="o">=</span><span class="n">context_options</span><span class="p">,</span>
-                    <span class="n">sleep_after</span><span class="o">=</span><span class="n">sleep_after</span><span class="p">,</span>
-                    <span class="n">cookies</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">cookies</span><span class="p">),</span>
-                    <span class="n">suppress_resource_load_types</span><span class="o">=</span><span class="n">suppress_resource_load_types</span><span class="p">,</span>
-                    <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_sessions</span><span class="p">)</span>
+        <span class="c1"># Create sessions concurrently</span>
+        <span class="c1"># Use return_exceptions only if partial sessions are allowed</span>
+        <span class="k">if</span> <span class="n">allow_partial_sessions</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+                <span class="o">*</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__create_session</span><span class="p">(</span>
+                        <span class="n">proxy</span><span class="o">=</span><span class="p">(</span>
+                            <span class="n">random_choice</span><span class="p">(</span><span class="n">proxies</span><span class="p">)</span> <span class="k">if</span> <span class="n">proxy_provider</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+                        <span class="p">),</span>
+                        <span class="n">ms_token</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">ms_tokens</span><span class="p">),</span>
+                        <span class="n">url</span><span class="o">=</span><span class="n">starting_url</span><span class="p">,</span>
+                        <span class="n">context_options</span><span class="o">=</span><span class="n">context_options</span><span class="p">,</span>
+                        <span class="n">sleep_after</span><span class="o">=</span><span class="n">sleep_after</span><span class="p">,</span>
+                        <span class="n">cookies</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">cookies</span><span class="p">),</span>
+                        <span class="n">suppress_resource_load_types</span><span class="o">=</span><span class="n">suppress_resource_load_types</span><span class="p">,</span>
+                        <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                        <span class="n">page_factory</span><span class="o">=</span><span class="n">page_factory</span><span class="p">,</span>
+                        <span class="n">browser_context_factory</span><span class="o">=</span><span class="n">browser_context_factory</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_sessions</span><span class="p">)</span>
+                <span class="p">),</span>
+                <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="p">)</span></div>
+
+            <span class="c1"># Count failures and provide feedback</span>
+            <span class="n">failed_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">))</span>
+            <span class="n">success_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span>
+            <span class="n">minimum_required</span> <span class="o">=</span> <span class="n">min_sessions</span> <span class="k">if</span> <span class="n">min_sessions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">success_count</span> <span class="o">&lt;</span> <span class="n">minimum_required</span><span class="p">:</span>
+                <span class="c1"># Didn&#39;t meet minimum requirements</span>
+                <span class="n">error_messages</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">)]</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to create minimum required sessions. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Created </span><span class="si">{</span><span class="n">success_count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">num_sessions</span><span class="si">}</span><span class="s2">, needed at least </span><span class="si">{</span><span class="n">minimum_required</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Errors: </span><span class="si">{</span><span class="n">error_messages</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>  <span class="c1"># Show first 3 errors</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">failed_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Some sessions failed but we have enough - log warning and continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Created </span><span class="si">{</span><span class="n">success_count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">num_sessions</span><span class="si">}</span><span class="s2"> sessions successfully. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">failed_count</span><span class="si">}</span><span class="s2"> session(s) failed to create.&quot;</span>
+                <span class="p">)</span>
+                <span class="c1"># Log individual errors at debug level</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Session </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> creation failed: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+                <span class="o">*</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__create_session</span><span class="p">(</span>
+                        <span class="n">proxy</span><span class="o">=</span><span class="p">(</span>
+                            <span class="n">random_choice</span><span class="p">(</span><span class="n">proxies</span><span class="p">)</span> <span class="k">if</span> <span class="n">proxy_provider</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+                        <span class="p">),</span>
+                        <span class="n">ms_token</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">ms_tokens</span><span class="p">),</span>
+                        <span class="n">url</span><span class="o">=</span><span class="n">starting_url</span><span class="p">,</span>
+                        <span class="n">context_options</span><span class="o">=</span><span class="n">context_options</span><span class="p">,</span>
+                        <span class="n">sleep_after</span><span class="o">=</span><span class="n">sleep_after</span><span class="p">,</span>
+                        <span class="n">cookies</span><span class="o">=</span><span class="n">random_choice</span><span class="p">(</span><span class="n">cookies</span><span class="p">),</span>
+                        <span class="n">suppress_resource_load_types</span><span class="o">=</span><span class="n">suppress_resource_load_types</span><span class="p">,</span>
+                        <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                        <span class="n">page_factory</span><span class="o">=</span><span class="n">page_factory</span><span class="p">,</span>
+                        <span class="n">browser_context_factory</span><span class="o">=</span><span class="n">browser_context_factory</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_sessions</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="TikTokApi.close_sessions">
+<a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.close_sessions">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">close_sessions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Close all the sessions. Should be called when you&#39;re done with the TikTokApi object</span>
 
 <span class="sd">        This is called automatically when using the TikTokApi with &quot;with&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Closing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span><span class="si">}</span><span class="s2"> sessions...&quot;</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
-            <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error closing page: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">context</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error closing context: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error closing browser: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error stopping playwright: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_called</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;All sessions and browser resources closed successfully&quot;</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="TikTokApi.generate_js_fetch">
 <a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.generate_js_fetch">[docs]</a>
@@ -416,6 +748,8 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a random session</span>
+
+<span class="sd">        DEPRECATED: Use _get_valid_session_index() for better error handling</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            session_index (int): The index of the session you want to use, if not provided a random session will be used.</span>
@@ -476,16 +810,32 @@
 <span class="sd">            any: The result of the fetch. Seems to be a string or dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">js_script</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_js_fetch</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">js_script</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">result</span></div>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_valid_session_index</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># Fallback to old method for backwards compatibility</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">js_script</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">except</span> <span class="n">PlaywrightError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Session died during operation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Session failed during fetch: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mark_session_invalid</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+            <span class="k">raise</span></div>
 
 
 <div class="viewcode-block" id="TikTokApi.generate_x_bogus">
 <a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.generate_x_bogus">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">generate_x_bogus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate the X-Bogus header for a url&quot;&quot;&quot;</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_valid_session_index</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># Fallback to old method for backwards compatibility</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">max_attempts</span> <span class="o">=</span> <span class="mi">5</span>
         <span class="n">attempts</span> <span class="o">=</span> <span class="mi">0</span>
@@ -493,27 +843,51 @@
             <span class="n">attempts</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">timeout_time</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">5000</span><span class="p">,</span> <span class="mi">20000</span><span class="p">)</span>
-                <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">wait_for_function</span><span class="p">(</span><span class="s2">&quot;window.byted_acrawler !== undefined&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout_time</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">wait_for_function</span><span class="p">(</span>
+                    <span class="s2">&quot;window.byted_acrawler !== undefined&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout_time</span>
+                <span class="p">)</span>
                 <span class="k">break</span>
             <span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">attempts</span> <span class="o">==</span> <span class="n">max_attempts</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load tiktok after </span><span class="si">{</span><span class="n">max_attempts</span><span class="si">}</span><span class="s2"> attempts, consider using a proxy&quot;</span><span class="p">)</span>
-                
-                <span class="n">try_urls</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;https://www.tiktok.com/foryou&quot;</span><span class="p">,</span> <span class="s2">&quot;https://www.tiktok.com&quot;</span><span class="p">,</span> <span class="s2">&quot;https://www.tiktok.com/@tiktok&quot;</span><span class="p">,</span> <span class="s2">&quot;https://www.tiktok.com/foryou&quot;</span><span class="p">]</span>
+                    <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Failed to load tiktok after </span><span class="si">{</span><span class="n">max_attempts</span><span class="si">}</span><span class="s2"> attempts, consider using a proxy&quot;</span>
+                    <span class="p">)</span>
+
+                <span class="n">try_urls</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="s2">&quot;https://www.tiktok.com/foryou&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;https://www.tiktok.com&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;https://www.tiktok.com/@tiktok&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;https://www.tiktok.com/foryou&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
 
                 <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">try_urls</span><span class="p">))</span>
-        
-        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;() =&gt; </span><span class="se">{{</span><span class="s1"> return window.byted_acrawler.frontierSign(&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1">&quot;) </span><span class="se">}}</span><span class="s1">&#39;</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">result</span></div>
+            <span class="k">except</span> <span class="n">PlaywrightError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># Session died</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Session died during x-bogus generation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mark_session_invalid</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+                <span class="k">raise</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;() =&gt; </span><span class="se">{{</span><span class="s1"> return window.byted_acrawler.frontierSign(&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1">&quot;) </span><span class="se">}}</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">except</span> <span class="n">PlaywrightError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Session died during operation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Session died during x-bogus evaluation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mark_session_invalid</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+            <span class="k">raise</span></div>
 
 
 <div class="viewcode-block" id="TikTokApi.sign_url">
 <a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.sign_url">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sign_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sign a url&quot;&quot;&quot;</span>
-        <span class="n">i</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">i</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_valid_session_index</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># Fallback to old method for backwards compatibility</span>
+            <span class="n">i</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># TODO: Would be nice to generate msToken here</span>
 
@@ -559,7 +933,12 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            Exception: If the request fails.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">i</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">i</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_valid_session_index</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># Fallback to old method for backwards compatibility</span>
+            <span class="n">i</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">session</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">}</span>
 
@@ -589,67 +968,172 @@
         <span class="n">retry_count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">retry_count</span> <span class="o">&lt;</span> <span class="n">retries</span><span class="p">:</span>
             <span class="n">retry_count</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_fetch_script</span><span class="p">(</span>
-                <span class="n">signed_url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">session_index</span><span class="o">=</span><span class="n">i</span>
-            <span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;TikTokApi.run_fetch_script returned None&quot;</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">EmptyResponseException</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">&quot;TikTok returned an empty response. They are detecting you&#39;re a bot, try some of these: headless=False, browser=&#39;webkit&#39;, consider using a proxy&quot;</span><span class="p">)</span>
-
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status_code&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Got an unexpected status code: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">data</span>
-            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">retry_count</span> <span class="o">==</span> <span class="n">retries</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to decode json response: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                    <span class="k">raise</span> <span class="n">InvalidJSONException</span><span class="p">()</span>
-
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Failed a request, retrying (</span><span class="si">{</span><span class="n">retry_count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">retries</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_fetch_script</span><span class="p">(</span>
+                    <span class="n">signed_url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">session_index</span><span class="o">=</span><span class="n">i</span>
                 <span class="p">)</span>
-                <span class="k">if</span> <span class="n">exponential_backoff</span><span class="p">:</span>
-                    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">retry_count</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;TikTokApi.run_fetch_script returned None&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">EmptyResponseException</span><span class="p">(</span>
+                        <span class="n">result</span><span class="p">,</span>
+                        <span class="s2">&quot;TikTok returned an empty response. They are detecting you&#39;re a bot, try some of these: headless=False, browser=&#39;webkit&#39;, consider using a proxy&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status_code&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Got an unexpected status code: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">data</span>
+                <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">retry_count</span> <span class="o">==</span> <span class="n">retries</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to decode json response: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="n">InvalidJSONException</span><span class="p">()</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Failed a request, retrying (</span><span class="si">{</span><span class="n">retry_count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">retries</span><span class="si">}</span><span class="s2">)&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">exponential_backoff</span><span class="p">:</span>
+                        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">retry_count</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">PlaywrightError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># Session died during request</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Playwright error during request: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mark_session_invalid</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">retry_count</span> <span class="o">&lt;</span> <span class="n">retries</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Retrying with a new session (</span><span class="si">{</span><span class="n">retry_count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">retries</span><span class="si">}</span><span class="s2">)&quot;</span>
+                    <span class="p">)</span>
+                    <span class="c1"># Get a new valid session for the retry</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">i</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_valid_session_index</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">session_error</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Failed to get valid session: </span><span class="si">{</span><span class="n">session_error</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                        <span class="k">raise</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="TikTokApi.close_sessions">
-<a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.close_sessions">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">close_sessions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close all the sessions. Should be called when you&#39;re done with the TikTokApi object&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
-            <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+                    <span class="k">raise</span></div>
 
 
 <div class="viewcode-block" id="TikTokApi.stop_playwright">
 <a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.stop_playwright">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stop_playwright</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the playwright browser&quot;&quot;&quot;</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stop the playwright browser.</span>
+
+<span class="sd">        Note: It&#39;s better to use close_sessions() which calls this automatically.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error closing browser: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error stopping playwright: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="TikTokApi.get_session_content">
 <a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.get_session_content">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_session_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the content of a url&quot;&quot;&quot;</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">content</span><span class="p">()</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_valid_session_index</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># Fallback to old method</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">page</span><span class="o">.</span><span class="n">content</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">PlaywrightError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Session died during get_session_content: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mark_session_invalid</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="TikTokApi.get_resource_stats">
+<a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.get_resource_stats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resource_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get statistics about current resource usage.</span>
+
+<span class="sd">        Useful for monitoring and detecting potential memory leaks.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Statistics including session count, browser status, etc.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">valid_sessions</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">is_valid</span><span class="p">)</span>
+        <span class="n">invalid_sessions</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span> <span class="o">-</span> <span class="n">valid_sessions</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;total_sessions&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">),</span>
+            <span class="s2">&quot;valid_sessions&quot;</span><span class="p">:</span> <span class="n">valid_sessions</span><span class="p">,</span>
+            <span class="s2">&quot;invalid_sessions&quot;</span><span class="p">:</span> <span class="n">invalid_sessions</span><span class="p">,</span>
+            <span class="s2">&quot;has_browser&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;has_playwright&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">playwright</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;cleanup_called&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_called</span><span class="p">,</span>
+            <span class="s2">&quot;auto_cleanup_enabled&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auto_cleanup_dead_sessions</span><span class="p">,</span>
+            <span class="s2">&quot;recovery_enabled&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_recovery_enabled</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="TikTokApi.health_check">
+<a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.tiktok.TikTokApi.health_check">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health_check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform a health check on all resources.</span>
+
+<span class="sd">        This actively validates all sessions and returns detailed health info.</span>
+<span class="sd">        Useful for monitoring and debugging.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Health check results</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">health</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_resource_stats</span><span class="p">()</span>
+
+        <span class="c1"># Actively validate all sessions</span>
+        <span class="n">session_health</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">session</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">):</span>
+            <span class="n">is_valid</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_session_valid</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+            <span class="n">session_health</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span>
+                    <span class="s2">&quot;valid&quot;</span><span class="p">:</span> <span class="n">is_valid</span><span class="p">,</span>
+                    <span class="s2">&quot;marked_valid&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">is_valid</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="n">health</span><span class="p">[</span><span class="s2">&quot;session_details&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">session_health</span>
+        <span class="n">health</span><span class="p">[</span><span class="s2">&quot;healthy_sessions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">session_health</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;valid&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Check for potential leaks</span>
+        <span class="k">if</span> <span class="n">health</span><span class="p">[</span><span class="s2">&quot;invalid_sessions&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auto_cleanup_dead_sessions</span><span class="p">:</span>
+            <span class="n">health</span><span class="p">[</span><span class="s2">&quot;warning&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">health</span><span class="p">[</span><span class="s1">&#39;invalid_sessions&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> invalid sessions accumulating (auto-cleanup disabled)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">health</span></div>
 
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc</span><span class="p">,</span> <span class="n">tb</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensure cleanup happens when exiting context manager&quot;&quot;&quot;</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_sessions</span><span class="p">()</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_playwright</span><span class="p">()</span></div>
+        <span class="c1"># stop_playwright is already called by close_sessions, but call it again for safety</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_called</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_playwright</span><span class="p">()</span></div>
 
 </pre></div>
 
@@ -660,7 +1144,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, David Teather.</p>
+    <p>&#169; Copyright 2025, David Teather.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

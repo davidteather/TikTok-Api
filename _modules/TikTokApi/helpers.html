@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTokApi.helpers &mdash; TikTokAPI v7.1.0 documentation</title>
+  <title>TikTokApi.helpers &mdash; TikTokAPI v7.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
@@ -13,7 +13,7 @@
     <link rel="canonical" href="https://davidteather.github.io/TikTok-Api/_modules/TikTokApi/helpers.html" />
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=65841b19"></script>
+      <script src="../../_static/documentation_options.js?v=f7fbc5f2"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -98,18 +98,19 @@
     <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">choices</span><span class="p">)</span></div>
 
 
+
 <div class="viewcode-block" id="requests_cookie_to_playwright_cookie">
 <a class="viewcode-back" href="../../TikTokApi.html#TikTokApi.helpers.requests_cookie_to_playwright_cookie">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">requests_cookie_to_playwright_cookie</span><span class="p">(</span><span class="n">req_c</span><span class="p">):</span>
     <span class="n">c</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">req_c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-        <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">req_c</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-        <span class="s1">&#39;domain&#39;</span><span class="p">:</span> <span class="n">req_c</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
-        <span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">req_c</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
-        <span class="s1">&#39;secure&#39;</span><span class="p">:</span> <span class="n">req_c</span><span class="o">.</span><span class="n">secure</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">req_c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">req_c</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="n">req_c</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
+        <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">req_c</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+        <span class="s2">&quot;secure&quot;</span><span class="p">:</span> <span class="n">req_c</span><span class="o">.</span><span class="n">secure</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">if</span> <span class="n">req_c</span><span class="o">.</span><span class="n">expires</span><span class="p">:</span>
-        <span class="n">c</span><span class="p">[</span><span class="s1">&#39;expires&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">req_c</span><span class="o">.</span><span class="n">expires</span>
+        <span class="n">c</span><span class="p">[</span><span class="s2">&quot;expires&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">req_c</span><span class="o">.</span><span class="n">expires</span>
     <span class="k">return</span> <span class="n">c</span></div>
 
 </pre></div>
@@ -121,7 +122,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, David Teather.</p>
+    <p>&#169; Copyright 2025, David Teather.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
