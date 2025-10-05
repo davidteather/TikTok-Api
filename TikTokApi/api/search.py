@@ -99,6 +99,9 @@ class Search:
                         sec_uid=sec_uid, user_id=uid, username=username
                     )
                     found += 1
+            elif obj_type == "item":
+                for video in resp.get("item_list", []):
+                    yield Search.parent.video(data=video)
 
             if not resp.get("has_more", False):
                 return
