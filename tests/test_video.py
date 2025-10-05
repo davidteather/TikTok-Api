@@ -10,7 +10,13 @@ headless = os.environ.get("headless", "True").lower() == "true"
 async def test_video_id_from_url():
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
+        await api.create_sessions(
+            ms_tokens=[ms_token],
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=headless,
+        )
 
         expected_id = "7074717081563942186"
         video = api.video(
@@ -29,7 +35,13 @@ async def test_video_id_from_url():
 async def test_video_info():
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
+        await api.create_sessions(
+            ms_tokens=[ms_token],
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=headless,
+        )
         video_id = "7074717081563942186"
         video = api.video(
             url="https://www.tiktok.com/@davidteathercodes/video/7074717081563942186"
@@ -46,7 +58,13 @@ async def test_video_bytes():
     pytest.skip("Not implemented yet")
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
+        await api.create_sessions(
+            ms_tokens=[ms_token],
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=headless,
+        )
         video_id = "7107272719166901550"
         video = api.video(id=video_id)
 
@@ -58,7 +76,13 @@ async def test_video_bytes():
 async def test_related_videos():
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
+        await api.create_sessions(
+            ms_tokens=[ms_token],
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=headless,
+        )
         video_id = "7107272719166901550"
         video = api.video(id=video_id)
         count = 0

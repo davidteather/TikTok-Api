@@ -14,7 +14,13 @@ headless = os.environ.get("headless", "True").lower() == "true"
 async def test_user_info():
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
+        await api.create_sessions(
+            ms_tokens=[ms_token],
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=headless,
+        )
         user = api.user(username=username)
         await user.info()
 
@@ -22,11 +28,18 @@ async def test_user_info():
         assert user.user_id == user_id
         assert user.sec_uid == sec_uid
 
+
 @pytest.mark.asyncio
 async def test_user_videos():
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
+        await api.create_sessions(
+            ms_tokens=[ms_token],
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=headless,
+        )
         user = api.user(username=username, sec_uid=sec_uid, user_id=user_id)
 
         count = 0
@@ -35,11 +48,18 @@ async def test_user_videos():
 
         assert count >= 30
 
+
 @pytest.mark.asyncio
 async def test_user_likes():
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
+        await api.create_sessions(
+            ms_tokens=[ms_token],
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=headless,
+        )
         user = api.user(
             username="publicliketest",
             sec_uid="MS4wLjABAAAAHjhwCIwmvzVZfRrDAZ2aZy74LciLnoyaPfM2rrX9N7bwbWMFuwTFG4YrByYvsH5c",
@@ -51,15 +71,22 @@ async def test_user_likes():
 
         assert count >= 30
 
+
 @pytest.mark.asyncio
 async def test_user_playlists():
     api = TikTokApi()
     async with api:
-        await api.create_sessions(ms_tokens=[ms_token], num_sessions=1, sleep_after=3, browser=os.getenv("TIKTOK_BROWSER", "chromium"), headless=headless)
+        await api.create_sessions(
+            ms_tokens=[ms_token],
+            num_sessions=1,
+            sleep_after=3,
+            browser=os.getenv("TIKTOK_BROWSER", "chromium"),
+            headless=headless,
+        )
         user = api.user(username="mrbeast")
 
         count = 0
         async for playlist in user.playlists(count=5):
             count += 1
-        
+
         assert count >= 5

@@ -53,8 +53,6 @@ These sponsors have paid to be placed here or are my own affiliate links which I
 - [Quick Start Guide](#quick-start-guide)
   - [Examples](https://github.com/davidteather/TikTok-Api/tree/main/examples)
 
-[**Upgrading from V5 to V6**](#upgrading-from-v5-to-v6)
-
 ## Documentation
 
 You can find the full documentation [here](https://davidteather.github.io/TikTok-Api)
@@ -140,3 +138,4 @@ python -m examples.trending_example
 
 You can access the full data dictionary the object was created from with `.as_dict`. On a video this may look like
 [this](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d). TikTok changes their structure from time to time so it's worth investigating the structure of the dictionary when you use this package.
+
