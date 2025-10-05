@@ -31,3 +31,4 @@ src
 /.idea/
 /TikTok-Api.iml
 venv/**
+*.DS_STORE
