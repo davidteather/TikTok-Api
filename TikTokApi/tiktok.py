@@ -883,10 +883,10 @@ class TikTokApi:
                     )
 
                 try:
-                    data = json.loads(result)
-                    if data.get("status_code") != 0:
-                        self.logger.error(f"Got an unexpected status code: {data}")
-                    return data
+                    # data = json.loads(result)
+                    # if data.get("status_code") != 0:
+                    #     self.logger.error(f"Got an unexpected status code: {data}")
+                    return result
                 except json.decoder.JSONDecodeError:
                     if retry_count == retries:
                         self.logger.error(f"Failed to decode json response: {result}")
