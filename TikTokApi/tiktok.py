@@ -911,6 +911,7 @@ class TikTokApi:
                     raise Exception("TikTokApi.run_fetch_script returned None")
 
                 if result == "":
+                    await self._mark_session_invalid(session)
                     raise EmptyResponseException(
                         result,
                         "TikTok returned an empty response. They are detecting you're a bot, try some of these: headless=False, browser='webkit', consider using a proxy",
