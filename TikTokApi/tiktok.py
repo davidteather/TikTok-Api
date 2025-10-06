@@ -260,6 +260,7 @@ class TikTokApi:
                 if i < len(self.sessions):
                     session = self.sessions[i]
                     if await self._is_session_valid(session):
+                        self.logger.info(f"Got a session & verified it's valid. Session " + i)
                         return i, session
                     else:
                         self.logger.warning(f"Requested session {i} is invalid")
