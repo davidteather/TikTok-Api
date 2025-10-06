@@ -795,7 +795,7 @@ class TikTokApi:
 
                 try_urls = [
                     "https://www.tiktok.com/foryou",
-                    "https://www.tiktok.com",
+                    # "https://www.tiktok.com",
                     "https://www.tiktok.com/@tiktok",
                     "https://www.tiktok.com/foryou",
                 ]
