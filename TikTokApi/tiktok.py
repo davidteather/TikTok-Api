@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import dataclasses
+import os
 from typing import Any, Awaitable, Callable, Optional
 import random
 import time
@@ -40,6 +41,9 @@ from .exceptions import (
     EmptyResponseException,
 )
 
+proxy_server_url = os.getenv("PROXY_SERVER_URL")
+proxy_username = os.getenv("PROXY_USERNAME")
+proxy_password = os.getenv("PROXY_PASSWORD")
 
 @dataclasses.dataclass
 class TikTokPlaywrightSession:
@@ -73,6 +77,8 @@ class TikTokApi:
     trending = Trending
     search = Search
     playlist = Playlist
+
+
 
     def __init__(self, logging_level: int = logging.WARN, logger_name: str = None):
         """
@@ -288,6 +294,13 @@ class TikTokApi:
             "Please call create_sessions() again or restart the API."
         )
 
+    def get_proxy_options(self):
+        return {
+            "server": proxy_server_url,
+            "username": proxy_username,
+            "password": proxy_password
+        }
+
     async def _recover_sessions(self):
         """
         Attempt to recover from session failures by cleaning up dead sessions
@@ -305,6 +318,26 @@ class TikTokApi:
 
             if removed_count > 0:
                 self.logger.info(f"Removed {removed_count} dead session(s)")
+
+            self.logger.info(f"Creating {removed_count} sessions to replace dead sessions...")
+            await asyncio.gather(
+                *(
+                    self.create_sessions(headless=False,
+                                        ms_tokens=[],
+                                        num_sessions=1,
+                                        sleep_after=3,
+                                        starting_url="https://www.tiktok.com",
+                                        proxies=[self.get_proxy_options()],
+                                        suppress_resource_load_types=["stylesheet", "image", "media",
+                                                                      "font", "textrack", "xhr",
+                                                                      "eventsource", "websocket",
+                                                                      "manifest", "other"],
+                                        context_options={"ignore_https_errors": True},
+                                        timeout=60000)
+                    for _ in range(removed_count)
+                ),
+                return_exceptions=True  # This is the key parameter
+            )
 
             # Note: We don't automatically create new sessions here because we'd need
             # all the original parameters (proxies, ms_tokens, etc.)
