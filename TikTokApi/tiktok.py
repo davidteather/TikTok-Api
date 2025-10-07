@@ -927,6 +927,7 @@ class TikTokApi:
                     self.logger.info(f"Returning result for request and closing session {i}")
                     await session.page.close()
                     await session.context.close()
+                    await self.browser.close()
                     ######
                     return result
                 except json.decoder.JSONDecodeError:
