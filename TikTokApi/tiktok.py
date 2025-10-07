@@ -211,25 +211,33 @@ class TikTokApi:
 
     async def _mark_session_invalid(self, session: TikTokPlaywrightSession):
         """
-        Mark a session as invalid and attempt cleanup.
+        Mark a session as invalid and completely remove it along with its browser resources.
 
         Args:
             session: The session to mark as invalid
         """
         session.is_valid = False
 
-        # Attempt graceful cleanup
+        # Attempt graceful cleanup - close in reverse order of creation
+        # Close page first
         try:
-            if session.page:
+            if session.page and not session.page.is_closed():
                 await session.page.close()
+                self.logger.debug(f"Closed page for invalid session")
         except Exception as e:
             self.logger.debug(f"Error closing page during invalidation: {e}")
 
+        # Then close context
         try:
             if session.context:
                 await session.context.close()
+                self.logger.debug(f"Closed context for invalid session")
         except Exception as e:
             self.logger.debug(f"Error closing context during invalidation: {e}")
+
+        # Clear references to help garbage collection
+        session.page = None
+        session.context = None
 
         # Immediately remove from sessions list if auto-cleanup is enabled
         # This prevents memory leaks from accumulating dead sessions
@@ -237,7 +245,7 @@ class TikTokApi:
             try:
                 self.sessions.remove(session)
                 self.logger.info(
-                    f"Automatically removed dead session from pool. Remaining: {len(self.sessions)}"
+                    f"Automatically removed dead session and its browser resources. Remaining: {len(self.sessions)}"
                 )
             except ValueError:
                 pass  # Session already removed
@@ -795,7 +803,7 @@ class TikTokApi:
 
                 try_urls = [
                     "https://www.tiktok.com/foryou",
-                    # "https://www.tiktok.com",
+                    "https://www.tiktok.com",
                     "https://www.tiktok.com/@tiktok",
                     "https://www.tiktok.com/foryou",
                 ]
@@ -923,12 +931,6 @@ class TikTokApi:
                     # data = json.loads(result)
                     # if data.get("status_code") != 0:
                     #     self.logger.error(f"Got an unexpected status code: {data}")
-                    #####TESTING
-                    self.logger.info(f"Returning result for request and closing session {i}")
-                    await session.page.close()
-                    await session.context.close()
-                    await self.browser.close()
-                    ######
                     return result
                 except json.decoder.JSONDecodeError:
                     if retry_count == retries:
