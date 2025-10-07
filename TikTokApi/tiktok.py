@@ -236,7 +236,7 @@ class TikTokApi:
         if self._auto_cleanup_dead_sessions and session in self.sessions:
             try:
                 self.sessions.remove(session)
-                self.logger.debug(
+                self.logger.info(
                     f"Automatically removed dead session from pool. Remaining: {len(self.sessions)}"
                 )
             except ValueError:
@@ -873,6 +873,8 @@ class TikTokApi:
             # Fallback to old method for backwards compatibility
             i, session = self._get_session(**kwargs)
 
+        self.logger.info(f"Got a session: {session} with index {i}")
+
         if session.params is not None:
             params = {**session.params, **params}
 
@@ -921,6 +923,11 @@ class TikTokApi:
                     # data = json.loads(result)
                     # if data.get("status_code") != 0:
                     #     self.logger.error(f"Got an unexpected status code: {data}")
+                    #####TESTING
+                    self.logger.info(f"Returning result for request and closing session {i}")
+                    await session.page.close
+                    await session.context.close
+                    ######
                     return result
                 except json.decoder.JSONDecodeError:
                     if retry_count == retries:
