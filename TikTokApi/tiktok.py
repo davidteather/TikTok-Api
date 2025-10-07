@@ -925,8 +925,8 @@ class TikTokApi:
                     #     self.logger.error(f"Got an unexpected status code: {data}")
                     #####TESTING
                     self.logger.info(f"Returning result for request and closing session {i}")
-                    await session.page.close
-                    await session.context.close
+                    await session.page.close()
+                    await session.context.close()
                     ######
                     return result
                 except json.decoder.JSONDecodeError:
