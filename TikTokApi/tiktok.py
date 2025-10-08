@@ -57,6 +57,7 @@ class TikTokPlaywrightSession:
     ms_token: str = None
     base_url: str = "https://www.tiktok.com"
     is_valid: bool = True
+    empty_response_count: int = 0
 
 
 class TikTokApi:
@@ -80,13 +81,15 @@ class TikTokApi:
 
 
 
-    def __init__(self, logging_level: int = logging.WARN, logger_name: str = None):
+    def __init__(self, logging_level: int = logging.WARN, logger_name: str = None, empty_response_threshold: int = 3, metrics_callback: Optional[Callable] = None):
         """
         Create a TikTokApi object.
 
         Args:
             logging_level (int): The logging level you want to use.
             logger_name (str): The name of the logger you want to use.
+            empty_response_threshold (int): Number of consecutive empty responses before marking session invalid (default: 3)
+            metrics_callback (Callable): Optional callback object with methods for recording metrics
         """
         self.sessions = []
         self._session_recovery_enabled = True
@@ -95,6 +98,8 @@ class TikTokApi:
         self._auto_cleanup_dead_sessions = True
         self._proxy_provider: Optional[ProxyProvider] = None
         self._proxy_algorithm: Optional[Algorithm] = None
+        self._empty_response_threshold = empty_response_threshold
+        self._metrics_callback = metrics_callback
 
         if logger_name is None:
             logger_name = __name__
@@ -921,7 +926,28 @@ class TikTokApi:
                     raise Exception("TikTokApi.run_fetch_script returned None")
 
                 if result == "":
-                    await self._mark_session_invalid(session)
+                    # Increment empty response counter
+                    session.empty_response_count += 1
+                    self.logger.warning(
+                        f"Session received empty response ({session.empty_response_count}/{self._empty_response_threshold})"
+                    )
+
+                    # Record empty response metric
+                    if self._metrics_callback and hasattr(self._metrics_callback, 'record_empty_response'):
+                        self._metrics_callback.record_empty_response()
+
+                    # Only mark invalid if threshold is exceeded
+                    if session.empty_response_count >= self._empty_response_threshold:
+                        self.logger.error(
+                            f"Session exceeded empty response threshold ({self._empty_response_threshold}), marking invalid"
+                        )
+
+                        # Record session invalidation metric
+                        if self._metrics_callback and hasattr(self._metrics_callback, 'record_session_invalidated'):
+                            self._metrics_callback.record_session_invalidated(session.empty_response_count)
+
+                        await self._mark_session_invalid(session)
+
                     raise EmptyResponseException(
                         result,
                         "TikTok returned an empty response. They are detecting you're a bot, try some of these: headless=False, browser='webkit', consider using a proxy",
@@ -931,6 +957,9 @@ class TikTokApi:
                     # data = json.loads(result)
                     # if data.get("status_code") != 0:
                     #     self.logger.error(f"Got an unexpected status code: {data}")
+
+                    # Reset empty response counter on successful response
+                    session.empty_response_count = 0
                     return result
                 except json.decoder.JSONDecodeError:
                     if retry_count == retries:
