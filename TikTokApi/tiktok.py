@@ -775,13 +775,27 @@ class TikTokApi:
             # Fallback to old method for backwards compatibility
             _, session = self._get_session(**kwargs)
 
+        # Check if session is still valid before using it
+        # This prevents race conditions where another thread just closed the session
+        if not session.is_valid or session not in self.sessions:
+            self.logger.debug(f"Session became invalid before fetch, attempting to get a new session")
+            try:
+                # Get a fresh valid session instead of erroring out
+                _, session = await self._get_valid_session_index(**kwargs)
+                self.logger.debug(f"Successfully got a replacement session")
+            except Exception as e:
+                self.logger.error(f"Failed to get replacement session: {e}")
+                raise PlaywrightError("Session was closed and no valid session available")
+
         try:
             result = await session.page.evaluate(js_script)
             return result
         except PlaywrightError as e:
             # Session died during operation
             self.logger.error(f"Session failed during fetch: {e}")
-            await self._mark_session_invalid(session)
+            # Only mark invalid if it's still in the session list (might have been removed already)
+            if session in self.sessions:
+                await self._mark_session_invalid(session)
             raise
 
     async def generate_x_bogus(self, url: str, **kwargs):
