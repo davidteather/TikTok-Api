@@ -58,6 +58,8 @@ class TikTokPlaywrightSession:
     base_url: str = "https://www.tiktok.com"
     is_valid: bool = True
     empty_response_count: int = 0
+    successful_requests: int = 0
+    total_requests: int = 0
 
 
 class TikTokApi:
@@ -926,10 +928,14 @@ class TikTokApi:
                     raise Exception("TikTokApi.run_fetch_script returned None")
 
                 if result == "":
+                    # Track request
+                    session.total_requests += 1
+
                     # Increment empty response counter
                     session.empty_response_count += 1
                     self.logger.warning(
-                        f"Session received empty response ({session.empty_response_count}/{self._empty_response_threshold})"
+                        f"Session received empty response ({session.empty_response_count}/{self._empty_response_threshold}). "
+                        f"Lifetime: {session.successful_requests} successful / {session.total_requests} total requests"
                     )
 
                     # Record empty response metric
@@ -939,12 +945,17 @@ class TikTokApi:
                     # Only mark invalid if threshold is exceeded
                     if session.empty_response_count >= self._empty_response_threshold:
                         self.logger.error(
-                            f"Session exceeded empty response threshold ({self._empty_response_threshold}), marking invalid"
+                            f"Session exceeded empty response threshold ({self._empty_response_threshold}), marking invalid. "
+                            f"Session lifetime: {session.successful_requests} successful / {session.total_requests} total requests"
                         )
 
-                        # Record session invalidation metric
+                        # Record session invalidation metric with lifetime stats
                         if self._metrics_callback and hasattr(self._metrics_callback, 'record_session_invalidated'):
-                            self._metrics_callback.record_session_invalidated(session.empty_response_count)
+                            self._metrics_callback.record_session_invalidated(
+                                session.empty_response_count,
+                                session.successful_requests,
+                                session.total_requests
+                            )
 
                         await self._mark_session_invalid(session)
 
@@ -957,6 +968,10 @@ class TikTokApi:
                     # data = json.loads(result)
                     # if data.get("status_code") != 0:
                     #     self.logger.error(f"Got an unexpected status code: {data}")
+
+                    # Track successful request
+                    session.total_requests += 1
+                    session.successful_requests += 1
 
                     # Reset empty response counter on successful response
                     session.empty_response_count = 0
