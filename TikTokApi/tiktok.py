@@ -60,6 +60,7 @@ class TikTokPlaywrightSession:
     empty_response_count: int = 0
     successful_requests: int = 0
     total_requests: int = 0
+    bytes_downloaded: int = 0
 
 
 class TikTokApi:
@@ -230,8 +231,12 @@ class TikTokApi:
         if self._auto_cleanup_dead_sessions and session in self.sessions:
             try:
                 self.sessions.remove(session)
+                # Log session statistics including bandwidth
+                bandwidth_mb = session.bytes_downloaded / (1024 * 1024)
                 self.logger.info(
-                    f"Removed dead session from pool. Remaining: {len(self.sessions)}"
+                    f"Removed dead session from pool. Remaining: {len(self.sessions)} | "
+                    f"Session stats: {session.successful_requests} successful / {session.total_requests} total requests, "
+                    f"Bandwidth: {bandwidth_mb:.2f} MB ({session.bytes_downloaded:,} bytes)"
                 )
             except ValueError:
                 pass  # Session already removed
@@ -446,6 +451,21 @@ class TikTokApi:
                 is_valid=True,
             )
 
+            # Track bandwidth usage for this session
+            def track_response_size(response):
+                try:
+                    # Try to get content-length from headers
+                    content_length = response.headers.get('content-length')
+                    if content_length:
+                        session.bytes_downloaded += int(content_length)
+                    # If no content-length header, we can't track size without fetching body
+                    # which would be expensive, so we skip it
+                except Exception as e:
+                    # Silently ignore errors in bandwidth tracking
+                    pass
+
+            page.on("response", track_response_size)
+
             if ms_token is None:
                 await asyncio.sleep(
                     sleep_after
@@ -458,6 +478,13 @@ class TikTokApi:
                         f"Failed to get msToken on session index {len(self.sessions)}, you should consider specifying ms_tokens"
                     )
             self.sessions.append(session)
+
+            # Log initial session creation bandwidth
+            bandwidth_mb = session.bytes_downloaded / (1024 * 1024)
+            self.logger.info(
+                f"Session created successfully. Initial bandwidth: {bandwidth_mb:.2f} MB ({session.bytes_downloaded:,} bytes)"
+            )
+
             await self.__set_session_params(session)
         except Exception as e:
             # clean up
