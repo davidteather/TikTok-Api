@@ -225,7 +225,18 @@ class TikTokApi:
         """
         session.is_valid = False
 
-        # Attempt graceful cleanup - close in reverse order of creation
+        # CRITICAL: Remove from sessions list FIRST before closing resources
+        # This prevents race conditions where other threads try to use a closing session
+        if self._auto_cleanup_dead_sessions and session in self.sessions:
+            try:
+                self.sessions.remove(session)
+                self.logger.info(
+                    f"Removed dead session from pool. Remaining: {len(self.sessions)}"
+                )
+            except ValueError:
+                pass  # Session already removed
+
+        # Now safely cleanup resources - no other thread can grab this session
         # Close page first
         try:
             if session.page and not session.page.is_closed():
@@ -245,17 +256,6 @@ class TikTokApi:
         # Clear references to help garbage collection
         session.page = None
         session.context = None
-
-        # Immediately remove from sessions list if auto-cleanup is enabled
-        # This prevents memory leaks from accumulating dead sessions
-        if self._auto_cleanup_dead_sessions and session in self.sessions:
-            try:
-                self.sessions.remove(session)
-                self.logger.info(
-                    f"Automatically removed dead session and its browser resources. Remaining: {len(self.sessions)}"
-                )
-            except ValueError:
-                pass  # Session already removed
 
     async def _get_valid_session_index(
         self, **kwargs
