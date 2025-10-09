@@ -60,8 +60,7 @@ class TikTokPlaywrightSession:
     empty_response_count: int = 0
     successful_requests: int = 0
     total_requests: int = 0
-    cooling_off: bool = False
-    cooling_off_until: float = None
+    mstoken_refresh_attempts: int = 0
 
 
 class TikTokApi:
@@ -85,15 +84,15 @@ class TikTokApi:
 
 
 
-    def __init__(self, logging_level: int = logging.WARN, logger_name: str = None, empty_response_threshold: int = 3, session_cooloff_duration: int = 0, metrics_callback: Optional[Callable] = None):
+    def __init__(self, logging_level: int = logging.WARN, logger_name: str = None, empty_response_threshold: int = 3, max_mstoken_refresh_attempts: int = 2, metrics_callback: Optional[Callable] = None):
         """
         Create a TikTokApi object.
 
         Args:
             logging_level (int): The logging level you want to use.
             logger_name (str): The name of the logger you want to use.
-            empty_response_threshold (int): Number of consecutive empty responses before marking session invalid (default: 3)
-            session_cooloff_duration (int): Seconds to cool-off a session before testing it again. 0 disables cool-off (default: 0)
+            empty_response_threshold (int): Number of consecutive empty responses before attempting msToken refresh (default: 3)
+            max_mstoken_refresh_attempts (int): Maximum number of msToken refresh attempts before marking session invalid (default: 2)
             metrics_callback (Callable): Optional callback object with methods for recording metrics
         """
         self.sessions = []
@@ -104,7 +103,7 @@ class TikTokApi:
         self._proxy_provider: Optional[ProxyProvider] = None
         self._proxy_algorithm: Optional[Algorithm] = None
         self._empty_response_threshold = empty_response_threshold
-        self._session_cooloff_duration = session_cooloff_duration
+        self._max_mstoken_refresh_attempts = max_mstoken_refresh_attempts
         self._metrics_callback = metrics_callback
 
         if logger_name is None:
@@ -199,19 +198,15 @@ class TikTokApi:
 
     async def _is_session_valid(self, session: TikTokPlaywrightSession) -> bool:
         """
-        Check if a session is still valid/alive and not cooling off.
+        Check if a session is still valid/alive.
 
         Args:
             session: The session to check
 
         Returns:
-            bool: True if session is valid and not cooling off, False otherwise
+            bool: True if session is valid, False otherwise
         """
         if not session.is_valid:
-            return False
-
-        # Skip sessions that are cooling off
-        if session.cooling_off:
             return False
 
         try:
@@ -265,33 +260,44 @@ class TikTokApi:
         session.page = None
         session.context = None
 
-    async def check_cooled_off_sessions(self):
+    async def refresh_mstoken(self, session: TikTokPlaywrightSession) -> bool:
         """
-        Check for sessions that have completed their cool-off period and mark them ready.
-        The next real incoming request will naturally test the session's validity.
+        Refresh the msToken for a session by reloading the page.
+        This triggers TikTok's token generation mechanism.
+
+        Args:
+            session: The session to refresh
+
+        Returns:
+            bool: True if refresh succeeded, False otherwise
         """
-        if self._session_cooloff_duration == 0:
-            return  # Cool-off is disabled
+        try:
+            self.logger.info("Attempting to refresh msToken by reloading page...")
 
-        current_time = time.time()
+            # Reload the page to trigger fresh token generation
+            await session.page.reload(wait_until="networkidle")
+            await asyncio.sleep(3)  # Wait for token generation
 
-        for session in self.sessions[:]:  # Use slice to iterate over copy
-            # Skip if not cooling off or cooloff period not yet elapsed
-            if not session.cooling_off:
-                continue
-            if session.cooling_off_until is None or current_time < session.cooling_off_until:
-                continue
+            # Get fresh cookies
+            cookies = await self.get_session_cookies(session)
+            new_ms_token = cookies.get("msToken")
 
-            # Cool-off period completed - mark as ready for the next real request
-            session.cooling_off = False
-            session.cooling_off_until = None
-            session.empty_response_count = 0  # Reset counter to give it a fresh start
+            if new_ms_token and new_ms_token != session.ms_token:
+                old_token_preview = session.ms_token[:20] + "..." if session.ms_token else "None"
+                new_token_preview = new_ms_token[:20] + "..." if new_ms_token else "None"
 
-            self.logger.info(
-                f"Session cool-off period completed ({self._session_cooloff_duration}s). "
-                f"Marked ready - next incoming request will test its validity. "
-                f"Session lifetime: {session.successful_requests} successful / {session.total_requests} total requests"
-            )
+                session.ms_token = new_ms_token
+                self.logger.info(
+                    f"Successfully refreshed msToken (old: {old_token_preview}, new: {new_token_preview})"
+                )
+                return True
+            else:
+                self.logger.warning("msToken refresh did not produce a new token")
+                return False
+
+        except Exception as e:
+            self.logger.error(f"Failed to refresh msToken: {e}")
+            return False
 
     async def _get_valid_session_index(
         self, **kwargs
@@ -994,19 +1000,32 @@ class TikTokApi:
 
                     # Only take action if threshold is exceeded
                     if session.empty_response_count >= self._empty_response_threshold:
-                        # Check if cool-off is enabled
-                        if self._session_cooloff_duration > 0:
-                            # Put session in cool-off instead of killing it
-                            session.cooling_off = True
-                            session.cooling_off_until = time.time() + self._session_cooloff_duration
+                        # Try to refresh msToken before giving up on the session
+                        if session.mstoken_refresh_attempts < self._max_mstoken_refresh_attempts:
+                            session.mstoken_refresh_attempts += 1
                             self.logger.warning(
-                                f"Session exceeded empty response threshold ({self._empty_response_threshold}), putting in cool-off for {self._session_cooloff_duration}s. "
+                                f"Session exceeded empty response threshold ({self._empty_response_threshold}), "
+                                f"attempting msToken refresh (attempt {session.mstoken_refresh_attempts}/{self._max_mstoken_refresh_attempts}). "
                                 f"Session lifetime: {session.successful_requests} successful / {session.total_requests} total requests"
                             )
+
+                            # Attempt to refresh the msToken
+                            refresh_success = await self.refresh_mstoken(session)
+
+                            if refresh_success:
+                                # Reset empty response counter to give refreshed session a chance
+                                session.empty_response_count = 0
+                                self.logger.info(
+                                    "msToken refreshed successfully, session will retry on next request"
+                                )
+                            else:
+                                self.logger.warning(
+                                    "msToken refresh failed, session will be marked invalid on next empty response"
+                                )
                         else:
-                            # No cool-off, mark invalid immediately
+                            # Max refresh attempts exceeded, mark session invalid
                             self.logger.error(
-                                f"Session exceeded empty response threshold ({self._empty_response_threshold}), marking invalid. "
+                                f"Session exceeded maximum msToken refresh attempts ({self._max_mstoken_refresh_attempts}), marking invalid. "
                                 f"Session lifetime: {session.successful_requests} successful / {session.total_requests} total requests"
                             )
 
@@ -1034,8 +1053,9 @@ class TikTokApi:
                     session.total_requests += 1
                     session.successful_requests += 1
 
-                    # Reset empty response counter on successful response
+                    # Reset counters on successful response
                     session.empty_response_count = 0
+                    session.mstoken_refresh_attempts = 0
                     return result
                 except json.decoder.JSONDecodeError:
                     if retry_count == retries:
