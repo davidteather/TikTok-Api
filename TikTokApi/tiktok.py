@@ -60,6 +60,8 @@ class TikTokPlaywrightSession:
     empty_response_count: int = 0
     successful_requests: int = 0
     total_requests: int = 0
+    cooling_off: bool = False
+    cooling_off_until: float = None
 
 
 class TikTokApi:
@@ -83,7 +85,7 @@ class TikTokApi:
 
 
 
-    def __init__(self, logging_level: int = logging.WARN, logger_name: str = None, empty_response_threshold: int = 3, metrics_callback: Optional[Callable] = None):
+    def __init__(self, logging_level: int = logging.WARN, logger_name: str = None, empty_response_threshold: int = 3, session_cooloff_duration: int = 0, metrics_callback: Optional[Callable] = None):
         """
         Create a TikTokApi object.
 
@@ -91,6 +93,7 @@ class TikTokApi:
             logging_level (int): The logging level you want to use.
             logger_name (str): The name of the logger you want to use.
             empty_response_threshold (int): Number of consecutive empty responses before marking session invalid (default: 3)
+            session_cooloff_duration (int): Seconds to cool-off a session before testing it again. 0 disables cool-off (default: 0)
             metrics_callback (Callable): Optional callback object with methods for recording metrics
         """
         self.sessions = []
@@ -101,6 +104,7 @@ class TikTokApi:
         self._proxy_provider: Optional[ProxyProvider] = None
         self._proxy_algorithm: Optional[Algorithm] = None
         self._empty_response_threshold = empty_response_threshold
+        self._session_cooloff_duration = session_cooloff_duration
         self._metrics_callback = metrics_callback
 
         if logger_name is None:
@@ -195,15 +199,19 @@ class TikTokApi:
 
     async def _is_session_valid(self, session: TikTokPlaywrightSession) -> bool:
         """
-        Check if a session is still valid/alive.
+        Check if a session is still valid/alive and not cooling off.
 
         Args:
             session: The session to check
 
         Returns:
-            bool: True if session is valid, False otherwise
+            bool: True if session is valid and not cooling off, False otherwise
         """
         if not session.is_valid:
+            return False
+
+        # Skip sessions that are cooling off
+        if session.cooling_off:
             return False
 
         try:
@@ -256,6 +264,34 @@ class TikTokApi:
         # Clear references to help garbage collection
         session.page = None
         session.context = None
+
+    async def check_cooled_off_sessions(self):
+        """
+        Check for sessions that have completed their cool-off period and mark them ready.
+        The next real incoming request will naturally test the session's validity.
+        """
+        if self._session_cooloff_duration == 0:
+            return  # Cool-off is disabled
+
+        current_time = time.time()
+
+        for session in self.sessions[:]:  # Use slice to iterate over copy
+            # Skip if not cooling off or cooloff period not yet elapsed
+            if not session.cooling_off:
+                continue
+            if session.cooling_off_until is None or current_time < session.cooling_off_until:
+                continue
+
+            # Cool-off period completed - mark as ready for the next real request
+            session.cooling_off = False
+            session.cooling_off_until = None
+            session.empty_response_count = 0  # Reset counter to give it a fresh start
+
+            self.logger.info(
+                f"Session cool-off period completed ({self._session_cooloff_duration}s). "
+                f"Marked ready - next incoming request will test its validity. "
+                f"Session lifetime: {session.successful_requests} successful / {session.total_requests} total requests"
+            )
 
     async def _get_valid_session_index(
         self, **kwargs
@@ -956,22 +992,33 @@ class TikTokApi:
                     if self._metrics_callback and hasattr(self._metrics_callback, 'record_empty_response'):
                         self._metrics_callback.record_empty_response()
 
-                    # Only mark invalid if threshold is exceeded
+                    # Only take action if threshold is exceeded
                     if session.empty_response_count >= self._empty_response_threshold:
-                        self.logger.error(
-                            f"Session exceeded empty response threshold ({self._empty_response_threshold}), marking invalid. "
-                            f"Session lifetime: {session.successful_requests} successful / {session.total_requests} total requests"
-                        )
-
-                        # Record session invalidation metric with lifetime stats
-                        if self._metrics_callback and hasattr(self._metrics_callback, 'record_session_invalidated'):
-                            self._metrics_callback.record_session_invalidated(
-                                session.empty_response_count,
-                                session.successful_requests,
-                                session.total_requests
+                        # Check if cool-off is enabled
+                        if self._session_cooloff_duration > 0:
+                            # Put session in cool-off instead of killing it
+                            session.cooling_off = True
+                            session.cooling_off_until = time.time() + self._session_cooloff_duration
+                            self.logger.warning(
+                                f"Session exceeded empty response threshold ({self._empty_response_threshold}), putting in cool-off for {self._session_cooloff_duration}s. "
+                                f"Session lifetime: {session.successful_requests} successful / {session.total_requests} total requests"
+                            )
+                        else:
+                            # No cool-off, mark invalid immediately
+                            self.logger.error(
+                                f"Session exceeded empty response threshold ({self._empty_response_threshold}), marking invalid. "
+                                f"Session lifetime: {session.successful_requests} successful / {session.total_requests} total requests"
                             )
 
-                        await self._mark_session_invalid(session)
+                            # Record session invalidation metric with lifetime stats
+                            if self._metrics_callback and hasattr(self._metrics_callback, 'record_session_invalidated'):
+                                self._metrics_callback.record_session_invalidated(
+                                    session.empty_response_count,
+                                    session.successful_requests,
+                                    session.total_requests
+                                )
+
+                            await self._mark_session_invalid(session)
 
                     raise EmptyResponseException(
                         result,
