@@ -480,7 +480,7 @@ class TikTokApi:
                     self.logger.debug(
                         f"→ Request: {request.method} {request.url[:100]} "
                         f"[{request.resource_type}]"
-                        f"[Request headers: {request_headers}]"
+                        f"[Request headers: {request_headers}, Context cookies: {context.cookies()}]"
                     )
 
                 def log_response(response):
