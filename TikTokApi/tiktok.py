@@ -466,7 +466,6 @@ class TikTokApi:
                     for k, v in cookies.items()
                     if v is not None
                 ]
-                self.logger.debug(f"Adding cookies to context: {formatted_cookies}")
                 await context.add_cookies(formatted_cookies)
 
             if page_factory:
@@ -476,11 +475,12 @@ class TikTokApi:
                 await stealth_async(page)
 
                 # Add network logging to track what's being loaded
-                def log_request(request):
+                async def log_request(request):
+                    contextCookies = await context.cookies()
                     self.logger.debug(
                         f"→ Request: {request.method} {request.url[:100]} "
                         f"[{request.resource_type}]"
-                        f"[Request headers: {request_headers}, Context cookies: {context.cookies()}]"
+                        f"[Request headers: {request_headers}, Context cookies: {contextCookies}]"
                     )
 
                 def log_response(response):
