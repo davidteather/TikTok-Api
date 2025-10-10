@@ -486,6 +486,7 @@ class TikTokApi:
                     self.logger.debug(
                         f"← Response: {response.status} {response.url[:100]} "
                         f"[{response.request.resource_type}] Size: {size} bytes"
+                        f"[Headers: {response.headers}"
                     )
 
                 page.on("request", log_request)
