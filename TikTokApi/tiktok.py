@@ -871,7 +871,9 @@ class TikTokApi:
                     "https://www.tiktok.com/foryou",
                 ]
 
-                await session.page.goto(random.choice(try_urls))
+                page = random.choice(try_urls)
+                self.logger.info(f"Timed out waiting for acrawler function. Reloading page: {page}")
+                await session.page.goto(page)
             except PlaywrightError as e:
                 # Session died
                 self.logger.error(f"Session died during x-bogus generation: {e}")
