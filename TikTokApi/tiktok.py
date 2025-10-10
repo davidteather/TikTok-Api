@@ -512,7 +512,7 @@ class TikTokApi:
                     "**/*",
                     lambda route, request: (
                         route.abort()
-                        if request.resource_type in suppress_resource_load_types
+                        if ((request.resource_type in suppress_resource_load_types) or ("tiktokv.com" in request.url))
                         else route.continue_()
                     ),
                 )
