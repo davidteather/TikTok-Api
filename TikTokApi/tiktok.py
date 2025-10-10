@@ -274,9 +274,39 @@ class TikTokApi:
         try:
             self.logger.info("Attempting to refresh msToken by reloading page...")
 
+            # Track bandwidth during reload
+            total_bytes = 0
+            request_count = 0
+
+            def track_reload_response(response):
+                nonlocal total_bytes, request_count
+                request_count += 1
+                try:
+                    size = response.headers.get('content-length')
+                    if size:
+                        total_bytes += int(size)
+                        self.logger.debug(
+                            f"Reload resource: {response.url[:80]} [{response.request.resource_type}] "
+                            f"Size: {int(size):,} bytes"
+                        )
+                except Exception:
+                    pass
+
+            # Add temporary listener to track reload bandwidth
+            session.page.on("response", track_reload_response)
+
             # Reload the page to trigger fresh token generation
             await session.page.reload(wait_until="networkidle")
             await asyncio.sleep(3)  # Wait for token generation
+
+            # Remove the temporary listener
+            session.page.remove_listener("response", track_reload_response)
+
+            # Log total bandwidth used
+            total_mb = total_bytes / (1024 * 1024)
+            self.logger.info(
+                f"Page reload completed: {request_count} requests, {total_mb:.2f} MB ({total_bytes:,} bytes)"
+            )
 
             # Get fresh cookies
             cookies = await self.get_session_cookies(session)
@@ -443,6 +473,24 @@ class TikTokApi:
             else:
                 page = await context.new_page()
                 await stealth_async(page)
+
+                # Add network logging to track what's being loaded
+                def log_request(request):
+                    self.logger.debug(
+                        f"→ Request: {request.method} {request.url[:100]} "
+                        f"[{request.resource_type}]"
+                    )
+
+                def log_response(response):
+                    size = response.headers.get('content-length', 'unknown')
+                    self.logger.debug(
+                        f"← Response: {response.status} {response.url[:100]} "
+                        f"[{response.request.resource_type}] Size: {size} bytes"
+                    )
+
+                page.on("request", log_request)
+                page.on("response", log_response)
+
                 _ = await page.goto(url)
 
             if "tiktok" not in page.url:
