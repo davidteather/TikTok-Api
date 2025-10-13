@@ -4,6 +4,7 @@ import asyncio
 import logging
 import dataclasses
 import os
+import re
 from typing import Any, Awaitable, Callable, Optional
 import random
 import time
@@ -482,7 +483,6 @@ class TikTokApi:
                     self.logger.debug(
                         f"→ Request: {request.method} {request.url[:100]} "
                         f"[{request.resource_type}]"
-                        f"[Request headers: {request_headers}, Context cookies: {contextCookies}]"
                     )
 
                 def log_response(response):
@@ -510,12 +510,23 @@ class TikTokApi:
 
             page.once("request", handle_request)
 
+            def blockable_request(request):
+                if ((request.resource_type in suppress_resource_load_types) or re.match(
+                        r'https://(mon[^.]+\.tiktokv\.(com|eu|us)|mcs[^.]+\.tiktokv\.(com|eu|us)|m\.tiktok\.com|www\.tiktok\.com.ttwid.check)/.*',
+                        request.url)):
+                  self.logger.info(
+                      f"aborting request to {request.url}"
+                  )
+                  return True
+                else:
+                  return False
+
+
             if suppress_resource_load_types is not None:
                 await page.route(
                     "**/*",
                     lambda route, request: (
-                        route.abort()
-                        if ((request.resource_type in suppress_resource_load_types) or ("tiktokv.com" in request.url))
+                        route.abort() if (blockable_request(request))
                         else route.continue_()
                     ),
                 )
