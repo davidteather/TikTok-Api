@@ -84,7 +84,7 @@ class TikTokApi:
 
 
 
-    def __init__(self, logging_level: int = logging.WARN, logger_name: str = None, empty_response_threshold: int = 3, max_mstoken_refresh_attempts: int = 2, metrics_callback: Optional[Callable] = None):
+    def __init__(self, logging_level: int = logging.WARN, logger_name: str = None, empty_response_threshold: int = 3, enable_mstoken_refresh: bool = True, max_mstoken_refresh_attempts: int = 2, metrics_callback: Optional[Callable] = None):
         """
         Create a TikTokApi object.
 
@@ -92,6 +92,7 @@ class TikTokApi:
             logging_level (int): The logging level you want to use.
             logger_name (str): The name of the logger you want to use.
             empty_response_threshold (int): Number of consecutive empty responses before attempting msToken refresh (default: 3)
+            enable_mstoken_refresh (bool): Enable msToken refresh mechanism. If False, sessions are marked invalid immediately at threshold (default: True)
             max_mstoken_refresh_attempts (int): Maximum number of msToken refresh attempts before marking session invalid (default: 2)
             metrics_callback (Callable): Optional callback object with methods for recording metrics
         """
@@ -103,6 +104,7 @@ class TikTokApi:
         self._proxy_provider: Optional[ProxyProvider] = None
         self._proxy_algorithm: Optional[Algorithm] = None
         self._empty_response_threshold = empty_response_threshold
+        self._enable_mstoken_refresh = enable_mstoken_refresh
         self._max_mstoken_refresh_attempts = max_mstoken_refresh_attempts
         self._metrics_callback = metrics_callback
 
@@ -1053,8 +1055,8 @@ class TikTokApi:
 
                     # Only take action if threshold is exceeded
                     if session.empty_response_count >= self._empty_response_threshold:
-                        # Try to refresh msToken before giving up on the session
-                        if session.mstoken_refresh_attempts < self._max_mstoken_refresh_attempts:
+                        # Check if msToken refresh is enabled and hasn't exceeded max attempts
+                        if self._enable_mstoken_refresh and session.mstoken_refresh_attempts < self._max_mstoken_refresh_attempts:
                             session.mstoken_refresh_attempts += 1
                             self.logger.warning(
                                 f"Session exceeded empty response threshold ({self._empty_response_threshold}), "
@@ -1076,9 +1078,14 @@ class TikTokApi:
                                     "msToken refresh failed, session will be marked invalid on next empty response"
                                 )
                         else:
-                            # Max refresh attempts exceeded, mark session invalid
+                            # Refresh disabled or max attempts exceeded, mark session invalid
+                            if not self._enable_mstoken_refresh:
+                                reason = "msToken refresh disabled"
+                            else:
+                                reason = f"exceeded maximum msToken refresh attempts ({self._max_mstoken_refresh_attempts})"
+
                             self.logger.error(
-                                f"Session exceeded maximum msToken refresh attempts ({self._max_mstoken_refresh_attempts}), marking invalid. "
+                                f"Session {reason}, marking invalid. "
                                 f"Session lifetime: {session.successful_requests} successful / {session.total_requests} total requests"
                             )
 
