@@ -26,7 +26,7 @@ These sponsors have paid to be placed here or are my own affiliate links which I
         </div>
     </a>
     <br>
-    <a href="https://tikhub.io" target="_blank">
+    <a href="https://tikhub.io/?utm_source=github&utm_medium=readme&utm_campaign=tiktok_api&ref=github_davidteather_tiktokapi" target="_blank">
         <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/tikhub.png" width="100" alt="TikHub API">
         <b></b>
         <div>
@@ -35,7 +35,7 @@ These sponsors have paid to be placed here or are my own affiliate links which I
     </a>
     <br>
     <a href="https://www.webshare.io/?referral_code=3x5812idzzzp" target="_blank">
-        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/webshare.png" width="100" alt="TikTok Captcha Solver">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/webshare.png" width="100" alt="Webshare Proxies">
         <b></b>
         <div>
          <b>Cheap, Reliable Proxies: </b> Supercharge your web scraping with fast, reliable proxies. Try 10 free datacenter proxies today!
