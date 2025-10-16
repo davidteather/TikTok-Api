@@ -132,7 +132,7 @@ class TikTokApi:
             "() => navigator.language || navigator.userLanguage"
         )
         platform = await session.page.evaluate("() => navigator.platform")
-        device_id = str(random.randint(10**18, 10**19 - 1))  # Random device id
+        device_id = str(random.randint(10 ** 18, 10 ** 19 - 1))  # Random device id
         history_len = str(random.randint(1, 10))  # Random history length
         screen_height = str(random.randint(600, 1080))  # Random screen height
         screen_width = str(random.randint(800, 1920))  # Random screen width
@@ -311,19 +311,19 @@ class TikTokApi:
             # Users should call create_sessions() again if they need more sessions
 
     async def __create_session(
-        self,
-        url: str = "https://www.tiktok.com",
-        ms_token: str | None = None,
-        proxy: dict[str, Any] | ProxySettings | None = None,
-        context_options: dict[str, Any] = {},
-        sleep_after: int = 1,
-        cookies: dict[str, Any] | None = None,
-        suppress_resource_load_types: list[str] = None,
-        timeout: int = 30000,
-        page_factory: Callable[[BrowserContext], Awaitable[Page]] | None = None,
-        browser_context_factory: (
-            Callable[[Playwright], Awaitable[BrowserContext]] | None
-        ) = None,
+            self,
+            url: str = "https://www.tiktok.com",
+            ms_token: str | None = None,
+            proxy: dict[str, Any] | ProxySettings | None = None,
+            context_options: dict[str, Any] = {},
+            sleep_after: int = 1,
+            cookies: dict[str, Any] | None = None,
+            suppress_resource_load_types: list[str] = None,
+            timeout: int = 30000,
+            page_factory: Callable[[BrowserContext], Awaitable[Page]] | None = None,
+            browser_context_factory: (
+                    Callable[[Playwright], Awaitable[BrowserContext]] | None
+            ) = None,
     ):
         try:
             """Create a TikTokPlaywrightSession"""
@@ -428,29 +428,29 @@ class TikTokApi:
             raise  # Re-raise the exception after cleanup
 
     async def create_sessions(
-        self,
-        num_sessions: int = 5,
-        headless: bool = True,
-        ms_tokens: list[str] | None = None,
-        proxies: list[dict[str, Any] | ProxySettings] | None = None,
-        proxy_provider: Optional[ProxyProvider] = None,
-        proxy_algorithm: Optional[Algorithm] = None,
-        sleep_after: int = 1,
-        starting_url: str = "https://www.tiktok.com",
-        context_options: dict[str, Any] = {},
-        override_browser_args: list[str] | None = None,
-        cookies: list[dict[str, Any]] | None = None,
-        suppress_resource_load_types: list[str] | None = None,
-        browser: str = "chromium",
-        executable_path: str | None = None,
-        page_factory: Callable[[BrowserContext], Awaitable[Page]] | None = None,
-        browser_context_factory: (
-            Callable[[Playwright], Awaitable[BrowserContext]] | None
-        ) = None,
-        timeout: int = 30000,
-        enable_session_recovery: bool = True,
-        allow_partial_sessions: bool = False,
-        min_sessions: int | None = None,
+            self,
+            num_sessions: int = 5,
+            headless: bool = True,
+            ms_tokens: list[str] | None = None,
+            proxies: list[dict[str, Any] | ProxySettings] | None = None,
+            proxy_provider: ProxyProvider | None = None,
+            proxy_algorithm: Algorithm | None = None,
+            sleep_after: int = 1,
+            starting_url: str = "https://www.tiktok.com",
+            context_options: dict[str, Any] = {},
+            override_browser_args: list[str] | None = None,
+            cookies: list[dict[str, Any]] | None = None,
+            suppress_resource_load_types: list[str] | None = None,
+            browser: str = "chromium",
+            executable_path: str | None = None,
+            page_factory: Callable[[BrowserContext], Awaitable[Page]] | None = None,
+            browser_context_factory: (
+                    Callable[[Playwright], Awaitable[BrowserContext]] | None
+            ) = None,
+            timeout: int = 30000,
+            enable_session_recovery: bool = True,
+            allow_partial_sessions: bool = False,
+            min_sessions: int | None = None,
     ):
         """
         Create sessions for use within the TikTokApi class.
@@ -809,13 +809,13 @@ class TikTokApi:
         return url
 
     async def make_request(
-        self,
-        url: str,
-        headers: dict = None,
-        params: dict = None,
-        retries: int = 3,
-        exponential_backoff: bool = True,
-        **kwargs,
+            self,
+            url: str,
+            headers: dict = None,
+            params: dict = None,
+            retries: int = 3,
+            exponential_backoff: bool = True,
+            **kwargs,
     ):
         """
         Makes a request to TikTok through a session.
