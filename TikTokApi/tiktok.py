@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import asyncio
-import logging
 import dataclasses
-from typing import Any, Awaitable, Callable, Optional
-import random
-import time
 import json
+import logging
+import random
+from typing import Any, Awaitable, Callable
+from urllib.parse import urlencode, quote, urlparse
 
 from playwright.async_api import (
     Browser,
@@ -18,27 +18,25 @@ from playwright.async_api import (
     TimeoutError,
     Error as PlaywrightError,
 )
-from urllib.parse import urlencode, quote, urlparse
 from proxyproviders import ProxyProvider
 from proxyproviders.algorithms import Algorithm
 from proxyproviders.models.proxy import ProxyFormat
 
-from .stealth import stealth_async
-from .helpers import random_choice
-
-from .api.user import User
-from .api.video import Video
-from .api.sound import Sound
-from .api.hashtag import Hashtag
-from .api.comment import Comment
-from .api.trending import Trending
-from .api.search import Search
-from .api.playlist import Playlist
-
+from .api import Comment
+from .api import Hashtag
+from .api import Playlist
+from .api import Search
+from .api import Sound
+from .api import Trending
+from .api import User
+from .api import Video
 from .exceptions import (
     InvalidJSONException,
     EmptyResponseException,
 )
+from .helpers import random_choice
+from TikTokApi.tiktok_model import TikTokApiRoute
+from .stealth import stealth_async
 
 
 @dataclasses.dataclass
@@ -87,22 +85,14 @@ class TikTokApi:
         self._session_creation_lock = asyncio.Lock()
         self._cleanup_called = False
         self._auto_cleanup_dead_sessions = True
-        self._proxy_provider: Optional[ProxyProvider] = None
-        self._proxy_algorithm: Optional[Algorithm] = None
+        self._proxy_provider: ProxyProvider | None = None
+        self._proxy_algorithm: Algorithm | None = None
 
         if logger_name is None:
             logger_name = __name__
         self.__create_logger(logger_name, logging_level)
 
-        User.parent = self
-        Video.parent = self
-        Sound.parent = self
-        Hashtag.parent = self
-        Comment.parent = self
-        Trending.parent = self
-        Search.parent = self
-        Playlist.parent = self
-
+        TikTokApiRoute._parent = self
         self.browser: Browser = None
         self.playwright: Playwright = None
 
@@ -896,7 +886,7 @@ class TikTokApi:
                         f"Failed a request, retrying ({retry_count}/{retries})"
                     )
                     if exponential_backoff:
-                        await asyncio.sleep(2**retry_count)
+                        await asyncio.sleep(2 ** retry_count)
                     else:
                         await asyncio.sleep(1)
             except PlaywrightError as e:
