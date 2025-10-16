@@ -2,7 +2,7 @@ from TikTokApi import TikTokApi
 import os
 import pytest
 
-video_id = 7248300636498890011
+video_id = "7248300636498890011"
 ms_token = os.environ.get("ms_token", None)
 headless = os.environ.get("headless", "True").lower() == "true"
 
