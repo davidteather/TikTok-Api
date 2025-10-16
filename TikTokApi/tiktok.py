@@ -226,9 +226,20 @@ class TikTokApi:
             except ValueError:
                 pass  # Session already removed
 
-    async def _get_valid_session_index(
-        self, **kwargs
-    ) -> tuple[int, TikTokPlaywrightSession]:
+    async def get_random_session(self, **kwargs) -> TikTokPlaywrightSession:
+        """
+        Get a random valid session, with automatic recovery if needed.
+
+        Returns:
+            TikTokPlaywrightSession: A valid session
+
+        Raises:
+            Exception: If no valid sessions available and recovery fails
+        """
+        _, session = await self._get_valid_session_index(**kwargs)
+        return session
+
+    async def _get_valid_session_index(self, **kwargs) -> tuple[int, TikTokPlaywrightSession]:
         """
         Get a valid session, with automatic recovery if needed.
 
