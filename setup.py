@@ -1,5 +1,3 @@
-from distutils.core import setup
-import os.path
 import setuptools
 
 with open("README.md", "r", encoding="utf-8") as fh:
@@ -23,6 +21,7 @@ setuptools.setup(
         "playwright>=1.36.0,<2.0",
         "httpx>=0.27.0,<1.0",
         "proxyproviders>=0.2.1,<0.3.0",
+        "pydantic>=2.12.2,<3.0",
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
@@ -35,5 +34,5 @@ setuptools.setup(
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
     ],
-    python_requires=">=3.9",
+    python_requires=">=3.10",
 )
