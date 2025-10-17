@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-from typing import ClassVar, AsyncIterator, Optional
-from typing import TYPE_CHECKING, ClassVar, Optional
+from typing import AsyncIterator, TYPE_CHECKING
 
 from TikTokApi.exceptions import InvalidResponseException
+from TikTokApi.tiktok_model import TikTokModel
 
 if TYPE_CHECKING:
-    from ..tiktok import TikTokApi
     from .user import User
 
 
-class Comment:
+class Comment(TikTokModel):
     """
     A TikTok Comment.
 
@@ -22,36 +21,35 @@ class Comment:
                 print(comment.as_dict)
     """
 
-    parent: ClassVar[TikTokApi]
-
-    id: str
+    id: str | None = None
     """The id of the comment"""
-    author: ClassVar[User]
+
+    author: User | None = None
     """The author of the comment"""
-    text: str
+
+    text: str | None = None
     """The contents of the comment"""
-    likes_count: int
+
+    likes_count: int | None = None
     """The amount of likes of the comment"""
-    as_dict: dict
-    """The raw data associated with this comment"""
 
-    def __init__(self, data: Optional[dict] = None):
-        if data is not None:
-            self.as_dict = data
-            self.__extract_from_data()
+    def _extract_from_data(self, raw_data: dict):
+        self.raw_data = raw_data
+        self.id = self.raw_data["cid"]
+        self.text = self.raw_data["text"]
 
-    def __extract_from_data(self):
-        data = self.as_dict
-        self.id = self.as_dict["cid"]
-        self.text = self.as_dict["text"]
+        # Extract from user
+        user = self.raw_data["user"]
 
-        usr = self.as_dict["user"]
-        self.author = self.parent.user(
-            user_id=usr["uid"], username=usr["unique_id"], sec_uid=usr["sec_uid"]
+        self.author = self._parent.user(
+            user_id=user["uid"],
+            username=user["unique_id"],
+            sec_uid=user["sec_uid"]
         )
-        self.likes_count = self.as_dict["digg_count"]
 
-    async def replies(self, count=20, cursor=0, **kwargs) -> AsyncIterator[Comment]:
+        self.likes_count = self.raw_data["digg_count"]
+
+    async def replies(self, count: int = 20, cursor: int = 0, **kwargs) -> AsyncIterator["Comment"]:
         found = 0
 
         while found < count:
@@ -62,7 +60,7 @@ class Comment:
                 "comment_id": self.id,
             }
 
-            resp = await self.parent.make_request(
+            resp = await self._parent.make_request(
                 url="https://www.tiktok.com/api/comment/list/reply/",
                 params=params,
                 headers=kwargs.get("headers"),
@@ -75,18 +73,10 @@ class Comment:
                 )
 
             for comment in resp.get("comments", []):
-                yield self.parent.comment(data=comment)
+                yield self._parent.comment.from_raw_data(raw_data=comment)
                 found += 1
 
             if not resp.get("has_more", False):
                 return
 
             cursor = resp.get("cursor")
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __str__(self):
-        id = getattr(self, "id", None)
-        text = getattr(self, "text", None)
-        return f"TikTokApi.comment(comment_id='{id}', text='{text}')"

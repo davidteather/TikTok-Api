@@ -1,20 +1,19 @@
 from __future__ import annotations
-from ..exceptions import InvalidResponseException
-from .video import Video
 
-from typing import TYPE_CHECKING, AsyncIterator
+from typing import AsyncIterator, TYPE_CHECKING
+
+from ..exceptions import InvalidResponseException
+from TikTokApi.tiktok_model import TikTokApiRoute
 
 if TYPE_CHECKING:
-    from ..tiktok import TikTokApi
+    from .video import Video
 
 
-class Trending:
+class Trending(TikTokApiRoute):
     """Contains static methods related to trending objects on TikTok."""
 
-    parent: TikTokApi
-
-    @staticmethod
-    async def videos(count=30, **kwargs) -> AsyncIterator[Video]:
+    @classmethod
+    async def videos(cls, count: int = 30, **kwargs) -> AsyncIterator[Video]:
         """
         Returns Videos that are trending on TikTok.
 
@@ -33,14 +32,15 @@ class Trending:
                 async for video in api.trending.videos():
                     # do something
         """
+
         found = 0
         while found < count:
             params = {
                 "from_page": "fyp",
-                "count": count,
+                "count": 12,  # TikTok expects this number to ALWAYS be 12, regardless of how many you want
             }
 
-            resp = await Trending.parent.make_request(
+            resp = await cls._parent.make_request(
                 url="https://www.tiktok.com/api/recommend/item_list/",
                 params=params,
                 headers=kwargs.get("headers"),
@@ -53,7 +53,7 @@ class Trending:
                 )
 
             for video in resp.get("itemList", []):
-                yield Trending.parent.video(data=video)
+                yield cls._parent.video.from_raw_data(raw_data=video)
                 found += 1
 
             if not resp.get("hasMore", False):

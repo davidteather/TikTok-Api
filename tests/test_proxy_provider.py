@@ -1,11 +1,12 @@
-import pytest
 import os
+
+import pytest
 import requests
-from TikTokApi import TikTokApi
 from proxyproviders import ProxyProvider
-from proxyproviders.algorithms import RoundRobin, Random, Algorithm
+from proxyproviders.algorithms import RoundRobin
 from proxyproviders.models.proxy import Proxy, ProxyFormat
-from typing import List
+
+from TikTokApi import TikTokApi
 
 
 def test_proxy_format_playwright_with_auth():

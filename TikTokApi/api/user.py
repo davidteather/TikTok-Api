@@ -1,14 +1,16 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, ClassVar, AsyncIterator, Optional
+
+from typing import AsyncIterator, TYPE_CHECKING
+
 from ..exceptions import InvalidResponseException
+from TikTokApi.tiktok_model import TikTokModel
 
 if TYPE_CHECKING:
-    from ..tiktok import TikTokApi
-    from .video import Video
     from .playlist import Playlist
+    from .video import Video
 
 
-class User:
+class User(TikTokModel):
     """
     A TikTok User.
 
@@ -18,32 +20,14 @@ class User:
             user = api.user(username='therock')
     """
 
-    parent: ClassVar[TikTokApi]
-
-    user_id: str
-    """The  ID of the user."""
-    sec_uid: str
-    """The sec UID of the user."""
-    username: str
+    username: str | None = None
     """The username of the user."""
-    as_dict: dict
-    """The raw data associated with this user."""
 
-    def __init__(
-        self,
-        username: Optional[str] = None,
-        user_id: Optional[str] = None,
-        sec_uid: Optional[str] = None,
-        data: Optional[dict] = None,
-    ):
-        """
-        You must provide the username or (user_id and sec_uid) otherwise this
-        will not function correctly.
-        """
-        self.__update_id_sec_uid_username(user_id, sec_uid, username)
-        if data is not None:
-            self.as_dict = data
-            self.__extract_from_data()
+    user_id: str | None = None
+    """The  ID of the user."""
+
+    sec_uid: str | None = None
+    """The sec UID of the user."""
 
     async def info(self, **kwargs) -> dict:
         """
@@ -61,20 +45,18 @@ class User:
                 user_data = await api.user(username='therock').info()
         """
 
-        username = getattr(self, "username", None)
-        if not username:
+        if not self.username:
             raise TypeError(
                 "You must provide the username when creating this class to use this method."
             )
 
-        sec_uid = getattr(self, "sec_uid", None)
         url_params = {
-            "secUid": sec_uid if sec_uid is not None else "",
-            "uniqueId": username,
+            "secUid": self.sec_uid if self.sec_uid is not None else "",
+            "uniqueId": self.username,
             "msToken": kwargs.get("ms_token"),
         }
 
-        resp = await self.parent.make_request(
+        resp = await self._parent.make_request(
             url="https://www.tiktok.com/api/user/detail/",
             params=url_params,
             headers=kwargs.get("headers"),
@@ -84,11 +66,10 @@ class User:
         if resp is None:
             raise InvalidResponseException(resp, "TikTok returned an invalid response.")
 
-        self.as_dict = resp
-        self.__extract_from_data()
+        self._extract_from_data(resp)
         return resp
 
-    async def playlists(self, count=20, cursor=0, **kwargs) -> AsyncIterator[Playlist]:
+    async def playlists(self, count: int = 20, cursor: int = 0, **kwargs) -> AsyncIterator["Playlist"]:
         """
         Returns a user's playlists.
 
@@ -117,7 +98,7 @@ class User:
                 "cursor": cursor,
             }
 
-            resp = await self.parent.make_request(
+            resp = await self._parent.make_request(
                 url="https://www.tiktok.com/api/user/playlist",
                 params=params,
                 headers=kwargs.get("headers"),
@@ -130,7 +111,7 @@ class User:
                 )
 
             for playlist in resp.get("playList", []):
-                yield self.parent.playlist(data=playlist)
+                yield self._parent.playlist.from_raw_data(raw_data=playlist)
                 found += 1
 
             if not resp.get("hasMore", False):
@@ -138,13 +119,13 @@ class User:
 
             cursor = resp.get("cursor")
 
-    async def videos(self, count=30, cursor=0, **kwargs) -> AsyncIterator[Video]:
+    async def videos(self, count: int = 30, cursor: int = 0, **kwargs) -> AsyncIterator["Video"]:
         """
         Returns a user's videos.
 
         Args:
             count (int): The amount of videos you want returned.
-            cursor (int): The the offset of videos from 0 you want to get.
+            cursor (int): The offset of videos from 0 you want to get.
 
         Returns:
             async iterator/generator: Yields TikTokApi.video objects.
@@ -170,7 +151,7 @@ class User:
                 "cursor": cursor,
             }
 
-            resp = await self.parent.make_request(
+            resp = await self._parent.make_request(
                 url="https://www.tiktok.com/api/post/item_list/",
                 params=params,
                 headers=kwargs.get("headers"),
@@ -183,7 +164,7 @@ class User:
                 )
 
             for video in resp.get("itemList", []):
-                yield self.parent.video(data=video)
+                yield self._parent.video.from_raw_data(raw_data=video)
                 found += 1
 
             if not resp.get("hasMore", False):
@@ -191,9 +172,7 @@ class User:
 
             cursor = resp.get("cursor")
 
-    async def liked(
-        self, count: int = 30, cursor: int = 0, **kwargs
-    ) -> AsyncIterator[Video]:
+    async def liked(self, count: int = 30, cursor: int = 0, **kwargs) -> AsyncIterator["Video"]:
         """
         Returns a user's liked posts if public.
 
@@ -225,7 +204,7 @@ class User:
                 "cursor": cursor,
             }
 
-            resp = await self.parent.make_request(
+            resp = await self._parent.make_request(
                 url="https://www.tiktok.com/api/favorite/item_list",
                 params=params,
                 headers=kwargs.get("headers"),
@@ -238,7 +217,7 @@ class User:
                 )
 
             for video in resp.get("itemList", []):
-                yield self.parent.video(data=video)
+                yield self._parent.video.from_raw_data(raw_data=video)
                 found += 1
 
             if not resp.get("hasMore", False):
@@ -246,38 +225,24 @@ class User:
 
             cursor = resp.get("cursor")
 
-    def __extract_from_data(self):
-        data = self.as_dict
-        keys = data.keys()
+    def _extract_from_data(self, raw_data: dict) -> None:
+        """
+        Extracts relevant fields from the raw_data dictionary and assigns them to class attributes.
 
-        if "userInfo" in keys:
-            self.__update_id_sec_uid_username(
-                data["userInfo"]["user"]["id"],
-                data["userInfo"]["user"]["secUid"],
-                data["userInfo"]["user"]["uniqueId"],
-            )
+        """
+
+        self.raw_data = raw_data
+
+        if "userInfo" in raw_data:
+            self.user_id = raw_data["userInfo"]["user"]["id"]
+            self.sec_uid = raw_data["userInfo"]["user"]["secUid"]
+            self.username = raw_data["userInfo"]["user"]["uniqueId"]
         else:
-            self.__update_id_sec_uid_username(
-                data["id"],
-                data["secUid"],
-                data["uniqueId"],
-            )
+            self.user_id = raw_data.get("id")
+            self.sec_uid = raw_data.get("secUid")
+            self.username = raw_data.get("uniqueId")
 
         if None in (self.username, self.user_id, self.sec_uid):
-            User.parent.logger.error(
-                f"Failed to create User with data: {data}\nwhich has keys {data.keys()}"
+            self._parent.logger.error(
+                f"Failed to create User with data: {raw_data}\nwhich has keys {raw_data.keys()}"
             )
-
-    def __update_id_sec_uid_username(self, id, sec_uid, username):
-        self.user_id = id
-        self.sec_uid = sec_uid
-        self.username = username
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __str__(self):
-        username = getattr(self, "username", None)
-        user_id = getattr(self, "user_id", None)
-        sec_uid = getattr(self, "sec_uid", None)
-        return f"TikTokApi.user(username='{username}', user_id='{user_id}', sec_uid='{sec_uid}')"

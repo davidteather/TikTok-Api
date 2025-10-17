@@ -92,7 +92,7 @@ class StealthConfig:
     nav_user_agent: str = None
     nav_platform: str = None
     languages: Tuple[str] = ("en-US", "en")
-    runOnInsecureOrigins: Optional[bool] = None
+    runOnInsecureOrigins: bool | None = None
 
     @property
     def enabled_scripts(self):

@@ -1,20 +1,19 @@
 from __future__ import annotations
-from urllib.parse import urlencode
-from typing import TYPE_CHECKING, AsyncIterator
-from .user import User
+
+from typing import AsyncIterator, TYPE_CHECKING
+
 from ..exceptions import InvalidResponseException
+from TikTokApi.tiktok_model import TikTokApiRoute
 
 if TYPE_CHECKING:
-    from ..tiktok import TikTokApi
+    from .user import User
 
 
-class Search:
+class Search(TikTokApiRoute):
     """Contains static methods about searching TikTok for a phrase."""
 
-    parent: TikTokApi
-
-    @staticmethod
-    async def users(search_term, count=10, cursor=0, **kwargs) -> AsyncIterator[User]:
+    @classmethod
+    async def users(cls, search_term: str, count: int = 10, cursor: int = 0, **kwargs) -> AsyncIterator["User"]:
         """
         Searches for users.
 
@@ -23,6 +22,7 @@ class Search:
         Args:
             search_term (str): The phrase you want to search for.
             count (int): The amount of users you want returned.
+            cursor (int): The cursor to start from.
 
         Returns:
             async iterator/generator: Yields TikTokApi.user objects.
@@ -36,15 +36,13 @@ class Search:
                 async for user in api.search.users('david teather'):
                     # do something
         """
-        async for user in Search.search_type(
-            search_term, "user", count=count, cursor=cursor, **kwargs
+        async for user in cls.search_type(
+                search_term, "user", count=count, cursor=cursor, **kwargs
         ):
             yield user
 
-    @staticmethod
-    async def search_type(
-        search_term, obj_type, count=10, cursor=0, **kwargs
-    ) -> AsyncIterator:
+    @classmethod
+    async def search_type(cls, search_term, obj_type, count=10, cursor=0, **kwargs) -> AsyncIterator:
         """
         Searches for a specific type of object. But you shouldn't use this directly, use the other methods.
 
@@ -55,7 +53,7 @@ class Search:
             search_term (str): The phrase you want to search for.
             obj_type (str): The type of object you want to search for (user)
             count (int): The amount of users you want returned.
-            cursor (int): The the offset of users from 0 you want to get.
+            cursor (int): The offset of users from 0 you want to get.
 
         Returns:
             async iterator/generator: Yields TikTokApi.video objects.
@@ -76,9 +74,10 @@ class Search:
                 "cursor": cursor,
                 "from_page": "search",
                 "web_search_code": """{"tiktok":{"client_params_x":{"search_engine":{"ies_mt_user_live_video_card_use_libra":1,"mt_search_general_user_live_card":1}},"search_server":{}}}""",
+                "search_id": ""
             }
 
-            resp = await Search.parent.make_request(
+            resp = await cls._parent.make_request(
                 url=f"https://www.tiktok.com/api/search/{obj_type}/full/",
                 params=params,
                 headers=kwargs.get("headers"),
@@ -90,18 +89,23 @@ class Search:
                     resp, "TikTok returned an invalid response."
                 )
 
+            if not params["search_id"]:
+                params["search_id"] = resp.get("rid")
+
             if obj_type == "user":
                 for user in resp.get("user_list", []):
                     sec_uid = user.get("user_info").get("sec_uid")
                     uid = user.get("user_info").get("user_id")
                     username = user.get("user_info").get("unique_id")
-                    yield Search.parent.user(
-                        sec_uid=sec_uid, user_id=uid, username=username
+                    yield cls._parent.user(
+                        sec_uid=sec_uid,
+                        user_id=uid,
+                        username=username
                     )
                     found += 1
             elif obj_type == "item":
                 for video in resp.get("item_list", []):
-                    yield Search.parent.video(data=video)
+                    yield cls._parent.video.from_raw_data(raw_data=video)
 
             if not resp.get("has_more", False):
                 return
