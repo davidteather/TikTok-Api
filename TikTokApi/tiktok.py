@@ -347,11 +347,23 @@ class TikTokApi:
                 ]
                 await context.add_cookies(formatted_cookies)
 
+            inited_suppression = False
+
             if page_factory:
                 page = await page_factory(context)
             else:
                 page = await context.new_page()
                 await stealth_async(page)
+                if suppress_resource_load_types is not None:
+                    await page.route(
+                        "**/*",
+                        lambda route, request: (
+                            route.abort()
+                            if request.resource_type in suppress_resource_load_types
+                            else route.continue_()
+                        ),
+                    )
+                    inited_suppression = True
                 _ = await page.goto(url)
 
             if "tiktok" not in page.url:
@@ -366,7 +378,7 @@ class TikTokApi:
 
             page.once("request", handle_request)
 
-            if suppress_resource_load_types is not None:
+            if suppress_resource_load_types is not None and not inited_suppression:
                 await page.route(
                     "**/*",
                     lambda route, request: (
@@ -375,6 +387,8 @@ class TikTokApi:
                         else route.continue_()
                     ),
                 )
+
+            del inited_suppression 
 
             # Set the navigation timeout
             page.set_default_navigation_timeout(timeout)
