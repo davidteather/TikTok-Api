@@ -25,7 +25,7 @@ class Hashtag:
     id: Optional[str]
     """The ID of the hashtag"""
     name: Optional[str]
-    """The name of the hashtag (omiting the #)"""
+    """The name of the hashtag (omitting the #)"""
     as_dict: dict
     """The raw data associated with this hashtag."""
 

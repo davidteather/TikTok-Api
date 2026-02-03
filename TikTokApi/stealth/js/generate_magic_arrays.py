@@ -129,7 +129,7 @@ function generateMagicArray(
         },
         ownKeys(target) {
             // There are a couple of quirks where the original property demonstrates "magical" behavior that makes no sense
-            // This can be witnessed when calling `Object.getOwnPropertyNames(navigator.mimeTypes)` and the absense of `length`
+            // This can be witnessed when calling `Object.getOwnPropertyNames(navigator.mimeTypes)` and the absence of `length`
             // My guess is that it has to do with the recent change of not allowing data enumeration and this being implemented weirdly
             // For that reason we just completely fake the available property names based on our data to match what regular Chrome is doing
             // Specific issues when not patching this: `length` property is available, direct `types` props (e.g. `obj['application/pdf']`) are missing
