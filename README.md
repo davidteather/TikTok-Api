@@ -100,7 +100,7 @@ docker run -v TikTokApi --rm tiktokapi:latest python3 your_script.py
 ### Common Issues
 
 - **EmptyResponseException** - this means TikTok is blocking the request and detects you're a bot. This can be a problem with your setup or the library itself
-  - you may need a proxy to successfuly scrape TikTok, I've made a [web scraping lesson](https://github.com/davidteather/everything-web-scraping/tree/main/002-proxies) explaining the differences of "tiers" of proxies, I've personally had success with [webshare's residential proxies](https://www.webshare.io/?referral_code=3x5812idzzzp) (affiliate link), but you might have success on their free data center IPs or a cheaper competitor.
+  - you may need a proxy to successfully scrape TikTok, I've made a [web scraping lesson](https://github.com/davidteather/everything-web-scraping/tree/main/002-proxies) explaining the differences of "tiers" of proxies, I've personally had success with [webshare's residential proxies](https://www.webshare.io/?referral_code=3x5812idzzzp) (affiliate link), but you might have success on their free data center IPs or a cheaper competitor.
 
 - **Browser Has no Attribute** - make sure you ran `python3 -m playwright install`, if your error persists try the [playwright-python](https://github.com/microsoft/playwright-python) quickstart guide and diagnose issues from there.
 
