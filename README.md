@@ -34,6 +34,14 @@ These sponsors have paid to be placed here or are my own affiliate links which I
         </div>
     </a>
     <br>
+    <a href="https://getlate.dev/?utm_source=github&utm_medium=readme&utm_campaign=tiktok_api" target="_blank">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/late.png" width="100" alt="Late">
+        <b></b>
+        <div>
+         <b>Late</b> — Ship social media features in an hour, not months. A single API that replaces 13 platform integrations so you can focus on building your product.
+        </div>
+    </a>
+    <br>
     <a href="https://www.webshare.io/?referral_code=3x5812idzzzp" target="_blank">
         <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/webshare.png" width="100" alt="Webshare Proxies">
         <b></b>
