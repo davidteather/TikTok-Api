@@ -1,14 +1,15 @@
 from __future__ import annotations
-from ..exceptions import *
 
-from typing import TYPE_CHECKING, ClassVar, AsyncIterator, Optional
+from typing import AsyncIterator, TYPE_CHECKING
+
+from ..exceptions import *
+from TikTokApi.tiktok_model import TikTokModel
 
 if TYPE_CHECKING:
-    from ..tiktok import TikTokApi
     from .video import Video
 
 
-class Hashtag:
+class Hashtag(TikTokModel):
     """
     A TikTok Hashtag/Challenge.
 
@@ -20,33 +21,17 @@ class Hashtag:
                 print(video.id)
     """
 
-    parent: ClassVar[TikTokApi]
-
-    id: Optional[str]
+    id: str | None = None
     """The ID of the hashtag"""
-    name: Optional[str]
+
+    name: str | None = None
     """The name of the hashtag (omiting the #)"""
-    as_dict: dict
-    """The raw data associated with this hashtag."""
 
-    def __init__(
-        self,
-        name: Optional[str] = None,
-        id: Optional[str] = None,
-        data: Optional[dict] = None,
-    ):
-        """
-        You must provide the name or id of the hashtag.
-        """
+    split_name: str | None = None
+    """The split name of the hashtag (if it exists)"""
 
-        if name is not None:
-            self.name = name
-        if id is not None:
-            self.id = id
-
-        if data is not None:
-            self.as_dict = data
-            self.__extract_from_data()
+    stats: dict | None = None
+    """A dictionary of stats related to this hashtag"""
 
     async def info(self, **kwargs) -> dict:
         """
@@ -68,7 +53,7 @@ class Hashtag:
             "msToken": kwargs.get("ms_token"),
         }
 
-        resp = await self.parent.make_request(
+        resp = await self._parent.make_request(
             url="https://www.tiktok.com/api/challenge/detail/",
             params=url_params,
             headers=kwargs.get("headers"),
@@ -78,17 +63,16 @@ class Hashtag:
         if resp is None:
             raise InvalidResponseException(resp, "TikTok returned an invalid response.")
 
-        self.as_dict = resp
-        self.__extract_from_data()
+        self._extract_from_data(resp)
         return resp
 
-    async def videos(self, count=30, cursor=0, **kwargs) -> AsyncIterator[Video]:
+    async def videos(self, count: int = 30, cursor: int = 0, **kwargs) -> AsyncIterator[Video]:
         """
         Returns TikTok videos that have this hashtag in the caption.
 
         Args:
             count (int): The amount of videos you want returned.
-            cursor (int): The the offset of videos from 0 you want to get.
+            cursor (int): The offset of videos from 0 you want to get.
 
         Returns:
             async iterator/generator: Yields TikTokApi.video objects.
@@ -103,19 +87,18 @@ class Hashtag:
                     # do something
         """
 
-        id = getattr(self, "id", None)
-        if id is None:
+        if self.id is None:
             await self.info(**kwargs)
 
         found = 0
         while found < count:
             params = {
                 "challengeID": self.id,
-                "count": 35,
+                "count": 30,
                 "cursor": cursor,
             }
 
-            resp = await self.parent.make_request(
+            resp = await self._parent.make_request(
                 url="https://www.tiktok.com/api/challenge/item_list/",
                 params=params,
                 headers=kwargs.get("headers"),
@@ -128,7 +111,7 @@ class Hashtag:
                 )
 
             for video in resp.get("itemList", []):
-                yield self.parent.video(data=video)
+                yield self._parent.video.from_raw_data(raw_data=video)
                 found += 1
 
             if not resp.get("hasMore", False):
@@ -136,32 +119,23 @@ class Hashtag:
 
             cursor = resp.get("cursor")
 
-    def __extract_from_data(self):
-        data = self.as_dict
-        keys = data.keys()
+    def _extract_from_data(self, raw_data: dict) -> None:
+        self.raw_data = raw_data
 
-        if "title" in keys:
-            self.id = data["id"]
-            self.name = data["title"]
+        if "title" in raw_data:
+            self.id = raw_data["id"]
+            self.name = raw_data["title"]
 
-        if "challengeInfo" in keys:
-            if "challenge" in data["challengeInfo"]:
-                self.id = data["challengeInfo"]["challenge"]["id"]
-                self.name = data["challengeInfo"]["challenge"]["title"]
-                self.split_name = data["challengeInfo"]["challenge"].get("splitTitle")
+        if "challengeInfo" in raw_data:
+            if "challenge" in raw_data["challengeInfo"]:
+                self.id = raw_data["challengeInfo"]["challenge"]["id"]
+                self.name = raw_data["challengeInfo"]["challenge"]["title"]
+                self.split_name = raw_data["challengeInfo"]["challenge"].get("splitTitle")
 
-            if "stats" in data["challengeInfo"]:
-                self.stats = data["challengeInfo"]["stats"]
+            if "stats" in raw_data["challengeInfo"]:
+                self.stats = raw_data["challengeInfo"]["stats"]
 
-        id = getattr(self, "id", None)
-        name = getattr(self, "name", None)
-        if None in (id, name):
-            Hashtag.parent.logger.error(
-                f"Failed to create Hashtag with data: {data}\nwhich has keys {data.keys()}"
+        if None in (self.id, self.name):
+            self._parent.logger.error(
+                f"Failed to create Hashtag with data: {raw_data}\nwhich has keys {raw_data.keys()}"
             )
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __str__(self):
-        return f"TikTokApi.hashtag(id='{getattr(self, 'id', None)}', name='{getattr(self, 'name', None)}')"

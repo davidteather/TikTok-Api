@@ -1,22 +1,24 @@
 from __future__ import annotations
-from ..helpers import extract_video_id_from_url, requests_cookie_to_playwright_cookie
-from typing import TYPE_CHECKING, ClassVar, AsyncIterator, Optional
-from datetime import datetime
-import requests
-from ..exceptions import InvalidResponseException
+
 import json
+from datetime import datetime
+from typing import Union, AsyncIterator, TYPE_CHECKING
+
 import httpx
-from typing import Union, AsyncIterator
+import requests
+
+from ..exceptions import InvalidResponseException
+from ..helpers import requests_cookie_to_playwright_cookie
+from TikTokApi.tiktok_model import TikTokModel
 
 if TYPE_CHECKING:
-    from ..tiktok import TikTokApi
-    from .user import User
-    from .sound import Sound
-    from .hashtag import Hashtag
     from .comment import Comment
+    from .hashtag import Hashtag
+    from .sound import Sound
+    from .user import User
 
 
-class Video:
+class Video(TikTokModel):
     """
     A TikTok Video class
 
@@ -26,54 +28,73 @@ class Video:
     ```
     """
 
-    parent: ClassVar[TikTokApi]
-
-    id: Optional[str]
+    id: str | None = None
     """TikTok's ID of the Video"""
-    url: Optional[str]
-    """The URL of the Video"""
-    create_time: Optional[datetime]
-    """The creation time of the Video"""
-    stats: Optional[dict]
-    """TikTok's stats of the Video"""
-    author: Optional[User]
-    """The User who created the Video"""
-    sound: Optional[Sound]
-    """The Sound that is associated with the Video"""
-    hashtags: Optional[list[Hashtag]]
-    """A List of Hashtags on the Video"""
-    as_dict: dict
-    """The raw data associated with this Video."""
 
-    def __init__(
-        self,
-        id: Optional[str] = None,
-        url: Optional[str] = None,
-        data: Optional[dict] = None,
-        **kwargs,
-    ):
+    url: str | None = None
+    """The URL of the Video"""
+
+    create_time: datetime | None = None
+    """The creation time of the Video"""
+
+    stats: dict | None = None
+    """TikTok's stats of the Video"""
+
+    author: User | None = None
+    """The User who created the Video"""
+
+    sound: Sound | None = None
+    """The Sound that is associated with the Video"""
+
+    hashtags: list[Hashtag] = []
+    """A List of Hashtags on the Video"""
+
+    def __init__(self, **kwargs):
+
+        if kwargs.get('url') and not kwargs.get('id'):
+            kwargs['id'] = self._extract_id_from_url(kwargs['url'])
+
+        super().__init__(**kwargs)
+
+    @classmethod
+    def _extract_id_from_url(cls, url: str) -> str | None:
+        if "@" in url and "/video/" in url:
+            return url.split("/video/")[1].split("?")[0]
+        return None
+
+    @classmethod
+    async def from_url(cls, url: str, **kwargs) -> Video:
         """
-        You must provide the id or a valid url, else this will fail.
+        Creates a Video object from a TikTok URL.
+
+        Parameters:
+            url (str): The URL of the TikTok video.
+        Returns:
+            Video: An instance of the Video class.
+        Raises:
+            TypeError: If the URL format is not supported.
+
         """
-        self.id = id
-        self.url = url
-        if data is not None:
-            self.as_dict = data
-            self.__extract_from_data()
-        elif url is not None:
-            i, session = self.parent._get_session(**kwargs)
-            self.id = extract_video_id_from_url(
-                url,
-                headers=session.headers,
-                proxy=(
-                    kwargs.get("proxy")
-                    if kwargs.get("proxy") is not None
-                    else session.proxy
-                ),
+
+        session = await cls._parent.get_random_session(**kwargs)
+
+        response: httpx.Response = httpx.head(
+            url=url,
+            follow_redirects=True,
+            headers=kwargs.get("headers") or session.headers,
+            proxy=kwargs.get("proxy", None) or session.proxy,
+        )
+
+        final_url = str(response.url)
+        video_id = cls._extract_id_from_url(final_url)
+
+        if not video_id:
+            raise TypeError(
+                "URL format not supported. Below is an example of a supported url.\n"
+                "https://www.tiktok.com/@therock/video/6829267836783971589"
             )
 
-        if getattr(self, "id", None) is None:
-            raise TypeError("You must provide id or url parameter.")
+        return cls(id=video_id, url=final_url, **kwargs)
 
     async def info(self, **kwargs) -> dict:
         """
@@ -93,7 +114,7 @@ class Video:
                 url = "https://www.tiktok.com/@davidteathercodes/video/7106686413101468970"
                 video_info = await api.video(url=url).info()
         """
-        i, session = self.parent._get_session(**kwargs)
+        session = await self._parent.get_random_session(**kwargs)
         proxy = (
             kwargs.get("proxy") if kwargs.get("proxy") is not None else session.proxy
         )
@@ -169,16 +190,13 @@ class Video:
                     error_code=r.status_code,
                 )
 
-        self.as_dict = video_info
-        self.__extract_from_data()
-
+        self._extract_from_data(video_info)
         cookies = [requests_cookie_to_playwright_cookie(c) for c in r.cookies]
-
-        await self.parent.set_session_cookies(session, cookies)
+        await self._parent.set_session_cookies(session, cookies)
         return video_info
 
     async def bytes(
-        self, stream: bool = False, **kwargs
+            self, stream: bool = False, **kwargs
     ) -> Union[bytes, AsyncIterator[bytes]]:
         """
         Returns the bytes of a TikTok Video.
@@ -199,10 +217,10 @@ class Video:
                 async for chunk in api.video(id='7041997751718137094').bytes(stream=True):
                     # Process or upload chunk
         """
-        i, session = self.parent._get_session(**kwargs)
-        downloadAddr = self.as_dict["video"]["downloadAddr"]
+        i, session = self._parent._get_session(**kwargs)
+        downloadAddr = self.raw_data["video"]["downloadAddr"]
 
-        cookies = await self.parent.get_session_cookies(session)
+        cookies = await self._parent.get_session_cookies(session)
 
         h = session.headers
         h["range"] = "bytes=0-"
@@ -214,7 +232,7 @@ class Video:
             async def stream_bytes():
                 async with httpx.AsyncClient() as client:
                     async with client.stream(
-                        "GET", downloadAddr, headers=h, cookies=cookies
+                            "GET", downloadAddr, headers=h, cookies=cookies
                     ) as response:
                         async for chunk in response.aiter_bytes():
                             yield chunk
@@ -224,11 +242,11 @@ class Video:
             resp = requests.get(downloadAddr, headers=h, cookies=cookies)
             return resp.content
 
-    def __extract_from_data(self) -> None:
-        data = self.as_dict
-        self.id = data["id"]
+    def _extract_from_data(self, raw_data: dict) -> None:
+        self.raw_data = raw_data
+        self.id = raw_data["id"]
 
-        timestamp = data.get("createTime", None)
+        timestamp: int | None = raw_data.get("createTime", None)
         if timestamp is not None:
             try:
                 timestamp = int(timestamp)
@@ -236,25 +254,25 @@ class Video:
                 pass
 
         self.create_time = datetime.fromtimestamp(timestamp)
-        self.stats = data.get("statsV2") or data.get("stats")
+        self.stats = raw_data.get("statsV2") or raw_data.get("stats")
 
-        author = data.get("author")
+        author = raw_data.get("author")
         if isinstance(author, str):
-            self.author = self.parent.user(username=author)
+            self.author = self._parent.user(username=author)
         else:
-            self.author = self.parent.user(data=author)
-        self.sound = self.parent.sound(data=data)
+            self.author = self._parent.user.from_raw_data(raw_data=author)
+        self.sound = self._parent.sound.from_raw_data(raw_data=raw_data)
 
         self.hashtags = [
-            self.parent.hashtag(data=hashtag) for hashtag in data.get("challenges", [])
+            self._parent.hashtag.from_raw_data(raw_data=hashtag) for hashtag in raw_data.get("challenges", [])
         ]
 
         if getattr(self, "id", None) is None:
-            Video.parent.logger.error(
-                f"Failed to create Video with data: {data}\nwhich has keys {data.keys()}"
+            self._parent.logger.error(
+                f"Failed to create Video with data: {raw_data}\nwhich has keys {raw_data.keys()}"
             )
 
-    async def comments(self, count=20, cursor=0, **kwargs) -> AsyncIterator[Comment]:
+    async def comments(self, count=20, cursor=0, **kwargs) -> AsyncIterator["Comment"]:
         """
         Returns the comments of a TikTok Video.
 
@@ -280,7 +298,7 @@ class Video:
                 "cursor": cursor,
             }
 
-            resp = await self.parent.make_request(
+            resp = await self._parent.make_request(
                 url="https://www.tiktok.com/api/comment/list/",
                 params=params,
                 headers=kwargs.get("headers"),
@@ -293,7 +311,7 @@ class Video:
                 )
 
             for video in resp.get("comments", []):
-                yield self.parent.comment(data=video)
+                yield self._parent.comment.from_raw_data(raw_data=video)
                 found += 1
 
             if not resp.get("has_more", False):
@@ -301,15 +319,12 @@ class Video:
 
             cursor = resp.get("cursor")
 
-    async def related_videos(
-        self, count: int = 30, cursor: int = 0, **kwargs
-    ) -> AsyncIterator[Video]:
+    async def related_videos(self, count: int = 30, **kwargs) -> AsyncIterator[Video]:
         """
         Returns related videos of a TikTok Video.
 
         Parameters:
             count (int): The amount of comments you want returned.
-            cursor (int): The the offset of comments from 0 you want to get.
 
         Returns:
             async iterator/generator: Yields TikTokApi.video objects.
@@ -328,7 +343,7 @@ class Video:
                 "count": 16,
             }
 
-            resp = await self.parent.make_request(
+            resp = await self._parent.make_request(
                 url="https://www.tiktok.com/api/related/item_list/",
                 params=params,
                 headers=kwargs.get("headers"),
@@ -341,11 +356,5 @@ class Video:
                 )
 
             for video in resp.get("itemList", []):
-                yield self.parent.video(data=video)
+                yield self._parent.video.from_raw_data(video)
                 found += 1
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __str__(self):
-        return f"TikTokApi.video(id='{getattr(self, 'id', None)}')"

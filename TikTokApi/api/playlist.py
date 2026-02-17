@@ -1,14 +1,16 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, ClassVar, AsyncIterator, Optional
+
+from typing import AsyncIterator, TYPE_CHECKING
+
+from .video import Video
 from ..exceptions import InvalidResponseException
+from TikTokApi.tiktok_model import TikTokModel
 
 if TYPE_CHECKING:
-    from ..tiktok import TikTokApi
-    from .video import Video
     from .user import User
 
 
-class Playlist:
+class Playlist(TikTokModel):
     """
     A TikTok video playlist.
 
@@ -18,39 +20,20 @@ class Playlist:
             playlist = api.playlist(id='7426714779919797038')
     """
 
-    parent: ClassVar[TikTokApi]
-
-    id: Optional[str]
+    id: str | None = None
     """The ID of the playlist."""
-    name: Optional[str]
+
+    name: str | None = None
     """The name of the playlist."""
-    video_count: Optional[int]
+
+    video_count: int | None = None
     """The video count of the playlist."""
-    creator: Optional[User]
+
+    creator: User | None = None
     """The creator of the playlist."""
-    cover_url: Optional[str]
+
+    cover_url: str | None = None
     """The cover URL of the playlist."""
-    as_dict: dict
-    """The raw data associated with this Playlist."""
-
-    def __init__(
-        self,
-        id: Optional[str] = None,
-        data: Optional[dict] = None,
-    ):
-        """
-        You must provide the playlist id or playlist data otherwise this
-        will not function correctly.
-        """
-
-        if id is None and data.get("id") is None:
-            raise TypeError("You must provide id parameter.")
-
-        self.id = id
-
-        if data is not None:
-            self.as_dict = data
-            self.__extract_from_data()
 
     async def info(self, **kwargs) -> dict:
         """
@@ -68,18 +51,12 @@ class Playlist:
                 user_data = await api.playlist(id='7426714779919797038').info()
         """
 
-        id = getattr(self, "id", None)
-        if not id:
-            raise TypeError(
-                "You must provide the playlist id when creating this class to use this method."
-            )
-
         url_params = {
-            "mixId": id,
+            "mixId": self.id,
             "msToken": kwargs.get("ms_token"),
         }
 
-        resp = await self.parent.make_request(
+        resp = await self._parent.make_request(
             url="https://www.tiktok.com/api/mix/detail/",
             params=url_params,
             headers=kwargs.get("headers"),
@@ -89,11 +66,10 @@ class Playlist:
         if resp is None:
             raise InvalidResponseException(resp, "TikTok returned an invalid response.")
 
-        self.as_dict = resp["mixInfo"]
-        self.__extract_from_data()
+        self._extract_from_data(resp)
         return resp
 
-    async def videos(self, count=30, cursor=0, **kwargs) -> AsyncIterator[Video]:
+    async def videos(self, count=30, cursor=0, **kwargs) -> AsyncIterator["Video"]:
         """
         Returns an iterator of videos in this User's playlist.
 
@@ -108,19 +84,16 @@ class Playlist:
 
                 playlist_videos = await api.playlist(id='7426714779919797038').videos()
         """
-        id = getattr(self, "id", None)
-        if id is None or id == "":
-            await self.info(**kwargs)
 
         found = 0
         while found < count:
             params = {
-                "mixId": id,
+                "mixId": self.id,
                 "count": min(count, 30),
                 "cursor": cursor,
             }
 
-            resp = await self.parent.make_request(
+            resp = await self._parent.make_request(
                 url="https://www.tiktok.com/api/mix/item_list/",
                 params=params,
                 headers=kwargs.get("headers"),
@@ -133,7 +106,7 @@ class Playlist:
                 )
 
             for video in resp.get("itemList", []):
-                yield self.parent.video(data=video)
+                yield self._parent.video.from_raw_data(raw_data=video)
                 found += 1
 
             if not resp.get("hasMore", False):
@@ -141,27 +114,25 @@ class Playlist:
 
             cursor = resp.get("cursor")
 
-    def __extract_from_data(self):
-        data = self.as_dict
-        keys = data.keys()
+    def _extract_from_data(self, raw_data: dict) -> None:
+        self.raw_data = raw_data
 
-        if "mixInfo" in keys:
-            data = data["mixInfo"]
+        if "mixInfo" in raw_data:
+            raw_data = raw_data["mixInfo"]
 
-        self.id = data.get("id", None) or data.get("mixId", None)
-        self.name = data.get("name", None) or data.get("mixName", None)
-        self.video_count = data.get("videoCount", None)
-        self.creator = self.parent.user(data=data.get("creator", {}))
-        self.cover_url = data.get("cover", None)
+        video_id: str | None = raw_data.get("id", None) or raw_data.get("mixId", None)
 
-        if None in [self.id, self.name, self.video_count, self.creator, self.cover_url]:
-            User.parent.logger.error(
-                f"Failed to create Playlist with data: {data}\nwhich has keys {data.keys()}"
+        if video_id is None:
+            self._parent.logger.error(f"Failed to create Playlist with data: {raw_data}\nwhich has keys {raw_data.keys()}")
+            return
+
+        self.id = video_id
+        self.name = raw_data.get("name", None) or raw_data.get("mixName", None)
+        self.video_count = raw_data.get("videoCount", None)
+        self.creator = self._parent.user.from_raw_data(raw_data=raw_data.get("creator", {}))
+        self.cover_url = raw_data.get("cover", None)
+
+        if None in [self.name, self.video_count, self.creator, self.cover_url]:
+            self._parent.logger.error(
+                f"Failed to create Playlist with data: {raw_data}\nwhich has keys {raw_data.keys()}"
             )
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __str__(self):
-        id = getattr(self, "id", None)
-        return f"TikTokApi.playlist(id='{id}'')"
