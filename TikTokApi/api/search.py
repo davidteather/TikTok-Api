@@ -70,6 +70,7 @@ class Search:
                     # do something
         """
         found = 0
+        search_id = ""
         while found < count:
             params = {
                 "keyword": search_term,
@@ -77,6 +78,9 @@ class Search:
                 "from_page": "search",
                 "web_search_code": """{"tiktok":{"client_params_x":{"search_engine":{"ies_mt_user_live_video_card_use_libra":1,"mt_search_general_user_live_card":1}},"search_server":{}}}""",
             }
+
+            if search_id != "":
+                params["search_id"] = search_id
 
             resp = await Search.parent.make_request(
                 url=f"https://www.tiktok.com/api/search/{obj_type}/full/",
@@ -102,8 +106,10 @@ class Search:
             elif obj_type == "item":
                 for video in resp.get("item_list", []):
                     yield Search.parent.video(data=video)
+                    found += 1
 
             if not resp.get("has_more", False):
                 return
 
             cursor = resp.get("cursor")
+            search_id = resp.get("rid", "")

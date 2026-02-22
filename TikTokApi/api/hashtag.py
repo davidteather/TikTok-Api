@@ -25,7 +25,7 @@ class Hashtag:
     id: Optional[str]
     """The ID of the hashtag"""
     name: Optional[str]
-    """The name of the hashtag (omiting the #)"""
+    """The name of the hashtag (omitting the #)"""
     as_dict: dict
     """The raw data associated with this hashtag."""
 
@@ -111,7 +111,7 @@ class Hashtag:
         while found < count:
             params = {
                 "challengeID": self.id,
-                "count": 35,
+                "count": 30,
                 "cursor": cursor,
             }
 

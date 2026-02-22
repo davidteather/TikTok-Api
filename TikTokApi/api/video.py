@@ -199,8 +199,9 @@ class Video:
                 async for chunk in api.video(id='7041997751718137094').bytes(stream=True):
                     # Process or upload chunk
         """
-        i, session = self.parent._get_session(**kwargs)
-        downloadAddr = self.as_dict["video"]["downloadAddr"]
+        i, session = self.parent._get_session(**kwargs)        
+        video_data = self.as_dict.get("video", {})
+        downloadAddr = video_data.get("downloadAddr") or video_data.get("playAddr")
 
         cookies = await self.parent.get_session_cookies(session)
 
