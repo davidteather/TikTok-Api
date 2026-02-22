@@ -347,23 +347,24 @@ class TikTokApi:
                 ]
                 await context.add_cookies(formatted_cookies)
 
-            inited_suppression = False
+            async def _apply_suppression(page):
+                if suppress_resource_load_types is None:
+                    return
+                await page.route(
+                    "**/*",
+                    lambda route, request: (
+                        route.abort()
+                        if request.resource_type in suppress_resource_load_types
+                        else route.continue_()
+                    ),
+                )
 
             if page_factory:
                 page = await page_factory(context)
             else:
                 page = await context.new_page()
                 await stealth_async(page)
-                if suppress_resource_load_types is not None:
-                    await page.route(
-                        "**/*",
-                        lambda route, request: (
-                            route.abort()
-                            if request.resource_type in suppress_resource_load_types
-                            else route.continue_()
-                        ),
-                    )
-                    inited_suppression = True
+                await _apply_suppression(page)
                 _ = await page.goto(url)
 
             if "tiktok" not in page.url:
@@ -378,17 +379,8 @@ class TikTokApi:
 
             page.once("request", handle_request)
 
-            if suppress_resource_load_types is not None and not inited_suppression:
-                await page.route(
-                    "**/*",
-                    lambda route, request: (
-                        route.abort()
-                        if request.resource_type in suppress_resource_load_types
-                        else route.continue_()
-                    ),
-                )
-
-            del inited_suppression 
+            if page_factory:
+                await _apply_suppression(page)
 
             # Set the navigation timeout
             page.set_default_navigation_timeout(timeout)
