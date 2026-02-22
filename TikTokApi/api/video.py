@@ -200,9 +200,6 @@ class Video:
                     # Process or upload chunk
         """
         i, session = self.parent._get_session(**kwargs)        
-#        downloadAddr = self.as_dict["video"]["downloadAddr"]
-# Download URL FIX
-# if ["video"]["downloadAddr"] empty use alternate ["video"]["playAddr"]
         video_data = self.as_dict.get("video", {})
         downloadAddr = video_data.get("downloadAddr") or video_data.get("playAddr")
 
