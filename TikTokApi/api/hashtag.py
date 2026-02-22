@@ -111,7 +111,7 @@ class Hashtag:
         while found < count:
             params = {
                 "challengeID": self.id,
-                "count": 20,
+                "count": 30,
                 "cursor": cursor,
             }
 
