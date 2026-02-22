@@ -191,6 +191,55 @@ class User:
 
             cursor = resp.get("cursor")
 
+    async def stories(self, count=30, cursor=0, **kwargs) -> AsyncIterator[Video]:
+        """
+        Returns a user's stories.
+
+        Args:
+            count (int): The amount of stories you want returned.
+            cursor (int): The the offset of stories from 0 you want to get.
+
+        Returns:
+            async iterator/generator: Yields TikTokApi.video objects.
+
+        Raises:
+            InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.
+
+        Example Usage:
+            .. code-block:: python
+
+                async for story in api.user(username="davidteathercodes").stories():
+                    # do something
+        """
+        found = 0
+        while found < count:
+            params = {
+                "authorId": self.user_id,
+                "count": 4,
+                "cursor": cursor,
+            }
+
+            resp = await self.parent.make_request(
+                url="https://www.tiktok.com/api/story/item_list/",
+                params=params,
+                headers=kwargs.get("headers"),
+                session_index=kwargs.get("session_index"),
+            )
+
+            if resp is None:
+                raise InvalidResponseException(
+                    resp, "TikTok returned an invalid response."
+                )
+
+            for story in resp.get("itemList", []):
+                yield self.parent.video(data=story)
+                found += 1
+
+            if not resp.get("HasMoreAfter", False):
+                return
+
+            cursor = resp.get("cursor")
+
     async def liked(
         self, count: int = 30, cursor: int = 0, **kwargs
     ) -> AsyncIterator[Video]:
