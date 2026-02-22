@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTokApi.tiktok &mdash; TikTokAPI v7.2.2 documentation</title>
+  <title>TikTokApi.tiktok &mdash; TikTokAPI v7.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
 
@@ -13,7 +13,7 @@
     <link rel="canonical" href="https://davidteather.github.io/TikTok-Api/_modules/TikTokApi/tiktok.html" />
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=647bcb81"></script>
+      <script src="../../_static/documentation_options.js?v=862e8fab"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -421,11 +421,24 @@
                 <span class="p">]</span>
                 <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">add_cookies</span><span class="p">(</span><span class="n">formatted_cookies</span><span class="p">)</span>
 
+            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_apply_suppression</span><span class="p">(</span><span class="n">page</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">suppress_resource_load_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span>
+                <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span>
+                    <span class="s2">&quot;**/*&quot;</span><span class="p">,</span>
+                    <span class="k">lambda</span> <span class="n">route</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">route</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">resource_type</span> <span class="ow">in</span> <span class="n">suppress_resource_load_types</span>
+                        <span class="k">else</span> <span class="n">route</span><span class="o">.</span><span class="n">continue_</span><span class="p">()</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
+
             <span class="k">if</span> <span class="n">page_factory</span><span class="p">:</span>
                 <span class="n">page</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page_factory</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">page</span> <span class="o">=</span> <span class="k">await</span> <span class="n">context</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
                 <span class="k">await</span> <span class="n">stealth_async</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">_apply_suppression</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
                 <span class="n">_</span> <span class="o">=</span> <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="s2">&quot;tiktok&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">page</span><span class="o">.</span><span class="n">url</span><span class="p">:</span>
@@ -440,15 +453,8 @@
 
             <span class="n">page</span><span class="o">.</span><span class="n">once</span><span class="p">(</span><span class="s2">&quot;request&quot;</span><span class="p">,</span> <span class="n">handle_request</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">suppress_resource_load_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">await</span> <span class="n">page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span>
-                    <span class="s2">&quot;**/*&quot;</span><span class="p">,</span>
-                    <span class="k">lambda</span> <span class="n">route</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="p">(</span>
-                        <span class="n">route</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
-                        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">resource_type</span> <span class="ow">in</span> <span class="n">suppress_resource_load_types</span>
-                        <span class="k">else</span> <span class="n">route</span><span class="o">.</span><span class="n">continue_</span><span class="p">()</span>
-                    <span class="p">),</span>
-                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">page_factory</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">_apply_suppression</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
 
             <span class="c1"># Set the navigation timeout</span>
             <span class="n">page</span><span class="o">.</span><span class="n">set_default_navigation_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>

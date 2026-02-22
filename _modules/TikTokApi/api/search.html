@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTokApi.api.search &mdash; TikTokAPI v7.2.2 documentation</title>
+  <title>TikTokApi.api.search &mdash; TikTokAPI v7.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
 
@@ -13,7 +13,7 @@
     <link rel="canonical" href="https://davidteather.github.io/TikTok-Api/_modules/TikTokApi/api/search.html" />
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=647bcb81"></script>
+      <script src="../../../_static/documentation_options.js?v=862e8fab"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -146,6 +146,7 @@
 <span class="sd">                    # do something</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">found</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">search_id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">while</span> <span class="n">found</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s2">&quot;keyword&quot;</span><span class="p">:</span> <span class="n">search_term</span><span class="p">,</span>
@@ -153,6 +154,9 @@
                 <span class="s2">&quot;from_page&quot;</span><span class="p">:</span> <span class="s2">&quot;search&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;web_search_code&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;{&quot;tiktok&quot;:{&quot;client_params_x&quot;:{&quot;search_engine&quot;:{&quot;ies_mt_user_live_video_card_use_libra&quot;:1,&quot;mt_search_general_user_live_card&quot;:1}},&quot;search_server&quot;:</span><span class="si">{}</span><span class="s2">}}&quot;&quot;&quot;</span><span class="p">,</span>
             <span class="p">}</span>
+
+            <span class="k">if</span> <span class="n">search_id</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;search_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">search_id</span>
 
             <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Search</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
                 <span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;https://www.tiktok.com/api/search/</span><span class="si">{</span><span class="n">obj_type</span><span class="si">}</span><span class="s2">/full/&quot;</span><span class="p">,</span>
@@ -178,11 +182,13 @@
             <span class="k">elif</span> <span class="n">obj_type</span> <span class="o">==</span> <span class="s2">&quot;item&quot;</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;item_list&quot;</span><span class="p">,</span> <span class="p">[]):</span>
                     <span class="k">yield</span> <span class="n">Search</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">video</span><span class="p">)</span>
+                    <span class="n">found</span> <span class="o">+=</span> <span class="mi">1</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;has_more&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="k">return</span>
 
-            <span class="n">cursor</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cursor&quot;</span><span class="p">)</span></div>
+            <span class="n">cursor</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cursor&quot;</span><span class="p">)</span>
+            <span class="n">search_id</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rid&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div>
 </div>
 
 </pre></div>
