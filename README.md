@@ -26,6 +26,14 @@ These sponsors have paid to be placed here or are my own affiliate links which I
         </div>
     </a>
     <br>
+    <a href="https://tikhub.io/?utm_source=github&utm_medium=readme&utm_campaign=tiktok_api&ref=github_davidteather_tiktokapi" target="_blank">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/tikhub.png" width="100" alt="TikHub API">
+        <b></b>
+        <div>
+         <b>TikHub API</b> offers 700+ endpoints for fetching and analyzing data from 14+ social media platforms<br>including videos, users, comments, shops, products, and trends — all in one place.
+        </div>
+    </a>
+    <br>
     <a href="https://getlate.dev/?utm_source=github&utm_medium=readme&utm_campaign=tiktok_api" target="_blank">
         <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/late.png" width="100" alt="Late">
         <b></b>
