@@ -34,11 +34,11 @@ These sponsors have paid to be placed here or are my own affiliate links which I
         </div>
     </a>
     <br>
-    <a href="https://getlate.dev/?utm_source=github&utm_medium=readme&utm_campaign=tiktok_api" target="_blank">
-        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/late.png" width="100" alt="Late">
+    <a href="https://zernio.com/?utm_source=github&utm_medium=readme&utm_campaign=tiktok_api" target="_blank">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/zernio.png" width="100" alt="Zernio">
         <b></b>
         <div>
-         <b>Late</b> — Ship social media features in an hour, not months. A single API that replaces 13 platform integrations so you can focus on building your product.
+         <b>Zernio</b> — Skip TikTok's API review process. Publish videos, schedule posts, manage comments, and pull analytics through our pre-approved TikTok integration. Works with 13 other platforms too.
         </div>
     </a>
     <br>
@@ -146,4 +146,3 @@ python -m examples.trending_example
 
 You can access the full data dictionary the object was created from with `.as_dict`. On a video this may look like
 [this](https://gist.github.com/davidteather/7c30780bbc30772ba11ec9e0b909e99d). TikTok changes their structure from time to time so it's worth investigating the structure of the dictionary when you use this package.
-
