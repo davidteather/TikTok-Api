@@ -42,6 +42,14 @@ These sponsors have paid to be placed here or are my own affiliate links which I
         </div>
     </a>
     <br>
+    <a href="https://socialapis.io/?utm_source=github&utm_medium=sponsor&utm_campaign=tiktok-api" target="_blank">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/socialapis.png" width="96" alt="SocialAPIs">
+        <b></b>
+        <div>
+        <b>SocialAPIs</b> — Facebook data APIs that just work. Extract Pages, Groups, Posts, Reels, Comments, Ads Library & Marketplace via clean JSON endpoints. No proxies, no headless browsers. MCP included!
+        </div>
+    </a>
+    <br>
     <a href="https://www.webshare.io/?referral_code=3x5812idzzzp" target="_blank">
         <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/webshare.png" width="100" alt="Webshare Proxies">
         <b></b>

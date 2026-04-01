@@ -8,7 +8,7 @@
 
 ## 赞助商
 
-以下赞助商为展示位付费，或为我个人的联盟推广链接（可能会获得佣金）。除此之外，我与他们没有任何其他关联。TikTokAPI 包将始终保持免费、开源。
+以下赞助商为展示位付费，或为我个人的联盟推广链接（可能会获得佣金）。除此之外，我与他们没有任何其他关联。TikTokAPI 包将始终保持免费、开源。若你希望赞助本项目，请查看我的 [GitHub Sponsors 页面](https://github.com/sponsors/davidteather)。
 
 <div align="center">
     <a href="https://tikapi.io/?ref=davidteather" target="_blank">
@@ -31,6 +31,22 @@
         <b></b>
         <div>
          <b>TikHub API</b> 提供 700+ 个端点，覆盖 14+ 个社交平台的数据抓取与分析，<br>包括视频、用户、评论、店铺、商品与趋势等——一站式搞定。
+        </div>
+    </a>
+    <br>
+    <a href="https://zernio.com/?utm_source=github&utm_medium=readme&utm_campaign=tiktok_api" target="_blank">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/zernio.png" width="100" alt="Zernio">
+        <b></b>
+        <div>
+         <b>Zernio</b> — 跳过 TikTok 的 API 审核流程。通过我们预审核通过的 TikTok 集成发布视频、定时发帖、管理评论并拉取分析数据。还支持另外 13 个平台。
+        </div>
+    </a>
+    <br>
+    <a href="https://socialapis.io/?utm_source=github&utm_medium=sponsor&utm_campaign=tiktok-api" target="_blank">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/socialapis.png" width="96" alt="SocialAPIs">
+        <b></b>
+        <div>
+        <b>SocialAPIs</b> — Facebook 数据 API，开箱即用。通过简洁的 JSON 端点提取 Page、群组、帖子、Reels、评论、广告资料库与 Marketplace。无需代理、无需无头浏览器。内含 MCP！
         </div>
     </a>
     <br>
