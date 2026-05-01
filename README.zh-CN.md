@@ -42,14 +42,6 @@
         </div>
     </a>
     <br>
-    <a href="https://socialapis.io/?utm_source=github&utm_medium=sponsor&utm_campaign=tiktok-api" target="_blank">
-        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/socialapis.png" width="96" alt="SocialAPIs">
-        <b></b>
-        <div>
-        <b>SocialAPIs</b> — Facebook 数据 API，开箱即用。通过简洁的 JSON 端点提取 Page、群组、帖子、Reels、评论、广告资料库与 Marketplace。无需代理、无需无头浏览器。内含 MCP！
-        </div>
-    </a>
-    <br>
     <a href="https://www.webshare.io/?referral_code=3x5812idzzzp" target="_blank">
         <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/webshare.png" width="100" alt="Webshare Proxies">
         <b></b>
