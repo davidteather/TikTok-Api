@@ -41,6 +41,14 @@
          <b>高性价比、可靠的代理：</b> 用快速稳定的代理为你的爬虫加速。立即试用 10 个免费数据中心代理！
         </div>
     </a>
+    <br>
+    <a href="https://www.rapidproxy.io/?ref=tiktok" target="_blank">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/rapidproxy.png" width="100" alt="RapidProxy API">
+        <b></b>
+        <div>
+         <b>RapidProxy</b> 使用快速、可靠的住宅代理，为你的爬虫与自动化赋能。<br>立即获取 9000 万+ 住宅 IP、500MB 免费流量、永不过期的带宽，每 GB 低至 $0.65。
+        </div>
+    </a>
 </div>
 
 ## 目录

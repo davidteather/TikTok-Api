@@ -34,7 +34,7 @@ These sponsors have paid to be placed here or are my own affiliate links which I
         </div>
     </a>
     <br>
-        <a href="https://www.rapidproxy.io/?ref=tiktok" target="_blank">
+    <a href="https://www.rapidproxy.io/?ref=tiktok" target="_blank">
         <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/rapidproxy.png" width="100" alt="RapidProxy API">
         <b></b>
         <div>
