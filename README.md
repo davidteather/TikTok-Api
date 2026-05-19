@@ -34,6 +34,14 @@ These sponsors have paid to be placed here or are my own affiliate links which I
         </div>
     </a>
     <br>
+        <a href="https://www.rapidproxy.io/?ref=tiktok" target="_blank">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/rapidproxy.png" width="100" alt="RapidProxy API">
+        <b></b>
+        <div>
+         <b>RapidProxy</b> Power your scraping and automation with fast, reliable residential proxies.<br>Get 90M+ residential IPs, 500MB free traffic, non-expiring bandwidth, and pricing from just $0.65/GB with RapidProxy.
+        </div>
+    </a>
+    <br>
     <a href="https://www.webshare.io/?referral_code=3x5812idzzzp" target="_blank">
         <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/webshare.png" width="100" alt="Webshare Proxies">
         <b></b>
