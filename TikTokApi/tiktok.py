@@ -511,6 +511,15 @@ class TikTokApi:
         self._proxy_provider = proxy_provider
         self._proxy_algorithm = proxy_algorithm
 
+        if "user_agent" not in context_options:
+            if browser == "firefox":
+                context_options["user_agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0"
+            elif browser == "webkit":
+                context_options["user_agent"] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15"
+            else:
+                context_options["user_agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+
+
         if proxies is not None and proxy_provider is not None:
             raise ValueError(
                 "Cannot use both 'proxies' and 'proxy_provider' parameters. "
@@ -868,8 +877,18 @@ class TikTokApi:
                     )
                 params["msToken"] = ms_token
 
-        encoded_params = f"{url}?{urlencode(params, safe='=', quote_via=quote)}"
-        signed_url = await self.sign_url(encoded_params, session_index=i)
+        if params:
+            keys_to_remove = [
+                "msToken", "mstoken", 
+                "X-Bogus", "x-bogus", 
+                "X-Dynosaur", "x-dynosaur", 
+                "X-Gnarly", "x-gnarly"
+            ]
+            for key in keys_to_remove:
+                params.pop(key, None)
+
+        encoded_params_url = encoded_params = f"{url}?{urlencode(params, safe='=', quote_via=quote)}"
+        signed_url = encoded_params_url #await self.sign_url(encoded_params, session_index=i)
 
         retry_count = 0
         while retry_count < retries:
