@@ -845,8 +845,14 @@ class TikTokApi:
             # Fallback to old method for backwards compatibility
             i, session = self._get_session(**kwargs)
 
+        if params is None:
+            params = {}
+
         if session.params is not None:
             params = {**session.params, **params}
+
+        for key in ["X-Bogus", "X-Dynosaur", "X-Gnarly"]:
+            params.pop(key, None)
 
         if headers is not None:
             headers = {**session.headers, **headers}

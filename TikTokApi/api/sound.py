@@ -112,9 +112,10 @@ class Sound:
 
         found = 0
         while found < count:
+            remaining = count - found
             params = {
                 "musicID": id,
-                "count": 30,
+                "count": min(remaining, 30),
                 "cursor": cursor,
             }
 
@@ -131,6 +132,8 @@ class Sound:
                 )
 
             for video in resp.get("itemList", []):
+                if found >= count:
+                    return
                 yield self.parent.video(data=video)
                 found += 1
 
