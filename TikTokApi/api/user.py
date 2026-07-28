@@ -111,9 +111,10 @@ class User:
         found = 0
 
         while found < count:
+            remaining = count - found
             params = {
                 "secUid": self.sec_uid,
-                "count": min(count, 30),
+                "count": min(remaining, 30),
                 "cursor": cursor,
             }
 
@@ -130,6 +131,8 @@ class User:
                 )
 
             for playlist in resp.get("playList", []):
+                if found >= count:
+                    return
                 yield self.parent.playlist(data=playlist)
                 found += 1
 
@@ -164,9 +167,10 @@ class User:
 
         found = 0
         while found < count:
+            remaining = count - found
             params = {
                 "secUid": self.sec_uid,
-                "count": 30,
+                "count": min(remaining, 30),
                 "cursor": cursor,
             }
 
@@ -183,6 +187,8 @@ class User:
                 )
 
             for video in resp.get("itemList", []):
+                if found >= count:
+                    return
                 yield self.parent.video(data=video)
                 found += 1
 
@@ -219,9 +225,10 @@ class User:
 
         found = 0
         while found < count:
+            remaining = count - found
             params = {
                 "secUid": self.sec_uid,
-                "count": 30,
+                "count": min(remaining, 30),
                 "cursor": cursor,
             }
 
@@ -238,6 +245,8 @@ class User:
                 )
 
             for video in resp.get("itemList", []):
+                if found >= count:
+                    return
                 yield self.parent.video(data=video)
                 found += 1
 
