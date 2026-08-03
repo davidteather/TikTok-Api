@@ -40,6 +40,10 @@ from .exceptions import (
     EmptyResponseException,
 )
 
+# Params TikTok's web client appends to every request on its own, compared
+# lowercased so a caller passing a different casing is caught too.
+NATIVELY_SIGNED_PARAMS = frozenset({"mstoken", "x-bogus", "x-dynosaur", "x-gnarly"})
+
 
 @dataclasses.dataclass
 class TikTokPlaywrightSession:
@@ -309,6 +313,22 @@ class TikTokApi:
             # all the original parameters (proxies, ms_tokens, etc.)
             # Users should call create_sessions() again if they need more sessions
 
+    async def __get_default_user_agent(self) -> str | None:
+        """Read the launched browser's user agent, minus any headless marker"""
+        context = None
+        try:
+            context = await self.browser.new_context()
+            page = await context.new_page()
+            user_agent = await page.evaluate("() => navigator.userAgent")
+        except PlaywrightError as e:
+            self.logger.warning(f"Failed to detect the browser user agent: {e}")
+            return None
+        finally:
+            if context is not None:
+                await context.close()
+
+        return user_agent.replace("HeadlessChrome", "Chrome").replace("Headless", "")
+
     async def __create_session(
         self,
         url: str = "https://www.tiktok.com",
@@ -511,15 +531,6 @@ class TikTokApi:
         self._proxy_provider = proxy_provider
         self._proxy_algorithm = proxy_algorithm
 
-        if "user_agent" not in context_options:
-            if browser == "firefox":
-                context_options["user_agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0"
-            elif browser == "webkit":
-                context_options["user_agent"] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15"
-            else:
-                context_options["user_agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
-
-
         if proxies is not None and proxy_provider is not None:
             raise ValueError(
                 "Cannot use both 'proxies' and 'proxy_provider' parameters. "
@@ -555,6 +566,16 @@ class TikTokApi:
             )
         else:
             raise ValueError("Invalid browser argument passed")
+
+        # Playwright's default user agent advertises HeadlessChrome, which TikTok
+        # flags on sight. Reuse the browser's own user agent with that marker
+        # stripped, so it stays consistent with the browser build and with the
+        # navigator.platform we report in __set_session_params. A hardcoded string
+        # would drift out of both.
+        if "user_agent" not in context_options and browser_context_factory is None:
+            user_agent = await self.__get_default_user_agent()
+            if user_agent is not None:
+                context_options = {**context_options, "user_agent": user_agent}
 
         # Create sessions concurrently
         # Use return_exceptions only if partial sessions are allowed
@@ -800,7 +821,12 @@ class TikTokApi:
             raise
 
     async def sign_url(self, url: str, **kwargs):
-        """Sign a url"""
+        """Sign a url
+
+        No longer used by make_request: TikTok's web client signs page-context
+        requests itself, and a second signature makes it return an empty body.
+        Kept for callers building requests outside of make_request.
+        """
         try:
             i, session = await self._get_valid_session_index(**kwargs)
         except Exception:
@@ -862,40 +888,26 @@ class TikTokApi:
         else:
             headers = session.headers
 
-        # get msToken
-        if params.get("msToken") is None:
-            # try to get msToken from session
-            if session.ms_token is not None:
-                params["msToken"] = session.ms_token
-            else:
-                # we'll try to read it from cookies
-                cookies = await self.get_session_cookies(session)
-                ms_token = cookies.get("msToken")
-                if ms_token is None:
-                    self.logger.warn(
-                        "Failed to get msToken from cookies, trying to make the request anyway (probably will fail)"
-                    )
-                params["msToken"] = ms_token
+        # TikTok's web client signs its own requests, appending msToken and the
+        # X-Bogus/X-Gnarly/X-Dynosaur params as they leave the page. run_fetch_script
+        # fetches from inside that page, so anything we attach here collides with the
+        # values TikTok injects and the response comes back empty. Drop them and let
+        # the page sign the request; msToken rides along in the cookie jar, where
+        # __create_session put it.
+        params = {
+            key: value
+            for key, value in (params or {}).items()
+            if key.lower() not in NATIVELY_SIGNED_PARAMS
+        }
 
-        if params:
-            keys_to_remove = [
-                "msToken", "mstoken", 
-                "X-Bogus", "x-bogus", 
-                "X-Dynosaur", "x-dynosaur", 
-                "X-Gnarly", "x-gnarly"
-            ]
-            for key in keys_to_remove:
-                params.pop(key, None)
-
-        encoded_params_url = encoded_params = f"{url}?{urlencode(params, safe='=', quote_via=quote)}"
-        signed_url = encoded_params_url #await self.sign_url(encoded_params, session_index=i)
+        request_url = f"{url}?{urlencode(params, safe='=', quote_via=quote)}"
 
         retry_count = 0
         while retry_count < retries:
             retry_count += 1
             try:
                 result = await self.run_fetch_script(
-                    signed_url, headers=headers, session_index=i
+                    request_url, headers=headers, session_index=i
                 )
 
                 if result is None:
