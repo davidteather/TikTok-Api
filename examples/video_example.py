@@ -25,9 +25,14 @@ async def get_video_example():
 
         video_info = await video.info()  # is HTML request, so avoid using this too much
         print(video_info)
-        video_bytes = await video.bytes()
-        with open("video.mp4", "wb") as f:
-            f.write(video_bytes)
+        if video.is_slideshow:
+            for index, image_bytes in enumerate(await video.images_bytes(), 1):
+                with open(f"image_{index:03d}.jpg", "wb") as f:
+                    f.write(image_bytes)
+        else:
+            video_bytes = await video.bytes()
+            with open("video.mp4", "wb") as f:
+                f.write(video_bytes)
 
 
 if __name__ == "__main__":
