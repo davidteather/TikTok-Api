@@ -187,7 +187,7 @@ If you don’t provide any, the sessions will try to get them themselves, but th
 <li><p><strong>proxies</strong> (<em>list</em>) – <strong>DEPRECATED - Use proxy_provider instead.</strong> A list of proxies to use for the sessions.
 This parameter is maintained for backwards compatibility but will be removed in a future version.</p></li>
 <li><p><strong>proxy_provider</strong> (<em>ProxyProvider</em><em> | </em><em>None</em>) – A ProxyProvider instance for smart proxy rotation.
-See examples/proxy_provider_example.py for usage examples. Full documentation: <a class="reference external" href="https://davidteather.github.io/proxyproviders/">https://davidteather.github.io/proxyproviders/</a></p></li>
+See examples/proxy_provider_example.py for usage examples. Full documentation: <a class="reference external" href="https://go.dteather.com/proxyproviders-docs?src=tiktokapi&amp;placement=proxy-docs">https://go.dteather.com/proxyproviders-docs?src=tiktokapi&amp;placement=proxy-docs</a></p></li>
 <li><p><strong>proxy_algorithm</strong> (<em>Algorithm</em><em> | </em><em>None</em>) – Algorithm for proxy selection (RoundRobin, Random, First, or custom) per session.
 Only used with proxy_provider. Defaults to RoundRobin if not specified.</p></li>
 <li><p><strong>sleep_after</strong> (<em>int</em>) – The amount of time to sleep after creating a session, this is to allow the msToken to be generated.</p></li>
@@ -211,7 +211,7 @@ Only used with proxy_provider. Defaults to RoundRobin if not specified.</p></li>
 <dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">TikTokApi</span><span class="w"> </span><span class="kn">import</span> <span class="n">TikTokApi</span>
 
 <span class="k">async</span> <span class="k">with</span> <span class="n">TikTokApi</span><span class="p">()</span> <span class="k">as</span> <span class="n">api</span><span class="p">:</span>
-    <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">create_sessions</span><span class="p">(</span><span class="n">num_sessions</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ms_tokens</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;msToken1&#39;</span><span class="p">,</span> <span class="s1">&#39;msToken2&#39;</span><span class="p">])</span>
+    <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">create_sessions</span><span class="p">(</span><span class="n">num_sessions</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ms_tokens</span><span class="o">=</span><span class="p">[</span><span class="s1">'msToken1'</span><span class="p">,</span> <span class="s1">'msToken2'</span><span class="p">])</span>
 </pre></div>
 </div>
 </dd>

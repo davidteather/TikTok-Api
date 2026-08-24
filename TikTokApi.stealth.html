@@ -140,9 +140,9 @@ This also means scripts can be extended by overriding enabled_scripts generator:
 ```
 @property
 def enabled_scripts():
-    yield &#39;console.log(&quot;first script&quot;)&#39;
+    yield 'console.log("first script")'
     yield from super().enabled_scripts()
-    yield &#39;console.log(&quot;last script&quot;)&#39;
+    yield 'console.log("last script")'
 ```
 </pre></div>
 </div>

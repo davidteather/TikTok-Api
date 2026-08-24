@@ -80,25 +80,25 @@
 <div class="viewcode-block" id="Hashtag">
 <a class="viewcode-back" href="../../../api/hashtag.html#TikTokApi.api.hashtag.Hashtag">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Hashtag</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A TikTok Hashtag/Challenge.</span>
 
 <span class="sd">    Example Usage</span>
 <span class="sd">        .. code-block:: python</span>
 
-<span class="sd">            hashtag = api.hashtag(name=&#39;funny&#39;)</span>
+<span class="sd">            hashtag = api.hashtag(name='funny')</span>
 <span class="sd">            async for video in hashtag.videos():</span>
 <span class="sd">                print(video.id)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">parent</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">TikTokApi</span><span class="p">]</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The ID of the hashtag&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""The ID of the hashtag"""</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The name of the hashtag (omitting the #)&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""The name of the hashtag (omitting the #)"""</span>
     <span class="n">as_dict</span><span class="p">:</span> <span class="nb">dict</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The raw data associated with this hashtag.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""The raw data associated with this hashtag."""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -106,9 +106,9 @@
         <span class="nb">id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        You must provide the name or id of the hashtag.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
@@ -122,34 +122,34 @@
 <div class="viewcode-block" id="Hashtag.info">
 <a class="viewcode-back" href="../../../api/hashtag.html#TikTokApi.api.hashtag.Hashtag.info">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns all information sent by TikTok related to this hashtag.</span>
 
 <span class="sd">        Example Usage</span>
 <span class="sd">            .. code-block:: python</span>
 
-<span class="sd">                hashtag = api.hashtag(name=&#39;funny&#39;)</span>
+<span class="sd">                hashtag = api.hashtag(name='funny')</span>
 <span class="sd">                hashtag_data = await hashtag.info()</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;You must provide the name when creating this class to use this method.&quot;</span>
+                <span class="s2">"You must provide the name when creating this class to use this method."</span>
             <span class="p">)</span>
 
         <span class="n">url_params</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;challengeName&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="s2">&quot;msToken&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ms_token&quot;</span><span class="p">),</span>
+            <span class="s2">"challengeName"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">"msToken"</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ms_token"</span><span class="p">),</span>
         <span class="p">}</span>
 
         <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
-            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://www.tiktok.com/api/challenge/detail/&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">"https://www.tiktok.com/api/challenge/detail/"</span><span class="p">,</span>
             <span class="n">params</span><span class="o">=</span><span class="n">url_params</span><span class="p">,</span>
-            <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">),</span>
-            <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_index&quot;</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"headers"</span><span class="p">),</span>
+            <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"session_index"</span><span class="p">),</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">resp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidResponseException</span><span class="p">(</span><span class="n">resp</span><span class="p">,</span> <span class="s2">&quot;TikTok returned an invalid response.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidResponseException</span><span class="p">(</span><span class="n">resp</span><span class="p">,</span> <span class="s2">"TikTok returned an invalid response."</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span> <span class="o">=</span> <span class="n">resp</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__extract_from_data</span><span class="p">()</span>
@@ -159,7 +159,7 @@
 <div class="viewcode-block" id="Hashtag.videos">
 <a class="viewcode-back" href="../../../api/hashtag.html#TikTokApi.api.hashtag.Hashtag.videos">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">videos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="n">Video</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns TikTok videos that have this hashtag in the caption.</span>
 
 <span class="sd">        Args:</span>
@@ -170,78 +170,78 @@
 <span class="sd">            async iterator/generator: Yields TikTokApi.video objects.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            InvalidResponseException: If TikTok returns an invalid response, or one we don&#39;t understand.</span>
+<span class="sd">            InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.</span>
 
 <span class="sd">        Example Usage:</span>
 <span class="sd">            .. code-block:: python</span>
 
-<span class="sd">                async for video in api.hashtag(name=&#39;funny&#39;).videos():</span>
+<span class="sd">                async for video in api.hashtag(name='funny').videos():</span>
 <span class="sd">                    # do something</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
-        <span class="nb">id</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">found</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">found</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;challengeID&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
-                <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
+                <span class="s2">"challengeID"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">"count"</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+                <span class="s2">"cursor"</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
             <span class="p">}</span>
 
             <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
-                <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://www.tiktok.com/api/challenge/item_list/&quot;</span><span class="p">,</span>
+                <span class="n">url</span><span class="o">=</span><span class="s2">"https://www.tiktok.com/api/challenge/item_list/"</span><span class="p">,</span>
                 <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
-                <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">),</span>
-                <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_index&quot;</span><span class="p">),</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"headers"</span><span class="p">),</span>
+                <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"session_index"</span><span class="p">),</span>
             <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">resp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">InvalidResponseException</span><span class="p">(</span>
-                    <span class="n">resp</span><span class="p">,</span> <span class="s2">&quot;TikTok returned an invalid response.&quot;</span>
+                    <span class="n">resp</span><span class="p">,</span> <span class="s2">"TikTok returned an invalid response."</span>
                 <span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"itemList"</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">video</span><span class="p">)</span>
                 <span class="n">found</span> <span class="o">+=</span> <span class="mi">1</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"hasMore"</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="k">return</span>
 
-            <span class="n">cursor</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cursor&quot;</span><span class="p">)</span></div>
+            <span class="n">cursor</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cursor"</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__extract_from_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span>
         <span class="n">keys</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="s2">&quot;title&quot;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">"title"</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"title"</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="s2">&quot;challengeInfo&quot;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;challenge&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;challengeInfo&quot;</span><span class="p">]:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;challengeInfo&quot;</span><span class="p">][</span><span class="s2">&quot;challenge&quot;</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;challengeInfo&quot;</span><span class="p">][</span><span class="s2">&quot;challenge&quot;</span><span class="p">][</span><span class="s2">&quot;title&quot;</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">split_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;challengeInfo&quot;</span><span class="p">][</span><span class="s2">&quot;challenge&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;splitTitle&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"challengeInfo"</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">"challenge"</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">"challengeInfo"</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"challengeInfo"</span><span class="p">][</span><span class="s2">"challenge"</span><span class="p">][</span><span class="s2">"id"</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"challengeInfo"</span><span class="p">][</span><span class="s2">"challenge"</span><span class="p">][</span><span class="s2">"title"</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">split_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"challengeInfo"</span><span class="p">][</span><span class="s2">"challenge"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"splitTitle"</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="s2">&quot;stats&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;challengeInfo&quot;</span><span class="p">]:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;challengeInfo&quot;</span><span class="p">][</span><span class="s2">&quot;stats&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">"stats"</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">"challengeInfo"</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"challengeInfo"</span><span class="p">][</span><span class="s2">"stats"</span><span class="p">]</span>
 
-        <span class="nb">id</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
             <span class="n">Hashtag</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Failed to create Hashtag with data: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="se">\n</span><span class="s2">which has keys </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Failed to create Hashtag with data: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="se">\n</span><span class="s2">which has keys </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;TikTokApi.hashtag(id=&#39;</span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="w"> </span><span class="kc">None</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;, name=&#39;</span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="w"> </span><span class="kc">None</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;)&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"TikTokApi.hashtag(id='</span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="kc">None</span><span class="p">)</span><span class="si">}</span><span class="s2">', name='</span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="kc">None</span><span class="p">)</span><span class="si">}</span><span class="s2">')"</span></div>
 
 </pre></div>
 

@@ -256,7 +256,7 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A TikTok User.</p>
 <dl>
-<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">user</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;therock&#39;</span><span class="p">)</span>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">user</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">'therock'</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd>
@@ -283,7 +283,7 @@
 </dd>
 </dl>
 <dl>
-<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">user_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;therock&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">user_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">'therock'</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
 </dd>
@@ -312,7 +312,7 @@
 </dd>
 </dl>
 <dl>
-<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">like</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;davidteathercodes&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">liked</span><span class="p">():</span>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">like</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">"davidteathercodes"</span><span class="p">)</span><span class="o">.</span><span class="n">liked</span><span class="p">():</span>
     <span class="c1"># do something</span>
 </pre></div>
 </div>
@@ -341,7 +341,7 @@
 </dd>
 </dl>
 <dl>
-<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">playlist</span> <span class="ow">in</span> <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;therock&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">playlists</span><span class="p">():</span>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">playlist</span> <span class="ow">in</span> <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">'therock'</span><span class="p">)</span><span class="o">.</span><span class="n">playlists</span><span class="p">():</span>
     <span class="c1"># do something</span>
 </pre></div>
 </div>
@@ -389,7 +389,7 @@
 </dd>
 </dl>
 <dl>
-<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;davidteathercodes&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">"davidteathercodes"</span><span class="p">)</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
     <span class="c1"># do something</span>
 </pre></div>
 </div>
@@ -486,7 +486,7 @@ Note: Currently only supports searching for users, other endpoints require auth.
 </dd>
 </dl>
 <dl>
-<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">search</span><span class="o">.</span><span class="n">search_type</span><span class="p">(</span><span class="s1">&#39;david teather&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">):</span>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">search</span><span class="o">.</span><span class="n">search_type</span><span class="p">(</span><span class="s1">'david teather'</span><span class="p">,</span> <span class="s1">'user'</span><span class="p">):</span>
     <span class="c1"># do something</span>
 </pre></div>
 </div>
@@ -517,7 +517,7 @@ Note: Currently only supports searching for users, other endpoints require auth.
 </dd>
 </dl>
 <dl>
-<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">search</span><span class="o">.</span><span class="n">users</span><span class="p">(</span><span class="s1">&#39;david teather&#39;</span><span class="p">):</span>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">search</span><span class="o">.</span><span class="n">users</span><span class="p">(</span><span class="s1">'david teather'</span><span class="p">):</span>
     <span class="c1"># do something</span>
 </pre></div>
 </div>
@@ -539,7 +539,7 @@ Note: Currently only supports searching for users, other endpoints require auth.
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A TikTok Hashtag/Challenge.</p>
 <dl>
-<dt>Example Usage</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hashtag</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;funny&#39;</span><span class="p">)</span>
+<dt>Example Usage</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hashtag</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'funny'</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">hashtag</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">video</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
 </pre></div>
@@ -563,7 +563,7 @@ Note: Currently only supports searching for users, other endpoints require auth.
 <span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/TikTokApi/api/hashtag.html#Hashtag.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.hashtag.Hashtag.info" title="Link to this definition"></a></dt>
 <dd><p>Returns all information sent by TikTok related to this hashtag.</p>
 <dl>
-<dt>Example Usage</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hashtag</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;funny&#39;</span><span class="p">)</span>
+<dt>Example Usage</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hashtag</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'funny'</span><span class="p">)</span>
 <span class="n">hashtag_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">hashtag</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -604,7 +604,7 @@ Note: Currently only supports searching for users, other endpoints require auth.
 </dd>
 </dl>
 <dl>
-<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;funny&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'funny'</span><span class="p">)</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
     <span class="c1"># do something</span>
 </pre></div>
 </div>
@@ -626,7 +626,7 @@ Note: Currently only supports searching for users, other endpoints require auth.
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A TikTok Sound/Music/Song.</p>
 <dl>
-<dt>Example Usage</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">song</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">song</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;7016547803243022337&#39;</span><span class="p">)</span>
+<dt>Example Usage</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">song</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">song</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">'7016547803243022337'</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd>
@@ -665,7 +665,7 @@ Note: Currently only supports searching for users, other endpoints require auth.
 </dd>
 </dl>
 <dl>
-<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sound_info</span> <span class="o">=</span> <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">sound</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;7016547803243022337&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sound_info</span> <span class="o">=</span> <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">sound</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">'7016547803243022337'</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
 </dd>
@@ -711,7 +711,7 @@ Note: Currently only supports searching for users, other endpoints require auth.
 </dd>
 </dl>
 <dl>
-<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">sound</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;7016547803243022337&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">sound</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">'7016547803243022337'</span><span class="p">)</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
     <span class="c1"># do something</span>
 </pre></div>
 </div>
@@ -753,14 +753,14 @@ Note: Currently only supports searching for users, other endpoints require auth.
 <span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">AsyncIterator</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/TikTokApi/api/video.html#Video.bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.video.Video.bytes" title="Link to this definition"></a></dt>
 <dd><p>Returns the bytes of a TikTok Video.</p>
 <dl>
-<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">video_bytes</span> <span class="o">=</span> <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;7041997751718137094&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">bytes</span><span class="p">()</span>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">video_bytes</span> <span class="o">=</span> <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">'7041997751718137094'</span><span class="p">)</span><span class="o">.</span><span class="n">bytes</span><span class="p">()</span>
 
 <span class="c1"># Saving The Video</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;saved_video.mp4&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'saved_video.mp4'</span><span class="p">,</span> <span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">output</span><span class="p">:</span>
     <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">video_bytes</span><span class="p">)</span>
 
 <span class="c1"># Streaming (if stream=True)</span>
-<span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;7041997751718137094&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">bytes</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">'7041997751718137094'</span><span class="p">)</span><span class="o">.</span><span class="n">bytes</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="c1"># Process or upload chunk</span>
 </pre></div>
 </div>
@@ -832,7 +832,7 @@ Note: Currently only supports searching for users, other endpoints require auth.
 </dd>
 </dl>
 <dl>
-<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://www.tiktok.com/@davidteathercodes/video/7106686413101468970&quot;</span>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s2">"https://www.tiktok.com/@davidteathercodes/video/7106686413101468970"</span>
 <span class="n">video_info</span> <span class="o">=</span> <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>

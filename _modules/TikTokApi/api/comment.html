@@ -82,7 +82,7 @@
 <div class="viewcode-block" id="Comment">
 <a class="viewcode-back" href="../../../api/comment.html#TikTokApi.api.comment.Comment">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Comment</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A TikTok Comment.</span>
 
 <span class="sd">    Example Usage</span>
@@ -91,20 +91,20 @@
 <span class="sd">            for comment in video.comments:</span>
 <span class="sd">                print(comment.text)</span>
 <span class="sd">                print(comment.as_dict)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">parent</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">TikTokApi</span><span class="p">]</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The id of the comment&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""The id of the comment"""</span>
     <span class="n">author</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">User</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The author of the comment&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""The author of the comment"""</span>
     <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The contents of the comment&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""The contents of the comment"""</span>
     <span class="n">likes_count</span><span class="p">:</span> <span class="nb">int</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The amount of likes of the comment&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""The amount of likes of the comment"""</span>
     <span class="n">as_dict</span><span class="p">:</span> <span class="nb">dict</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The raw data associated with this comment&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""The raw data associated with this comment"""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -113,14 +113,14 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__extract_from_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span><span class="p">[</span><span class="s2">&quot;cid&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span><span class="p">[</span><span class="s2">"cid"</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span><span class="p">[</span><span class="s2">"text"</span><span class="p">]</span>
 
-        <span class="n">usr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">]</span>
+        <span class="n">usr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span><span class="p">[</span><span class="s2">"user"</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">user</span><span class="p">(</span>
-            <span class="n">user_id</span><span class="o">=</span><span class="n">usr</span><span class="p">[</span><span class="s2">&quot;uid&quot;</span><span class="p">],</span> <span class="n">username</span><span class="o">=</span><span class="n">usr</span><span class="p">[</span><span class="s2">&quot;unique_id&quot;</span><span class="p">],</span> <span class="n">sec_uid</span><span class="o">=</span><span class="n">usr</span><span class="p">[</span><span class="s2">&quot;sec_uid&quot;</span><span class="p">]</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">usr</span><span class="p">[</span><span class="s2">"uid"</span><span class="p">],</span> <span class="n">username</span><span class="o">=</span><span class="n">usr</span><span class="p">[</span><span class="s2">"unique_id"</span><span class="p">],</span> <span class="n">sec_uid</span><span class="o">=</span><span class="n">usr</span><span class="p">[</span><span class="s2">"sec_uid"</span><span class="p">]</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">likes_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span><span class="p">[</span><span class="s2">&quot;digg_count&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">likes_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span><span class="p">[</span><span class="s2">"digg_count"</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Comment.replies">
 <a class="viewcode-back" href="../../../api/comment.html#TikTokApi.api.comment.Comment.replies">[docs]</a>
@@ -129,41 +129,41 @@
 
         <span class="k">while</span> <span class="n">found</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
-                <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
-                <span class="s2">&quot;item_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
-                <span class="s2">&quot;comment_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">"count"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+                <span class="s2">"cursor"</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
+                <span class="s2">"item_id"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="s2">"comment_id"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
             <span class="p">}</span>
 
             <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
-                <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://www.tiktok.com/api/comment/list/reply/&quot;</span><span class="p">,</span>
+                <span class="n">url</span><span class="o">=</span><span class="s2">"https://www.tiktok.com/api/comment/list/reply/"</span><span class="p">,</span>
                 <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
-                <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">),</span>
-                <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_index&quot;</span><span class="p">),</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"headers"</span><span class="p">),</span>
+                <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"session_index"</span><span class="p">),</span>
             <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">resp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">InvalidResponseException</span><span class="p">(</span>
-                    <span class="n">resp</span><span class="p">,</span> <span class="s2">&quot;TikTok returned an invalid response.&quot;</span>
+                    <span class="n">resp</span><span class="p">,</span> <span class="s2">"TikTok returned an invalid response."</span>
                 <span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">comment</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;comments&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">for</span> <span class="n">comment</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"comments"</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">comment</span><span class="p">)</span>
                 <span class="n">found</span> <span class="o">+=</span> <span class="mi">1</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;has_more&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"has_more"</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="k">return</span>
 
-            <span class="n">cursor</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cursor&quot;</span><span class="p">)</span></div>
+            <span class="n">cursor</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cursor"</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">id</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;TikTokApi.comment(comment_id=&#39;</span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2">&#39;, text=&#39;</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">&#39;)&quot;</span></div>
+        <span class="nb">id</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"text"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"TikTokApi.comment(comment_id='</span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2">', text='</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">')"</span></div>
 
 </pre></div>
 

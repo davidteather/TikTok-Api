@@ -80,7 +80,7 @@
 <div class="viewcode-block" id="Trending">
 <a class="viewcode-back" href="../../../api/trending.html#TikTokApi.api.trending.Trending">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Trending</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Contains static methods related to trending objects on TikTok.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Contains static methods related to trending objects on TikTok."""</span>
 
     <span class="n">parent</span><span class="p">:</span> <span class="n">TikTokApi</span>
 
@@ -88,7 +88,7 @@
 <a class="viewcode-back" href="../../../api/trending.html#TikTokApi.api.trending.Trending.videos">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">videos</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="n">Video</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns Videos that are trending on TikTok.</span>
 
 <span class="sd">        Args:</span>
@@ -98,38 +98,38 @@
 <span class="sd">            async iterator/generator: Yields TikTokApi.video objects.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            InvalidResponseException: If TikTok returns an invalid response, or one we don&#39;t understand.</span>
+<span class="sd">            InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.</span>
 
 <span class="sd">        Example Usage:</span>
 <span class="sd">            .. code-block:: python</span>
 
 <span class="sd">                async for video in api.trending.videos():</span>
 <span class="sd">                    # do something</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">found</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">found</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;from_page&quot;</span><span class="p">:</span> <span class="s2">&quot;fyp&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="n">count</span><span class="p">,</span>
+                <span class="s2">"from_page"</span><span class="p">:</span> <span class="s2">"fyp"</span><span class="p">,</span>
+                <span class="s2">"count"</span><span class="p">:</span> <span class="n">count</span><span class="p">,</span>
             <span class="p">}</span>
 
             <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Trending</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
-                <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://www.tiktok.com/api/recommend/item_list/&quot;</span><span class="p">,</span>
+                <span class="n">url</span><span class="o">=</span><span class="s2">"https://www.tiktok.com/api/recommend/item_list/"</span><span class="p">,</span>
                 <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
-                <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">),</span>
-                <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_index&quot;</span><span class="p">),</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"headers"</span><span class="p">),</span>
+                <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"session_index"</span><span class="p">),</span>
             <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">resp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">InvalidResponseException</span><span class="p">(</span>
-                    <span class="n">resp</span><span class="p">,</span> <span class="s2">&quot;TikTok returned an invalid response.&quot;</span>
+                    <span class="n">resp</span><span class="p">,</span> <span class="s2">"TikTok returned an invalid response."</span>
                 <span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"itemList"</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="k">yield</span> <span class="n">Trending</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">video</span><span class="p">)</span>
                 <span class="n">found</span> <span class="o">+=</span> <span class="mi">1</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"hasMore"</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="k">return</span></div>
 </div>
 

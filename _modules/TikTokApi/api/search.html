@@ -80,7 +80,7 @@
 <div class="viewcode-block" id="Search">
 <a class="viewcode-back" href="../../../api/search.html#TikTokApi.api.search.Search">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Search</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Contains static methods about searching TikTok for a phrase.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Contains static methods about searching TikTok for a phrase."""</span>
 
     <span class="n">parent</span><span class="p">:</span> <span class="n">TikTokApi</span>
 
@@ -88,7 +88,7 @@
 <a class="viewcode-back" href="../../../api/search.html#TikTokApi.api.search.Search.users">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">users</span><span class="p">(</span><span class="n">search_term</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Searches for users.</span>
 
 <span class="sd">        Note: Your ms_token needs to have done a search before for this to work.</span>
@@ -101,16 +101,16 @@
 <span class="sd">            async iterator/generator: Yields TikTokApi.user objects.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            InvalidResponseException: If TikTok returns an invalid response, or one we don&#39;t understand.</span>
+<span class="sd">            InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.</span>
 
 <span class="sd">        Example Usage:</span>
 <span class="sd">            .. code-block:: python</span>
 
-<span class="sd">                async for user in api.search.users(&#39;david teather&#39;):</span>
+<span class="sd">                async for user in api.search.users('david teather'):</span>
 <span class="sd">                    # do something</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">async</span> <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">Search</span><span class="o">.</span><span class="n">search_type</span><span class="p">(</span>
-            <span class="n">search_term</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="n">cursor</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="n">search_term</span><span class="p">,</span> <span class="s2">"user"</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="n">cursor</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">):</span>
             <span class="k">yield</span> <span class="n">user</span></div>
 
@@ -121,8 +121,8 @@
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search_type</span><span class="p">(</span>
         <span class="n">search_term</span><span class="p">,</span> <span class="n">obj_type</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Searches for a specific type of object. But you shouldn&#39;t use this directly, use the other methods.</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Searches for a specific type of object. But you shouldn't use this directly, use the other methods.</span>
 
 <span class="sd">        Note: Your ms_token needs to have done a search before for this to work.</span>
 <span class="sd">        Note: Currently only supports searching for users, other endpoints require auth.</span>
@@ -137,58 +137,58 @@
 <span class="sd">            async iterator/generator: Yields TikTokApi.video objects.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            InvalidResponseException: If TikTok returns an invalid response, or one we don&#39;t understand.</span>
+<span class="sd">            InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.</span>
 
 <span class="sd">        Example Usage:</span>
 <span class="sd">            .. code-block:: python</span>
 
-<span class="sd">                async for user in api.search.search_type(&#39;david teather&#39;, &#39;user&#39;):</span>
+<span class="sd">                async for user in api.search.search_type('david teather', 'user'):</span>
 <span class="sd">                    # do something</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">found</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">search_id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">search_id</span> <span class="o">=</span> <span class="s2">""</span>
         <span class="k">while</span> <span class="n">found</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;keyword&quot;</span><span class="p">:</span> <span class="n">search_term</span><span class="p">,</span>
-                <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
-                <span class="s2">&quot;from_page&quot;</span><span class="p">:</span> <span class="s2">&quot;search&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;web_search_code&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;{&quot;tiktok&quot;:{&quot;client_params_x&quot;:{&quot;search_engine&quot;:{&quot;ies_mt_user_live_video_card_use_libra&quot;:1,&quot;mt_search_general_user_live_card&quot;:1}},&quot;search_server&quot;:</span><span class="si">{}</span><span class="s2">}}&quot;&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">"keyword"</span><span class="p">:</span> <span class="n">search_term</span><span class="p">,</span>
+                <span class="s2">"cursor"</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
+                <span class="s2">"from_page"</span><span class="p">:</span> <span class="s2">"search"</span><span class="p">,</span>
+                <span class="s2">"web_search_code"</span><span class="p">:</span> <span class="s2">"""{"tiktok":{"client_params_x":{"search_engine":{"ies_mt_user_live_video_card_use_libra":1,"mt_search_general_user_live_card":1}},"search_server":</span><span class="si">{}</span><span class="s2">}}"""</span><span class="p">,</span>
             <span class="p">}</span>
 
-            <span class="k">if</span> <span class="n">search_id</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;search_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">search_id</span>
+            <span class="k">if</span> <span class="n">search_id</span> <span class="o">!=</span> <span class="s2">""</span><span class="p">:</span>
+                <span class="n">params</span><span class="p">[</span><span class="s2">"search_id"</span><span class="p">]</span> <span class="o">=</span> <span class="n">search_id</span>
 
             <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Search</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
-                <span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;https://www.tiktok.com/api/search/</span><span class="si">{</span><span class="n">obj_type</span><span class="si">}</span><span class="s2">/full/&quot;</span><span class="p">,</span>
+                <span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s2">"https://www.tiktok.com/api/search/</span><span class="si">{</span><span class="n">obj_type</span><span class="si">}</span><span class="s2">/full/"</span><span class="p">,</span>
                 <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
-                <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">),</span>
-                <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_index&quot;</span><span class="p">),</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"headers"</span><span class="p">),</span>
+                <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"session_index"</span><span class="p">),</span>
             <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">resp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">InvalidResponseException</span><span class="p">(</span>
-                    <span class="n">resp</span><span class="p">,</span> <span class="s2">&quot;TikTok returned an invalid response.&quot;</span>
+                    <span class="n">resp</span><span class="p">,</span> <span class="s2">"TikTok returned an invalid response."</span>
                 <span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">obj_type</span> <span class="o">==</span> <span class="s2">&quot;user&quot;</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_list&quot;</span><span class="p">,</span> <span class="p">[]):</span>
-                    <span class="n">sec_uid</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_info&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sec_uid&quot;</span><span class="p">)</span>
-                    <span class="n">uid</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_info&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">)</span>
-                    <span class="n">username</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_info&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unique_id&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">obj_type</span> <span class="o">==</span> <span class="s2">"user"</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"user_list"</span><span class="p">,</span> <span class="p">[]):</span>
+                    <span class="n">sec_uid</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"user_info"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sec_uid"</span><span class="p">)</span>
+                    <span class="n">uid</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"user_info"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"user_id"</span><span class="p">)</span>
+                    <span class="n">username</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"user_info"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"unique_id"</span><span class="p">)</span>
                     <span class="k">yield</span> <span class="n">Search</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">user</span><span class="p">(</span>
                         <span class="n">sec_uid</span><span class="o">=</span><span class="n">sec_uid</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">uid</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="n">username</span>
                     <span class="p">)</span>
                     <span class="n">found</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">obj_type</span> <span class="o">==</span> <span class="s2">&quot;item&quot;</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;item_list&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">elif</span> <span class="n">obj_type</span> <span class="o">==</span> <span class="s2">"item"</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"item_list"</span><span class="p">,</span> <span class="p">[]):</span>
                     <span class="k">yield</span> <span class="n">Search</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">video</span><span class="p">)</span>
                     <span class="n">found</span> <span class="o">+=</span> <span class="mi">1</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;has_more&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"has_more"</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="k">return</span>
 
-            <span class="n">cursor</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cursor&quot;</span><span class="p">)</span>
-            <span class="n">search_id</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rid&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+            <span class="n">cursor</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cursor"</span><span class="p">)</span>
+            <span class="n">search_id</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"rid"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

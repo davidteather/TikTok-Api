@@ -126,15 +126,7 @@
         </div>
     </a>
     <br>
-    <a href="https://www.rapidproxy.io/?ref=tiktok" target="_blank">
-        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/rapidproxy.png" width="100" alt="RapidProxy API">
-        <b></b>
-        <div>
-         <b>RapidProxy</b> Power your scraping and automation with fast, reliable residential proxies.<br>Get 90M+ residential IPs, 500MB free traffic, non-expiring bandwidth, and pricing from just $0.65/GB with RapidProxy.
-        </div>
-    </a>
-    <br>
-    <a href="https://www.webshare.io/?referral_code=3x5812idzzzp" target="_blank">
+    <a href="https://go.dteather.com/webshare?src=tiktokapi&placement=readme" target="_blank">
         <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/webshare.png" width="100" alt="Webshare Proxies">
         <b></b>
         <div>
@@ -168,7 +160,7 @@
 <section id="getting-started">
 <h3>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h3>
 <p>To get started using this API follow the instructions below.</p>
-<p><strong>Note:</strong> If you want to learn how to web scrape websites check my <a class="reference external" href="https://github.com/davidteather/everything-web-scraping">free and open-source course for learning everything web scraping</a></p>
+<p><strong>Note:</strong> If you want to learn how to web scrape websites check my <a class="reference external" href="https://go.dteather.com/everything-web-scraping?src=tiktokapi&amp;placement=readme">free and open-source course for learning everything web scraping</a></p>
 <section id="how-to-support-the-project">
 <h4>How to Support The Project<a class="headerlink" href="#how-to-support-the-project" title="Link to this heading"></a></h4>
 <ul class="simple">
@@ -204,7 +196,8 @@ docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </sp
 <ul class="simple">
 <li><p><strong>EmptyResponseException</strong> - this means TikTok is blocking the request and detects you’re a bot. This can be a problem with your setup or the library itself</p>
 <ul>
-<li><p>you may need a proxy to successfully scrape TikTok, I’ve made a <a class="reference external" href="https://github.com/davidteather/everything-web-scraping/tree/main/002-proxies">web scraping lesson</a> explaining the differences of “tiers” of proxies, I’ve personally had success with <a class="reference external" href="https://www.webshare.io/?referral_code=3x5812idzzzp">webshare’s residential proxies</a> (affiliate link), but you might have success on their free data center IPs or a cheaper competitor.</p></li>
+<li><p>you may need a proxy to successfully scrape TikTok, I’ve made a <a class="reference external" href="https://go.dteather.com/everything-web-scraping-proxies?src=tiktokapi&amp;placement=readme">web scraping lesson</a> explaining the differences of “tiers” of proxies, I’ve personally had success with <a class="reference external" href="https://go.dteather.com/webshare?src=tiktokapi&amp;placement=readme">webshare’s residential proxies</a> (affiliate link), but you might have success on their free data center IPs or a cheaper competitor.</p></li>
+<li><p>not sure which proxy provider will work for you? This library integrates with my <a class="reference external" href="https://go.dteather.com/proxyproviders?src=tiktokapi&amp;placement=readme">ProxyProviders</a> package, which makes it easy to try out and switch between different proxy providers with a single line via <code class="docutils literal notranslate"><span class="pre">create_sessions(proxy_provider=...)</span></code>. See <a class="reference external" href="https://github.com/davidteather/TikTok-Api/blob/main/examples/proxy_provider_example.py">examples/proxy_provider_example.py</a> for usage.</p></li>
 </ul>
 </li>
 <li><p><strong>Browser Has no Attribute</strong> - make sure you ran <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">playwright</span> <span class="pre">install</span></code>, if your error persists try the <a class="reference external" href="https://github.com/microsoft/playwright-python">playwright-python</a> quickstart guide and diagnose issues from there.</p></li>
@@ -220,16 +213,16 @@ docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </sp
 <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="n">ms_token</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ms_token&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="c1"># get your own ms_token from your cookies on tiktok.com</span>
+<span class="n">ms_token</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ms_token"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="c1"># get your own ms_token from your cookies on tiktok.com</span>
 
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">trending_videos</span><span class="p">():</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">TikTokApi</span><span class="p">()</span> <span class="k">as</span> <span class="n">api</span><span class="p">:</span>
-        <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">create_sessions</span><span class="p">(</span><span class="n">ms_tokens</span><span class="o">=</span><span class="p">[</span><span class="n">ms_token</span><span class="p">],</span> <span class="n">num_sessions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sleep_after</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">browser</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;TIKTOK_BROWSER&quot;</span><span class="p">,</span> <span class="s2">&quot;chromium&quot;</span><span class="p">))</span>
+        <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">create_sessions</span><span class="p">(</span><span class="n">ms_tokens</span><span class="o">=</span><span class="p">[</span><span class="n">ms_token</span><span class="p">],</span> <span class="n">num_sessions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sleep_after</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">browser</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"TIKTOK_BROWSER"</span><span class="p">,</span> <span class="s2">"chromium"</span><span class="p">))</span>
         <span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">trending</span><span class="o">.</span><span class="n">videos</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">video</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">video</span><span class="o">.</span><span class="n">as_dict</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">trending_videos</span><span class="p">())</span>
 </pre></div>
 </div>

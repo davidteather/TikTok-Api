@@ -89,7 +89,7 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A TikTok Hashtag/Challenge.</p>
 <dl>
-<dt>Example Usage</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hashtag</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;funny&#39;</span><span class="p">)</span>
+<dt>Example Usage</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hashtag</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'funny'</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">hashtag</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">video</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
 </pre></div>
@@ -113,7 +113,7 @@
 <span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/TikTokApi/api/hashtag.html#Hashtag.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#TikTokApi.api.hashtag.Hashtag.info" title="Link to this definition"></a></dt>
 <dd><p>Returns all information sent by TikTok related to this hashtag.</p>
 <dl>
-<dt>Example Usage</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hashtag</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;funny&#39;</span><span class="p">)</span>
+<dt>Example Usage</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hashtag</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'funny'</span><span class="p">)</span>
 <span class="n">hashtag_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">hashtag</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -154,7 +154,7 @@
 </dd>
 </dl>
 <dl>
-<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;funny&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
+<dt>Example Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">hashtag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'funny'</span><span class="p">)</span><span class="o">.</span><span class="n">videos</span><span class="p">():</span>
     <span class="c1"># do something</span>
 </pre></div>
 </div>

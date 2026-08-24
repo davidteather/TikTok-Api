@@ -80,78 +80,78 @@
 <div class="viewcode-block" id="Sound">
 <a class="viewcode-back" href="../../../api/sound.html#TikTokApi.api.sound.Sound">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Sound</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A TikTok Sound/Music/Song.</span>
 
 <span class="sd">    Example Usage</span>
 <span class="sd">        .. code-block:: python</span>
 
-<span class="sd">            song = api.song(id=&#39;7016547803243022337&#39;)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">            song = api.song(id='7016547803243022337')</span>
+<span class="sd">    """</span>
 
     <span class="n">parent</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">TikTokApi</span><span class="p">]</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;TikTok&#39;s ID for the sound&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""TikTok's ID for the sound"""</span>
     <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The title of the song.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""The title of the song."""</span>
     <span class="n">author</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The author of the song (if it exists)&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""The author of the song (if it exists)"""</span>
     <span class="n">duration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The duration of the song in seconds.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""The duration of the song in seconds."""</span>
     <span class="n">original</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether the song is original or not.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Whether the song is original or not."""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        You must provide the id of the sound or it will not work.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span> <span class="o">=</span> <span class="n">data</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__extract_from_data</span><span class="p">()</span>
         <span class="k">elif</span> <span class="nb">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;You must provide id parameter.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"You must provide id parameter."</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
 
 <div class="viewcode-block" id="Sound.info">
 <a class="viewcode-back" href="../../../api/sound.html#TikTokApi.api.sound.Sound.info">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns all information sent by TikTok related to this sound.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: The raw data returned by TikTok.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            InvalidResponseException: If TikTok returns an invalid response, or one we don&#39;t understand.</span>
+<span class="sd">            InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.</span>
 
 <span class="sd">        Example Usage:</span>
 <span class="sd">            .. code-block:: python</span>
 
-<span class="sd">                sound_info = await api.sound(id=&#39;7016547803243022337&#39;).info()</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">                sound_info = await api.sound(id='7016547803243022337').info()</span>
+<span class="sd">        """</span>
 
-        <span class="nb">id</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">id</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;You must provide the id when creating this class to use this method.&quot;</span>
+                <span class="s2">"You must provide the id when creating this class to use this method."</span>
             <span class="p">)</span>
 
         <span class="n">url_params</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;msToken&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ms_token&quot;</span><span class="p">),</span>
-            <span class="s2">&quot;musicId&quot;</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span>
+            <span class="s2">"msToken"</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ms_token"</span><span class="p">),</span>
+            <span class="s2">"musicId"</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
-            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://www.tiktok.com/api/music/detail/&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">"https://www.tiktok.com/api/music/detail/"</span><span class="p">,</span>
             <span class="n">params</span><span class="o">=</span><span class="n">url_params</span><span class="p">,</span>
-            <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">),</span>
-            <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_index&quot;</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"headers"</span><span class="p">),</span>
+            <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"session_index"</span><span class="p">),</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">resp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidResponseException</span><span class="p">(</span><span class="n">resp</span><span class="p">,</span> <span class="s2">&quot;TikTok returned an invalid response.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidResponseException</span><span class="p">(</span><span class="n">resp</span><span class="p">,</span> <span class="s2">"TikTok returned an invalid response."</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span> <span class="o">=</span> <span class="n">resp</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__extract_from_data</span><span class="p">()</span>
@@ -161,7 +161,7 @@
 <div class="viewcode-block" id="Sound.videos">
 <a class="viewcode-back" href="../../../api/sound.html#TikTokApi.api.sound.Sound.videos">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">videos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="n">Video</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns Video objects of videos created with this sound.</span>
 
 <span class="sd">        Args:</span>
@@ -172,88 +172,88 @@
 <span class="sd">            async iterator/generator: Yields TikTokApi.video objects.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            InvalidResponseException: If TikTok returns an invalid response, or one we don&#39;t understand.</span>
+<span class="sd">            InvalidResponseException: If TikTok returns an invalid response, or one we don't understand.</span>
 
 <span class="sd">        Example Usage:</span>
 <span class="sd">            .. code-block:: python</span>
 
-<span class="sd">                async for video in api.sound(id=&#39;7016547803243022337&#39;).videos():</span>
+<span class="sd">                async for video in api.sound(id='7016547803243022337').videos():</span>
 <span class="sd">                    # do something</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">id</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;You must provide the id when creating this class to use this method.&quot;</span>
+                <span class="s2">"You must provide the id when creating this class to use this method."</span>
             <span class="p">)</span>
 
         <span class="n">found</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">found</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;musicID&quot;</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span>
-                <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
-                <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
+                <span class="s2">"musicID"</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span>
+                <span class="s2">"count"</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+                <span class="s2">"cursor"</span><span class="p">:</span> <span class="n">cursor</span><span class="p">,</span>
             <span class="p">}</span>
 
             <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
-                <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://www.tiktok.com/api/music/item_list/&quot;</span><span class="p">,</span>
+                <span class="n">url</span><span class="o">=</span><span class="s2">"https://www.tiktok.com/api/music/item_list/"</span><span class="p">,</span>
                 <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
-                <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;headers&quot;</span><span class="p">),</span>
-                <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_index&quot;</span><span class="p">),</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"headers"</span><span class="p">),</span>
+                <span class="n">session_index</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"session_index"</span><span class="p">),</span>
             <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">resp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">InvalidResponseException</span><span class="p">(</span>
-                    <span class="n">resp</span><span class="p">,</span> <span class="s2">&quot;TikTok returned an invalid response.&quot;</span>
+                    <span class="n">resp</span><span class="p">,</span> <span class="s2">"TikTok returned an invalid response."</span>
                 <span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;itemList&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"itemList"</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">video</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">video</span><span class="p">)</span>
                 <span class="n">found</span> <span class="o">+=</span> <span class="mi">1</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hasMore&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"hasMore"</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="k">return</span>
 
-            <span class="n">cursor</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cursor&quot;</span><span class="p">)</span></div>
+            <span class="n">cursor</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cursor"</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__extract_from_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_dict</span>
         <span class="n">keys</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="s2">&quot;musicInfo&quot;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-            <span class="n">author</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;author&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"musicInfo"</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="n">author</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"musicInfo"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"author"</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">author</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">author</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">author</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">author</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;music&quot;</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;music&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;music&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">original</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;music&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;original&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">play_url</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;music&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;playUrl&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cover_large</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;music&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;coverLarge&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;musicInfo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;music&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;duration&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"musicInfo"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"music"</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"musicInfo"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"music"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"musicInfo"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"music"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">original</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"musicInfo"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"music"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"original"</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">play_url</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"musicInfo"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"music"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"playUrl"</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cover_large</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"musicInfo"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"music"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"coverLarge"</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"musicInfo"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"music"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"duration"</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="s2">&quot;music&quot;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;music&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;music&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">original</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;music&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;original&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">play_url</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;music&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;playUrl&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cover_large</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;music&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;coverLarge&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;music&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;duration&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"music"</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"music"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"music"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"music"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"original"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">play_url</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"music"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"playUrl"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cover_large</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"music"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"coverLarge"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"music"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"duration"</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="s2">&quot;stats&quot;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stats&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"stats"</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"stats"</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">Sound</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create Sound with data: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Sound</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to create Sound with data: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;TikTokApi.sound(id=&#39;</span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="w"> </span><span class="kc">None</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;)&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"TikTokApi.sound(id='</span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="kc">None</span><span class="p">)</span><span class="si">}</span><span class="s2">')"</span></div>
 
 </pre></div>
 
