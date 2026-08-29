@@ -116,7 +116,7 @@ class Playlist:
         while found < count:
             params = {
                 "mixId": id,
-                "count": min(count, 30),
+                "count": min(count - found, 30),
                 "cursor": cursor,
             }
 
@@ -135,6 +135,8 @@ class Playlist:
             for video in resp.get("itemList", []):
                 yield self.parent.video(data=video)
                 found += 1
+                if found >= count:
+                    return
 
             if not resp.get("hasMore", False):
                 return
