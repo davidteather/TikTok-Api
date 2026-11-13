@@ -26,11 +26,11 @@
         </div>
     </a>
     <br>
-    <a href="https://tikhub.io/?utm_source=github&utm_medium=readme&utm_campaign=tiktok_api&ref=github_davidteather_tiktokapi" target="_blank">
-        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/tikhub.png" width="100" alt="TikHub API">
+    <a href="https://go.eulerstream.com/tiktok-api-img" target="_blank">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/eulerstream.png" width="100" alt="Euler Stream API">
         <b></b>
         <div>
-         <b>TikHub API</b> 提供 700+ 个端点，覆盖 14+ 个社交平台的数据抓取与分析，<br>包括视频、用户、评论、店铺、商品与趋势等——一站式搞定。
+         <b>Euler Stream</b> 是面向<b>企业与代理机构</b>的 #1 TikTok API 数据提供商，已被 30,000+ 客户信任。我们专注于快速、稳定的 API，并提供世界一流的文档与 SDK。
         </div>
     </a>
     <br>
