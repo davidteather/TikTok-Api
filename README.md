@@ -20,9 +20,10 @@ These sponsors have paid to be placed here or are my own affiliate links which I
     </a>
 </div>
 
+<br/>
+
 <div align="center">
     <a href="https://www.ensembledata.com/?utm_source=github&utm_medium=githubpage&utm_campaign=david_thea_github&utm_id=david_thea_github" target="_blank">
-        <br/>
         <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/EnsembleData.png" width="100" alt="Ensemble Data">
         <br/>
         <div>
@@ -31,26 +32,32 @@ These sponsors have paid to be placed here or are my own affiliate links which I
     </a>
 </div>
 
-<div align="center">
 <br/>
-    
-[![Euler Stream API](https://web.cdn.eulerstream.com/ads/david-teather-gh-ad.gif?v=2)](https://go.eulerstream.com/tiktok-api-img)
-&nbsp;<b></b><br/>
-<a href="https://go.eulerstream.com/tiktok-api" target="_blank">
-    <b>Euler Stream</b> is the #1 provider of TikTok API data for <b>Enterprises & Agencies</b>, trusted by 30,000+ customers. Our focus is on quick, stable APIs with world-class documentation & SDKs.
-</a>
+
+<div align="center">
+
+[![Euler Stream API](https://web.cdn.eulerstream.com/ads/david-teather-gh-ad.gif?v=2)](https://go.eulerstream.com/tiktok-api-img) 
+
 </div>
 
 <div align="center">
-    <a href="https://www.webshare.io/?referral_code=3x5812idzzzp" target="_blank">
-        <br/>
+    <a href="https://go.eulerstream.com/tiktok-api" target="_blank"> 
+        <b>Euler Stream</b> is the #1 provider of TikTok API data for <b>Enterprises & Agencies</b>, trusted by 30,000+ customers. Our focus is on quick, stable APIs with world-class documentation & SDKs.
+    </a>
+</div>
+
+<br/>
+<div align="center">
+<a href="https://www.webshare.io/?referral_code=3x5812idzzzp" target="_blank">
         <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/webshare.png" width="100" alt="Webshare Proxies">
         <b></b>
         <div>
          <b>Cheap, Reliable Proxies: </b> Supercharge your web scraping with fast, reliable proxies. Try 10 free datacenter proxies today!
         </div>
     </a>
-</div>
+</div> 
+
+
 
 ## Table of Contents
 
