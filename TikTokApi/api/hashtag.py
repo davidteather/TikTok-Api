@@ -111,7 +111,7 @@ class Hashtag:
         while found < count:
             params = {
                 "challengeID": self.id,
-                "count": 30,
+                "count": min(count - found, 30),
                 "cursor": cursor,
             }
 
@@ -130,6 +130,8 @@ class Hashtag:
             for video in resp.get("itemList", []):
                 yield self.parent.video(data=video)
                 found += 1
+                if found >= count:
+                    return
 
             if not resp.get("hasMore", False):
                 return
