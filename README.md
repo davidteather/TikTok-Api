@@ -27,10 +27,10 @@ These sponsors have paid to be placed here or are my own affiliate links which I
     </a>
     <br>
     <a href="https://go.eulerstream.com/tiktok-api-img" target="_blank">
-        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/eulerstream.gif" width="100" alt="Euler Stream API">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/eulerstream.png" width="100" alt="Euler Stream API">
         <b></b>
         <div>
-         <b>Euler Stream</b> is the #1 provider of TikTok API data for <b>Enterprises & Agencies</b>, trusted by 30,000+ customers.<br>Our focus is on quick, stable APIs with world-class documentation & SDKs.
+         <b>Euler Stream</b> is the #1 provider of TikTok API data for <b>Enterprises & Agencies</b>, trusted by 30,000+ customers. Our focus is on quick, stable APIs with world-class documentation & SDKs.
         </div>
     </a>
     <br>
