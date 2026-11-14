@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setuptools.setup(
     name="TikTokApi",
     packages=setuptools.find_packages(),
-    version="7.3.4",
+    version="7.3.5",
     license="MIT",
     description="The Unofficial TikTok API Wrapper in Python 3.",
     author="David Teather",
@@ -22,7 +22,7 @@ setuptools.setup(
         "requests>=2.31.0,<3.0",
         "playwright>=1.36.0,<2.0",
         "httpx>=0.27.0,<1.0",
-        "proxyproviders>=0.2.1,<0.3.0",
+        "proxyproviders>=0.2.1,<1.0.0",
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
