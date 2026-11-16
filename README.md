@@ -1,5 +1,27 @@
 # Unofficial TikTok API in Python
 
+## Video and photo-post media
+
+`Video.info()` supports both `/video/` and `/photo/` URLs. After loading the
+post, `video.media_type` is either `"video"` or `"slideshow"`, and
+`video.is_slideshow` can be used as a convenience check.
+
+Photo posts expose their original images in display order through
+`video.image_urls`. Use `await video.image_bytes(index)` for one image or
+`await video.images_bytes()` for the complete slideshow. Audio and covers are
+available through `audio_url`, `cover_url`, `audio_bytes()`, and
+`cover_bytes()`. Regular video downloads continue to use `await video.bytes()`.
+
+```python
+post = api.video(url="https://www.tiktok.com/@creator/photo/1234567890")
+await post.info()
+
+if post.is_slideshow:
+    for index, image in enumerate(await post.images_bytes(), 1):
+        with open(f"slide_{index:03d}.jpg", "wb") as output:
+            output.write(image)
+```
+
 This is an unofficial api wrapper for TikTok.com in python. With this api you are able to call most trending and fetch specific user information as well as much more.
 
 [![DOI](https://zenodo.org/badge/188710490.svg)](https://zenodo.org/badge/latestdoi/188710490) [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white&style=flat-square)](https://www.linkedin.com/in/davidteather/) [![Sponsor Me](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub)](https://github.com/sponsors/davidteather) [![GitHub release (latest by date)](https://img.shields.io/github/v/release/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/releases) [![GitHub](https://img.shields.io/github/license/davidteather/TikTok-Api)](https://github.com/davidteather/TikTok-Api/blob/main/LICENSE) [![Downloads](https://pepy.tech/badge/tiktokapi)](https://pypi.org/project/TikTokApi/) ![](https://visitor-badge.laobi.icu/badge?page_id=davidteather.TikTok-Api) [![Support Server](https://img.shields.io/discord/783108952111579166.svg?color=7289da&logo=discord&style=flat-square)](https://discord.gg/yyPhbfma6f)

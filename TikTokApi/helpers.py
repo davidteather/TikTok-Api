@@ -8,13 +8,16 @@ def extract_video_id_from_url(url, headers={}, proxy=None):
     url = requests.head(
         url=url, allow_redirects=True, headers=headers, proxies=proxy
     ).url
-    if "@" in url and "/video/" in url:
-        return url.split("/video/")[1].split("?")[0]
-    else:
-        raise TypeError(
-            "URL format not supported. Below is an example of a supported url.\n"
-            "https://www.tiktok.com/@therock/video/6829267836783971589"
-        )
+    if "@" in url:
+        for post_type in ("video", "photo"):
+            marker = f"/{post_type}/"
+            if marker in url:
+                return url.split(marker, 1)[1].split("?", 1)[0]
+
+    raise TypeError(
+        "URL format not supported. Expected a TikTok /video/ or /photo/ post URL.\n"
+        "https://www.tiktok.com/@therock/video/6829267836783971589"
+    )
 
 
 def random_choice(choices: list):

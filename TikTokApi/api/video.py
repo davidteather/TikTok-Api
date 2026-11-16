@@ -1,12 +1,11 @@
 from __future__ import annotations
 from ..helpers import extract_video_id_from_url, requests_cookie_to_playwright_cookie
-from typing import TYPE_CHECKING, ClassVar, AsyncIterator, Optional
+from typing import TYPE_CHECKING, Any, ClassVar, AsyncIterator, Optional, Union
 from datetime import datetime
 import requests
 from ..exceptions import InvalidResponseException
 import json
 import httpx
-from typing import Union, AsyncIterator
 
 if TYPE_CHECKING:
     from ..tiktok import TikTokApi
@@ -14,6 +13,67 @@ if TYPE_CHECKING:
     from .sound import Sound
     from .hashtag import Hashtag
     from .comment import Comment
+
+
+MediaBytes = Union[bytes, AsyncIterator[bytes]]
+
+
+def _first_media_url(value: Any) -> Optional[str]:
+    """Return the first HTTP URL from TikTok's nested media URL shapes."""
+    if isinstance(value, str) and value.startswith(("http://", "https://")):
+        return value
+    if isinstance(value, (list, tuple)):
+        for item in value:
+            if url := _first_media_url(item):
+                return url
+    if isinstance(value, dict):
+        for key in (
+            "urlList",
+            "UrlList",
+            "url_list",
+            "downloadAddr",
+            "playAddr",
+            "PlayAddr",
+            "url",
+            "Url",
+        ):
+            if url := _first_media_url(value.get(key)):
+                return url
+    return None
+
+
+def _video_info_from_html(html: str, video_id: Optional[str]) -> dict:
+    """Extract a post object from either TikTok page hydration format."""
+    sigi_marker = '<script id="SIGI_STATE" type="application/json">'
+    start = html.find(sigi_marker)
+    if start != -1:
+        start += len(sigi_marker)
+        end = html.find("</script>", start)
+        if end != -1:
+            items = json.loads(html[start:end]).get("ItemModule", {})
+            if video_id and isinstance(items.get(video_id), dict):
+                return items[video_id]
+            for item in items.values():
+                if isinstance(item, dict):
+                    return item
+
+    universal_marker = (
+        '<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__" '
+        'type="application/json">'
+    )
+    start = html.find(universal_marker)
+    if start != -1:
+        start += len(universal_marker)
+        end = html.find("</script>", start)
+        if end != -1:
+            data = json.loads(html[start:end])
+            detail = data.get("__DEFAULT_SCOPE__", {}).get("webapp.video-detail", {})
+            if detail.get("statusCode", 0) == 0:
+                item = detail.get("itemInfo", {}).get("itemStruct")
+                if isinstance(item, dict):
+                    return item
+
+    raise ValueError("TikTok's page did not contain a recognizable post payload")
 
 
 class Video:
@@ -44,6 +104,16 @@ class Video:
     """A List of Hashtags on the Video"""
     as_dict: dict
     """The raw data associated with this Video."""
+    media_type: Optional[str]
+    """Either ``video`` or ``slideshow`` after post data has been loaded."""
+    image_urls: list[str]
+    """Original slideshow image URLs in display order."""
+    video_url: Optional[str]
+    """The preferred direct video URL, or ``None`` for a slideshow."""
+    audio_url: Optional[str]
+    """The direct music/audio URL when TikTok exposes one."""
+    cover_url: Optional[str]
+    """The first slideshow image or preferred video cover URL."""
 
     def __init__(
         self,
@@ -100,74 +170,30 @@ class Video:
         if self.url is None:
             raise TypeError("To call video.info() you need to set the video's url.")
 
-        r = requests.get(self.url, headers=session.headers, proxies=proxy)
+        # TikTok serves hydration data more consistently from /video/ even for
+        # photo posts. Keep self.url untouched, but normalize the request URL.
+        request_url = self.url.replace("/photo/", "/video/", 1)
+        r = requests.get(request_url, headers=session.headers, proxies=proxy)
         if r.status_code != 200:
             raise InvalidResponseException(
                 r.text, "TikTok returned an invalid response.", error_code=r.status_code
             )
 
-        # Try SIGI_STATE first
-        # extract tag <script id="SIGI_STATE" type="application/json">{..}</script>
-        # extract json in the middle
-
-        start = r.text.find('<script id="SIGI_STATE" type="application/json">')
-        if start != -1:
-            start += len('<script id="SIGI_STATE" type="application/json">')
-            end = r.text.find("</script>", start)
-
-            if end == -1:
-                raise InvalidResponseException(
-                    r.text,
-                    "TikTok returned an invalid response.",
-                    error_code=r.status_code,
-                )
-
-            data = json.loads(r.text[start:end])
-            video_info = data["ItemModule"][self.id]
-        else:
-            # Try __UNIVERSAL_DATA_FOR_REHYDRATION__ next
-
-            # extract tag <script id="__UNIVERSAL_DATA_FOR_REHYDRATION__" type="application/json">{..}</script>
-            # extract json in the middle
-
-            start = r.text.find(
-                '<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__" type="application/json">'
-            )
-            if start == -1:
-                raise InvalidResponseException(
-                    r.text,
-                    "TikTok returned an invalid response.",
-                    error_code=r.status_code,
-                )
-
-            start += len(
-                '<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__" type="application/json">'
-            )
-            end = r.text.find("</script>", start)
-
-            if end == -1:
-                raise InvalidResponseException(
-                    r.text,
-                    "TikTok returned an invalid response.",
-                    error_code=r.status_code,
-                )
-
-            data = json.loads(r.text[start:end])
-            default_scope = data.get("__DEFAULT_SCOPE__", {})
-            video_detail = default_scope.get("webapp.video-detail", {})
-            if video_detail.get("statusCode", 0) != 0:  # assume 0 if not present
+        try:
+            video_info = _video_info_from_html(r.text, self.id)
+        except (ValueError, KeyError, json.JSONDecodeError):
+            # A browser-rendered retry handles TikTok's occasional JS challenge
+            # without involving application-specific extractor code.
+            try:
+                await session.page.goto(request_url, wait_until="domcontentloaded")
+                await session.page.wait_for_timeout(1500)
+                video_info = _video_info_from_html(await session.page.content(), self.id)
+            except Exception as exc:
                 raise InvalidResponseException(
                     r.text,
                     "TikTok returned an invalid response structure.",
                     error_code=r.status_code,
-                )
-            video_info = video_detail.get("itemInfo", {}).get("itemStruct")
-            if video_info is None:
-                raise InvalidResponseException(
-                    r.text,
-                    "TikTok returned an invalid response structure.",
-                    error_code=r.status_code,
-                )
+                ) from exc
 
         self.as_dict = video_info
         self.__extract_from_data()
@@ -179,51 +205,128 @@ class Video:
 
     async def bytes(
         self, stream: bool = False, **kwargs
-    ) -> Union[bytes, AsyncIterator[bytes]]:
+    ) -> MediaBytes:
         """
         Returns the bytes of a TikTok Video.
-
-        TODO:
-            Not implemented yet.
 
         Example Usage:
             .. code-block:: python
 
-                video_bytes = await api.video(id='7041997751718137094').bytes()
+                video = api.video(
+                    url='https://www.tiktok.com/@creator/video/7041997751718137094'
+                )
+                video_bytes = await video.bytes()
 
                 # Saving The Video
                 with open('saved_video.mp4', 'wb') as output:
                     output.write(video_bytes)
 
                 # Streaming (if stream=True)
-                async for chunk in api.video(id='7041997751718137094').bytes(stream=True):
+                stream = await video.bytes(stream=True)
+                async for chunk in stream:
                     # Process or upload chunk
         """
-        i, session = self.parent._get_session(**kwargs)        
-        video_data = self.as_dict.get("video", {})
-        downloadAddr = video_data.get("downloadAddr") or video_data.get("playAddr")
+        await self._ensure_info(**kwargs)
+        if self.is_slideshow:
+            raise TypeError(
+                "This post is a slideshow. Use image_bytes() or images_bytes() instead."
+            )
+        if not self.video_url:
+            raise InvalidResponseException(
+                self.as_dict, "TikTok did not expose a downloadable video URL."
+            )
+        return await self._download_media(self.video_url, stream=stream, **kwargs)
 
+    @property
+    def is_slideshow(self) -> bool:
+        """Whether the loaded post contains a TikTok photo slideshow."""
+        return bool(getattr(self, "image_urls", []))
+
+    @property
+    def image_count(self) -> int:
+        """Number of images in the loaded slideshow."""
+        return len(getattr(self, "image_urls", []))
+
+    async def image_bytes(
+        self, index: int, stream: bool = False, **kwargs
+    ) -> MediaBytes:
+        """Return or stream one original slideshow image by zero-based index."""
+        await self._ensure_info(**kwargs)
+        if not self.is_slideshow:
+            raise TypeError("This post is not a slideshow.")
+        if not 0 <= index < len(self.image_urls):
+            raise IndexError(
+                f"Image index {index} is out of range for {len(self.image_urls)} images."
+            )
+        return await self._download_media(self.image_urls[index], stream=stream, **kwargs)
+
+    async def images_bytes(self, **kwargs) -> list[bytes]:
+        """Download every original slideshow image in display order."""
+        await self._ensure_info(**kwargs)
+        if not self.is_slideshow:
+            raise TypeError("This post is not a slideshow.")
+        output = []
+        for image_url in self.image_urls:
+            body = await self._download_media(image_url, stream=False, **kwargs)
+            output.append(body)
+        return output
+
+    async def audio_bytes(
+        self, stream: bool = False, **kwargs
+    ) -> MediaBytes:
+        """Return or stream the post's audio track."""
+        await self._ensure_info(**kwargs)
+        if not self.audio_url:
+            raise InvalidResponseException(
+                self.as_dict, "TikTok did not expose a downloadable audio URL."
+            )
+        return await self._download_media(self.audio_url, stream=stream, **kwargs)
+
+    async def cover_bytes(
+        self, stream: bool = False, **kwargs
+    ) -> MediaBytes:
+        """Return or stream the post's preferred cover image."""
+        await self._ensure_info(**kwargs)
+        if not self.cover_url:
+            raise InvalidResponseException(
+                self.as_dict, "TikTok did not expose a cover image URL."
+            )
+        return await self._download_media(self.cover_url, stream=stream, **kwargs)
+
+    async def _ensure_info(self, **kwargs) -> None:
+        if not hasattr(self, "as_dict"):
+            await self.info(**kwargs)
+
+    async def _download_media(
+        self, url: str, stream: bool = False, **kwargs
+    ) -> MediaBytes:
+        _, session = self.parent._get_session(**kwargs)
         cookies = await self.parent.get_session_cookies(session)
-
-        h = session.headers
-        h["range"] = "bytes=0-"
-        h["accept-encoding"] = "identity;q=1, *;q=0"
-        h["referer"] = "https://www.tiktok.com/"
+        headers = dict(session.headers)
+        headers.update(
+            {
+                "range": "bytes=0-",
+                "accept-encoding": "identity;q=1, *;q=0",
+                "referer": "https://www.tiktok.com/",
+            }
+        )
 
         if stream:
-
             async def stream_bytes():
-                async with httpx.AsyncClient() as client:
+                async with httpx.AsyncClient(follow_redirects=True, timeout=60) as client:
                     async with client.stream(
-                        "GET", downloadAddr, headers=h, cookies=cookies
+                        "GET", url, headers=headers, cookies=cookies
                     ) as response:
+                        response.raise_for_status()
                         async for chunk in response.aiter_bytes():
                             yield chunk
 
             return stream_bytes()
-        else:
-            resp = requests.get(downloadAddr, headers=h, cookies=cookies)
-            return resp.content
+
+        async with httpx.AsyncClient(follow_redirects=True, timeout=60) as client:
+            response = await client.get(url, headers=headers, cookies=cookies)
+            response.raise_for_status()
+            return response.content
 
     def __extract_from_data(self) -> None:
         data = self.as_dict
@@ -250,10 +353,78 @@ class Video:
             self.parent.hashtag(data=hashtag) for hashtag in data.get("challenges", [])
         ]
 
+        self.image_urls = self._extract_image_urls(data)
+        self.media_type = "slideshow" if self.image_urls else "video"
+        self.video_url = None if self.image_urls else self._extract_video_url(data)
+        self.audio_url = self._extract_audio_url(data)
+        self.cover_url = self.image_urls[0] if self.image_urls else self._extract_cover_url(data)
+
         if getattr(self, "id", None) is None:
             Video.parent.logger.error(
                 f"Failed to create Video with data: {data}\nwhich has keys {data.keys()}"
             )
+
+    @staticmethod
+    def _extract_image_urls(data: dict) -> list[str]:
+        image_post = data.get("imagePost") or data.get("image_post") or {}
+        urls = []
+        for image in image_post.get("images", []):
+            if not isinstance(image, dict):
+                continue
+            for key in (
+                "imageURL",
+                "imageUrl",
+                "displayImage",
+                "thumbnail",
+                "ownerWatermarkImage",
+            ):
+                if url := _first_media_url(image.get(key)):
+                    if url not in urls:
+                        urls.append(url)
+                    break
+        return urls
+
+    @staticmethod
+    def _extract_video_url(data: dict) -> Optional[str]:
+        video = data.get("video") or {}
+        ranked_urls = []
+        bitrate_info = video.get("bitrateInfo") or []
+        if isinstance(bitrate_info, dict):
+            bitrate_info = [bitrate_info]
+        for item in bitrate_info:
+            if not isinstance(item, dict):
+                continue
+            address = item.get("PlayAddr") or item.get("playAddr") or {}
+            width = address.get("Width") or address.get("width") or 0
+            height = address.get("Height") or address.get("height") or 0
+            try:
+                quality = int(width) * int(height)
+            except (TypeError, ValueError):
+                quality = 0
+            if url := _first_media_url(address):
+                ranked_urls.append((quality, url))
+        if ranked_urls:
+            return max(ranked_urls, key=lambda item: item[0])[1]
+        for key in ("playAddr", "downloadAddr"):
+            if url := _first_media_url(video.get(key)):
+                return url
+        return None
+
+    @staticmethod
+    def _extract_audio_url(data: dict) -> Optional[str]:
+        music = data.get("music") or {}
+        for key in ("playUrl", "play_url", "audioURL", "audioUrl"):
+            if url := _first_media_url(music.get(key)):
+                return url
+        return None
+
+    @staticmethod
+    def _extract_cover_url(data: dict) -> Optional[str]:
+        video = data.get("video") or {}
+        for key in ("cover", "originCover", "dynamicCover"):
+            if url := _first_media_url(video.get(key)):
+                return url
+        return None
 
     async def comments(self, count=20, cursor=0, **kwargs) -> AsyncIterator[Comment]:
         """
