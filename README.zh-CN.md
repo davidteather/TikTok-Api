@@ -34,6 +34,14 @@
         </div>
     </a>
     <br>
+    <a href="https://www.importly.io/?utm_source=tiktok-api&utm_medium=sponsorship&utm_campaign=library-readme&utm_content=zh-cn" target="_blank">
+        <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/importly.png" width="100" alt="Importly">
+        <b></b>
+        <div>
+         <b>在服务器上被拦截？</b> Importly 通过一个 API，从 TikTok、YouTube 等 1,000+ 个网站下载视频、字幕文本和元数据。免费试用。
+        </div>
+    </a>
+    <br>
     <a href="https://go.dteather.com/webshare?src=tiktokapi&placement=readme-cn" target="_blank">
         <img src="https://raw.githubusercontent.com/davidteather/TikTok-Api/main/imgs/webshare.png" width="100" alt="Webshare Proxies">
         <b></b>
